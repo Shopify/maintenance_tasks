@@ -1,0 +1,13 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  task_name: MyString
+  executions: MyText
+  tick_count: 1
+  tick_total: 1
+
+two:
+  task_name: MyString
+  executions: MyText
+  tick_count: 1
+  tick_total: 1
