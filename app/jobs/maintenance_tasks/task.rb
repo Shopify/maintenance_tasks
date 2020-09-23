@@ -2,7 +2,7 @@
 require 'job-iteration'
 
 module MaintenanceTasks
-  class ApplicationJob < ActiveJob::Base
+  class Task < ActiveJob::Base
     include JobIteration::Iteration
   end
 end
