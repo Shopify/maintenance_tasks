@@ -3,3 +3,8 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 2.7
+
+Style/FrozenStringLiteralComment:
+  Enabled: true
+  Exclude:
+    - test/dummy/db/schema.rb
