@@ -1,0 +1,21 @@
+name: Ruby
+
+on: [push, pull_request]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Ruby 2.7
+      uses: actions/setup-ruby@v1.1.1
+      with:
+        ruby-version: 2.7
+    - name: Install dependencies
+      run: gem install bundler && bundle install --jobs 4 --retry 3
+    - name: Ruby Tests
+      run: bundle exec rake test
+    - name: Ruby Lint
+      run: bundle exec rubocop
