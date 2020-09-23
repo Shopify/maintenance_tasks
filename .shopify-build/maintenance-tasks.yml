@@ -1,9 +1,20 @@
 containers:
   default:
-    docker: circleci/ruby:2.6.5-node-browsers
+    docker: circleci/ruby:2.7.1
 
 steps:
-- label: Tests
-  timeout: 5m
-  run:
-  - echo "Hello World"
+  - label: 'Prepare dependencies'
+    run:
+      - bundle: ~
+    timeout: 10m
+  - wait
+  - label: ":ruby: Ruby Tests"
+    timeout: 10m
+    run:
+      - bundle: ~
+      - bundle exec rake test
+  - label: ":rubocop: Ruby Lint"
+    timeout: 5m
+    run:
+      - bundle: ~
+      - bundle exec rubocop
