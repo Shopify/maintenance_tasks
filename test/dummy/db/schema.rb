@@ -10,12 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_09_22_174623) do
+ActiveRecord::Schema.define(version: 2020_09_23_173403) do
   create_table "maintenance_tasks_runs", force: :cascade do |t|
     t.string("task_name", null: false)
     t.text("executions")
     t.integer("tick_count", default: 0, null: false)
     t.integer("tick_total")
+    t.datetime("created_at", precision: 6, null: false)
+    t.datetime("updated_at", precision: 6, null: false)
+  end
+
+  create_table "posts", force: :cascade do |t|
+    t.string("title")
+    t.string("content")
     t.datetime("created_at", precision: 6, null: false)
     t.datetime("updated_at", precision: 6, null: false)
   end
