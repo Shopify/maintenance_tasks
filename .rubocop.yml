@@ -12,6 +12,16 @@ Bundler/OrderedGems:
 Layout/LineLength:
   Max: 80
 
+Style/Documentation:
+  Include:
+    - app/**/*.rb
+    - lib/**/*.rb
+
+Style/DocumentationMethod:
+  Include:
+    - app/**/*.rb
+    - lib/**/*.rb
+
 Style/StringLiterals:
   EnforcedStyle: single_quotes
 

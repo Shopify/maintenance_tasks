@@ -9,15 +9,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Set up Ruby 2.7
+    - name: Set up Ruby
       uses: actions/setup-ruby@v1.1.1
       with:
         ruby-version: 2.7
     - name: Install dependencies
       run: gem install bundler && bundle install --jobs 4 --retry 3
-    - name: Set up db schema
-      run: RAILS_ENV=test bundle exec rake db:create db:schema:load
+    - name: Set up database
+      run: bundle exec rails db:setup
     - name: Ruby Tests
-      run: bundle exec rake test
-    - name: Ruby Lint
+      run: bundle exec rails test
+    - name: RuboCop
       run: bundle exec rubocop

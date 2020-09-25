@@ -1,0 +1,4 @@
+--no-cache
+--fail-on-warning
+app/**/*.rb
+lib/**/*.rb
