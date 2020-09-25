@@ -3,8 +3,17 @@ inherit_gem:
 
 AllCops:
   TargetRubyVersion: 2.7
-
-Style/FrozenStringLiteralComment:
-  Enabled: true
   Exclude:
     - test/dummy/db/schema.rb
+
+Bundler/OrderedGems:
+  Enabled: true
+
+Style/StringLiterals:
+  EnforcedStyle: single_quotes
+
+Style/SymbolArray:
+  EnforcedStyle: brackets
+
+Style/WordArray:
+  EnforcedStyle: brackets
