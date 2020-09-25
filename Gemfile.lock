@@ -2,7 +2,7 @@ PATH
   remote: .
   specs:
     maintenance_tasks (0.1.0)
-      job-iteration
+      job-iteration (~> 1.1.8)
       rails (~> 6.0.3)
 
 GEM

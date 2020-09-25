@@ -4,7 +4,7 @@ require_relative 'boot'
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
-require "maintenance_tasks"
+require 'maintenance_tasks'
 
 module Dummy
   class Application < Rails::Application
