@@ -9,6 +9,9 @@ AllCops:
 Bundler/OrderedGems:
   Enabled: true
 
+Layout/LineLength:
+  Max: 80
+
 Style/StringLiterals:
   EnforcedStyle: single_quotes
 
