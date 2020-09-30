@@ -6,3 +6,4 @@ gemspec
 
 gem 'rubocop-shopify'
 gem 'sqlite3'
+gem 'yard'
