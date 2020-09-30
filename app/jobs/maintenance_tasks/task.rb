@@ -8,6 +8,14 @@ module MaintenanceTasks
     extend ActiveSupport::DescendantsTracker
 
     class << self
+      # Given the name of a Task, returns the Task subclass. Returns nil if
+      # there's no task with that name.
+      def named(name)
+        name.constantize
+      rescue NameError
+        nil
+      end
+
       # Returns a list of classes that inherit from the Task superclass.
       #
       # @return [Array<Class>] the list of classes.

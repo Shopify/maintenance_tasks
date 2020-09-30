@@ -10,5 +10,17 @@ module MaintenanceTasks
     def index
       @available_tasks = Task.descendants
     end
+
+    # POST /maintenance_tasks/runs
+    #
+    # Takes a name parameter which is the name of the MaintenanceTask to run.
+    def create
+      task_name = params.require(:name)
+      if Run.enqueue_task_named(task_name)
+        redirect_to(root_path, notice: "Task #{task_name} enqueued.")
+      else
+        redirect_to(root_path, notice: "Task #{task_name} does not exist.")
+      end
+    end
   end
 end

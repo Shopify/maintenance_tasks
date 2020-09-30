@@ -20,5 +20,12 @@ module MaintenanceTasks
     ]
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
+
+    # Given the name of a task, creates a Run for it and enqueues the job.
+    def self.enqueue_task_named(task_name)
+      task = Task.named(task_name)
+      return unless task
+      task.perform_later
+    end
   end
 end
