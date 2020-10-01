@@ -6,7 +6,7 @@ module MaintenanceTasks
   # It makes data about available, enqueued, performing, and completed
   # tasks accessible to the views so it can be displayed in the UI.
   class RunsController < ApplicationController
-    # Renders the /maintenance_tasks page, displaying available tasks to users
+    # Renders the /maintenance_tasks page, displaying available tasks to users.
     def index
       @available_tasks = Task.descendants
     end

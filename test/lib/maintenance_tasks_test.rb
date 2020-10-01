@@ -7,11 +7,13 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
   end
 
   test '.tasks_module can be set' do
+    previous_task_module = MaintenanceTasks.tasks_module.name
+
     Object.const_set('Task', Module.new {})
     MaintenanceTasks.tasks_module = 'Task'
     assert_equal(Task, MaintenanceTasks.tasks_module)
   ensure
-    MaintenanceTasks.tasks_module = nil
+    MaintenanceTasks.tasks_module = previous_task_module
     Object.send(:remove_const, :Task)
   end
 end
