@@ -1,4 +1,5 @@
 .bundle/
+.byebug_history
 .yardoc/
 doc/
 log/*.log
