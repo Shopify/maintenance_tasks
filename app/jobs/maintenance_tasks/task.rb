@@ -8,6 +8,9 @@ module MaintenanceTasks
     extend ActiveSupport::DescendantsTracker
 
     class << self
+      # Returns list of objects that inherit from MaintenanceTasks::Task
+      # @return [Array<Class>] the list of class names for classes that
+      # inherit from MaintenanceTasks::Task.
       def descendants
         load_constants
         super
