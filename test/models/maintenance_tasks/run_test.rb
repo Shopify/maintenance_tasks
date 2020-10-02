@@ -5,6 +5,12 @@ module MaintenanceTasks
   class RunTest < ActiveSupport::TestCase
     include ActiveJob::TestHelper
 
+    test '.enqueue_task_named persists a run' do
+      assert_changes -> { Run.count } do
+        Run.enqueue_task_named('Maintenance::UpdatePostsTask')
+      end
+    end
+
     test '.enqueue_task_named enqueues the task' do
       assert_enqueued_with job: Maintenance::UpdatePostsTask do
         assert_not_nil Run.enqueue_task_named('Maintenance::UpdatePostsTask')
