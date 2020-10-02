@@ -5,6 +5,7 @@ AllCops:
   TargetRubyVersion: 2.7
   Exclude:
     - test/dummy/db/schema.rb
+    - vendor/**/*
 
 Bundler/OrderedGems:
   Enabled: true
