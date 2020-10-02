@@ -46,11 +46,9 @@ module MaintenanceTasks
       FileUtils.copy_entry(Rails.root, SAMPLE_APP_PATH)
 
       Dir.chdir(SAMPLE_APP_PATH) do
+        FileUtils.rm_r('db')
         FileUtils.rm('config/initializers/maintenance_tasks.rb')
         FileUtils.rm('app/jobs/maintenance/application_task.rb')
-
-        FileUtils.rm('db/schema.rb')
-        %x(rails db:drop)
       end
     end
   end

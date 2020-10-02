@@ -3,6 +3,10 @@
 # Custom configuration for the tasks namespace can be defined here, ie.
 # MaintenanceTasks.tasks_module = 'Maintenance'
 <% unless Rails.autoloaders.zeitwerk_enabled? -%>
+
+# Your application does not use Zeitwerk, so task dependencies must be
+# manually required. This block can be removed if zeitwerk mode is enabled.
+# For more information on Zeitwerk, see https://guides.rubyonrails.org/autoloading_and_reloading_constants.html
 Rails.application.config.to_prepare do
   Dir["#{Rails.root}/app/jobs/maintenance/*.rb"].each do |file|
     require_dependency(file)
