@@ -20,5 +20,26 @@ module MaintenanceTasks
     ]
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
+
+    validate :task_exists?
+
+    # Enqueues the job after validating and persisting the run.
+    def enqueue
+      if save
+        task_class.perform_later(run: self)
+      end
+    end
+
+    private
+
+    def task_class
+      Task.named(task_name)
+    end
+
+    def task_exists?
+      unless task_class
+        errors.add(:base, "Task #{task_name} does not exist.")
+      end
+    end
   end
 end

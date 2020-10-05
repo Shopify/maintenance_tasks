@@ -6,6 +6,6 @@ class MaintenanceTasksPageTest < ActionDispatch::IntegrationTest
     get maintenance_tasks_path
 
     assert_response :success
-    assert_select('tr', text: 'Maintenance::UpdatePostsTask')
+    assert_select('tr td', text: 'Maintenance::UpdatePostsTask')
   end
 end
