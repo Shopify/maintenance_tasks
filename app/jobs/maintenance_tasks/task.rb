@@ -40,7 +40,7 @@ module MaintenanceTasks
 
     def create_run
       run = arguments.dig(-1, :run)
-      Run.create!(task_name: name, enqueued: true) unless run
+      Run.create!(task_name: name) unless run
     end
   end
 end

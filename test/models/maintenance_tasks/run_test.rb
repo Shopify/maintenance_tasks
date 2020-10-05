@@ -5,9 +5,11 @@ module MaintenanceTasks
   class RunTest < ActiveSupport::TestCase
     include ActiveJob::TestHelper
 
-    test 'enqueues the task on create' do
+    test '#enqueue enqueues the task' do
       assert_enqueued_with job: Maintenance::UpdatePostsTask do
-        Run.create(task_name: 'Maintenance::UpdatePostsTask')
+        run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+        run.enqueue
+        assert_predicate run, :persisted?
       end
     end
 

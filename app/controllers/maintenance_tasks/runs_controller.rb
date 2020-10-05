@@ -17,7 +17,7 @@ module MaintenanceTasks
     def create
       task_name = params.require(:name)
       run = Run.new(task_name: task_name)
-      if run.save
+      if run.enqueue
         redirect_to(root_path, notice: "Task #{task_name} enqueued.")
       else
         redirect_to(root_path, notice: run.errors.full_messages.join(' '))
