@@ -16,10 +16,11 @@ module MaintenanceTasks
     # Takes a name parameter which is the name of the MaintenanceTask to run.
     def create
       task_name = params.require(:name)
-      if Run.enqueue_task_named(task_name)
+      run = Run.new(task_name: task_name)
+      if run.save
         redirect_to(root_path, notice: "Task #{task_name} enqueued.")
       else
-        redirect_to(root_path, notice: "Task #{task_name} does not exist.")
+        redirect_to(root_path, notice: run.errors.full_messages.join(' '))
       end
     end
   end

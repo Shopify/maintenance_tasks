@@ -21,11 +21,26 @@ module MaintenanceTasks
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
-    # Given the name of a task, creates a Run for it and enqueues the job.
-    def self.enqueue_task_named(task_name)
-      task = Task.named(task_name)
-      return unless task
-      task.perform_later
+    # Whether the task has already been enqueued.
+    attr_accessor :enqueued
+
+    validate :task_exists
+    after_commit :enqueue_job
+
+    private
+
+    def enqueue_job
+      task_class.perform_later(run: self) unless enqueued
+    end
+
+    def task_class
+      Task.named(task_name)
+    end
+
+    def task_exists
+      unless task_class
+        errors.add(:base, "Task #{task_name} does not exist.")
+      end
     end
   end
 end

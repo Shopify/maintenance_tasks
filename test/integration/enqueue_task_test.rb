@@ -14,4 +14,12 @@ class EnqueueTaskTest < ActionDispatch::IntegrationTest
     assert_equal '/maintenance_tasks/', path
     assert_equal 'Task Maintenance::UpdatePostsTask enqueued.', flash[:notice]
   end
+
+  test 'enqueuing an invalid task' do
+    post '/maintenance_tasks/runs?name=Maintenance::DoesNotExist'
+    follow_redirect!
+    assert_equal '/maintenance_tasks/', path
+    assert_equal 'Task Maintenance::DoesNotExist does not exist.',
+      flash[:notice]
+  end
 end
