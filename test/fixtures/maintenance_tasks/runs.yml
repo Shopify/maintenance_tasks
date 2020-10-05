@@ -2,12 +2,14 @@
 
 one:
   task_name: MyString
-  executions: MyText
   tick_count: 1
   tick_total: 1
+  job_id: '123abc'
+  status: 'enqueued'
 
 two:
   task_name: MyString
-  executions: MyText
   tick_count: 1
   tick_total: 1
+  job_id: '456xyz'
+  status: 'enqueued'
