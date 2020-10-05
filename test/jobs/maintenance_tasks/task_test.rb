@@ -8,12 +8,12 @@ module MaintenanceTasks
       assert_equal expected_tasks, MaintenanceTasks::Task.descendants
     end
 
-    test '.task_named returns the task based on its name' do
+    test '.named returns the task based on its name' do
       expected_task = Maintenance::UpdatePostsTask
       assert_equal expected_task, Task.named('Maintenance::UpdatePostsTask')
     end
 
-    test ".task_named returns nil if the task doesn't exist" do
+    test ".named returns nil if the task doesn't exist" do
       assert_nil Task.named('Maintenance::DoesNotExist')
     end
 

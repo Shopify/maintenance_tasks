@@ -12,7 +12,7 @@
     <% @available_tasks.each do |task| %>
       <tr>
         <td><%= task %></td>
-        <td><%= button_to "Enqueue", runs_path(name: task.name) %></td>
+        <td><%= link_to 'Enqueue', runs_path(name: task.name) %></td>
       </tr>
     <% end %>
   </tbody>

@@ -2,13 +2,15 @@
 require 'test_helper'
 
 class EnqueueTaskTest < ActionDispatch::IntegrationTest
+  include MaintenanceTasks::Engine.routes.url_helpers
+
   test 'enqueuing a task' do
     get '/maintenance_tasks'
     assert_response :success
     assert_select 'tbody tr td', 'Maintenance::UpdatePostsTask'
 
     assert_enqueued_with job: Maintenance::UpdatePostsTask do
-      post '/maintenance_tasks/runs?name=Maintenance::UpdatePostsTask'
+      post runs_path, params: { name: 'Maintenance::UpdatePostsTask' }
     end
     follow_redirect!
     assert_equal '/maintenance_tasks/', path
