@@ -19,7 +19,7 @@ class EnqueueTaskTest < ActionDispatch::IntegrationTest
     post '/maintenance_tasks/runs?name=Maintenance::DoesNotExist'
     follow_redirect!
     assert_equal '/maintenance_tasks/', path
-    assert_equal 'Task Maintenance::DoesNotExist does not exist.',
-      flash[:notice]
+    expected_error = 'Task Maintenance::DoesNotExist does not exist.'
+    assert_equal expected_error, flash[:notice]
   end
 end

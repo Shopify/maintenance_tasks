@@ -5,22 +5,29 @@ module MaintenanceTasks
   class RunTest < ActiveSupport::TestCase
     include ActiveJob::TestHelper
 
-    test 'a Run can be persisted with a task' do
-      assert_changes -> { Run.count } do
+    test 'can be persisted with a task' do
+      assert_difference -> { Run.count } do
         Run.create(task_name: 'Maintenance::UpdatePostsTask')
       end
     end
 
-    test 'creating a Run enqueues the task' do
+    test 'enqueues the task on create' do
       assert_enqueued_with job: Maintenance::UpdatePostsTask do
-        assert_not_nil Run.create(task_name: 'Maintenance::UpdatePostsTask')
+        Run.create(task_name: 'Maintenance::UpdatePostsTask')
       end
     end
 
-    test "a Run is invalid if the task doesn't exist" do
+    test "invalid if the task doesn't exist" do
       run = Run.new(task_name: 'Maintenance::DoesNotExist')
       refute run.valid?
-      refute_empty run.errors
+      expected_error = 'Task Maintenance::DoesNotExist does not exist.'
+      assert_includes run.errors.full_messages, expected_error
+    end
+
+    test "doesn't enqueue if the task doesn't exist" do
+      assert_no_enqueued_jobs do
+        Run.create(task_name: 'Maintenance::DoesNotExist')
+      end
     end
   end
 end

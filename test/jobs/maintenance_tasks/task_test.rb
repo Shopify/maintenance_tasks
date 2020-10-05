@@ -2,12 +2,19 @@
 require 'test_helper'
 
 module MaintenanceTasks
-  class TaskTest < ActiveSupport::TestCase
-    include ActiveJob::TestHelper
-
+  class TaskTest < ActiveJob::TestCase
     test '.descendants returns list of tasks that inherit from the Task superclass' do
       expected_tasks = [Maintenance::UpdatePostsTask]
       assert_equal expected_tasks, MaintenanceTasks::Task.descendants
+    end
+
+    test '.task_named returns the task based on its name' do
+      expected_task = Maintenance::UpdatePostsTask
+      assert_equal expected_task, Task.named('Maintenance::UpdatePostsTask')
+    end
+
+    test ".task_named returns nil if the task doesn't exist" do
+      assert_nil Task.named('Maintenance::DoesNotExist')
     end
 
     test 'can be enqueued without a Run' do
@@ -17,7 +24,7 @@ module MaintenanceTasks
     end
 
     test 'creates a Run if it has been enqueued without one' do
-      assert_changes -> { Run.count } do
+      assert_difference -> { Run.count } do
         Maintenance::UpdatePostsTask.perform_later
       end
     end

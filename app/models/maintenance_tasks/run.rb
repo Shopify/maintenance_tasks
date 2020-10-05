@@ -24,7 +24,7 @@ module MaintenanceTasks
     # Whether the task has already been enqueued.
     attr_accessor :enqueued
 
-    validate :task_exists
+    validate :task_exists?
     after_commit :enqueue_job
 
     private
@@ -37,7 +37,7 @@ module MaintenanceTasks
       Task.named(task_name)
     end
 
-    def task_exists
+    def task_exists?
       unless task_class
         errors.add(:base, "Task #{task_name} does not exist.")
       end
