@@ -15,12 +15,13 @@ module MaintenanceTasks
     #
     # Creates a new Run with the given parameters.
     def create
-      run = Run.new(run_params)
-      if run.save
-        run.task_class.perform_later(run: run)
-        redirect_to(root_path, notice: "Task #{run.task_name} enqueued.")
+      task_name = run_params[:task_name]
+      task = Task.named(task_name)
+      if task
+        task.perform_later
+        redirect_to(root_path, notice: "Task #{task_name} enqueued.")
       else
-        redirect_to(root_path, notice: run.errors.full_messages.join(' '))
+        redirect_to(root_path, notice: "Task #{task_name} does not exist.")
       end
     end
 
