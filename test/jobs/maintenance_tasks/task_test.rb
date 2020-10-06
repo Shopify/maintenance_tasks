@@ -3,9 +3,9 @@ require 'test_helper'
 
 module MaintenanceTasks
   class TaskTest < ActiveJob::TestCase
-    test '.descendants returns list of tasks that inherit from the Task superclass' do
-      expected_tasks = [Maintenance::UpdatePostsTask]
-      assert_equal expected_tasks, MaintenanceTasks::Task.descendants
+    test '.available_tasks returns list of tasks that inherit from the Task superclass' do
+      expected = ['Maintenance::UpdatePostsTask']
+      assert_equal expected, MaintenanceTasks::Task.available_tasks.map(&:name)
     end
 
     test '.named returns the task based on its name' do

@@ -8,7 +8,7 @@ module MaintenanceTasks
   class RunsController < ApplicationController
     # Renders the /maintenance_tasks page, displaying available tasks to users.
     def index
-      @available_tasks = Task.descendants
+      @available_tasks = Task.available_tasks
     end
 
     # POST /maintenance_tasks/runs
