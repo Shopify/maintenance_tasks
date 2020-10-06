@@ -23,6 +23,13 @@ module MaintenanceTasks
 
     validate :task_exists?
 
+    # Enqueues the job after validating and persisting the run.
+    def enqueue
+      if valid?
+        task_class.perform_run_later(self)
+      end
+    end
+
     private
 
     def task_class
