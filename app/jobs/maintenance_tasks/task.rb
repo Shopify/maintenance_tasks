@@ -52,8 +52,7 @@ module MaintenanceTasks
     private
 
     def create_run
-      run = arguments.dig(-1, :run)
-      Run.create!(task_name: name) unless run
+      Run.create!(task_name: name, job_id: job_id)
     end
   end
 end
