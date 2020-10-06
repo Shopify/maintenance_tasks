@@ -49,11 +49,15 @@ module MaintenanceTasks
 
     before_enqueue :create_run
 
+    def initialize(*arguments, run: nil)
+      @run = run
+      super(*arguments)
+    end
+
     private
 
     def create_run
-      run = arguments.dig(-1, :run)
-      Run.create!(task_name: name) unless run
+      Run.create!(task_name: name) unless @run
     end
   end
 end
