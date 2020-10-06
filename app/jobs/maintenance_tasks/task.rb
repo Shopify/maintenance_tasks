@@ -46,15 +46,20 @@ module MaintenanceTasks
     end
 
     delegate :name, to: :class
-
-    before_enqueue :create_run
-
     attr_accessor :run
+    before_enqueue :set_job_id
+
+    def initialize(*arguments, run: nil)
+      super(*arguments)
+
+      @run = run
+    end
 
     private
 
-    def create_run
-      Run.create!(task_name: name, job_id: job_id) unless run
+    def set_job_id
+      return unless run
+      run.update!(job_id: job_id)
     end
   end
 end
