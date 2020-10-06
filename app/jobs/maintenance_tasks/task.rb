@@ -8,16 +8,6 @@ module MaintenanceTasks
     extend ActiveSupport::DescendantsTracker
 
     class << self
-      # Persists all the data necessary for performing a task in the given Run
-      # and enqueues the job.
-      def perform_run_later(run)
-        task = new
-        task.run = run
-        run.job_id = task.job_id
-        run.save!
-        task.enqueue
-      end
-
       # Controls the value of abstract_class, which indicates whether the class
       # is abstract or not. Abstract classes are excluded from the list of
       # available_tasks.

@@ -26,7 +26,11 @@ module MaintenanceTasks
     # Enqueues the job after validating and persisting the run.
     def enqueue
       if valid?
-        task_class.perform_run_later(self)
+        task = task_class.new
+        task.run = self
+        self.job_id = task.job_id
+        save!
+        task.enqueue
       end
     end
 
