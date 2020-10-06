@@ -6,7 +6,6 @@ rescue LoadError
 end
 
 require 'rdoc/task'
-
 RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = 'rdoc'
   rdoc.title    = 'MaintenanceTasks'
@@ -23,11 +22,13 @@ load('rails/tasks/statistics.rake')
 require 'bundler/gem_tasks'
 
 require 'rake/testtask'
-
 Rake::TestTask.new(:test) do |t|
   t.libs << 'test'
   t.pattern = 'test/**/*_test.rb'
   t.verbose = false
 end
 
-task(default: ['db:setup', :test, 'app:test:system'])
+require 'rubocop/rake_task'
+RuboCop::RakeTask.new
+
+task(default: ['db:setup', :test, 'rubocop'])
