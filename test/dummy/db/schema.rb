@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_05_191107) do
+ActiveRecord::Schema.define(version: 2020_10_06_195701) do
 
   create_table "maintenance_tasks_runs", force: :cascade do |t|
     t.string "task_name", null: false
@@ -18,7 +18,7 @@ ActiveRecord::Schema.define(version: 2020_10_05_191107) do
     t.integer "tick_total"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.string "job_id"
+    t.string "job_id", null: false
     t.bigint "cursor"
     t.string "status", default: "enqueued", null: false
     t.string "error_class"
