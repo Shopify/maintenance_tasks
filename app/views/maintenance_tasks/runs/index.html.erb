@@ -1,18 +1,22 @@
 <p id="notice"><%= notice %></p>
 
-<h1>Enqueue Task</h1>
+<h1>Maintenance Tasks</h1>
+
 <table>
   <thead>
     <tr>
-      <th colspan="3"></th>
+      <th>Name</th>
+      <th></th>
     </tr>
   </thead>
 
   <tbody>
-    <% @available_tasks.each do |task| %>
+    <% @tasks.each do |task| %>
       <tr>
         <td><%= task %></td>
-        <td><%= link_to 'Enqueue', runs_path(name: task.name) %></td>
+        <td>
+          <%= button_to 'Run', runs_path, params: { run: { task_name: task.name } }%>
+        </td>
       </tr>
     <% end %>
   </tbody>

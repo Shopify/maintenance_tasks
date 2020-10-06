@@ -8,20 +8,25 @@ module MaintenanceTasks
   class RunsController < ApplicationController
     # Renders the /maintenance_tasks page, displaying available tasks to users.
     def index
-      @available_tasks = Task.available_tasks
+      @tasks = Task.available_tasks
     end
 
     # POST /maintenance_tasks/runs
     #
-    # Takes a name parameter which is the name of the MaintenanceTask to run.
+    # Creates a new Run with the given parameters.
     def create
-      task_name = params.require(:name)
-      run = Run.new(task_name: task_name)
+      run = Run.new(run_params)
       if run.enqueue
-        redirect_to(root_path, notice: "Task #{task_name} enqueued.")
+        redirect_to(root_path, notice: "Task #{run.task_name} enqueued.")
       else
         redirect_to(root_path, notice: run.errors.full_messages.join(' '))
       end
+    end
+
+    private
+
+    def run_params
+      params.require(:run).permit(:task_name)
     end
   end
 end

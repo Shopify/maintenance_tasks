@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <title>Maintenance tasks</title>
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title>Maintenance Tasks</title>
 
-  <%= stylesheet_link_tag    "maintenance_tasks/application", media: "all" %>
-</head>
-<body>
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
 
-<%= yield %>
+    <%= stylesheet_link_tag 'maintenance_tasks/application', media: 'all' %>
+  </head>
 
-</body>
+  <body>
+    <%= yield %>
+  </body>
 </html>
