@@ -30,4 +30,4 @@ Rake::TestTask.new(:test) do |t|
   t.verbose = false
 end
 
-task(default: ['db:setup', :test])
+task(default: ['db:setup', :test, 'app:test:system'])
