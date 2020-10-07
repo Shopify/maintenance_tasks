@@ -23,16 +23,21 @@ module MaintenanceTasks
       end
     end
 
-    test 'creates a Run if it has been enqueued without one' do
-      assert_difference -> { Run.count } do
-        Maintenance::UpdatePostsTask.perform_later
+    test 'can be enqueued with a Run' do
+      run = Run.create(task_name: Maintenance::UpdatePostsTask)
+
+      assert_enqueued_with job: Maintenance::UpdatePostsTask do
+        Maintenance::UpdatePostsTask.perform_later(run: run)
       end
     end
 
-    test 'does not re-enqueue itself if it has been enqueued without a Run' do
-      assert_enqueued_jobs 1 do
-        Maintenance::UpdatePostsTask.perform_later
-      end
+    test 'updates job_id on Run when performed with a run' do
+      run = Run.create(task_name: Maintenance::UpdatePostsTask)
+      job = Maintenance::UpdatePostsTask.perform_later(run: run)
+
+      perform_enqueued_jobs
+
+      assert_equal job.job_id, run.reload.job_id
     end
   end
 end
