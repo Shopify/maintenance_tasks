@@ -44,5 +44,17 @@ module MaintenanceTasks
         namespace.constants.map { |constant| namespace.const_get(constant) }
       end
     end
+
+    private
+
+    def build_enumerator(run, cursor:)
+      @run = run
+      @run.update!(job_id: job_id)
+      task_enumerator(cursor: cursor)
+    end
+
+    def each_iteration(record, _run)
+      task_iteration(record)
+    end
   end
 end
