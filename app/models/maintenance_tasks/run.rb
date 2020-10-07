@@ -8,7 +8,8 @@ module MaintenanceTasks
     # running       The task is being performed by a job worker.
     # succeeded     The task finished without error.
     # aborted       The user explicitly halted the task's execution.
-    # interrupted   The task was paused in the middle of the run by the user.
+    # interrupted   The task was interrupted by the job infrastructure.
+    # paused        The task was paused in the middle of the run by the user.
     # errored       The task code produced an unhandled exception.
     STATUSES = [
       :enqueued,
@@ -16,6 +17,7 @@ module MaintenanceTasks
       :succeeded,
       :aborted,
       :interrupted,
+      :paused,
       :errored,
     ]
 
