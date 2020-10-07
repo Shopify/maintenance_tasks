@@ -13,6 +13,13 @@ module MaintenanceTasks
       end
     end
 
+    test '#enqueue performs the task properly' do
+      perform_enqueued_jobs do
+        run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+        run.enqueue
+      end
+    end
+
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: 'Maintenance::DoesNotExist')
       refute run.valid?
