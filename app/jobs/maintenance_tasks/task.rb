@@ -44,16 +44,5 @@ module MaintenanceTasks
         namespace.constants.map { |constant| namespace.const_get(constant) }
       end
     end
-
-    delegate :name, to: :class
-
-    before_enqueue :create_run
-
-    private
-
-    def create_run
-      run = arguments.dig(-1, :run)
-      Run.create!(task_name: name) unless run
-    end
   end
 end

@@ -16,23 +16,5 @@ module MaintenanceTasks
     test ".named returns nil if the task doesn't exist" do
       assert_nil Task.named('Maintenance::DoesNotExist')
     end
-
-    test 'can be enqueued without a Run' do
-      assert_enqueued_with job: Maintenance::UpdatePostsTask do
-        Maintenance::UpdatePostsTask.perform_later
-      end
-    end
-
-    test 'creates a Run if it has been enqueued without one' do
-      assert_difference -> { Run.count } do
-        Maintenance::UpdatePostsTask.perform_later
-      end
-    end
-
-    test 'does not re-enqueue itself if it has been enqueued without a Run' do
-      assert_enqueued_jobs 1 do
-        Maintenance::UpdatePostsTask.perform_later
-      end
-    end
   end
 end
