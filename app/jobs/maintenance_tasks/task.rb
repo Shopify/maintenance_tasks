@@ -45,15 +45,16 @@ module MaintenanceTasks
       end
     end
 
-    delegate :name, to: :class
-
-    before_enqueue :create_run
-
     private
 
-    def create_run
-      run = arguments.dig(-1, :run)
-      Run.create!(task_name: name) unless run
+    def build_enumerator(run, cursor:)
+      @run = run
+      @run.update!(job_id: job_id)
+      task_enumerator(cursor: cursor)
+    end
+
+    def each_iteration(record, _run)
+      task_iteration(record)
     end
   end
 end
