@@ -22,19 +22,38 @@ module MaintenanceTasks
       end
     end
 
-    class NoCompletionJob < Task
-      def task_enumerator(*)
-        [1].to_enum
-      end
+    class SnapshotTask < Task
+      self.abstract_class = true
 
-      def task_iteration(*); end
+      attr_reader :run
+
+      class << self
+        attr_reader :run_status_snapshots
+
+        def clear
+          @run_status_snapshots = []
+        end
+      end
 
       private
 
-      def job_completed; end
+      def job_running
+        super
+        self.class.run_status_snapshots << run.status
+      end
+
+      def job_completed
+        super
+        self.class.run_status_snapshots << run.status
+      end
+
+      def reenqueue_iteration_job
+        super
+        self.class.run_status_snapshots << run.status
+      end
     end
 
-    class SuccessfulJob < Task
+    class SuccessfulJob < SnapshotTask
       def task_enumerator(*)
         [1].to_enum
       end
@@ -42,26 +61,28 @@ module MaintenanceTasks
       def task_iteration(*); end
     end
 
-    class InterruptedJob < Task
+    class InterruptedJob < SnapshotTask
       def task_enumerator(*)
         [1, 2].to_enum
       end
 
       def task_iteration(*); end
 
-      private
-
       def job_should_exit?
         true if executions == 1
       end
+    end
+
+    def setup
+      SuccessfulJob.clear
+      InterruptedJob.clear
     end
 
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
       expected = [
         'Maintenance::UpdatePostsTask',
         'MaintenanceTasks::TaskTest::InterruptedJob',
-        'MaintenanceTasks::TaskTest::NoCompletionJob',
-        'MaintenanceTasks::TaskTest::SuccessfulJob'
+        'MaintenanceTasks::TaskTest::SuccessfulJob',
       ]
       assert_equal expected,
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
@@ -93,32 +114,42 @@ module MaintenanceTasks
     end
 
     test 'updates associated Run to running and persists job_id when job starts performing' do
-      run = Run.create(task_name: 'MaintenanceTasks::TaskTest::NoCompletionJob')
-      job = NoCompletionJob.perform_later(run)
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
+      job = SuccessfulJob.perform_later(run)
 
       perform_enqueued_jobs
 
       run.reload
       assert_equal job.job_id, run.job_id
-      assert_predicate run, :running?
+
+      assert_includes SuccessfulJob.run_status_snapshots, 'running'
     end
 
     test 'updates associated Run to succeeded when job finishes successfully' do
-      run = Run.create(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
       SuccessfulJob.perform_later(run)
 
       perform_enqueued_jobs
 
-      assert_predicate run.reload, :succeeded?
+      assert_includes SuccessfulJob.run_status_snapshots, 'succeeded'
     end
 
-    test 'job is reenqueued if interrupted' do
-      run = Run.create(task_name: 'MaintenanceTasks::TaskTest::InterruptedJob')
+    test 'updates associated Run to interrupted when job is interrupted' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::InterruptedJob')
       InterruptedJob.perform_later(run)
 
       perform_enqueued_jobs
 
-      assert_predicate run.reload, :succeeded?
+      assert_includes InterruptedJob.run_status_snapshots, 'interrupted'
+    end
+
+    test 'job is reenqueued if interrupted' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::InterruptedJob')
+      InterruptedJob.perform_later(run)
+
+      perform_enqueued_jobs
+
+      assert_includes InterruptedJob.run_status_snapshots, 'succeeded'
     end
   end
 end
