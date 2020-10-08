@@ -8,7 +8,8 @@ module MaintenanceTasks
     # running       The task is being performed by a job worker.
     # succeeded     The task finished without error.
     # aborted       The user explicitly halted the task's execution.
-    # interrupted   The task was paused in the middle of the run by the user.
+    # interrupted   The task was interrupted by the job infrastructure.
+    # paused        The task was paused in the middle of the run by the user.
     # errored       The task code produced an unhandled exception.
     STATUSES = [
       :enqueued,
@@ -16,12 +17,13 @@ module MaintenanceTasks
       :succeeded,
       :aborted,
       :interrupted,
+      :paused,
       :errored,
     ]
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
-    validate :task_exists?
+    validate :task_exists?, :task_non_abstract?
 
     # Enqueues the job after validating and persisting the run.
     def enqueue
@@ -39,6 +41,12 @@ module MaintenanceTasks
     def task_exists?
       unless task_class
         errors.add(:base, "Task #{task_name} does not exist.")
+      end
+    end
+
+    def task_non_abstract?
+      if task_class&.abstract_class?
+        errors.add(:base, "Task #{task_name} is abstract.")
       end
     end
   end

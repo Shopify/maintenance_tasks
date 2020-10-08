@@ -26,5 +26,12 @@ module MaintenanceTasks
       expected_error = 'Task Maintenance::DoesNotExist does not exist.'
       assert_includes run.errors.full_messages, expected_error
     end
+
+    test 'invalid if the task is abstract' do
+      run = Run.new(task_name: 'Maintenance::ApplicationTask')
+      refute run.valid?
+      expected_error = 'Task Maintenance::ApplicationTask is abstract.'
+      assert_includes run.errors.full_messages, expected_error
+    end
   end
 end

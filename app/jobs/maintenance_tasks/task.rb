@@ -7,6 +7,9 @@ module MaintenanceTasks
     include JobIteration::Iteration
     extend ActiveSupport::DescendantsTracker
 
+    before_perform(:job_running)
+    on_complete(:job_completed)
+
     class << self
       # Controls the value of abstract_class, which indicates whether the class
       # is abstract or not. Abstract classes are excluded from the list of
@@ -47,14 +50,28 @@ module MaintenanceTasks
 
     private
 
-    def build_enumerator(run, cursor:)
-      @run = run
-      @run.update!(job_id: job_id)
+    def build_enumerator(_run, cursor:)
       task_enumerator(cursor: cursor)
     end
 
     def each_iteration(record, _run)
       task_iteration(record)
+    end
+
+    def job_running
+      @run = arguments.first
+      @run.job_id = job_id
+      @run.running!
+    end
+
+    def job_completed
+      @run.succeeded!
+    end
+
+    def reenqueue_iteration_job
+      @run.interrupted!
+
+      super
     end
   end
 end
