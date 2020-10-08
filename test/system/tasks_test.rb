@@ -8,7 +8,7 @@ class TasksTest < ApplicationSystemTestCase
 
     assert_title 'Maintenance Tasks'
 
-    assert_table 'Enqueue Task', rows: [
+    assert_table 'Enqueue Task', with_rows: [
       ['Maintenance::UpdatePostsTask', ''],
     ]
   end
