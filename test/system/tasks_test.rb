@@ -8,12 +8,14 @@ class TasksTest < ApplicationSystemTestCase
 
     assert_title 'Maintenance Tasks'
 
-    assert_table rows: [
+    assert_table 'Enqueue Task', rows: [
       ['Maintenance::UpdatePostsTask', ''],
     ]
   end
 
   test 'run a task' do
+    freeze_time
+
     visit maintenance_tasks_path
 
     within 'tr', text: 'Maintenance::UpdatePostsTask' do
@@ -23,5 +25,9 @@ class TasksTest < ApplicationSystemTestCase
     assert_title 'Maintenance Tasks'
 
     assert_text 'Task Maintenance::UpdatePostsTask enqueued.'
+
+    assert_table 'Maintenance Task Runs', with_rows: [
+      ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc), 'enqueued'],
+    ]
   end
 end

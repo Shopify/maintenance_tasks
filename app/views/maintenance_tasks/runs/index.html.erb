@@ -3,6 +3,8 @@
 <h1>Maintenance Tasks</h1>
 
 <table>
+  <caption>Enqueue Task</caption>
+
   <thead>
     <tr>
       <th>Name</th>
@@ -17,6 +19,28 @@
         <td>
           <%= button_to 'Run', runs_path, params: { run: { task_name: task.name } }%>
         </td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<table>
+  <caption>Maintenance Task Runs</caption>
+
+  <thead>
+    <tr>
+      <th>Task Name</th>
+      <th>Created at</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @runs.each do |run| %>
+      <tr>
+        <td><%= run.task_name %></td>
+        <td><%= l run.created_at %></td>
+        <td><%= run.status %></td>
       </tr>
     <% end %>
   </tbody>
