@@ -24,6 +24,13 @@ module MaintenanceTasks
       end
     end
 
+    # Updates a Run status to paused.
+    def pause
+      run = Run.find(params.fetch(:id))
+      run.paused!
+      redirect_to(root_path)
+    end
+
     private
 
     def run_params

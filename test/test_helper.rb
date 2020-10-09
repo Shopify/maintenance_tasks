@@ -22,3 +22,5 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
     ActiveSupport::TestCase.fixture_path + '/files'
   ActiveSupport::TestCase.fixtures(:all)
 end
+
+Maintenance::UpdatePostsTask.fast_task = true
