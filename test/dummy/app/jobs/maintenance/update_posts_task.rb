@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
+    self.minimum_duration_for_tick_update = 2.seconds
+
     class << self
       attr_accessor :fast_task
     end
