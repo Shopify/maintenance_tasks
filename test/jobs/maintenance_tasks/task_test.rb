@@ -69,11 +69,36 @@ module MaintenanceTasks
       end
     end
 
+    class ControlledTask < SnapshotTask
+      self.minimum_duration_for_tick_update = 10.seconds
+
+      def control(&block)
+        @control = block
+      end
+
+      def task_enumerator(*)
+        @state = :run
+        Enumerator.new do |yielder|
+          iteration = 1
+          loop do
+            yielder.yield(iteration)
+            break if @state == :stop
+            iteration += 1
+          end
+        end
+      end
+
+      def task_iteration(iteration)
+        @state = @control.call(iteration)
+      end
+    end
+
     def setup
       AbortedTask.clear
       PausedTask.clear
       SuccessfulTask.clear
       InterruptedTask.clear
+      ControlledTask.clear
     end
 
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
@@ -81,6 +106,7 @@ module MaintenanceTasks
         'Maintenance::ErrorTask',
         'Maintenance::UpdatePostsTask',
         'MaintenanceTasks::TaskTest::AbortedTask',
+        'MaintenanceTasks::TaskTest::ControlledTask',
         'MaintenanceTasks::TaskTest::InterruptedTask',
         'MaintenanceTasks::TaskTest::PausedTask',
         'MaintenanceTasks::TaskTest::SuccessfulTask',
@@ -164,6 +190,62 @@ module MaintenanceTasks
       assert_equal ['aborted', 'aborted'], SuccessfulTask.run_status_snapshots
       assert_predicate run.reload, :aborted?
       assert_no_enqueued_jobs
+    end
+
+    test 'tick_count is updated after the minimum duration' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::ControlledTask')
+      task = ControlledTask.new(run)
+      freeze_time
+      task.control do |iteration|
+        if iteration == 1
+          travel 11.second
+        else
+          assert_equal 1, run.reload.tick_count
+          :stop
+        end
+      end
+      task.perform_now
+      refute assertions.zero?
+    end
+
+    test "tick_count isn't updated under the minimum duration" do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::ControlledTask')
+      task = ControlledTask.new(run)
+      freeze_time
+      task.control do |iteration|
+        if iteration == 1
+          travel 9.seconds
+        else
+          assert_equal 0, run.reload.tick_count
+          :stop
+        end
+      end
+      task.perform_now
+      refute assertions.zero?
+    end
+
+    test 'tick_count is updated for multiple ticks after the duration' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::ControlledTask')
+      task = ControlledTask.new(run)
+      freeze_time
+      task.control do |iteration|
+        if iteration <= 2
+          travel 6.seconds
+        else
+          assert_equal 2, run.reload.tick_count
+          :stop
+        end
+      end
+      task.perform_now
+      refute assertions.zero?
+    end
+
+    test 'tick_count is updated when the job is interrupted' do
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskTest::InterruptedTask',
+      )
+      InterruptedTask.perform_now(run)
+      assert_equal 1, run.reload.tick_count
     end
 
     test 'updates associated Run to running and persists job_id when job starts performing' do

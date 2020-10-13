@@ -33,5 +33,16 @@ module MaintenanceTasks
       expected_error = 'Task Maintenance::ApplicationTask is abstract.'
       assert_includes run.errors.full_messages, expected_error
     end
+
+    test '#increment_ticks persists an increment to the tick count' do
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        tick_count: 40,
+      )
+      run.tick_count = 21
+      run.increment_ticks(2)
+      assert_equal 21, run.tick_count # record is not used or updated
+      assert_equal 42, run.reload.tick_count
+    end
   end
 end

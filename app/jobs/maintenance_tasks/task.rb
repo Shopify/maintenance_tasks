@@ -11,7 +11,17 @@ module MaintenanceTasks
     on_complete(:job_completed)
     on_shutdown(:shutdown_job)
 
+    before_perform(:setup_ticker)
+    on_shutdown(:record_tick)
+
     rescue_from StandardError, with: :job_errored
+
+    # After each iteration, the progress of the task may be updated.
+    # This duration in seconds limits these updates, skipping if the duration
+    # since the last update is lower than this value, except if the job is
+    # interrupted, in which case the progress will always be recorded.
+    class_attribute :minimum_duration_for_tick_update, default: 1.0,
+      instance_accessor: false, instance_predicate: false, instance_reader: true
 
     class << self
       # Controls the value of abstract_class, which indicates whether the class
@@ -81,6 +91,7 @@ module MaintenanceTasks
     def each_iteration(input, _run)
       throw(:abort, :skip_complete_callbacks) if task_stopped?
       task_iteration(input)
+      @ticker.tick
     end
 
     def job_running
@@ -120,6 +131,16 @@ module MaintenanceTasks
         run = Run.select(:status).find(@run.id)
         run.paused? || run.aborted?
       end
+    end
+
+    def setup_ticker
+      @ticker = Ticker.new(minimum_duration_for_tick_update) do |ticks|
+        @run.increment_ticks(ticks)
+      end
+    end
+
+    def record_tick
+      @ticker.persist
     end
   end
 end
