@@ -6,8 +6,6 @@ module MaintenanceTasks
     class SnapshotTask < Task
       self.abstract_class = true
 
-      attr_reader :run
-
       class << self
         attr_reader :run_status_snapshots
 
@@ -100,14 +98,19 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
-    test 'updates associated Run to running and persists job_id when job starts performing' do
+    test 'persists job_id to associated Run when job is enqueued' do
       run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
       job = SuccessfulJob.perform_later(run)
 
-      perform_enqueued_jobs
-
       run.reload
       assert_equal job.job_id, run.job_id
+    end
+
+    test 'updates associated Run to running when job starts performing' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
+      SuccessfulJob.perform_later(run)
+
+      perform_enqueued_jobs
 
       assert_includes SuccessfulJob.run_status_snapshots, 'running'
     end

@@ -7,6 +7,7 @@ module MaintenanceTasks
     include JobIteration::Iteration
     extend ActiveSupport::DescendantsTracker
 
+    before_enqueue(:set_job_id_on_run)
     before_perform(:job_running)
     on_complete(:job_completed)
     on_shutdown(:shutdown_job)
@@ -51,6 +52,10 @@ module MaintenanceTasks
 
     private
 
+    def set_job_id_on_run
+      run.update!(job_id: job_id)
+    end
+
     def build_enumerator(_run, cursor:)
       task_enumerator(cursor: cursor)
     end
@@ -61,29 +66,31 @@ module MaintenanceTasks
     # @param input [Object] the current element from the enumerator.
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
-      task_iteration(input)
-      if Run.select(:status).find(@run.id).paused?
+      if Run.select(:status).find(run.id).paused?
         @job_should_exit = true
         @retried = true
       end
+      task_iteration(input)
     end
 
     def job_running
-      @run = arguments.first
-      @run.job_id = job_id
-      @run.running!
+      run.running!
     end
 
     def job_completed
-      @run.succeeded!
+      run.succeeded!
     end
 
     def shutdown_job
-      @run.interrupted! if @run.running?
+      run.interrupted! if run.running?
     end
 
     def job_should_exit?
       (defined?(@job_should_exit) && @job_should_exit == true) || super
+    end
+
+    def run
+      @run ||= arguments.first
     end
   end
 end
