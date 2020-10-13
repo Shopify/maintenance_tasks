@@ -3,25 +3,6 @@ require 'test_helper'
 
 module MaintenanceTasks
   class TaskTest < ActiveJob::TestCase
-    class ExampleTask < Task
-      self.abstract_class = true
-
-      attr_reader :task_enumerator_called
-      attr_reader :task_enumerator_cursor
-      attr_reader :task_iteration_called
-      attr_reader :task_iteration_argument
-
-      def task_enumerator(cursor:)
-        @task_enumerator_called = true
-        @task_enumerator_cursor = cursor
-      end
-
-      def task_iteration(argument)
-        @task_iteration_called = true
-        @task_iteration_argument = argument
-      end
-    end
-
     class SnapshotTask < Task
       self.abstract_class = true
 
@@ -47,7 +28,7 @@ module MaintenanceTasks
         self.class.run_status_snapshots << run.status
       end
 
-      def reenqueue_iteration_job
+      def shutdown_job
         super
         self.class.run_status_snapshots << run.status
       end
@@ -73,15 +54,27 @@ module MaintenanceTasks
       end
     end
 
+    class PausedJob < SnapshotTask
+      def task_enumerator(*)
+        [1, 2, 3, 4].to_enum
+      end
+
+      def task_iteration(*)
+        @run.paused!
+      end
+    end
+
     def setup
       SuccessfulJob.clear
       InterruptedJob.clear
+      PausedJob.clear
     end
 
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
       expected = [
         'Maintenance::UpdatePostsTask',
         'MaintenanceTasks::TaskTest::InterruptedJob',
+        'MaintenanceTasks::TaskTest::PausedJob',
         'MaintenanceTasks::TaskTest::SuccessfulJob',
       ]
       assert_equal expected,
@@ -97,20 +90,14 @@ module MaintenanceTasks
       assert_nil Task.named('Maintenance::DoesNotExist')
     end
 
-    test '#build_enumerator calls task_enumerator' do
-      task = ExampleTask.new
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
-      task.send(:build_enumerator, run, cursor: :some_cursor)
-      assert(task.task_enumerator_called)
-      assert_equal(:some_cursor, task.task_enumerator_cursor)
-    end
+    test '.perform_now exits job when Run is paused' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::PausedJob')
 
-    test '#each_iteration calls .task_iteration' do
-      task = ExampleTask.new
-      run = nil
-      task.send(:each_iteration, :some_record, run)
-      assert(task.task_iteration_called)
-      assert_equal(:some_record, task.task_iteration_argument)
+      PausedJob.perform_now(run)
+
+      assert_equal ['running', 'paused'], PausedJob.run_status_snapshots
+      assert_predicate run.reload, :paused?
+      assert_no_enqueued_jobs
     end
 
     test 'updates associated Run to running and persists job_id when job starts performing' do

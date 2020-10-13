@@ -9,6 +9,7 @@ module MaintenanceTasks
 
     before_perform(:job_running)
     on_complete(:job_completed)
+    on_shutdown(:shutdown_job)
 
     class << self
       # Controls the value of abstract_class, which indicates whether the class
@@ -54,8 +55,17 @@ module MaintenanceTasks
       task_enumerator(cursor: cursor)
     end
 
-    def each_iteration(record, _run)
-      task_iteration(record)
+    # Performs task iteration logic for the current input returned by the
+    # enumerator.
+    #
+    # @param input [Object] the current element from the enumerator.
+    # @param _run [Run] the current Run, passed as an argument by Job Iteration.
+    def each_iteration(input, _run)
+      task_iteration(input)
+      if Run.select(:status).find(@run.id).paused?
+        @job_should_exit = true
+        @retried = true
+      end
     end
 
     def job_running
@@ -68,10 +78,12 @@ module MaintenanceTasks
       @run.succeeded!
     end
 
-    def reenqueue_iteration_job
-      @run.interrupted!
+    def shutdown_job
+      @run.interrupted! if @run.running?
+    end
 
-      super
+    def job_should_exit?
+      (defined?(@job_should_exit) && @job_should_exit == true) || super
     end
   end
 end
