@@ -48,8 +48,12 @@
         <td><%= run.error_message %></td>
         <td><%= format_backtrace(run.backtrace) %></td>
         <td>
-          <%= button_to 'Pause', pause_run_path(run), method: :put if run.enqueued? || run.running? %>
-          <%= button_to 'Resume', resume_run_path(run), method: :put if run.paused? %>
+          <% if run.enqueued? || run.running? %>
+             <%= button_to 'Pause', pause_run_path(run), method: :put %>
+             <%= button_to 'Abort', abort_run_path(run), method: :put %>
+          <% elsif run.paused? %>
+            <%= button_to 'Resume', resume_run_path(run), method: :put %>
+          <% end %>
         </td>
       </tr>
     <% end %>

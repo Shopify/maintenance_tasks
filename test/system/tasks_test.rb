@@ -48,6 +48,22 @@ class TasksTest < ApplicationSystemTestCase
     ]
   end
 
+  test 'abort a Run' do
+    visit maintenance_tasks_path
+
+    within 'tr', text: 'Maintenance::UpdatePostsTask' do
+      click_on 'Run'
+    end
+
+    within 'table', text: 'Maintenance Task Runs' do
+      within('tr', text: 'Maintenance::UpdatePostsTask') { click_on 'Abort' }
+    end
+
+    assert_table 'Maintenance Task Runs', with_rows: [
+      ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc), 'aborted'],
+    ]
+  end
+
   test 'run a task that errors' do
     with_queue_adapter(:inline, Maintenance::ErrorTask) do
       visit maintenance_tasks_path

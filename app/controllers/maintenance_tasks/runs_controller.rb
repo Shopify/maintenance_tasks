@@ -6,6 +6,8 @@ module MaintenanceTasks
   # It makes data about available, enqueued, performing, and completed
   # tasks accessible to the views so it can be displayed in the UI.
   class RunsController < ApplicationController
+    before_action :set_run, only: [:pause, :abort]
+
     # Renders the /maintenance_tasks page, displaying available tasks to users.
     def index
       @runs = Run.all
@@ -26,8 +28,13 @@ module MaintenanceTasks
 
     # Updates a Run status to paused.
     def pause
-      run = Run.find(params.fetch(:id))
-      run.paused!
+      @run.paused!
+      redirect_to(root_path)
+    end
+
+    # Updates a Run status to aborted.
+    def abort
+      @run.aborted!
       redirect_to(root_path)
     end
 
@@ -40,6 +47,10 @@ module MaintenanceTasks
     end
 
     private
+
+    def set_run
+      @run = Run.find(params.fetch(:id))
+    end
 
     def run_params
       params.require(:run).permit(:task_name)

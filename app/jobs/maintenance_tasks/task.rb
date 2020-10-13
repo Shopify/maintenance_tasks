@@ -63,17 +63,15 @@ module MaintenanceTasks
     # @param input [Object] the current element from the enumerator.
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
+      throw(:abort, :skip_complete_callbacks) if task_stopped?
       task_iteration(input)
-      if Run.select(:status).find(@run.id).paused?
-        @job_should_exit = true
-        @retried = true
-      end
     end
 
     def job_running
       @run = arguments.first
       @run.job_id = job_id
-      @run.running!
+
+      @run.running! unless task_stopped?
     end
 
     def job_completed
@@ -81,11 +79,7 @@ module MaintenanceTasks
     end
 
     def shutdown_job
-      @run.interrupted! if @run.running?
-    end
-
-    def job_should_exit?
-      (defined?(@job_should_exit) && @job_should_exit == true) || super
+      @run.interrupted! unless task_stopped?
     end
 
     def job_errored(exception)
@@ -99,6 +93,17 @@ module MaintenanceTasks
         error_message: exception_message,
         backtrace: backtrace
       )
+    end
+
+    def task_stopped?
+      # Note that as long as @task_stopped is false, this block will run.
+      # It is still preferable to memoize here because it prevents us from
+      #  having to perform more reloads after the task has entered
+      # a paused or aborted status
+      @task_stopped ||= begin
+        run = Run.select(:status).find(@run.id)
+        run.paused? || run.aborted?
+      end
     end
   end
 end

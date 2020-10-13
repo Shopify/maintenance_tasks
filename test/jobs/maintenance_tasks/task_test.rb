@@ -59,7 +59,18 @@ module MaintenanceTasks
       end
     end
 
+    class AbortedTask < SnapshotTask
+      def task_enumerator(*)
+        [1, 2].to_enum
+      end
+
+      def task_iteration(*)
+        @run.aborted!
+      end
+    end
+
     def setup
+      AbortedTask.clear
       PausedTask.clear
       SuccessfulTask.clear
       InterruptedTask.clear
@@ -69,6 +80,7 @@ module MaintenanceTasks
       expected = [
         'Maintenance::ErrorTask',
         'Maintenance::UpdatePostsTask',
+        'MaintenanceTasks::TaskTest::AbortedTask',
         'MaintenanceTasks::TaskTest::InterruptedTask',
         'MaintenanceTasks::TaskTest::PausedTask',
         'MaintenanceTasks::TaskTest::SuccessfulTask',
@@ -93,6 +105,42 @@ module MaintenanceTasks
 
       assert_equal ['running', 'paused'], PausedTask.run_status_snapshots
       assert_predicate run.reload, :paused?
+      assert_no_enqueued_jobs
+    end
+
+    test '.perform_now exits job when Run is aborted' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::AbortedTask')
+
+      AbortedTask.perform_now(run)
+
+      assert_equal ['running', 'aborted'], AbortedTask.run_status_snapshots
+      assert_predicate run.reload, :aborted?
+      assert_no_enqueued_jobs
+    end
+
+    test 'a Run can be paused before it starts performing' do
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskTest::SuccessfulTask',
+        status: :paused
+      )
+
+      SuccessfulTask.perform_now(run)
+
+      assert_equal ['paused', 'paused'], SuccessfulTask.run_status_snapshots
+      assert_predicate run.reload, :paused?
+      assert_no_enqueued_jobs
+    end
+
+    test 'a Run can be aborted before it starts performing' do
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskTest::SuccessfulTask',
+        status: :aborted
+      )
+
+      SuccessfulTask.perform_now(run)
+
+      assert_equal ['aborted', 'aborted'], SuccessfulTask.run_status_snapshots
+      assert_predicate run.reload, :aborted?
       assert_no_enqueued_jobs
     end
 

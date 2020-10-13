@@ -4,6 +4,7 @@ MaintenanceTasks::Engine.routes.draw do
     member do
       put 'pause'
       put 'resume'
+      put 'abort'
     end
   end
 
