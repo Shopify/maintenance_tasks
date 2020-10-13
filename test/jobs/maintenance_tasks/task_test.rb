@@ -67,6 +67,7 @@ module MaintenanceTasks
 
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
       expected = [
+        'Maintenance::ErrorTask',
         'Maintenance::UpdatePostsTask',
         'MaintenanceTasks::TaskTest::InterruptedTask',
         'MaintenanceTasks::TaskTest::PausedTask',
@@ -130,9 +131,25 @@ module MaintenanceTasks
       end
     end
 
-      perform_enqueued_jobs
+    test 'updates associated on Run to errored if exception is raised' do
+      run = Run.create!(task_name: 'Maintenance::ErrorTask')
+      Maintenance::ErrorTask.perform_now(run)
 
-      assert_includes InterruptedJob.run_status_snapshots, 'succeeded'
+      run.reload
+      assert_equal 'ArgumentError', run.error_class
+      assert_equal 'Something went wrong', run.error_message
+
+      expected = ["app/jobs/maintenance/error_task.rb:9:in `task_iteration'"]
+      assert_equal expected, run.backtrace
+      assert_predicate run.reload, :errored?
+    end
+
+    test 'does not enqueue another job if Run errors' do
+      run = Run.create!(task_name: 'Maintenance::ErrorTask')
+
+      assert_no_enqueued_jobs do
+        Maintenance::ErrorTask.perform_now(run)
+      end
     end
   end
 end
