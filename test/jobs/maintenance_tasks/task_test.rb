@@ -23,18 +23,13 @@ module MaintenanceTasks
         self.class.run_status_snapshots << run.status
       end
 
-      def job_completed
-        super
-        self.class.run_status_snapshots << run.status
-      end
-
       def shutdown_job
         super
         self.class.run_status_snapshots << run.status
       end
     end
 
-    class SuccessfulJob < SnapshotTask
+    class SuccessfulTask < SnapshotTask
       def task_enumerator(*)
         [1].to_enum
       end
@@ -42,7 +37,7 @@ module MaintenanceTasks
       def task_iteration(*); end
     end
 
-    class InterruptedJob < SnapshotTask
+    class InterruptedTask < SnapshotTask
       def task_enumerator(*)
         [1, 2].to_enum
       end
@@ -54,7 +49,7 @@ module MaintenanceTasks
       end
     end
 
-    class PausedJob < SnapshotTask
+    class PausedTask < SnapshotTask
       def task_enumerator(*)
         [1, 2, 3, 4].to_enum
       end
@@ -65,17 +60,17 @@ module MaintenanceTasks
     end
 
     def setup
-      SuccessfulJob.clear
-      InterruptedJob.clear
-      PausedJob.clear
+      PausedTask.clear
+      SuccessfulTask.clear
+      InterruptedTask.clear
     end
 
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
       expected = [
         'Maintenance::UpdatePostsTask',
-        'MaintenanceTasks::TaskTest::InterruptedJob',
-        'MaintenanceTasks::TaskTest::PausedJob',
-        'MaintenanceTasks::TaskTest::SuccessfulJob',
+        'MaintenanceTasks::TaskTest::InterruptedTask',
+        'MaintenanceTasks::TaskTest::PausedTask',
+        'MaintenanceTasks::TaskTest::SuccessfulTask',
       ]
       assert_equal expected,
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
@@ -91,48 +86,49 @@ module MaintenanceTasks
     end
 
     test '.perform_now exits job when Run is paused' do
-      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::PausedJob')
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::PausedTask')
 
-      PausedJob.perform_now(run)
+      PausedTask.perform_now(run)
 
-      assert_equal ['running', 'paused'], PausedJob.run_status_snapshots
+      assert_equal ['running', 'paused'], PausedTask.run_status_snapshots
       assert_predicate run.reload, :paused?
       assert_no_enqueued_jobs
     end
 
     test 'updates associated Run to running and persists job_id when job starts performing' do
-      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
-      job = SuccessfulJob.perform_later(run)
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulTask')
+      job = SuccessfulTask.new(run)
+      job.perform_now
 
-      perform_enqueued_jobs
-
-      run.reload
       assert_equal job.job_id, run.job_id
-
-      assert_includes SuccessfulJob.run_status_snapshots, 'running'
+      assert_includes SuccessfulTask.run_status_snapshots, 'running'
     end
 
     test 'updates associated Run to succeeded when job finishes successfully' do
-      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulJob')
-      SuccessfulJob.perform_later(run)
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::SuccessfulTask')
+      SuccessfulTask.perform_now(run)
 
-      perform_enqueued_jobs
-
-      assert_includes SuccessfulJob.run_status_snapshots, 'succeeded'
+      assert_predicate run.reload, :succeeded?
     end
 
     test 'updates associated Run to interrupted when job is interrupted' do
-      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::InterruptedJob')
-      InterruptedJob.perform_later(run)
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskTest::InterruptedTask'
+      )
+      InterruptedTask.perform_now(run)
 
-      perform_enqueued_jobs
-
-      assert_includes InterruptedJob.run_status_snapshots, 'interrupted'
+      assert_predicate run.reload, :interrupted?
     end
 
     test 'job is reenqueued if interrupted' do
-      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::InterruptedJob')
-      InterruptedJob.perform_later(run)
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskTest::InterruptedTask'
+      )
+
+      assert_enqueued_with job: InterruptedTask do
+        InterruptedTask.perform_now(run)
+      end
+    end
 
       perform_enqueued_jobs
 
