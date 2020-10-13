@@ -11,6 +11,8 @@ module MaintenanceTasks
     on_complete(:job_completed)
     on_shutdown(:shutdown_job)
 
+    rescue_from StandardError, with: :job_errored
+
     class << self
       # Controls the value of abstract_class, which indicates whether the class
       # is abstract or not. Abstract classes are excluded from the list of
@@ -84,6 +86,19 @@ module MaintenanceTasks
 
     def job_should_exit?
       (defined?(@job_should_exit) && @job_should_exit == true) || super
+    end
+
+    def job_errored(exception)
+      exception_class = exception.class.to_s
+      exception_message = exception.message
+      backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
+
+      @run.update!(
+        status: :errored,
+        error_class: exception_class,
+        error_message: exception_message,
+        backtrace: backtrace
+      )
     end
   end
 end

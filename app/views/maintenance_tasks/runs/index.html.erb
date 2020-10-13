@@ -23,7 +23,6 @@
     <% end %>
   </tbody>
 </table>
-
 <table>
   <caption>Maintenance Task Runs</caption>
 
@@ -32,7 +31,9 @@
       <th>Task Name</th>
       <th>Created at</th>
       <th>Status</th>
-      <th></th>
+      <th>Error Class</th>
+      <th>Error Message</th>
+      <th>Backtrace</th>
     </tr>
   </thead>
 
@@ -42,6 +43,9 @@
         <td><%= run.task_name %></td>
         <td><%= l run.created_at %></td>
         <td><%= run.status %></td>
+        <td><%= run.error_class %></td>
+        <td><%= run.error_message %></td>
+        <td><%= format_backtrace(run.backtrace) %></td>
         <td>
           <%= button_to 'Pause', pause_run_path(run), method: :put if run.enqueued? || run.running? %>
         </td>

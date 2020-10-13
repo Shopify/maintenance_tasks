@@ -25,6 +25,8 @@ module MaintenanceTasks
 
     validate :task_exists?, :task_non_abstract?
 
+    serialize :backtrace
+
     # Enqueues the job after validating and persisting the run.
     def enqueue
       if save

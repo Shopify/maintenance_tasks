@@ -11,7 +11,8 @@ class TasksTest < ApplicationSystemTestCase
     assert_title 'Maintenance Tasks'
 
     assert_table 'Enqueue Task', with_rows: [
-      ['Maintenance::UpdatePostsTask'],
+      ['Maintenance::UpdatePostsTask', ''],
+      ['Maintenance::ErrorTask', ''],
     ]
   end
 
@@ -44,6 +45,32 @@ class TasksTest < ApplicationSystemTestCase
 
     assert_table 'Maintenance Task Runs', with_rows: [
       ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc), 'paused'],
+    ]
+  end
+
+  test 'run a task that errors' do
+    freeze_time
+
+    visit maintenance_tasks_path
+
+    within 'tr', text: 'Maintenance::ErrorTask' do
+      click_on 'Run'
+    end
+
+    # To remove after rewriting this test properly
+    sleep(1)
+
+    assert_text 'Task Maintenance::ErrorTask enqueued.'
+
+    assert_table 'Maintenance Task Runs', with_rows: [
+      [
+        'Maintenance::ErrorTask',
+        I18n.l(Time.now.utc),
+        'errored',
+        'ArgumentError',
+        'Something went wrong',
+        "app/jobs/maintenance/error_task.rb:9:in `task_iteration'",
+      ],
     ]
   end
 end
