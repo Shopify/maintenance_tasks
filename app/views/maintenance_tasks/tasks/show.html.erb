@@ -1,0 +1,37 @@
+<% content_for :page_title, @task %>
+
+<p id="notice"><%= notice %></p>
+
+<h1><%= @task %></h1>
+
+<% if @active_run %>
+  <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put %>
+<% else %>
+  <%= button_to 'Run', task_runs_path(@task) %>
+<% end %>
+
+<h2>Runs</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Created at</th>
+      <th>Status</th>
+      <th>Error Class</th>
+      <th>Error Message</th>
+      <th>Backtrace</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @runs.each do |run| %>
+      <tr>
+        <td><%= l run.created_at %></td>
+        <td><%= run.status %></td>
+        <td><%= run.error_class %></td>
+        <td><%= run.error_message %></td>
+        <td><%= format_backtrace(run.backtrace) %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
