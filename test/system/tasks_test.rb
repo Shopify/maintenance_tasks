@@ -27,6 +27,10 @@ class TasksTest < ApplicationSystemTestCase
 
     assert_text 'Task Maintenance::UpdatePostsTask enqueued.'
 
+    assert_no_table 'Enqueue Task', with_rows: [
+      ['Maintenance::UpdatePostsTask', ''],
+    ]
+
     assert_table 'Maintenance Task Runs', with_rows: [
       ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc)],
     ]

@@ -77,6 +77,12 @@ module MaintenanceTasks
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
     end
 
+    test '.available_tasks excludes running tasks' do
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask', status: :running)
+      running_task = Maintenance::UpdatePostsTask
+      refute_includes MaintenanceTasks::Task.available_tasks, running_task
+    end
+
     test '.named returns the task based on its name' do
       expected_task = Maintenance::UpdatePostsTask
       assert_equal expected_task, Task.named('Maintenance::UpdatePostsTask')

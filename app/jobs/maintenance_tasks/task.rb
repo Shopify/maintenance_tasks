@@ -40,7 +40,8 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants.reject(&:abstract_class?)
+        running = Run.select(&:running?).pluck(:task_name).map(&:constantize)
+        descendants.reject(&:abstract_class?) - running
       end
 
       private
