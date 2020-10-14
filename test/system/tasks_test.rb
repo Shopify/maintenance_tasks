@@ -49,28 +49,35 @@ class TasksTest < ApplicationSystemTestCase
   end
 
   test 'run a task that errors' do
-    freeze_time
+    with_inline_queue_adapter(Maintenance::ErrorTask) do
+      visit maintenance_tasks_path
 
-    visit maintenance_tasks_path
+      within 'tr', text: 'Maintenance::ErrorTask' do
+        click_on 'Run'
+      end
 
-    within 'tr', text: 'Maintenance::ErrorTask' do
-      click_on 'Run'
+      assert_text 'Task Maintenance::ErrorTask enqueued.'
+
+      assert_table 'Maintenance Task Runs', with_rows: [
+        [
+          'Maintenance::ErrorTask',
+          I18n.l(Time.now.utc),
+          'errored',
+          'ArgumentError',
+          'Something went wrong',
+          "app/jobs/maintenance/error_task.rb:9:in `task_iteration'",
+        ],
+      ]
     end
+  end
 
-    # To remove after rewriting this test properly
-    sleep(1)
+  private
 
-    assert_text 'Task Maintenance::ErrorTask enqueued.'
-
-    assert_table 'Maintenance Task Runs', with_rows: [
-      [
-        'Maintenance::ErrorTask',
-        I18n.l(Time.now.utc),
-        'errored',
-        'ArgumentError',
-        'Something went wrong',
-        "app/jobs/maintenance/error_task.rb:9:in `task_iteration'",
-      ],
-    ]
+  def with_inline_queue_adapter(task)
+    original_adapter = task.queue_adapter
+    task.queue_adapter = :inline
+    yield
+  ensure
+    task.queue_adapter = original_adapter
   end
 end
