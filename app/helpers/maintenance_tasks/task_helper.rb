@@ -9,9 +9,7 @@ module MaintenanceTasks
     #   exception on a Task that ran and raised.
     # @return [String] the parsed, HTML formatted version of the backtrace.
     def format_backtrace(backtrace)
-      return unless backtrace.present?
-
-      safe_join(backtrace, tag.br)
+      safe_join(backtrace.to_a, tag.br)
     end
   end
 end
