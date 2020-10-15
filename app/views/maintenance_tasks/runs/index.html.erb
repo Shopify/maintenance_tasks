@@ -34,6 +34,7 @@
       <th>Error Class</th>
       <th>Error Message</th>
       <th>Backtrace</th>
+      <th></th>
     </tr>
   </thead>
 
@@ -48,6 +49,7 @@
         <td><%= format_backtrace(run.backtrace) %></td>
         <td>
           <%= button_to 'Pause', pause_run_path(run), method: :put if run.enqueued? || run.running? %>
+          <%= button_to 'Resume', resume_run_path(run), method: :put if run.paused? %>
         </td>
       </tr>
     <% end %>

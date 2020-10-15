@@ -49,7 +49,7 @@ class TasksTest < ApplicationSystemTestCase
   end
 
   test 'run a task that errors' do
-    with_inline_queue_adapter(Maintenance::ErrorTask) do
+    with_queue_adapter(:inline, Maintenance::ErrorTask) do
       visit maintenance_tasks_path
 
       within 'tr', text: 'Maintenance::ErrorTask' do
@@ -71,11 +71,33 @@ class TasksTest < ApplicationSystemTestCase
     end
   end
 
+  test 'resume a Run' do
+    visit maintenance_tasks_path
+
+    within 'tr', text: 'Maintenance::UpdatePostsTask' do
+      click_on 'Run'
+    end
+
+    within 'table', text: 'Maintenance Task Runs' do
+      within('tr', text: 'Maintenance::UpdatePostsTask') { click_on 'Pause' }
+    end
+
+    with_queue_adapter(:test, Maintenance::UpdatePostsTask) do
+      within 'table', text: 'Maintenance Task Runs' do
+        within('tr', text: 'Maintenance::UpdatePostsTask') { click_on 'Resume' }
+      end
+
+      assert_table 'Maintenance Task Runs', with_rows: [
+        ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc), 'enqueued'],
+      ]
+    end
+  end
+
   private
 
-  def with_inline_queue_adapter(task)
+  def with_queue_adapter(adapter, task)
     original_adapter = task.queue_adapter
-    task.queue_adapter = :inline
+    task.queue_adapter = adapter
     yield
   ensure
     task.queue_adapter = original_adapter

@@ -31,6 +31,14 @@ module MaintenanceTasks
       redirect_to(root_path)
     end
 
+    # Updates a Run status from paused to running.
+    def resume
+      run = Run.find(params.fetch(:id))
+      run.enqueued!
+      run.enqueue
+      redirect_to(root_path)
+    end
+
     private
 
     def run_params
