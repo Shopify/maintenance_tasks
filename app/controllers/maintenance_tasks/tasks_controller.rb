@@ -14,8 +14,8 @@ module MaintenanceTasks
     # Shows running and completed instances of the Task.
     def show
       @task = Task.named(params.fetch(:id))
-      @runs = Run.where(task_name: @task.name).order(created_at: :desc)
-      @active_run = @runs.where(status: [:enqueued, :running]).first
+      @runs = @task.runs
+      @active_run = @task.active_run
     end
   end
 end

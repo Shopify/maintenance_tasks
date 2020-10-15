@@ -4,10 +4,13 @@
 
 <h1><%= @task %></h1>
 
-<% if @active_run %>
-  <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put %>
-<% else %>
+<% if @active_run.nil? %>
   <%= button_to 'Run', task_runs_path(@task) %>
+<% elsif @active_run.paused? %>
+  <%= button_to 'Resume', resume_task_run_path(@task, @active_run), method: :put %>
+<% else %>
+  <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put %>
+  <%= button_to 'Abort', abort_task_run_path(@task, @active_run), method: :put %>
 <% end %>
 
 <h2>Runs</h2>
