@@ -1,7 +1,9 @@
-<h1>Maintenance Tasks</h1>
+<h1 class="title">Maintenance Tasks</h1>
 
-<ul>
-  <% @tasks.each do |task| %>
-    <li><%= link_to task, task_path(task) %></li>
-  <% end %>
-</ul>
+<aside class="menu">
+  <ul class="menu-list">
+    <% @tasks.each do |task| %>
+      <li><%= link_to task, task_path(task) %></li>
+    <% end %>
+  </ul>
+</aside>
