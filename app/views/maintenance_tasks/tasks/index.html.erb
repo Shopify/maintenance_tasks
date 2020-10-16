@@ -1,4 +1,4 @@
-<h1 class="title">Maintenance Tasks</h1>
+<h1 class="title is-1">Maintenance Tasks</h1>
 
 <aside class="menu">
   <ul class="menu-list">
@@ -7,3 +7,24 @@
     <% end %>
   </ul>
 </aside>
+
+<h2 class="title is-2">Running Tasks</h2>
+<table class="table">
+  <thead>
+    <tr>
+      <th>Task name</th>
+      <th>Created at</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <% @active_runs.each do |run| %>
+      <tr>
+        <td><%= link_to run.task_name, task_path(run.task_name) %></td>
+        <td><%= l run.created_at %></td>
+        <td><%= run.status %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
