@@ -14,5 +14,20 @@ module MaintenanceTasks
 
       assert_equal expected_trace, format_backtrace(backtrace)
     end
+
+    test '#format_ticks only shows the ticks if tick_total is not set' do
+      run = Run.new(tick_count: 42)
+      assert_equal '42', format_ticks(run)
+    end
+
+    test '#format_ticks shows the ticks, total and percentage' do
+      run = Run.new(tick_count: 42, tick_total: 84)
+      assert_equal '42 / 84 (50%)', format_ticks(run)
+    end
+
+    test '#format_ticks percentage rounds down to the nearest integer' do
+      run = Run.new(tick_count: 999, tick_total: 1000)
+      assert_equal '999 / 1000 (99%)', format_ticks(run)
+    end
   end
 end
