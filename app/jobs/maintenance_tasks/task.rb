@@ -20,6 +20,8 @@ module MaintenanceTasks
     # This duration in seconds limits these updates, skipping if the duration
     # since the last update is lower than this value, except if the job is
     # interrupted, in which case the progress will always be recorded.
+    #
+    # @api private
     class_attribute :minimum_duration_for_tick_update, default: 1.0,
       instance_accessor: false, instance_predicate: false, instance_reader: true
 
