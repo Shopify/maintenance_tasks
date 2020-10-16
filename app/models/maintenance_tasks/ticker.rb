@@ -12,6 +12,8 @@ module MaintenanceTasks
   #
   # To not lose any increments, +persist+ should be used, which may call the
   # block with any leftover ticks.
+  #
+  # @api private
   class Ticker
     # Creates a Ticker that will call the block each time +tick+ is called,
     # unless the tick is being throttled.
@@ -50,5 +52,4 @@ module MaintenanceTasks
       Time.now - @last_persisted >= @throttle_duration
     end
   end
-  private_constant :Ticker
 end
