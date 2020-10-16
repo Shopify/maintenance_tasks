@@ -98,6 +98,28 @@ module MaintenanceTasks
       assert_nil Task.named('Maintenance::DoesNotExist')
     end
 
+    test '.runs returns the Active Record relation of the runs associated with a Task' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+
+      assert_equal 1, Maintenance::UpdatePostsTask.runs.count
+      assert_equal run, Maintenance::UpdatePostsTask.runs.first
+    end
+
+    test '.active_run returns the only enqueued, running, or paused run associated with a Task' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+
+      assert_equal run, Maintenance::UpdatePostsTask.active_run
+
+      run.running!
+      assert_equal run, Maintenance::UpdatePostsTask.active_run
+
+      run.paused!
+      assert_equal run, Maintenance::UpdatePostsTask.active_run
+
+      run.succeeded!
+      assert_nil Maintenance::UpdatePostsTask.active_run
+    end
+
     test '.perform_now exits job when Run is paused' do
       run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::PausedTask')
 

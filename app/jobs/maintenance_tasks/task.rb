@@ -43,6 +43,22 @@ module MaintenanceTasks
         descendants.reject(&:abstract_class?)
       end
 
+      # Returns the set of Run records associated with the Task.
+      #
+      # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]
+      #   the relation of Run records.
+      def runs
+        Run.where(task_name: name)
+      end
+
+      # Returns the active Run associated with the Task, if any.
+      # An active run is defined as enqueued, running, or paused.
+      #
+      # @return [MaintenanceTasks::Run] the Run record.
+      def active_run
+        runs.find_by(status: [:enqueued, :running, :paused])
+      end
+
       private
 
       def load_constants

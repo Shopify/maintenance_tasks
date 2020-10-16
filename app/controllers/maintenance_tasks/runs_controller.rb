@@ -1,49 +1,42 @@
 # frozen_string_literal: true
 
 module MaintenanceTasks
-  # Class handles rendering the maintenance_tasks page in the host application.
-  # It communicates with the Run model to persist info related to task runs.
-  # It makes data about available, enqueued, performing, and completed
-  # tasks accessible to the views so it can be displayed in the UI.
+  # Class communicates with the Run model to persist info related to task runs.
+  # It defines actions for creating and pausing runs.
   class RunsController < ApplicationController
-    before_action :set_run, only: [:pause, :abort]
-
-    # Renders the /maintenance_tasks page, displaying available tasks to users.
-    def index
-      @runs = Run.all
-      @tasks = Task.available_tasks
-    end
+    before_action :set_run, only: [:pause, :abort, :resume]
+    before_action :set_task
 
     # POST /maintenance_tasks/runs
     #
     # Creates a new Run with the given parameters.
     def create
-      run = Run.new(run_params)
+      run = Run.new(task_name: @task.name)
       if run.enqueue
-        redirect_to(root_path, notice: "Task #{run.task_name} enqueued.")
+        redirect_to(task_path(@task), notice: "Task #{run.task_name} enqueued.")
       else
-        redirect_to(root_path, notice: run.errors.full_messages.join(' '))
+        errors = run.errors.full_messages.join(' ')
+        redirect_to(task_path(@task), notice: errors)
       end
     end
 
     # Updates a Run status to paused.
     def pause
       @run.paused!
-      redirect_to(root_path)
+      redirect_to(task_path(@task))
     end
 
     # Updates a Run status to aborted.
     def abort
       @run.aborted!
-      redirect_to(root_path)
+      redirect_to(task_path(@task))
     end
 
     # Updates a Run status from paused to running.
     def resume
-      run = Run.find(params.fetch(:id))
-      run.enqueued!
-      run.enqueue
-      redirect_to(root_path)
+      @run.enqueued!
+      @run.enqueue
+      redirect_to(task_path(@task))
     end
 
     private
@@ -52,8 +45,8 @@ module MaintenanceTasks
       @run = Run.find(params.fetch(:id))
     end
 
-    def run_params
-      params.require(:run).permit(:task_name)
+    def set_task
+      @task = Task.named(params.fetch(:task_id))
     end
   end
 end

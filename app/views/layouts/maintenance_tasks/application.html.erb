@@ -1,7 +1,13 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
-    <title>Maintenance Tasks</title>
+    <title>
+      <% if content_for?(:page_title) %>
+        <%= content_for :page_title %> -
+      <% end %>
+
+      Maintenance Tasks
+    </title>
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
