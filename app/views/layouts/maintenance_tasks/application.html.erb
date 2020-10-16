@@ -11,9 +11,22 @@
 
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
+
+    <%=
+      stylesheet_link_tag 'https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.css',
+        media: :all,
+        integrity: 'sha256-67AR2JVjhMZCLVxapLuBSMap5RrXbksv4vlllenHBSE=',
+        crossorigin: 'anonymous'
+    %>
   </head>
 
   <body>
-    <%= yield %>
+    <%= render 'layouts/maintenance_tasks/navbar' %>
+
+    <section class="section">
+      <div class="container">
+        <%= yield %>
+      </div>
+    </div>
   </body>
 </html>
