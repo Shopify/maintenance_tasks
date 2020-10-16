@@ -34,6 +34,15 @@ module MaintenanceTasks
       end
     end
 
+    # Increments +tick_count+ by +number_of_ticks+, directly in the DB.
+    # The attribute value is not set in the current instance, you need
+    # to reload the record.
+    #
+    # @param number_of_ticks [Integer] number of ticks to add to tick_count.
+    def increment_ticks(number_of_ticks)
+      self.class.update_counters(id, tick_count: number_of_ticks, touch: true)
+    end
+
     private
 
     def task_class

@@ -24,6 +24,7 @@
     <tr>
       <th>Created at</th>
       <th>Status</th>
+      <th>Ticks</th>
       <th>Error Class</th>
       <th>Error Message</th>
       <th>Backtrace</th>
@@ -35,6 +36,7 @@
       <tr>
         <td><%= l run.created_at %></td>
         <td><%= run.status %></td>
+        <td><%= run.tick_count %></td>
         <td><%= run.error_class %></td>
         <td><%= run.error_message %></td>
         <td><%= format_backtrace(run.backtrace) %></td>
