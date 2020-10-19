@@ -22,19 +22,19 @@ module MaintenanceTasks
 
     # Updates a Run status to paused.
     def pause
-      @run.paused!
+      RunStateMachine.new(@run).pause
       redirect_to(task_path(@task))
     end
 
     # Updates a Run status to aborted.
     def abort
-      @run.aborted!
+      RunStateMachine.new(@run).abort
       redirect_to(task_path(@task))
     end
 
     # Updates a Run status from paused to running.
     def resume
-      @run.enqueued!
+      RunStateMachine.new(@run).resume
       @run.enqueue
       redirect_to(task_path(@task))
     end

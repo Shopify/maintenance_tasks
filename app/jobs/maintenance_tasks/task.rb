@@ -99,16 +99,15 @@ module MaintenanceTasks
     def job_running
       @run = arguments.first
       @run.job_id = job_id
-
-      @run.running! unless task_stopped?
+      RunStateMachine.new(@run).run
     end
 
     def job_completed
-      @run.succeeded!
+      RunStateMachine.new(@run).complete
     end
 
     def shutdown_job
-      @run.interrupted! unless task_stopped?
+      RunStateMachine.new(@run.reload).interrupt
     end
 
     def job_errored(exception)
@@ -116,23 +115,17 @@ module MaintenanceTasks
       exception_message = exception.message
       backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
 
-      @run.update!(
-        status: :errored,
+      @run.assign_attributes(
         error_class: exception_class,
         error_message: exception_message,
         backtrace: backtrace
       )
+      @run.restore_attributes unless RunStateMachine.new(@run).error
     end
 
     def task_stopped?
-      # Note that as long as @task_stopped is false, this block will run.
-      # It is still preferable to memoize here because it prevents us from
-      #  having to perform more reloads after the task has entered
-      # a paused or aborted status
-      @task_stopped ||= begin
-        run = Run.select(:status).find(@run.id)
-        run.paused? || run.aborted?
-      end
+      run = Run.select(:status).find(@run.id)
+      run.paused? || run.aborted?
     end
 
     def setup_ticker
