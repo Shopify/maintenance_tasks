@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 require 'maintenance_tasks/engine'
+require 'pagy'
+require 'pagy/extras/bulma'
 
 # The engine's namespace module. It provides isolation between the host
 # application's code and the engine-specific code. Top-level engine constants

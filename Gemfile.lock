@@ -3,6 +3,7 @@ PATH
   specs:
     maintenance_tasks (0.1.0)
       job-iteration (~> 1.1.8)
+      pagy (~> 3.8.3)
       rails (~> 6.0.3)
 
 GEM
@@ -103,6 +104,7 @@ GEM
     nio4r (2.5.4)
     nokogiri (1.10.10)
       mini_portile2 (~> 2.4.0)
+    pagy (3.8.3)
     parallel (1.19.2)
     parser (2.7.2.0)
       ast (~> 2.4.1)
