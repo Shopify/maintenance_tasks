@@ -8,6 +8,7 @@ module MaintenanceTasks
     # available tasks to users.
     def index
       @tasks = Task.available_tasks
+      @active_runs = Run.active
     end
 
     # Renders the page responsible for providing Task actions to users.

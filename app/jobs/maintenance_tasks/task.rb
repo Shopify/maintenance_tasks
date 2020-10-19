@@ -68,7 +68,7 @@ module MaintenanceTasks
       #
       # @return [MaintenanceTasks::Run] the Run record.
       def active_run
-        runs.find_by(status: [:enqueued, :running, :paused])
+        runs.active.first
       end
 
       private

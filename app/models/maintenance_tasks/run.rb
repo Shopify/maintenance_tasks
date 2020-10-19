@@ -21,11 +21,15 @@ module MaintenanceTasks
       :errored,
     ]
 
+    ACTIVE_STATUSES = [:enqueued, :running, :paused]
+
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
     validate :task_exists?, :task_non_abstract?
 
     serialize :backtrace
+
+    scope :active, -> { where(status: ACTIVE_STATUSES) }
 
     # Enqueues the job after validating and persisting the run.
     def enqueue

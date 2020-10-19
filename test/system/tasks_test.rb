@@ -19,4 +19,32 @@ class TasksTest < ApplicationSystemTestCase
 
     assert_title 'Maintenance::UpdatePostsTask'
   end
+
+  test 'lists active runs' do
+    visit maintenance_tasks_path
+
+    click_on 'Maintenance::UpdatePostsTask'
+    click_on 'Run'
+
+    visit maintenance_tasks_path
+
+    assert_table with_rows: [
+      ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc)],
+    ]
+  end
+
+  test 'visit a task page from an active run' do
+    visit maintenance_tasks_path
+
+    click_on 'Maintenance::UpdatePostsTask'
+    click_on 'Run'
+
+    visit maintenance_tasks_path
+
+    within 'tr', text: 'Maintenance::UpdatePostsTask' do
+      click_on 'Maintenance::UpdatePostsTask'
+    end
+
+    assert_title 'Maintenance::UpdatePostsTask'
+  end
 end
