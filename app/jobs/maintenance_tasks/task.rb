@@ -143,10 +143,10 @@ module MaintenanceTasks
       # Note that as long as @task_stopped is false, this block will run.
       # It is still preferable to memoize here because it prevents us from
       #  having to perform more reloads after the task has entered
-      # a paused or aborted status
+      # a paused or cancelled status
       @task_stopped ||= begin
         run = Run.select(:status).find(@run.id)
-        run.paused? || run.aborted?
+        run.paused? || run.cancelled?
       end
     end
 

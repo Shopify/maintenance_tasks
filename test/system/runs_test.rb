@@ -47,7 +47,7 @@ class RunsTest < ApplicationSystemTestCase
     assert_table with_rows: [[I18n.l(Time.now.utc), 'enqueued']]
   end
 
-  test 'abort a Run' do
+  test 'cancel a Run' do
     visit maintenance_tasks_path
 
     click_on 'Maintenance::UpdatePostsTask'
@@ -55,9 +55,9 @@ class RunsTest < ApplicationSystemTestCase
 
     assert_title 'Maintenance::UpdatePostsTask'
 
-    click_on 'Abort'
+    click_on 'Cancel'
 
-    assert_table with_rows: [[I18n.l(Time.now.utc), 'aborted']]
+    assert_table with_rows: [[I18n.l(Time.now.utc), 'cancelled']]
   end
 
   test 'run a task that errors' do
