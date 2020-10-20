@@ -4,7 +4,7 @@ module MaintenanceTasks
   # Class communicates with the Run model to persist info related to task runs.
   # It defines actions for creating and pausing runs.
   class RunsController < ApplicationController
-    before_action :set_run, only: [:pause, :abort, :resume]
+    before_action :set_run, only: [:pause, :cancel, :resume]
     before_action :set_task
 
     # POST /maintenance_tasks/runs
@@ -26,9 +26,9 @@ module MaintenanceTasks
       redirect_to(task_path(@task))
     end
 
-    # Updates a Run status to aborted.
-    def abort
-      @run.aborted!
+    # Updates a Run status to cancelled.
+    def cancel
+      @run.cancelled!
       redirect_to(task_path(@task))
     end
 

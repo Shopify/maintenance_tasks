@@ -13,7 +13,7 @@
     <%= button_to 'Resume', resume_task_run_path(@task, @active_run), method: :put, class: 'button is-primary' %>
   <% else %>
     <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning' %>
-    <%= button_to 'Abort', abort_task_run_path(@task, @active_run), method: :put, class: 'button is-danger' %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, @active_run), method: :put, class: 'button is-danger' %>
   <% end %>
 </div>
 

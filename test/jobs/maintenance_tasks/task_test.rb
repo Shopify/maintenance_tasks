@@ -59,13 +59,13 @@ module MaintenanceTasks
       end
     end
 
-    class AbortedTask < SnapshotTask
+    class CancelledTask < SnapshotTask
       def task_enumerator(*)
         [1, 2].to_enum
       end
 
       def task_iteration(*)
-        @run.aborted!
+        @run.cancelled!
       end
     end
 
@@ -96,7 +96,7 @@ module MaintenanceTasks
     end
 
     def setup
-      AbortedTask.clear
+      CancelledTask.clear
       PausedTask.clear
       SuccessfulTask.clear
       InterruptedTask.clear
@@ -107,7 +107,7 @@ module MaintenanceTasks
       expected = [
         'Maintenance::ErrorTask',
         'Maintenance::UpdatePostsTask',
-        'MaintenanceTasks::TaskTest::AbortedTask',
+        'MaintenanceTasks::TaskTest::CancelledTask',
         'MaintenanceTasks::TaskTest::ControlledTask',
         'MaintenanceTasks::TaskTest::InterruptedTask',
         'MaintenanceTasks::TaskTest::PausedTask',
@@ -158,13 +158,13 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
-    test '.perform_now exits job when Run is aborted' do
-      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::AbortedTask')
+    test '.perform_now exits job when Run is cancelled' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::CancelledTask')
 
-      AbortedTask.perform_now(run)
+      CancelledTask.perform_now(run)
 
-      assert_equal ['running', 'aborted'], AbortedTask.run_status_snapshots
-      assert_predicate run.reload, :aborted?
+      assert_equal ['running', 'cancelled'], CancelledTask.run_status_snapshots
+      assert_predicate run.reload, :cancelled?
       assert_no_enqueued_jobs
     end
 
@@ -181,16 +181,17 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
-    test 'a Run can be aborted before it starts performing' do
+    test 'a Run can be cancelled before it starts performing' do
       run = Run.create!(
         task_name: 'MaintenanceTasks::TaskTest::SuccessfulTask',
-        status: :aborted
+        status: :cancelled
       )
 
       SuccessfulTask.perform_now(run)
 
-      assert_equal ['aborted', 'aborted'], SuccessfulTask.run_status_snapshots
-      assert_predicate run.reload, :aborted?
+      expected_statuses = ['cancelled', 'cancelled']
+      assert_equal expected_statuses, SuccessfulTask.run_status_snapshots
+      assert_predicate run.reload, :cancelled?
       assert_no_enqueued_jobs
     end
 

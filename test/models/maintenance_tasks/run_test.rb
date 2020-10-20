@@ -53,7 +53,7 @@ module MaintenanceTasks
       running_run = Run.create!(task_name: task_name, status: :running)
 
       succeeded_run = Run.create!(task_name: task_name, status: :succeeded)
-      aborted_run = Run.create!(task_name: task_name, status: :aborted)
+      cancelled_run = Run.create!(task_name: task_name, status: :cancelled)
       interrupted_run = Run.create!(task_name: task_name, status: :interrupted)
       errored_run = Run.create!(task_name: task_name, status: :errored)
 
@@ -64,7 +64,7 @@ module MaintenanceTasks
       assert_includes active_runs, running_run
 
       assert_not_includes active_runs, succeeded_run
-      assert_not_includes active_runs, aborted_run
+      assert_not_includes active_runs, cancelled_run
       assert_not_includes active_runs, interrupted_run
       assert_not_includes active_runs, errored_run
     end

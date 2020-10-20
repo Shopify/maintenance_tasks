@@ -7,7 +7,7 @@ module MaintenanceTasks
     # enqueued      The task has been enqueued by the user.
     # running       The task is being performed by a job worker.
     # succeeded     The task finished without error.
-    # aborted       The user explicitly halted the task's execution.
+    # cancelled     The user explicitly halted the task's execution.
     # interrupted   The task was interrupted by the job infrastructure.
     # paused        The task was paused in the middle of the run by the user.
     # errored       The task code produced an unhandled exception.
@@ -15,7 +15,7 @@ module MaintenanceTasks
       :enqueued,
       :running,
       :succeeded,
-      :aborted,
+      :cancelled,
       :interrupted,
       :paused,
       :errored,
