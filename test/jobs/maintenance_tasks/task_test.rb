@@ -72,6 +72,8 @@ module MaintenanceTasks
     class ControlledTask < SnapshotTask
       self.minimum_duration_for_tick_update = 10.seconds
 
+      attr_accessor :task_count
+
       def control(&block)
         @control = block
       end
@@ -246,6 +248,23 @@ module MaintenanceTasks
       )
       InterruptedTask.perform_now(run)
       assert_equal 1, run.reload.tick_count
+    end
+
+    test '#task_count is nil by default' do
+      task = Task.new
+      assert_nil task.task_count
+    end
+
+    test 'tick_total is updated when the job starts, before iteration' do
+      run = Run.create!(task_name: 'MaintenanceTasks::TaskTest::ControlledTask')
+      task = ControlledTask.new(run)
+      task.task_count = 42
+      task.control do
+        assert_equal 42, run.reload.tick_total
+        :stop
+      end
+      task.perform_now
+      refute assertions.zero?
     end
 
     test 'updates associated Run to running and persists job_id when job starts performing' do

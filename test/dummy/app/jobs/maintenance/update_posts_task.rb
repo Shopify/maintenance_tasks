@@ -14,6 +14,10 @@ module Maintenance
       )
     end
 
+    def task_count
+      Post.count
+    end
+
     def task_iteration(post)
       sleep(1) unless self.class.fast_task
 

@@ -8,6 +8,7 @@ module MaintenanceTasks
     extend ActiveSupport::DescendantsTracker
 
     before_perform(:job_running)
+    on_start(:job_started)
     on_complete(:job_completed)
     on_shutdown(:shutdown_job)
 
@@ -79,6 +80,16 @@ module MaintenanceTasks
       end
     end
 
+    # Total count of iterations to be performed.
+    #
+    # Tasks override this method to define the total amount of iterations
+    # expected at the start of the run. Return +nil+ if the amount is
+    # undefined, or counting would be prohibitive for your database.
+    #
+    # @return [Integer, nil]
+    def task_count
+    end
+
     private
 
     def build_enumerator(_run, cursor:)
@@ -101,6 +112,10 @@ module MaintenanceTasks
       @run.job_id = job_id
 
       @run.running! unless task_stopped?
+    end
+
+    def job_started
+      @run.update!(tick_total: task_count)
     end
 
     def job_completed

@@ -36,7 +36,7 @@
       <tr>
         <td><%= l run.created_at %></td>
         <td><%= run.status %></td>
-        <td><%= run.tick_count %></td>
+        <td><%= format_ticks(run) %></td>
         <td><%= run.error_class %></td>
         <td><%= run.error_message %></td>
         <td><%= format_backtrace(run.backtrace) %></td>
