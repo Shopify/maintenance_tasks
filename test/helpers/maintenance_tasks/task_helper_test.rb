@@ -20,14 +20,20 @@ module MaintenanceTasks
       assert_equal '42', format_ticks(run)
     end
 
-    test '#format_ticks shows the ticks, total and percentage' do
+    test '#format_ticks renders a <progress> element' do
       run = Run.new(tick_count: 42, tick_total: 84)
-      assert_equal '42 / 84 (50%)', format_ticks(run)
+      render(inline: '<%= format_ticks(run) %>', locals: { run: run })
+      assert_select 'progress[value=42][max=84]'
     end
 
-    test '#format_ticks percentage rounds down to the nearest integer' do
+    test '#progress_text shows the ticks, total and percentage' do
+      run = Run.new(tick_count: 42, tick_total: 84)
+      assert_equal '42 / 84 (50%)', progress_text(run)
+    end
+
+    test '#progress_text percentage rounds down to the nearest integer' do
       run = Run.new(tick_count: 999, tick_total: 1000)
-      assert_equal '999 / 1000 (99%)', format_ticks(run)
+      assert_equal '999 / 1000 (99%)', progress_text(run)
     end
   end
 end
