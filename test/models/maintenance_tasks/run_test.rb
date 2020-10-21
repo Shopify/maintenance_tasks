@@ -17,15 +17,11 @@ module MaintenanceTasks
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: 'Maintenance::DoesNotExist')
       refute run.valid?
-      expected_error = 'Task Maintenance::DoesNotExist does not exist.'
-      assert_includes run.errors.full_messages, expected_error
     end
 
     test 'invalid if the task is abstract' do
       run = Run.new(task_name: 'Maintenance::ApplicationTask')
       refute run.valid?
-      expected_error = 'Task Maintenance::ApplicationTask is abstract.'
-      assert_includes run.errors.full_messages, expected_error
     end
 
     test '#increment_ticks persists an increment to the tick count' do
