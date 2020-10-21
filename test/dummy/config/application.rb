@@ -11,6 +11,11 @@ module Dummy
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults(6.0)
 
+    if ENV['CLASSIC_AUTOLOADER'].present?
+      puts '=> Using classic autoloader'
+      config.autoloader = :classic
+    end
+
     # Settings in config/environments/* take precedence over those specified
     # here.
     # Application configuration can go into files in config/initializers
