@@ -8,7 +8,7 @@
 # manually required. This block can be removed if zeitwerk mode is enabled.
 # For more information on Zeitwerk, see https://guides.rubyonrails.org/autoloading_and_reloading_constants.html
 Rails.application.config.to_prepare do
-  Dir["#{Rails.root}/app/jobs/maintenance/*.rb"].each do |file|
+  Dir["#{Rails.root}/app/tasks/maintenance/*.rb"].each do |file|
     require_dependency(file)
   end
 end

@@ -5,6 +5,7 @@ source 'https://rubygems.org'
 gemspec
 
 gem 'capybara'
+gem 'mocha'
 gem 'pry-byebug'
 gem 'rubocop-shopify'
 gem 'selenium-webdriver'

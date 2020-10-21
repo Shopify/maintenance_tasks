@@ -29,7 +29,7 @@ module MaintenanceTasks
     def create_application_task
       template(
         'application_task.rb',
-        'app/jobs/maintenance/application_task.rb'
+        'app/tasks/maintenance/application_task.rb'
       )
     end
   end
