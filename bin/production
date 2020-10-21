@@ -1,0 +1,12 @@
+#!/bin/sh
+
+set -ex
+
+export RAILS_ENV=production
+SECRET_KEY_BASE="$(rails app:secret)"
+export SECRET_KEY_BASE
+
+rails app:assets:precompile
+DISABLE_DATABASE_ENVIRONMENT_CHECK=true rails db:setup
+
+RAILS_SERVE_STATIC_FILES=true rails server
