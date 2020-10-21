@@ -25,7 +25,9 @@ module MaintenanceTasks
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
-    validate :task_exists?, :task_non_abstract?
+    validates :task_name, inclusion: { in: ->(_) {
+      Task.available_tasks.map(&:to_s)
+    } }
 
     serialize :backtrace
 
@@ -45,24 +47,6 @@ module MaintenanceTasks
     # @param number_of_ticks [Integer] number of ticks to add to tick_count.
     def increment_ticks(number_of_ticks)
       self.class.update_counters(id, tick_count: number_of_ticks, touch: true)
-    end
-
-    private
-
-    def task_class
-      Task.named(task_name)
-    end
-
-    def task_exists?
-      unless task_class
-        errors.add(:base, "Task #{task_name} does not exist.")
-      end
-    end
-
-    def task_non_abstract?
-      if task_class&.abstract_class?
-        errors.add(:base, "Task #{task_name} is abstract.")
-      end
     end
   end
 end
