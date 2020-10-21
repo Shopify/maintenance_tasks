@@ -1,21 +1,9 @@
 # frozen_string_literal: true
-require 'job-iteration'
 
 module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
-  class Task < ActiveJob::Base
-    include JobIteration::Iteration
+  class Task
     extend ActiveSupport::DescendantsTracker
-
-    before_perform(:job_running)
-    on_start(:job_started)
-    on_complete(:job_completed)
-    on_shutdown(:shutdown_job)
-
-    before_perform(:setup_ticker)
-    on_shutdown(:record_tick)
-
-    rescue_from StandardError, with: :job_errored
 
     # After each iteration, the progress of the task may be updated.
     # This duration in seconds limits these updates, skipping if the duration
@@ -80,6 +68,28 @@ module MaintenanceTasks
       end
     end
 
+    # Placeholder method to raise in case a subclass fails to implement the
+    # expected instance method.
+    #
+    # @raise [NotImplementedError] with a message advising subclasses to
+    #   implement an override for this method.
+    def task_enumerator(*)
+      raise NotImplementedError,
+        "#{self.class.name} must implement `task_enumerator`."
+    end
+
+    # Placeholder method to raise in case a subclass fails to implement the
+    # expected instance method.
+    #
+    # @param _item [Object] the current item from the enumerator being iterated.
+    #
+    # @raise [NotImplementedError] with a message advising subclasses to
+    #   implement an override for this method.
+    def task_iteration(_item)
+      raise NotImplementedError,
+        "#{self.class.name} must implement `task_iteration`."
+    end
+
     # Total count of iterations to be performed.
     #
     # Tasks override this method to define the total amount of iterations
@@ -90,74 +100,13 @@ module MaintenanceTasks
     def task_count
     end
 
-    private
-
-    def build_enumerator(_run, cursor:)
-      task_enumerator(cursor: cursor)
-    end
-
-    # Performs task iteration logic for the current input returned by the
-    # enumerator.
+    # Convenience method to allow tasks define enumerators with cursors for
+    # compatibility with Job Iteration.
     #
-    # @param input [Object] the current element from the enumerator.
-    # @param _run [Run] the current Run, passed as an argument by Job Iteration.
-    def each_iteration(input, _run)
-      throw(:abort, :skip_complete_callbacks) if task_stopped?
-      task_iteration(input)
-      @ticker.tick
-    end
-
-    def job_running
-      @run = arguments.first
-      @run.job_id = job_id
-
-      @run.running! unless task_stopped?
-    end
-
-    def job_started
-      @run.update!(tick_total: task_count)
-    end
-
-    def job_completed
-      @run.succeeded!
-    end
-
-    def shutdown_job
-      @run.interrupted! unless task_stopped?
-    end
-
-    def job_errored(exception)
-      exception_class = exception.class.to_s
-      exception_message = exception.message
-      backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
-
-      @run.update!(
-        status: :errored,
-        error_class: exception_class,
-        error_message: exception_message,
-        backtrace: backtrace
-      )
-    end
-
-    def task_stopped?
-      # Note that as long as @task_stopped is false, this block will run.
-      # It is still preferable to memoize here because it prevents us from
-      #  having to perform more reloads after the task has entered
-      # a paused or cancelled status
-      @task_stopped ||= begin
-        run = Run.select(:status).find(@run.id)
-        run.paused? || run.cancelled?
-      end
-    end
-
-    def setup_ticker
-      @ticker = Ticker.new(minimum_duration_for_tick_update) do |ticks|
-        @run.increment_ticks(ticks)
-      end
-    end
-
-    def record_tick
-      @ticker.persist
+    # @return [JobIteration::EnumeratorBuilder] instance of an enumerator
+    #   builder available to tasks.
+    def enumerator_builder
+      JobIteration.enumerator_builder.new(nil)
     end
   end
 end

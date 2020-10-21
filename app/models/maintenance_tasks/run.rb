@@ -34,7 +34,7 @@ module MaintenanceTasks
     # Enqueues the job after validating and persisting the run.
     def enqueue
       if save
-        task_class.perform_later(self)
+        TaskJob.perform_later(self)
       end
     end
 

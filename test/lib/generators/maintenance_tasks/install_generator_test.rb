@@ -35,7 +35,7 @@ module MaintenanceTasks
           assert_match(/create_table "maintenance_tasks_runs"/, contents)
         end
 
-        assert_file('app/jobs/maintenance/application_task.rb')
+        assert_file('app/tasks/maintenance/application_task.rb')
         assert_file('config/initializers/maintenance_tasks.rb')
       end
     end
@@ -48,7 +48,7 @@ module MaintenanceTasks
       Dir.chdir(SAMPLE_APP_PATH) do
         FileUtils.rm_r('db')
         FileUtils.rm('config/initializers/maintenance_tasks.rb')
-        FileUtils.rm('app/jobs/maintenance/application_task.rb')
+        FileUtils.rm('app/tasks/maintenance/application_task.rb')
       end
     end
   end
