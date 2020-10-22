@@ -8,14 +8,14 @@ module MaintenanceTasks
     # available tasks to users.
     def index
       @tasks = Task.available_tasks
-      @active_runs = Run.active
+      @pagy, @active_runs = pagy(Run.active)
     end
 
     # Renders the page responsible for providing Task actions to users.
     # Shows running and completed instances of the Task.
     def show
       @task = Task.named(params.fetch(:id))
-      @runs = @task.runs
+      @pagy, @runs = pagy(@task.runs)
       @active_run = @task.active_run
     end
   end
