@@ -22,6 +22,7 @@ module MaintenanceTasks
     end
 
     test 'lists active runs' do
+      freeze_time
       visit maintenance_tasks_path
 
       click_on 'Maintenance::UpdatePostsTask'
