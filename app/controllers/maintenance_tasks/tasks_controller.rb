@@ -9,6 +9,7 @@ module MaintenanceTasks
     def index
       @tasks = Task.available_tasks
       @pagy, @active_runs = pagy(Run.active.order(created_at: :desc))
+      set_refresh if @active_runs.present?
     end
 
     # Renders the page responsible for providing Task actions to users.
@@ -17,6 +18,13 @@ module MaintenanceTasks
       @task = Task.named(params.fetch(:id))
       @pagy, @runs = pagy(@task.runs.order(created_at: :desc))
       @active_run = @task.active_run
+      set_refresh if @active_run
+    end
+
+    private
+
+    def set_refresh
+      response.headers['Refresh'] = '5'
     end
   end
 end
