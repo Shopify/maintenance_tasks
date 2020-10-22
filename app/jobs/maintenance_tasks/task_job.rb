@@ -19,6 +19,7 @@ module MaintenanceTasks
     private
 
     def build_enumerator(_run, cursor:)
+      cursor ||= @run.cursor
       @task.task_enumerator(cursor: cursor)
     end
 
@@ -50,7 +51,9 @@ module MaintenanceTasks
     end
 
     def shutdown_job
-      @run.interrupted! unless task_stopped?
+      @run.cursor = cursor_position
+      @run.status = :interrupted unless task_stopped?
+      @run.save!
     end
 
     def job_errored(exception)

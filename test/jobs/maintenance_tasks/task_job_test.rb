@@ -5,8 +5,11 @@ require 'job-iteration'
 module MaintenanceTasks
   class TaskJobTest < ActiveJob::TestCase
     class TestTask < Task
-      def task_enumerator(*)
-        [1, 2].to_enum
+      def task_enumerator(cursor:)
+        enumerator_builder.build_array_enumerator(
+          [1, 2],
+          cursor: cursor
+        )
       end
 
       def task_count
@@ -141,6 +144,24 @@ module MaintenanceTasks
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 
       assert_no_enqueued_jobs { TaskJob.perform_now(run) }
+    end
+
+    test '.perform_now persists cursor when job shuts down' do
+      TestTask.any_instance.expects(:task_iteration).once.with do
+        @run.paused!
+      end
+
+      TaskJob.perform_now(@run)
+
+      assert_equal 0, @run.reload.cursor
+    end
+
+    test '.perform_now starts job from cursor position when job resumes' do
+      @run.update!(cursor: 0)
+
+      TestTask.any_instance.expects(:task_iteration).once.with(2)
+
+      TaskJob.perform_now(@run)
     end
   end
 end
