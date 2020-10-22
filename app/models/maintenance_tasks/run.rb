@@ -33,6 +33,8 @@ module MaintenanceTasks
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
 
+    validates_with RunStatusValidator, on: :update
+
     # Enqueues the job after validating and persisting the run.
     def enqueue
       if save

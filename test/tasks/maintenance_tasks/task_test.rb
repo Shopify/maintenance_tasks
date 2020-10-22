@@ -31,13 +31,13 @@ module MaintenanceTasks
 
     test '.active_run returns the only enqueued, running, or paused run associated with a Task' do
       run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-
-      assert_equal run, Maintenance::UpdatePostsTask.active_run
-
-      run.running!
       assert_equal run, Maintenance::UpdatePostsTask.active_run
 
       run.paused!
+      assert_equal run, Maintenance::UpdatePostsTask.active_run
+
+      run.enqueued!
+      run.running!
       assert_equal run, Maintenance::UpdatePostsTask.active_run
 
       run.succeeded!
