@@ -49,7 +49,7 @@ module MaintenanceTasks
       # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]
       #   the relation of Run records.
       def runs
-        Run.where(task_name: name)
+        MaintenanceTasks::Run.where(task_name: name)
       end
 
       # Returns the active Run associated with the Task, if any.
