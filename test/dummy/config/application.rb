@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 require_relative 'boot'
 
+verbose = $VERBOSE
+$VERBOSE = false
+require 'action_mailbox/engine'
+$VERBOSE = verbose
+
 require 'rails/all'
 
 Bundler.require(*Rails.groups)
