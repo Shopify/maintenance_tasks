@@ -20,7 +20,17 @@ module MaintenanceTasks
 
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
-      @task.task_enumerator(cursor: cursor)
+      collection = @task.collection
+
+      case collection
+      when ActiveRecord::Relation
+        enumerator_builder.active_record_on_records(collection, cursor: cursor)
+      when Array
+        enumerator_builder.build_array_enumerator(collection, cursor: cursor)
+      else
+        raise ArgumentError, "#{@task.class.name}#collection must be either "\
+          'an Active Record Relation or an Array.'
+      end
     end
 
     # Performs task iteration logic for the current input returned by the

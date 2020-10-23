@@ -73,9 +73,9 @@ module MaintenanceTasks
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
-    def task_enumerator(*)
+    def collection
       raise NotImplementedError,
-        "#{self.class.name} must implement `task_enumerator`."
+        "#{self.class.name} must implement `collection`."
     end
 
     # Placeholder method to raise in case a subclass fails to implement the

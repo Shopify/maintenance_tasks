@@ -49,11 +49,9 @@ module MaintenanceTasks
       assert_nil task.task_count
     end
 
-    test '#task_enumerator raises NotImplementedError' do
-      error = assert_raises(NotImplementedError) do
-        Task.new.task_enumerator(cursor: 1)
-      end
-      message = 'MaintenanceTasks::Task must implement `task_enumerator`.'
+    test '#collection raises NotImplementedError' do
+      error = assert_raises(NotImplementedError) { Task.new.collection }
+      message = 'MaintenanceTasks::Task must implement `collection`.'
       assert_equal message, error.message
     end
 
