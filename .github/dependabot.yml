@@ -4,6 +4,7 @@ updates:
 
   - package-ecosystem: bundler
     directory: '/'
+    versioning-strategy: increase
     schedule:
       interval: weekly
 
