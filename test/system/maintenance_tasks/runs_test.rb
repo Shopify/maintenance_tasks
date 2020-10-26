@@ -4,8 +4,6 @@ require 'application_system_test_case'
 
 module MaintenanceTasks
   class RunsTest < ApplicationSystemTestCase
-    setup { freeze_time }
-
     test 'run a task' do
       visit maintenance_tasks_path
 
@@ -14,7 +12,7 @@ module MaintenanceTasks
 
       assert_title 'Maintenance::UpdatePostsTask'
       assert_text 'Task Maintenance::UpdatePostsTask enqueued.'
-      assert_table with_rows: [[I18n.l(Time.now.utc)]]
+      assert_table with_rows: [['January 01, 2020 01:00']]
       assert_no_button 'Run'
     end
 
@@ -28,7 +26,7 @@ module MaintenanceTasks
 
       click_on 'Pause'
 
-      assert_table with_rows: [[I18n.l(Time.now.utc), 'paused']]
+      assert_table with_rows: [['January 01, 2020 01:00', 'paused']]
     end
 
     test 'resume a Run' do
@@ -45,7 +43,7 @@ module MaintenanceTasks
         click_on 'Resume'
       end
 
-      assert_table with_rows: [[I18n.l(Time.now.utc), 'enqueued']]
+      assert_table with_rows: [['January 01, 2020 01:00', 'enqueued']]
     end
 
     test 'cancel a Run' do
@@ -58,7 +56,7 @@ module MaintenanceTasks
 
       click_on 'Cancel'
 
-      assert_table with_rows: [[I18n.l(Time.now.utc), 'cancelled']]
+      assert_table with_rows: [['January 01, 2020 01:00', 'cancelled']]
     end
 
     test 'run a task that errors' do
@@ -74,7 +72,7 @@ module MaintenanceTasks
 
       assert_table with_rows: [
         [
-          I18n.l(Time.now.utc),
+          'January 01, 2020 01:00',
           'errored',
           'ArgumentError',
           'Something went wrong',
