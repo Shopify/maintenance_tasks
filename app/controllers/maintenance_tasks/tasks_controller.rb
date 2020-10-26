@@ -24,7 +24,7 @@ module MaintenanceTasks
     private
 
     def set_refresh
-      response.headers['Refresh'] = '5'
+      @refresh = 5
     end
   end
 end
