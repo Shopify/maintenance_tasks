@@ -24,4 +24,11 @@ if ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixtures(:all)
 end
 
+module Warning
+  def self.warn(message)
+    raise message.to_s
+  end
+end
+$VERBOSE = true
+
 Maintenance::UpdatePostsTask.fast_task = true
