@@ -18,6 +18,10 @@
         integrity: 'sha256-67AR2JVjhMZCLVxapLuBSMap5RrXbksv4vlllenHBSE=',
         crossorigin: 'anonymous'
     %>
+
+    <% if defined?(@refresh) %>
+      <meta http-equiv="refresh" content="<%= @refresh %>">
+    <% end %>
   </head>
 
   <body>
