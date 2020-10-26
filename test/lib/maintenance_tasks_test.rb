@@ -16,4 +16,12 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
     MaintenanceTasks.tasks_module = previous_task_module
     Object.send(:remove_const, :Task)
   end
+
+  test '.job can be set' do
+    original_job = MaintenanceTasks.job.name
+    MaintenanceTasks.job = 'CustomTaskJob'
+    assert_equal(CustomTaskJob, MaintenanceTasks.job)
+  ensure
+    MaintenanceTasks.job = original_job
+  end
 end
