@@ -15,6 +15,7 @@
       <th>Task name</th>
       <th>Created at</th>
       <th>Status</th>
+      <th>Progress</th>
     </tr>
   </thead>
 
@@ -24,6 +25,7 @@
         <td><%= link_to run.task_name, task_path(run.task_name) %></td>
         <td><%= l run.created_at %></td>
         <td><%= run.status %></td>
+        <td><%= format_ticks(run) %></td>
       </tr>
     <% end %>
   </tbody>
