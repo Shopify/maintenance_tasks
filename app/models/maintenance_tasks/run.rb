@@ -22,6 +22,8 @@ module MaintenanceTasks
     ]
 
     ACTIVE_STATUSES = [:enqueued, :running, :paused]
+    COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
+    COMPLETED_RUNS_LIMIT = 10
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
@@ -32,6 +34,11 @@ module MaintenanceTasks
     serialize :backtrace
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
+    scope :latest_completed, -> {
+      where(status: COMPLETED_STATUSES)
+        .order(created_at: :desc)
+        .limit(COMPLETED_RUNS_LIMIT)
+    }
 
     validates_with RunStatusValidator, on: :update
 
