@@ -8,7 +8,7 @@ module MaintenanceTasks
     test '#enqueue enqueues the Task Job for the current Run' do
       run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
 
-      assert_enqueued_with job: TaskJob, args: [run] do
+      assert_enqueued_with job: MaintenanceTasks.job, args: [run] do
         run.enqueue
         assert_predicate run, :persisted?
       end
