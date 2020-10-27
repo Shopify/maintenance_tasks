@@ -3,6 +3,8 @@
 module MaintenanceTasks
   # Class communicates with the Run model to persist info related to task runs.
   # It defines actions for creating and pausing runs.
+  #
+  # @api private
   class RunsController < ApplicationController
     before_action :set_run, only: [:pause, :cancel, :resume]
     before_action :set_task
@@ -49,4 +51,5 @@ module MaintenanceTasks
       @task = Task.named(params.fetch(:task_id))
     end
   end
+  private_constant :RunsController
 end

@@ -3,11 +3,13 @@
   Post.create!(title: "Post ##{i}", content: "Content ##{i}")
 end
 
-10.times do
-  MaintenanceTasks::Run.create!(
-    task_name: 'Maintenance::UpdatePostsTask',
-    tick_count: 10,
-    tick_total: 10,
-    status: :succeeded
-  )
+module MaintenanceTasks
+  10.times do
+    Run.create!(
+      task_name: 'Maintenance::UpdatePostsTask',
+      tick_count: 10,
+      tick_total: 10,
+      status: :succeeded
+    )
+  end
 end

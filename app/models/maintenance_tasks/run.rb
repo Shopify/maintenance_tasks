@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module MaintenanceTasks
   # Model that persists information related to a task being run from the UI.
+  #
+  # @api private
   class Run < ApplicationRecord
     # Various statuses a run can be in:
     #
@@ -58,4 +60,5 @@ module MaintenanceTasks
       self.class.update_counters(id, tick_count: number_of_ticks, touch: true)
     end
   end
+  private_constant :Run
 end
