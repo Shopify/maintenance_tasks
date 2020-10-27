@@ -1,0 +1,76 @@
+#!/bin/sh
+
+set -ex
+
+gem_path="$PWD"
+cd "${install_dir:=..}"
+if [ -d "${app_name:=maintenance_tasks_example}" ]; then
+	>&2 echo "Stopping: directory exists"
+	exit 1
+fi
+
+# clean up
+mkdir "$app_name"
+cd "$app_name"
+app_path="$PWD"
+cd ..
+trap 'rm -rf "$app_path"' EXIT
+
+# install rails
+rails new --skip-javascript --skip-spring $app_name
+cd "$app_name"
+
+sed s/app://g "$gem_path"/bin/production > bin/production
+if [ "$CLASSIC_AUTOLOADER" ]; then
+	sed -i '' "/load_defaults/ a\\
+		\\    config.autoloader = :classic
+	" config/application.rb
+fi
+
+if [ "$1" = "-i" ]; then
+	echo '# Before install, feel free to tweak the Rails app'
+	PS1="$ " sh -i
+fi
+
+# install gem
+echo "gem 'maintenance_tasks', path: '$gem_path'" >> Gemfile
+bundle
+rails generate maintenance_tasks:install
+
+
+cat <<EOT > app/tasks/maintenance/sleepy_task.rb
+class Maintenance::SleepyTask < MaintenanceTasks::Task
+  def collection
+    (1..10).to_enum { 10 }
+  end
+
+  def task_enumerator(cursor:)
+    if cursor
+      collection.drop(cursor+1)
+    else
+      collection
+    end
+  end
+
+  def task_count
+    collection.size
+  end
+
+  def task_iteration(number)
+    Rails.logger.debug "number: #{number}"
+    sleep 1
+  end
+end
+EOT
+
+if [ "$1" = "-i" ]; then
+	echo "# Shell"
+	PS1="$ " sh -i
+else
+	# run server
+	set -m
+	rails s &
+	sleep 3
+	open http://localhost:3000/maintenance_tasks
+	fg
+fi
