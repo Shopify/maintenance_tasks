@@ -15,9 +15,14 @@ module MaintenanceTasks
       assert_equal expected_trace, format_backtrace(backtrace)
     end
 
-    test '#format_ticks only shows the ticks if tick_total is not set' do
+    test '#format_ticks shows only the ticks if tick_total is not set' do
       run = Run.new(tick_count: 42)
       assert_equal '42', format_ticks(run)
+    end
+
+    test '#format_ticks shows only the ticks if tick_total is 0' do
+      run = Run.new(tick_count: 0, tick_total: 0)
+      assert_equal '0', format_ticks(run)
     end
 
     test '#format_ticks renders a <progress> element' do

@@ -20,7 +20,7 @@ module MaintenanceTasks
     # @param run [Run] the run for which the ticks are formatted.
     # @return [String] the progress information properly formatted.
     def format_ticks(run)
-      if run.tick_total
+      if run.tick_total.to_i > 0
         safe_join([
           tag.progress(value: run.tick_count, max: run.tick_total,
             class: 'progress is-small'),
