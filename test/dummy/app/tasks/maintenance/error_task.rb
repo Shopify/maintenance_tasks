@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 module Maintenance
   class ErrorTask < MaintenanceTasks::Task
-    def task_enumerator(*)
-      [1, 2].to_enum
+    def collection
+      [1, 2]
     end
 
     def task_iteration(*)

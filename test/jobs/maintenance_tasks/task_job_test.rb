@@ -5,15 +5,12 @@ require 'job-iteration'
 module MaintenanceTasks
   class TaskJobTest < ActiveJob::TestCase
     class TestTask < Task
-      def task_enumerator(cursor:)
-        enumerator_builder.build_array_enumerator(
-          [1, 2],
-          cursor: cursor
-        )
+      def collection
+        [1, 2]
       end
 
       def task_count
-        2
+        collection.count
       end
     end
 
@@ -162,6 +159,29 @@ module MaintenanceTasks
       TestTask.any_instance.expects(:task_iteration).once.with(2)
 
       TaskJob.perform_now(@run)
+    end
+
+    test '.perform_now accepts Active Record Relations as collection' do
+      TestTask.any_instance.stubs(collection: Post.all)
+      TestTask.any_instance.expects(:task_iteration).times(Post.count)
+
+      TaskJob.perform_now(@run)
+
+      assert_predicate @run.reload, :succeeded?
+    end
+
+    test '.perform_now sets the Run as errored when the Task collection is invalid' do
+      TestTask.any_instance.stubs(collection: 'not a collection')
+
+      TaskJob.perform_now(@run)
+      @run.reload
+
+      assert_predicate @run, :errored?
+      assert_equal 'ArgumentError', @run.error_class
+      assert_empty @run.backtrace
+      expected_message = 'MaintenanceTasks::TaskJobTest::TestTask#collection '\
+        'must be either an Active Record Relation or an Array.'
+      assert_equal expected_message, @run.error_message
     end
   end
 end
