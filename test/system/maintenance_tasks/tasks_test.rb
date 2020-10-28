@@ -29,7 +29,15 @@ module MaintenanceTasks
 
       visit maintenance_tasks_path
 
-      assert_table with_rows: [
+      assert_table 'running-tasks', with_rows: [
+        ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00'],
+      ]
+    end
+
+    test 'list completed runs' do
+      visit maintenance_tasks_path
+
+      assert_table 'completed-tasks', with_rows: [
         ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00'],
       ]
     end
@@ -42,7 +50,17 @@ module MaintenanceTasks
 
       visit maintenance_tasks_path
 
-      within 'tr', text: 'Maintenance::UpdatePostsTask' do
+      within_table 'running-tasks' do
+        click_on 'Maintenance::UpdatePostsTask'
+      end
+
+      assert_title 'Maintenance::UpdatePostsTask'
+    end
+
+    test 'visit a task page from a completed run' do
+      visit maintenance_tasks_path
+
+      within_table 'completed-tasks' do
         click_on 'Maintenance::UpdatePostsTask'
       end
 

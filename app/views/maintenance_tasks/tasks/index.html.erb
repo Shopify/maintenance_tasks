@@ -9,7 +9,7 @@
 </aside>
 
 <h2 class="title is-2">Running Tasks</h2>
-<table class="table">
+<table class="table" id="running-tasks">
   <thead>
     <tr>
       <th>Task name</th>
@@ -32,3 +32,28 @@
 </table>
 
 <%= pagination(@pagy) %>
+
+<h2 class="title is-2">Completed Tasks</h2>
+<table class="table" id="completed-tasks">
+  <thead>
+    <tr>
+      <th>Task name</th>
+      <th>Created at</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @latest_completed_runs.each do |run| %>
+      <tr>
+        <td><%= link_to run.task_name, task_path(run.task_name) %></td>
+        <td><%= formatted_datetime(run.created_at)%></td>
+        <td><%= status_tag(run.status)%></td>
+      </tr>
+    <% end %>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="3">Showing the last <%= pluralize(@latest_completed_runs.size, 'completed task') %>.</td>
+    </tr>
+  </tfoot>
+</table>
