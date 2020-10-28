@@ -34,7 +34,7 @@
   <tbody>
     <% @runs.each do |run| %>
       <tr>
-        <td><%= l run.created_at %></td>
+        <td><%= formatted_datetime(run.created_at) %></td>
         <td><%= status_tag(run.status) %></td>
         <td><%= format_ticks(run) %></td>
         <td><%= run.error_class %></td>

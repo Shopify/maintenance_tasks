@@ -12,5 +12,15 @@ module MaintenanceTasks
     def pagination(pagy)
       raw(pagy_bulma_nav(pagy)) if pagy.pages > 1
     end
+
+    # Renders a time element with the localized version of the datetime.
+    # The ISO 8601 version of the datetime is shown on hover
+    # via a title attribute.
+    #
+    # @param datetime [ActiveSupport::TimeWithZone] the time to be formatted.
+    # @return [String] the HTML to render with the formatted datetime.
+    def formatted_datetime(datetime)
+      time_tag(datetime, title: datetime.utc.iso8601)
+    end
   end
 end

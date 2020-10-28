@@ -22,7 +22,6 @@ module MaintenanceTasks
     end
 
     test 'lists active runs' do
-      freeze_time
       visit maintenance_tasks_path
 
       click_on 'Maintenance::UpdatePostsTask'
@@ -31,7 +30,7 @@ module MaintenanceTasks
       visit maintenance_tasks_path
 
       assert_table with_rows: [
-        ['Maintenance::UpdatePostsTask', I18n.l(Time.now.utc)],
+        ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00'],
       ]
     end
 
