@@ -7,7 +7,7 @@ module MaintenanceTasks
     test 'run a task' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
 
       assert_title 'Maintenance::UpdatePostsTask'
@@ -19,7 +19,7 @@ module MaintenanceTasks
     test 'pause a Run' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
 
       assert_title 'Maintenance::UpdatePostsTask'
@@ -32,7 +32,7 @@ module MaintenanceTasks
     test 'resume a Run' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
 
       assert_title 'Maintenance::UpdatePostsTask'
@@ -49,7 +49,7 @@ module MaintenanceTasks
     test 'cancel a Run' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
 
       assert_title 'Maintenance::UpdatePostsTask'
@@ -62,7 +62,7 @@ module MaintenanceTasks
     test 'run a task that errors' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::ErrorTask'
+      within('.menu') { click_on('Maintenance::ErrorTask') }
 
       with_queue_adapter(:inline) do
         click_on 'Run'

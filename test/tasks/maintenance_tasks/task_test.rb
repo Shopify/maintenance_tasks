@@ -23,7 +23,7 @@ module MaintenanceTasks
     end
 
     test '.runs returns the Active Record relation of the runs associated with a Task' do
-      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      run = maintenance_tasks_runs(:update_posts_task)
 
       assert_equal 1, Maintenance::UpdatePostsTask.runs.count
       assert_equal run, Maintenance::UpdatePostsTask.runs.first

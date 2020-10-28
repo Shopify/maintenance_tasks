@@ -16,7 +16,7 @@ module MaintenanceTasks
     test 'visit a task page' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
 
       assert_title 'Maintenance::UpdatePostsTask'
     end
@@ -24,7 +24,7 @@ module MaintenanceTasks
     test 'lists active runs' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
 
       visit maintenance_tasks_path
@@ -37,7 +37,7 @@ module MaintenanceTasks
     test 'visit a task page from an active run' do
       visit maintenance_tasks_path
 
-      click_on 'Maintenance::UpdatePostsTask'
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
 
       visit maintenance_tasks_path
