@@ -5,7 +5,7 @@ module Maintenance
       [1, 2]
     end
 
-    def task_iteration(*)
+    def process(*)
       raise ArgumentError, 'Something went wrong'
     end
   end

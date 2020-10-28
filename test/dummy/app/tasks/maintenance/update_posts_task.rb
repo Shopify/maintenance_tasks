@@ -15,7 +15,7 @@ module Maintenance
       collection.count
     end
 
-    def task_iteration(post)
+    def process(post)
       sleep(1) unless self.class.fast_task
 
       post.update!(content: "New content added on #{Time.now.utc}")

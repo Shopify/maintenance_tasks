@@ -19,7 +19,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now exits job when Run is paused' do
-      TestTask.any_instance.expects(:task_iteration).once.with do
+      TestTask.any_instance.expects(:process).once.with do
         @run.paused!
       end
 
@@ -30,7 +30,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now exits job when Run is cancelled' do
-      TestTask.any_instance.expects(:task_iteration).once.with do
+      TestTask.any_instance.expects(:process).once.with do
         @run.cancelled!
       end
 
@@ -43,7 +43,7 @@ module MaintenanceTasks
     test '.perform_now skips iterations when Run is paused' do
       @run.paused!
 
-      TestTask.any_instance.expects(:task_iteration).never
+      TestTask.any_instance.expects(:process).never
 
       TaskJob.perform_now(@run)
 
@@ -54,7 +54,7 @@ module MaintenanceTasks
     test '.perform_now skips iterations when Run is cancelled' do
       @run.cancelled!
 
-      TestTask.any_instance.expects(:task_iteration).never
+      TestTask.any_instance.expects(:process).never
 
       TaskJob.perform_now(@run)
 
@@ -63,7 +63,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now updates tick_count' do
-      TestTask.any_instance.expects(:task_iteration).twice
+      TestTask.any_instance.expects(:process).twice
 
       TaskJob.perform_now(@run)
 
@@ -72,7 +72,7 @@ module MaintenanceTasks
 
     test '.perform_now updates tick_count when job is interrupted' do
       JobIteration.stubs(interruption_adapter: -> { true })
-      TestTask.any_instance.expects(:task_iteration).once
+      TestTask.any_instance.expects(:process).once
 
       TaskJob.perform_now(@run)
 
@@ -80,7 +80,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now updates tick_total when the job starts' do
-      TestTask.any_instance.expects(:task_iteration).once.with do
+      TestTask.any_instance.expects(:process).once.with do
         @run.cancelled!
       end
 
@@ -90,7 +90,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now updates Run to running and persists job_id when job starts performing' do
-      TestTask.any_instance.expects(:task_iteration).twice.with do
+      TestTask.any_instance.expects(:process).twice.with do
         assert_predicate @run.reload, :running?
       end
 
@@ -101,7 +101,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now updates Run to succeeded when job finishes successfully' do
-      TestTask.any_instance.expects(:task_iteration).twice
+      TestTask.any_instance.expects(:process).twice
       TaskJob.perform_now(@run)
 
       assert_predicate @run.reload, :succeeded?
@@ -109,7 +109,7 @@ module MaintenanceTasks
 
     test '.perform_now updates Run to interrupted when job is interrupted' do
       JobIteration.stubs(interruption_adapter: -> { true })
-      TestTask.any_instance.expects(:task_iteration).once
+      TestTask.any_instance.expects(:process).once
 
       TaskJob.perform_now(@run)
 
@@ -118,7 +118,7 @@ module MaintenanceTasks
 
     test '.perform_now re-enqueues the job when interrupted' do
       JobIteration.stubs(interruption_adapter: -> { true })
-      TestTask.any_instance.expects(:task_iteration).once
+      TestTask.any_instance.expects(:process).once
 
       assert_enqueued_with(job: TaskJob) { TaskJob.perform_now(@run) }
     end
@@ -133,7 +133,7 @@ module MaintenanceTasks
       assert_predicate run, :errored?
       assert_equal 'ArgumentError', run.error_class
       assert_equal 'Something went wrong', run.error_message
-      expected = ["app/tasks/maintenance/error_task.rb:9:in `task_iteration'"]
+      expected = ["app/tasks/maintenance/error_task.rb:9:in `process'"]
       assert_equal expected, run.backtrace
     end
 
@@ -144,7 +144,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now persists cursor when job shuts down' do
-      TestTask.any_instance.expects(:task_iteration).once.with do
+      TestTask.any_instance.expects(:process).once.with do
         @run.paused!
       end
 
@@ -156,14 +156,14 @@ module MaintenanceTasks
     test '.perform_now starts job from cursor position when job resumes' do
       @run.update!(cursor: 0)
 
-      TestTask.any_instance.expects(:task_iteration).once.with(2)
+      TestTask.any_instance.expects(:process).once.with(2)
 
       TaskJob.perform_now(@run)
     end
 
     test '.perform_now accepts Active Record Relations as collection' do
       TestTask.any_instance.stubs(collection: Post.all)
-      TestTask.any_instance.expects(:task_iteration).times(Post.count)
+      TestTask.any_instance.expects(:process).times(Post.count)
 
       TaskJob.perform_now(@run)
 

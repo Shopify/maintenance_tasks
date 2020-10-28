@@ -40,7 +40,7 @@ module MaintenanceTasks
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
       throw(:abort, :skip_complete_callbacks) if task_stopped?
-      @task.task_iteration(input)
+      @task.process(input)
       @ticker.tick
     end
 
