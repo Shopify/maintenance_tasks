@@ -31,6 +31,26 @@ module MaintenanceTasks
       end
     end
 
+    # Renders a span with a Run's status, with the corresponding tag class
+    # attached.
+    #
+    # @param status [String] the status for the Run.
+    # @return [String] the span element containing the status, with the
+    #   appropriate tag class attached.
+    def status_tag(status)
+      tag_labels = {
+        'enqueued' => 'primary',
+        'running' => 'info',
+        'interrupted' => 'warning',
+        'paused' => 'warning',
+        'succeeded' => 'success',
+        'cancelled' => 'dark',
+        'errored' => 'danger',
+      }
+
+      tag.span(status, class: "tag is-#{tag_labels.fetch(status)}")
+    end
+
     private
 
     def progress_text(run)

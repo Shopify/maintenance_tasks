@@ -40,5 +40,22 @@ module MaintenanceTasks
       run = Run.new(tick_count: 999, tick_total: 1000)
       assert_equal '999 / 1000 (99%)', progress_text(run)
     end
+
+    test '#status_tag renders a span with the appropriate tag based on status' do
+      tag_classes = {
+        'enqueued' => 'tag is-primary',
+        'running' => 'tag is-info',
+        'interrupted' => 'tag is-warning',
+        'paused' => 'tag is-warning',
+        'succeeded' => 'tag is-success',
+        'cancelled' => 'tag is-dark',
+        'errored' => 'tag is-danger',
+      }
+
+      tag_classes.each do |status, tag_class|
+        expected_result = "<span class=\"#{tag_class}\">#{status}</span>"
+        assert_equal expected_result, status_tag(status)
+      end
+    end
   end
 end
