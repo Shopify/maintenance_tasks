@@ -11,7 +11,7 @@ module Maintenance
       Post.all
     end
 
-    def task_count
+    def count
       collection.count
     end
 

@@ -44,9 +44,9 @@ module MaintenanceTasks
       assert_nil Maintenance::UpdatePostsTask.active_run
     end
 
-    test '#task_count is nil by default' do
+    test '#count is nil by default' do
       task = Task.new
-      assert_nil task.task_count
+      assert_nil task.count
     end
 
     test '#collection raises NotImplementedError' do

@@ -97,7 +97,7 @@ module MaintenanceTasks
     # undefined, or counting would be prohibitive for your database.
     #
     # @return [Integer, nil]
-    def task_count
+    def count
     end
 
     # Convenience method to allow tasks define enumerators with cursors for

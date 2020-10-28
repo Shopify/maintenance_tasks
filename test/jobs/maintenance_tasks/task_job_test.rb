@@ -9,7 +9,7 @@ module MaintenanceTasks
         [1, 2]
       end
 
-      def task_count
+      def count
         collection.count
       end
     end

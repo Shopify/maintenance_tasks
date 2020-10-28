@@ -53,7 +53,7 @@ module MaintenanceTasks
     end
 
     def job_started
-      @run.update!(tick_total: @task.task_count)
+      @run.update!(tick_total: @task.count)
     end
 
     def job_completed
