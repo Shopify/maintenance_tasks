@@ -13,36 +13,53 @@ module MaintenanceTasks
       assert_link 'Maintenance::ErrorTask'
     end
 
-    test 'visit a task page' do
+    test 'show a Task' do
       visit maintenance_tasks_path
 
       within('.menu') { click_on('Maintenance::UpdatePostsTask') }
 
       assert_title 'Maintenance::UpdatePostsTask'
+
+      assert_table rows: [
+        [
+          'January 01, 2020 01:00',
+          'succeeded',
+          '10 / 10 (100%)',
+          '',
+          '',
+          '',
+        ],
+      ]
     end
 
-    test 'lists active runs' do
+    test 'list active Runs' do
       visit maintenance_tasks_path
 
       within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+
       click_on 'Run'
 
       visit maintenance_tasks_path
 
-      assert_table 'running-tasks', with_rows: [
-        ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00'],
+      assert_table 'running-tasks', rows: [
+        [
+          'Maintenance::UpdatePostsTask',
+          'January 09, 2020 09:41',
+          'enqueued',
+          '0',
+        ],
       ]
     end
 
-    test 'list completed runs' do
+    test 'list completed Runs' do
       visit maintenance_tasks_path
 
-      assert_table 'completed-tasks', with_rows: [
-        ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00'],
+      assert_table 'completed-tasks', rows: [
+        ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00', 'succeeded'],
       ]
     end
 
-    test 'visit a task page from an active run' do
+    test 'visit a Task page from an active Run' do
       visit maintenance_tasks_path
 
       within('.menu') { click_on('Maintenance::UpdatePostsTask') }
@@ -57,7 +74,7 @@ module MaintenanceTasks
       assert_title 'Maintenance::UpdatePostsTask'
     end
 
-    test 'visit a task page from a completed run' do
+    test 'visit a Task page from a completed Run' do
       visit maintenance_tasks_path
 
       within_table 'completed-tasks' do

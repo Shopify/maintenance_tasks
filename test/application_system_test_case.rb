@@ -11,7 +11,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   setup do
-    travel_to Time.zone.local(2020, 01, 01, 01, 00, 00)
+    travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
     Maintenance::UpdatePostsTask.fast_task = false
   end
 
