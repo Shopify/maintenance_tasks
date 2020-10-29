@@ -10,6 +10,7 @@ module MaintenanceTasks
       @tasks = Task.available_tasks
       @pagy, @active_runs = pagy(Run.active.order(created_at: :desc))
       set_refresh if @active_runs.present?
+      @latest_completed_runs = Run.latest_completed
     end
 
     # Renders the page responsible for providing Task actions to users.

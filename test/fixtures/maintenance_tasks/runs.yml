@@ -1,15 +1,9 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
-one:
-  task_name: MyString
-  tick_count: 1
-  tick_total: 1
+update_posts_task:
+  task_name: Maintenance::UpdatePostsTask
+  tick_count: 10
+  tick_total: 10
   job_id: '123abc'
   status: 'succeeded'
-
-two:
-  task_name: MyString
-  tick_count: 1
-  tick_total: 1
-  job_id: '456xyz'
-  status: 'succeeded'
+  created_at: '01 Jan 2020 01:00:00'
