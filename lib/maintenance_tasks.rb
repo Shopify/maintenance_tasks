@@ -17,6 +17,15 @@ module MaintenanceTasks
   # @param [String] the name of the job class.
   mattr_writer :job, default: 'MaintenanceTasks::TaskJob'
 
+  # After each iteration, the progress of the task may be updated. This duration
+  # in seconds limits these updates, skipping if the duration since the last
+  # update is lower than this value, except if the job is interrupted, in which
+  # case the progress will always be recorded.
+  #
+  # @param [ActiveSupport::Duration, Numeric] Duration of the delay to update
+  #   the ticker during Task iterations.
+  mattr_accessor :ticker_delay, default: 1.second
+
   # Retrieves the module that Tasks are namespaced in.
   #
   # @return [Module] the constantized tasks_module value.

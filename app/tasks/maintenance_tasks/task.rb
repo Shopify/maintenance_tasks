@@ -5,15 +5,6 @@ module MaintenanceTasks
   class Task
     extend ActiveSupport::DescendantsTracker
 
-    # After each iteration, the progress of the task may be updated.
-    # This duration in seconds limits these updates, skipping if the duration
-    # since the last update is lower than this value, except if the job is
-    # interrupted, in which case the progress will always be recorded.
-    #
-    # @api private
-    class_attribute :minimum_duration_for_tick_update, default: 1.0,
-      instance_accessor: false, instance_predicate: false, instance_reader: true
-
     class << self
       # Controls the value of abstract_class, which indicates whether the class
       # is abstract or not. Abstract classes are excluded from the list of
