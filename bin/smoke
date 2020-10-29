@@ -33,6 +33,18 @@ if [ "$CLASSIC_AUTOLOADER" ]; then
 	" config/application.rb
 fi
 
+cat >app/controllers/home_controller.rb <<EOF
+class HomeController < ApplicationController
+  def index
+    render plain: "home"
+  end
+end
+EOF
+
+sed -i '' "/^end/ i\\
+	\\  root to: 'home#index'
+" config/routes.rb
+
 if [ $interactive ]; then
 	echo
 	echo '# Before install, feel free to tweak the Rails app'
