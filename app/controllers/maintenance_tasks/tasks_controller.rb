@@ -3,7 +3,7 @@ module MaintenanceTasks
   # Class handles rendering the maintenance_tasks page in the host application.
   # It makes data about available, enqueued, performing, and completed
   # tasks accessible to the views so it can be displayed in the UI.
-  class TasksController < MaintenanceTasks::ApplicationController
+  class TasksController < ApplicationController
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users.
     def index
