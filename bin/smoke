@@ -16,8 +16,14 @@ app_path="$PWD"
 cd ..
 trap 'rm -rf "$app_path"' EXIT
 
+interactive=
+if [ "$1" = "-i" ]; then
+	interactive=1
+	shift
+fi
+
 # install rails
-rails new --skip-javascript --skip-spring $app_name
+rails new --skip-javascript --skip-spring --skip-git "$@" $app_name
 cd "$app_name"
 
 sed s/app://g "$gem_path"/bin/production > bin/production
@@ -27,7 +33,8 @@ if [ "$CLASSIC_AUTOLOADER" ]; then
 	" config/application.rb
 fi
 
-if [ "$1" = "-i" ]; then
+if [ $interactive ]; then
+	echo
 	echo '# Before install, feel free to tweak the Rails app'
 	PS1="$ " sh -i
 fi
@@ -37,33 +44,9 @@ echo "gem 'maintenance_tasks', path: '$gem_path'" >> Gemfile
 bundle
 rails generate maintenance_tasks:install
 
+cp "$gem_path"/test/dummy/app/tasks/maintenance/* app/tasks/maintenance
 
-cat <<EOT > app/tasks/maintenance/sleepy_task.rb
-class Maintenance::SleepyTask < MaintenanceTasks::Task
-  def collection
-    (1..10).to_enum { 10 }
-  end
-
-  def task_enumerator(cursor:)
-    if cursor
-      collection.drop(cursor+1)
-    else
-      collection
-    end
-  end
-
-  def task_count
-    collection.size
-  end
-
-  def task_iteration(number)
-    Rails.logger.debug "number: #{number}"
-    sleep 1
-  end
-end
-EOT
-
-if [ "$1" = "-i" ]; then
+if [ $interactive ]; then
 	echo "# Shell"
 	PS1="$ " sh -i
 else
