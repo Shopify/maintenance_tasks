@@ -16,7 +16,10 @@ Gem::Specification.new do |spec|
 
   spec.files = Dir['{app,config,db,lib}/**/*', 'Rakefile', 'README.md']
 
-  spec.add_dependency('job-iteration', '~> 1.1.8')
-  spec.add_dependency('pagy', '~> 3.9.0')
-  spec.add_dependency('rails', '~> 6.0.3')
+  spec.add_dependency('actionpack', '>= 6.0')
+  spec.add_dependency('activejob', '>= 6.0')
+  spec.add_dependency('activerecord', '>= 6.0')
+  spec.add_dependency('job-iteration', '~> 1.1')
+  spec.add_dependency('pagy', '~> 3.9')
+  spec.add_dependency('railties', '~> 6.0')
 end

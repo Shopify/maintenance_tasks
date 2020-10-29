@@ -1,4 +1,9 @@
 # frozen_string_literal: true
+require 'action_controller'
+require 'action_view'
+require 'active_job'
+require 'active_record'
+
 require 'maintenance_tasks/engine'
 require 'pagy'
 require 'pagy/extras/bulma'
