@@ -74,7 +74,7 @@ module MaintenanceTasks
           'errored',
           'ArgumentError',
           'Something went wrong',
-          "app/tasks/maintenance/error_task.rb:9:in `task_iteration'",
+          "app/tasks/maintenance/error_task.rb:9:in `process'",
         ],
       ]
     end

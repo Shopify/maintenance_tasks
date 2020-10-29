@@ -55,11 +55,11 @@ module MaintenanceTasks
       assert_equal message, error.message
     end
 
-    test '#task_iteration raises NotImplementedError' do
+    test '#process raises NotImplementedError' do
       error = assert_raises(NotImplementedError) do
-        Task.new.task_iteration('an item')
+        Task.new.process('an item')
       end
-      message = 'MaintenanceTasks::Task must implement `task_iteration`.'
+      message = 'MaintenanceTasks::Task must implement `process`.'
       assert_equal message, error.message
     end
 

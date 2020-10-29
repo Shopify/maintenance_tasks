@@ -85,9 +85,9 @@ module MaintenanceTasks
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
-    def task_iteration(_item)
+    def process(_item)
       raise NotImplementedError,
-        "#{self.class.name} must implement `task_iteration`."
+        "#{self.class.name} must implement `process`."
     end
 
     # Total count of iterations to be performed.

@@ -29,7 +29,7 @@ Or subclass your ApplicationTask and implement:
 
 * `collection`: return an Active Record Relation or an Array to be iterated
   over.
-* `task_iteration`: do the work of your maintenance task on a single record
+* `process`: do the work of your maintenance task on a single record
 * `count`: return the number of rows that will be iterated over (optional,
   to be able to show progress)
 
@@ -47,7 +47,7 @@ module Maintenance
       collection.count
     end
 
-    def task_iteration(post)
+    def process(post)
       post.update!(content: 'New content!')
     end
   end
