@@ -39,9 +39,7 @@ module MaintenanceTasks
 
       click_on 'Pause'
 
-      with_queue_adapter(:test) do
-        click_on 'Resume'
-      end
+      click_on 'Resume'
 
       assert_table with_rows: [['January 01, 2020 01:00', 'enqueued']]
     end
@@ -64,7 +62,7 @@ module MaintenanceTasks
 
       within('.menu') { click_on('Maintenance::ErrorTask') }
 
-      with_queue_adapter(:inline) do
+      perform_enqueued_jobs do
         click_on 'Run'
       end
 
@@ -79,16 +77,6 @@ module MaintenanceTasks
           "app/tasks/maintenance/error_task.rb:9:in `task_iteration'",
         ],
       ]
-    end
-
-    private
-
-    def with_queue_adapter(adapter)
-      original_adapter = TaskJob.queue_adapter
-      TaskJob.queue_adapter = adapter
-      yield
-    ensure
-      TaskJob.queue_adapter = original_adapter
     end
   end
 end
