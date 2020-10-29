@@ -1,4 +1,9 @@
 # frozen_string_literal: true
+require 'action_controller/railtie'
+require 'action_view/railtie'
+require 'active_job/railtie'
+require 'active_record/railtie'
+
 require 'maintenance_tasks/engine'
 require 'pagy'
 require 'pagy/extras/bulma'
