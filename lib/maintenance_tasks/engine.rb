@@ -1,4 +1,6 @@
 # frozen_string_literal: true
+require 'active_record/railtie'
+
 module MaintenanceTasks
   # The engine's main class, which defines its namespace. The engine is mounted
   # by the host application.
