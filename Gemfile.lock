@@ -2,9 +2,12 @@ PATH
   remote: .
   specs:
     maintenance_tasks (0.1.0)
-      job-iteration (~> 1.1.8)
-      pagy (~> 3.9.0)
-      rails (~> 6.0.3)
+      actionpack (>= 6.0)
+      activejob (>= 6.0)
+      activerecord (>= 6.0)
+      job-iteration (~> 1.1)
+      pagy (~> 3.9)
+      railties (~> 6.0)
 
 GEM
   remote: https://rubygems.org/
@@ -195,6 +198,7 @@ DEPENDENCIES
   maintenance_tasks!
   mocha
   pry-byebug
+  rails
   rubocop-shopify
   selenium-webdriver
   sqlite3

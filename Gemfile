@@ -7,6 +7,7 @@ gemspec
 gem 'capybara'
 gem 'mocha'
 gem 'pry-byebug'
+gem 'rails'
 gem 'rubocop-shopify'
 gem 'selenium-webdriver'
 gem 'sqlite3'
