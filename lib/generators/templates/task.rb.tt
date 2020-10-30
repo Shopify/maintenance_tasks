@@ -1,0 +1,19 @@
+module Maintenance
+<% module_namespacing do -%>
+  class <%= class_name %>Task < MaintenanceTasks::Task
+    def collection
+      # Collection to be iterated over
+      # Must be Active Record Relation or Array
+    end
+
+    def process(element)
+      # The work to be done in a single iteration of the task
+    end
+
+    def count
+      # Optionally, define the number of rows that will be iterated over
+      # This is used to track the task's progress
+    end
+  end
+<% end -%>
+end
