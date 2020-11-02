@@ -17,14 +17,6 @@ module MaintenanceTasks
       rake('db:migrate')
     end
 
-    # Creates an initializer file for the engine in the host application
-    def create_initializer
-      template(
-        'maintenance_tasks.rb',
-        'config/initializers/maintenance_tasks.rb'
-      )
-    end
-
     # Creates ApplicationTask class for task classes to subclass
     def create_application_task
       template(
