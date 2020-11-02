@@ -19,13 +19,14 @@ $ rails generate maintenance_tasks:install
 
 ## Usage
 
-TODO: You can generate tasks using:
+A generator is provided to create tasks. Generate a new task by running:
 
 ```bash
-$ rails generate maintenance_task
-```
+$ rails generate maintenance_task update_posts
 
-Or subclass `MaintenanceTasks::Task` and implement:
+This creates the task file `app/tasks/maintenance/update_posts_task.rb`.
+
+The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 
 * `collection`: return an Active Record Relation or an Array to be iterated
   over.
