@@ -7,7 +7,9 @@ A Rails engine for queuing and managing maintenance tasks.
 Add this line to your application's Gemfile:
 
 ```ruby
-gem 'maintenance_tasks'
+source 'https://packages.shopify.io/shopify/gems' do
+  gem 'maintenance_tasks'
+end
 ```
 
 And then execute:
@@ -86,3 +88,13 @@ end
 ```
 
 The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
+
+## Releasing new versions
+
+This gem is published to packagecloud. The procedure to publish a new version:
+
+* Update `spec.version` in `maintenance_tasks.gemspec`.
+* Run `bundle install` to bump the `Gemfile.lock` version of the gem.
+* Open a PR and merge on approval.
+* Create a [release on GitHub](https://help.github.com/articles/creating-releases/) with a version number that matches the version defined in the gemspec.
+* Deploy via [Shipit](https://shipit.shopify.io/shopify/maintenance_tasks/packagecloud) and see the new version on https://gems.shopify.io/packages/.
