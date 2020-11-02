@@ -1,8 +1,9 @@
 # frozen_string_literal: true
+require_relative 'lib/maintenance_tasks/version'
 
 Gem::Specification.new do |spec|
   spec.name = 'maintenance_tasks'
-  spec.version = '0.1.0'
+  spec.version = MaintenanceTasks::VERSION
   spec.author = 'Shopify Engineering'
   spec.email = 'gems@shopify.com'
   spec.homepage = 'https://github.com/Shopify/maintenance_tasks'

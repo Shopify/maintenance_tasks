@@ -30,6 +30,7 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
       :Engine,  # to mount
       :Task,    # to define tasks
       :TaskJob, # to customize the job
+      :VERSION, # to specify the gem version in gemspec
     ]
     public_constants = MaintenanceTasks.constants.select do |constant|
       constant =
