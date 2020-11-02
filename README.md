@@ -23,6 +23,7 @@ A generator is provided to create tasks. Generate a new task by running:
 
 ```bash
 $ rails generate maintenance_task update_posts
+```
 
 This creates the task file `app/tasks/maintenance/update_posts_task.rb`.
 
@@ -62,15 +63,18 @@ Custom configurations should be placed in a `maintenance_tasks.rb` initializer.
 
 `MaintenanceTasks.tasks_module` can be configured to define the module in which
 tasks will be placed.
+
 ```ruby
 # config/initializers/maintenance_tasks.rb
 MaintenanceTasks.tasks_module = 'TaskModule'
 ```
+
 If no value is specified, it will default to `Maintenance`.
 
 `MaintenanceTasks.job` can be configured to define a Job class for your tasks
 to use. This is a global configuration, so this Job class will be used across
 all maintenance tasks in your application.
+
 ```ruby
 # config/initializers/maintenance_tasks.rb
 MaintenanceTasks.job = 'CustomTaskJob'
@@ -80,4 +84,5 @@ class CustomTaskJob < MaintenanceTasks::TaskJob
   queue_as :low_priority
 end
 ```
+
 The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
