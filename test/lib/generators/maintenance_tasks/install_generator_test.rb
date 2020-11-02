@@ -18,7 +18,7 @@ module MaintenanceTasks
       FileUtils.rm_rf(SAMPLE_APP_PATH)
     end
 
-    test 'generator mounts engine, runs migrations, and creates required files' do
+    test 'generator mounts engine and runs migrations' do
       Dir.chdir(SAMPLE_APP_PATH) do
         run_generator
 
@@ -34,8 +34,6 @@ module MaintenanceTasks
         assert_file('db/schema.rb') do |contents|
           assert_match(/create_table "maintenance_tasks_runs"/, contents)
         end
-
-        assert_file('app/tasks/maintenance/application_task.rb')
       end
     end
 
@@ -46,7 +44,6 @@ module MaintenanceTasks
 
       Dir.chdir(SAMPLE_APP_PATH) do
         FileUtils.rm_r('db')
-        FileUtils.rm('app/tasks/maintenance/application_task.rb')
       end
     end
   end

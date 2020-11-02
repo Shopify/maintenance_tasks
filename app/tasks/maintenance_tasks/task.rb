@@ -6,18 +6,6 @@ module MaintenanceTasks
     extend ActiveSupport::DescendantsTracker
 
     class << self
-      # Controls the value of abstract_class, which indicates whether the class
-      # is abstract or not. Abstract classes are excluded from the list of
-      # available_tasks.
-      #
-      # @return [Boolean] the value of abstract_class
-      attr_accessor :abstract_class
-
-      # @return [Boolean] whether or not the class is abstract
-      def abstract_class?
-        defined?(@abstract_class) && @abstract_class == true
-      end
-
       # Given the name of a Task, returns the Task subclass. Returns nil if
       # there's no task with that name.
       def named(name)
@@ -26,13 +14,13 @@ module MaintenanceTasks
         nil
       end
 
-      # Returns a list of concrete classes that inherit from
-      # the Task superclass.
+      # Returns a list of concrete classes that inherit from the Task
+      # superclass.
       #
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants.reject(&:abstract_class?)
+        descendants
       end
 
       # Returns the set of Run records associated with the Task.
