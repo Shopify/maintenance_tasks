@@ -2,6 +2,8 @@
 
 module MaintenanceTasks
   # Helpers for formatting data in the maintenance_tasks views.
+  #
+  # @api private
   module TaskHelper
     # Formats a run backtrace.
     #
@@ -59,4 +61,5 @@ module MaintenanceTasks
         "(#{number_to_percentage(percentage.floor, precision: 0)})"
     end
   end
+  private_constant :TaskHelper
 end

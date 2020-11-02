@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 module MaintenanceTasks
   # Module for common view helpers.
+  #
+  # @api private
   module ApplicationHelper
     include Pagy::Frontend
 
@@ -23,4 +25,5 @@ module MaintenanceTasks
       time_tag(datetime, title: datetime.utc.iso8601)
     end
   end
+  private_constant :ApplicationHelper
 end

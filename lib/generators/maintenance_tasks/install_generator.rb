@@ -3,6 +3,8 @@ module MaintenanceTasks
   # Generator used to set up the engine in the host application.
   # It handles mounting the engine, installing migrations
   # and creating some required files.
+  #
+  # @api private
   class InstallGenerator < Rails::Generators::Base
     source_root File.expand_path('templates', __dir__)
 
@@ -25,4 +27,5 @@ module MaintenanceTasks
       )
     end
   end
+  private_constant :InstallGenerator
 end

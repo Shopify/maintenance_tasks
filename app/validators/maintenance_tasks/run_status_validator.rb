@@ -2,6 +2,8 @@
 module MaintenanceTasks
   # Custom validator class responsible for ensuring that transitions between
   # Run statuses are valid.
+  #
+  # @api private
   class RunStatusValidator < ActiveModel::Validator
     # Valid status transitions a Run can make.
     VALID_STATUS_TRANSITIONS = {
@@ -43,4 +45,5 @@ module MaintenanceTasks
       )
     end
   end
+  private_constant :RunStatusValidator
 end
