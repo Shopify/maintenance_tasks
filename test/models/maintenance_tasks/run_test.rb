@@ -19,11 +19,6 @@ module MaintenanceTasks
       refute run.valid?
     end
 
-    test 'invalid if the task is abstract' do
-      run = Run.new(task_name: 'Maintenance::ApplicationTask')
-      refute run.valid?
-    end
-
     test '#increment_ticks persists an increment to the tick count' do
       run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',

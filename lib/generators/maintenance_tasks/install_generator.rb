@@ -1,8 +1,7 @@
 # frozen_string_literal: true
 module MaintenanceTasks
-  # Generator used to set up the engine in the host application.
-  # It handles mounting the engine, installing migrations
-  # and creating some required files.
+  # Generator used to set up the engine in the host application. It handles
+  # mounting the engine and installing migrations.
   #
   # @api private
   class InstallGenerator < Rails::Generators::Base
@@ -17,14 +16,6 @@ module MaintenanceTasks
     def install_migrations
       rake('maintenance_tasks:install:migrations')
       rake('db:migrate')
-    end
-
-    # Creates ApplicationTask class for task classes to subclass
-    def create_application_task
-      template(
-        'application_task.rb',
-        'app/tasks/maintenance/application_task.rb'
-      )
     end
   end
   private_constant :InstallGenerator

@@ -25,7 +25,7 @@ TODO: You can generate tasks using:
 $ rails generate maintenance_task
 ```
 
-Or subclass your ApplicationTask and implement:
+Or subclass `MaintenanceTasks::Task` and implement:
 
 * `collection`: return an Active Record Relation or an Array to be iterated
   over.
@@ -38,7 +38,7 @@ Or subclass your ApplicationTask and implement:
 ```ruby
 # app/tasks/maintenance/update_posts_task.rb
 module Maintenance
-  class UpdatePostsTask < ApplicationTask
+  class UpdatePostsTask < MaintenanceTasks::Task
     def collection
       Post.all
     end
@@ -69,14 +69,14 @@ If no value is specified, it will default to `Maintenance`.
 
 `MaintenanceTasks.job` can be configured to define a Job class for your tasks
 to use. This is a global configuration, so this Job class will be used across
-all maintenance tasks in your application. 
+all maintenance tasks in your application.
 ```ruby
 # config/initializers/maintenance_tasks.rb
 MaintenanceTasks.job = 'CustomTaskJob'
 
 # app/jobs/custom_task_job.rb
 class CustomTaskJob < MaintenanceTasks::TaskJob
-  queue_as :low_priority 
+  queue_as :low_priority
 end
 ```
 The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
