@@ -24,6 +24,7 @@ jobs:
     - name: Install dependencies
       run: |
         bundle config path vendor/bundle
+        bundle config frozen true
         bundle install --jobs 4 --retry 3
     - name: Set up database
       run: bundle exec rails db:setup
