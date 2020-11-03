@@ -29,7 +29,7 @@ jobs:
     - name: Set up database
       run: bundle exec rails db:setup
     - name: Ruby Tests
-      run: bundle exec rails test
+      run: bundle exec rails app:test
     - name: System Tests
       run: bundle exec rails app:test:system
     - name: RuboCop
