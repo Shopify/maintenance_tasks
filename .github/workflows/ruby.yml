@@ -13,7 +13,7 @@ jobs:
     - name: Set up Ruby
       uses: actions/setup-ruby@v1.1.2
       with:
-        ruby-version: 2.7
+        ruby-version: '2.7.2'
     - name: Restore cache
       uses: actions/cache@v2
       with:
@@ -34,3 +34,9 @@ jobs:
       run: bundle exec rails app:test:system
     - name: RuboCop
       run: bundle exec rubocop
+    - name: Archive system test artifacts
+      uses: actions/upload-artifact@v2
+      if: failure()
+      with:
+        name: screenshots
+        path: test/dummy/tmp/screenshots

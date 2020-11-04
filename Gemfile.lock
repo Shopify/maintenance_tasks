@@ -118,6 +118,8 @@ GEM
       byebug (~> 11.0)
       pry (~> 0.13.0)
     public_suffix (4.0.6)
+    puma (5.0.4)
+      nio4r (~> 2.0)
     rack (2.2.3)
     rack-test (1.1.0)
       rack (>= 1.0, < 3)
@@ -182,6 +184,10 @@ GEM
     tzinfo (1.2.7)
       thread_safe (~> 0.1)
     unicode-display_width (1.7.0)
+    webdrivers (4.4.1)
+      nokogiri (~> 1.6)
+      rubyzip (>= 1.3.0)
+      selenium-webdriver (>= 3.0, < 4.0)
     websocket-driver (0.7.3)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
@@ -198,10 +204,12 @@ DEPENDENCIES
   maintenance_tasks!
   mocha
   pry-byebug
+  puma
   rails
   rubocop-shopify
   selenium-webdriver
   sqlite3
+  webdrivers
   yard
 
 BUNDLED WITH
