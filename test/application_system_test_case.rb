@@ -2,6 +2,9 @@
 
 require 'test_helper'
 require 'webdrivers/chromedriver'
+require 'action_dispatch/system_testing/server'
+
+ActionDispatch::SystemTesting::Server.silence_puma = true
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   include ActiveJob::TestHelper
