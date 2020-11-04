@@ -39,6 +39,7 @@ module MaintenanceTasks
     # @param input [Object] the current element from the enumerator.
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
+      @run.reload_status
       throw(:abort, :skip_complete_callbacks) if task_stopped?
       @task.process(input)
       @ticker.tick
@@ -80,14 +81,7 @@ module MaintenanceTasks
     end
 
     def task_stopped?
-      # Note that as long as @task_stopped is false, this block will run.
-      # It is still preferable to memoize here because it prevents us from
-      #  having to perform more reloads after the task has entered
-      # a paused or cancelled status
-      @task_stopped ||= begin
-        run = Run.select(:status).find(@run.id)
-        run.paused? || run.cancelled?
-      end
+      @run.paused? || @run.cancelled?
     end
 
     def setup_ticker

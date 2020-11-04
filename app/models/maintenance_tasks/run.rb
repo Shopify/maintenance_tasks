@@ -59,6 +59,19 @@ module MaintenanceTasks
     def increment_ticks(number_of_ticks)
       self.class.update_counters(id, tick_count: number_of_ticks, touch: true)
     end
+
+    # Refreshes just the status attribute on the Active Record object, and
+    # ensures ActiveModel::Dirty does not mark the object as changed.
+    # This allows us to get the Run's most up-to-date status without needing
+    # to reload the entire record.
+    #
+    # @return [MaintenanceTasks::Run] the Run record with its updated status.
+    def reload_status
+      updated_status = Run.where(id: id).pluck(:status).first
+      self.status = updated_status
+      clear_attribute_changes([:status])
+      self
+    end
   end
   private_constant :Run
 end
