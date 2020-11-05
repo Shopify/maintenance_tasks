@@ -29,5 +29,29 @@ module MaintenanceTasks
       assert_equal 21, run.tick_count # record is not used or updated
       assert_equal 42, run.reload.tick_count
     end
+
+    test '#reload_status reloads status and clears dirty tracking' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.find(run.id).running!
+
+      run.reload_status
+      assert_predicate run, :running?
+      refute run.changed?
+    end
+
+    test '#stopped? returns true if status is paused or cancelled' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+
+      (Run.statuses.keys - ['paused', 'cancelled']).each do |status|
+        run.status = status
+        refute_predicate run, :stopped?
+      end
+
+      run.status = :paused
+      assert_predicate run, :stopped?
+
+      run.status = :cancelled
+      assert_predicate run, :stopped?
+    end
   end
 end
