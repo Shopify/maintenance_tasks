@@ -183,35 +183,5 @@ module MaintenanceTasks
         'must be either an Active Record Relation or an Array.'
       assert_equal expected_message, @run.error_message
     end
-
-    test '.perform_now queries Run status from the db instead of from the query cache' do
-      queries = record_uncached_queries do
-        ActiveRecord::Base.connection.cache do
-          TestTask.any_instance.expects(:process).twice
-          TaskJob.perform_now(@run)
-        end
-      end
-
-      expected_query = /SELECT \"maintenance_tasks_runs\".\"status\"/
-      # Expect one query for each iteration of the task job
-      # TODO: Update to 2 once
-      # https://github.com/Shopify/maintenance_tasks/pull/134 ships
-      assert_equal 4, queries.select { |query| query[expected_query] }.size
-    end
-
-    private
-
-    def record_uncached_queries(&block)
-      queries = []
-
-      query_cb = ->(*, payload) {
-        queries << payload.fetch(:sql) unless payload[:cached]
-      }
-      ActiveSupport::Notifications.subscribed(query_cb,
-        'sql.active_record',
-        &block)
-
-      queries
-    end
   end
 end
