@@ -72,6 +72,14 @@ module MaintenanceTasks
       clear_attribute_changes([:status])
       self
     end
+
+    # Returns whether the Run is stopped, which is defined as
+    # having a status of paused or cancelled.
+    #
+    # @return [Boolean] whether the Run is stopped.
+    def stopped?
+      paused? || cancelled?
+    end
   end
   private_constant :Run
 end

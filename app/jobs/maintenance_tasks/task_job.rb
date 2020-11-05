@@ -40,7 +40,7 @@ module MaintenanceTasks
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
       @run.reload_status
-      throw(:abort, :skip_complete_callbacks) if task_stopped?
+      throw(:abort, :skip_complete_callbacks) if @run.stopped?
       @task.process(input)
       @ticker.tick
     end
@@ -50,7 +50,7 @@ module MaintenanceTasks
       @task = Task.named(@run.task_name).new
       @run.job_id = job_id
 
-      @run.running! unless task_stopped?
+      @run.running! unless @run.stopped?
     end
 
     def job_started
@@ -63,7 +63,7 @@ module MaintenanceTasks
 
     def shutdown_job
       @run.cursor = cursor_position
-      @run.status = :interrupted unless task_stopped?
+      @run.status = :interrupted unless @run.stopped?
       @run.save!
     end
 
@@ -78,10 +78,6 @@ module MaintenanceTasks
         error_message: exception_message,
         backtrace: backtrace
       )
-    end
-
-    def task_stopped?
-      @run.paused? || @run.cancelled?
     end
 
     def setup_ticker
