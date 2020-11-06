@@ -24,4 +24,6 @@ require 'bundler/gem_tasks'
 require 'rubocop/rake_task'
 RuboCop::RakeTask.new
 
-task(default: ['db:setup', 'app:test', 'app:test:system', 'rubocop'])
+task(test: 'app:test')
+task('test:system' => 'app:test:system')
+task(default: ['db:setup', 'test', 'test:system', 'rubocop'])
