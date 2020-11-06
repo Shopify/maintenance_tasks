@@ -27,11 +27,11 @@ jobs:
         bundle config frozen true
         bundle install --jobs 4 --retry 3
     - name: Set up database
-      run: bundle exec rails db:setup
+      run: RAILS_ENV=test bundle exec rails db:setup
     - name: Ruby Tests
-      run: bundle exec rails app:test
+      run: bundle exec rails test
     - name: System Tests
-      run: bundle exec rails app:test:system
+      run: bundle exec rails test:system
     - name: RuboCop
       run: bundle exec rubocop
     - name: Archive system test artifacts
