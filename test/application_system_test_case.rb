@@ -2,9 +2,8 @@
 
 require 'test_helper'
 require 'webdrivers/chromedriver'
-require 'action_dispatch/system_testing/server'
 
-ActionDispatch::SystemTesting::Server.silence_puma = true
+Capybara.server = :puma, { Silent: true, environment: 'test' }
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   include ActiveJob::TestHelper
