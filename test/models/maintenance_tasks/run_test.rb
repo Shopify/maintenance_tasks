@@ -39,6 +39,17 @@ module MaintenanceTasks
       refute run.changed?
     end
 
+    test '#reload_status does not use query cache' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      query_count = count_uncached_queries do
+        ActiveRecord::Base.connection.cache do
+          run.reload_status
+          run.reload_status
+        end
+      end
+      assert_equal 2, query_count
+    end
+
     test '#stopped? returns true if status is paused or cancelled' do
       run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
 
@@ -52,6 +63,19 @@ module MaintenanceTasks
 
       run.status = :cancelled
       assert_predicate run, :stopped?
+    end
+
+    private
+
+    def count_uncached_queries(&block)
+      count = 0
+
+      query_cb = ->(*, payload) { count += 1 unless payload[:cached] }
+      ActiveSupport::Notifications.subscribed(query_cb,
+        'sql.active_record',
+        &block)
+
+      count
     end
   end
 end
