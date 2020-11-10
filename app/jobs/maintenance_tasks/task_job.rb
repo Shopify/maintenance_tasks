@@ -40,7 +40,10 @@ module MaintenanceTasks
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
       @run.reload_status
-      throw(:abort, :skip_complete_callbacks) if @run.stopped?
+      if @run.stopped?
+        @run.update!(ended_at: Time.now.utc) if @run.cancelled?
+        throw(:abort, :skip_complete_callbacks)
+      end
       @task.process(input)
       @ticker.tick
     end
@@ -54,11 +57,17 @@ module MaintenanceTasks
     end
 
     def job_started
-      @run.update!(tick_total: @task.count)
+      @run.update!(
+        started_at: Time.now.utc,
+        tick_total: @task.count
+      )
     end
 
     def job_completed
-      @run.succeeded!
+      @run.update!(
+        status: :succeeded,
+        ended_at: Time.now.utc
+      )
     end
 
     def shutdown_job
@@ -76,7 +85,8 @@ module MaintenanceTasks
         status: :errored,
         error_class: exception_class,
         error_message: exception_message,
-        backtrace: backtrace
+        backtrace: backtrace,
+        ended_at: Time.now.utc
       )
     end
 
