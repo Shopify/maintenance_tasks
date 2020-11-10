@@ -31,6 +31,20 @@ module MaintenanceTasks
       end
     end
 
+    test 'generator uses configured tasks module' do
+      previous_task_module = MaintenanceTasks.tasks_module.name
+      Object.const_set('Foo', Module.new {})
+      MaintenanceTasks.tasks_module = 'Foo'
+
+      run_generator(['sleepy'])
+      assert_file('app/tasks/foo/sleepy_task.rb') do |task|
+        assert_match(/module Foo/, task)
+      end
+    ensure
+      MaintenanceTasks.tasks_module = previous_task_module
+      Object.send(:remove_const, :Foo)
+    end
+
     test 'generator namespaces task properly' do
       run_generator ['admin/sleepy']
       assert_file 'app/tasks/maintenance/admin/sleepy_task.rb' do |task|
