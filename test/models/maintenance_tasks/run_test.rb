@@ -78,6 +78,66 @@ module MaintenanceTasks
       assert_predicate run, :started?
     end
 
+    test '#completed? returns true if status is succeeded, errored, or cancelled' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+
+      (Run::STATUSES - Run::COMPLETED_STATUSES).each do |status|
+        run.status = status
+        refute_predicate run, :completed?
+      end
+
+      Run::COMPLETED_STATUSES.each do |status|
+        run.status = status
+        assert_predicate run, :completed?
+      end
+    end
+
+    test '#eta returns nil if the run is completed' do
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :succeeded
+      )
+
+      assert_nil run.eta
+    end
+
+    test '#eta returns nil if tick_count is 0' do
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :running,
+        tick_count: 0,
+        tick_total: 10
+      )
+
+      assert_nil run.eta
+    end
+
+    test '#eta returns nil if no tick_total' do
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :running,
+        tick_count: 1
+      )
+
+      assert_nil run.eta
+    end
+
+    test '#estimated_completion_time returns estimated completion time based on average time elapsed per tick' do
+      started_at = Time.utc(2020, 1, 9, 9, 41, 44)
+      travel_to started_at + 9.seconds
+
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        started_at: started_at,
+        status: :running,
+        tick_count: 9,
+        tick_total: 10
+      )
+
+      expected_completion_time = Time.utc(2020, 1, 9, 9, 41, 54)
+      assert_equal expected_completion_time, run.estimated_completion_time
+    end
+
     private
 
     def count_uncached_queries(&block)

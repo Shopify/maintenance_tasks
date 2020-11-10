@@ -90,6 +90,29 @@ module MaintenanceTasks
     def started?
       started_at.present?
     end
+
+    # Returns whether the Run is completed, which is defined as
+    # having a status of succeeded, cancelled, or errored.
+    #
+    # @return [Boolean] whether the Run is completed.
+    def completed?
+      COMPLETED_STATUSES.map(&:to_s).include?(status)
+    end
+
+    # Returns the estimated time the task will finish based on the the number of
+    # ticks left and the average time needed to process a tick.
+    # Returns nil if the Run is completed, or if the tick_count or tick_total is
+    # zero.
+    #
+    # @return [Time] the estimated time the Run will finish.
+    def eta
+      return if completed? || tick_count == 0 || tick_total.to_i == 0
+
+      processed_per_second = (tick_count.to_f / (Time.now - started_at))
+      ticks_left = (tick_total - tick_count)
+      seconds_to_finished = ticks_left / processed_per_second
+      Time.now + seconds_to_finished
+    end
   end
   private_constant :Run
 end
