@@ -96,7 +96,7 @@ module MaintenanceTasks
     #
     # @return [Boolean] whether the Run is completed.
     def completed?
-      COMPLETED_STATUSES.map(&:to_s).include?(status)
+      COMPLETED_STATUSES.include?(status.to_sym)
     end
 
     # Returns the estimated time the task will finish based on the the number of
@@ -105,7 +105,7 @@ module MaintenanceTasks
     # zero.
     #
     # @return [Time] the estimated time the Run will finish.
-    def eta
+    def estimated_completion_time
       return if completed? || tick_count == 0 || tick_total.to_i == 0
 
       processed_per_second = (tick_count.to_f / (Time.now - started_at))

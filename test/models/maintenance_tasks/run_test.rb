@@ -92,16 +92,16 @@ module MaintenanceTasks
       end
     end
 
-    test '#eta returns nil if the run is completed' do
+    test '#estimated_completion_time returns nil if the run is completed' do
       run = Run.new(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :succeeded
       )
 
-      assert_nil run.eta
+      assert_nil run.estimated_completion_time
     end
 
-    test '#eta returns nil if tick_count is 0' do
+    test '#estimated_completion_time returns nil if tick_count is 0' do
       run = Run.new(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running,
@@ -109,17 +109,17 @@ module MaintenanceTasks
         tick_total: 10
       )
 
-      assert_nil run.eta
+      assert_nil run.estimated_completion_time
     end
 
-    test '#eta returns nil if no tick_total' do
+    test '#estimated_completion_time returns nil if no tick_total' do
       run = Run.new(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running,
         tick_count: 1
       )
 
-      assert_nil run.eta
+      assert_nil run.estimated_completion_time
     end
 
     test '#estimated_completion_time returns estimated completion time based on average time elapsed per tick' do

@@ -29,12 +29,14 @@
       <th>Error Class</th>
       <th>Error Message</th>
       <th>Backtrace</th>
+      <th>Estimated time to finish</th>
       <th>Ended at</th>
     </tr>
   </thead>
 
   <tbody>
     <% @runs.each do |run| %>
+      <% estimated_completion_time = run.estimated_completion_time %>
       <tr>
         <td><%= formatted_datetime(run.created_at) %></td>
         <td><%= formatted_datetime(run.started_at) if run.started_at %></td>
@@ -43,6 +45,7 @@
         <td><%= run.error_class %></td>
         <td><%= run.error_message %></td>
         <td><%= format_backtrace(run.backtrace) %></td>
+        <td><%= distance_of_time_in_words_to_now(estimated_completion_time) if estimated_completion_time %></td>
         <td><%= formatted_datetime(run.ended_at) if run.ended_at %></td>
       </tr>
     <% end %>
