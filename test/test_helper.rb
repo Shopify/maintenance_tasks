@@ -30,5 +30,6 @@ module Warning
   end
 end
 $VERBOSE = true
+Warning[:deprecated] = true
 
 Maintenance::UpdatePostsTask.fast_task = true
