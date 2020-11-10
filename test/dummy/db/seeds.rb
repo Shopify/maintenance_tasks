@@ -7,9 +7,11 @@ module MaintenanceTasks
   10.times do
     Run.create!(
       task_name: 'Maintenance::UpdatePostsTask',
+      started_at: Time.now,
       tick_count: 10,
       tick_total: 10,
-      status: :succeeded
+      status: :succeeded,
+      ended_at: Time.now
     )
   end
 end
