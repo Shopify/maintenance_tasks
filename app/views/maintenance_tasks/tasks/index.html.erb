@@ -39,7 +39,9 @@
     <tr>
       <th>Task name</th>
       <th>Created at</th>
+      <th>Started at</th>
       <th>Status</th>
+      <th>Ended at</th>
     </tr>
   </thead>
   <tbody>
@@ -47,7 +49,9 @@
       <tr>
         <td><%= link_to run.task_name, task_path(run.task_name) %></td>
         <td><%= formatted_datetime(run.created_at)%></td>
+        <td><%= formatted_datetime(run.started_at)%></td>
         <td><%= status_tag(run.status)%></td>
+        <td><%= formatted_datetime(run.ended_at)%></td>
       </tr>
     <% end %>
   </tbody>

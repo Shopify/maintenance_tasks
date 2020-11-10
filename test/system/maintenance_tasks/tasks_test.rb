@@ -23,11 +23,13 @@ module MaintenanceTasks
       assert_table rows: [
         [
           'January 01, 2020 01:00',
+          'January 01, 2020 01:00',
           'succeeded',
           '10 / 10 (100%)',
           '',
           '',
           '',
+          'January 01, 2020 01:00',
         ],
       ]
     end
@@ -55,7 +57,13 @@ module MaintenanceTasks
       visit maintenance_tasks_path
 
       assert_table 'completed-tasks', rows: [
-        ['Maintenance::UpdatePostsTask', 'January 01, 2020 01:00', 'succeeded'],
+        [
+          'Maintenance::UpdatePostsTask',
+          'January 01, 2020 01:00',
+          'January 01, 2020 01:00',
+          'succeeded',
+          'January 01, 2020 01:00',
+        ],
       ]
     end
 
