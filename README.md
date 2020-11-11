@@ -60,8 +60,10 @@ end
 
 ### Configuring the Gem
 
-There are two configurable options for the gem.
+There are a couple configurable options for the gem.
 Custom configurations should be placed in a `maintenance_tasks.rb` initializer.
+
+#### Customizing the maintenance tasks module
 
 `MaintenanceTasks.tasks_module` can be configured to define the module in which
 tasks will be placed.
@@ -72,6 +74,8 @@ MaintenanceTasks.tasks_module = 'TaskModule'
 ```
 
 If no value is specified, it will default to `Maintenance`.
+
+#### Customizing the underlying job class
 
 `MaintenanceTasks.job` can be configured to define a Job class for your tasks
 to use. This is a global configuration, so this Job class will be used across
@@ -88,6 +92,19 @@ end
 ```
 
 The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
+
+#### Customizing the rate at which task progress gets updated
+
+`MaintenanceTasks.ticker_delay` can be configured to customize how frequently
+task progress gets persisted to the database. It can be a `Numeric` value or an
+`ActiveSupport::Duration` value.
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+MaintenanceTasks.ticker_delay = 2.seconds
+```
+
+If no value is specified, it will default to 1 second.
 
 ## Releasing new versions
 
