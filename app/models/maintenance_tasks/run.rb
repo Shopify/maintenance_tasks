@@ -82,6 +82,14 @@ module MaintenanceTasks
     def stopped?
       paused? || cancelled?
     end
+
+    # Returns whether the Run has been started, which is indicated by the
+    # started_at timestamp being present.
+    #
+    # @return [Boolean] whether the Run was started.
+    def started?
+      started_at.present?
+    end
   end
   private_constant :Run
 end

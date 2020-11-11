@@ -17,17 +17,22 @@ module MaintenanceTasks
     end
 
     test '#format_ticks shows only the ticks if tick_total is not set' do
-      run = Run.new(tick_count: 42)
+      run = Run.new(tick_count: 42, started_at: Time.now)
       assert_equal '42', format_ticks(run)
     end
 
     test '#format_ticks shows only the ticks if tick_total is 0' do
-      run = Run.new(tick_count: 0, tick_total: 0)
+      run = Run.new(tick_count: 0, tick_total: 0, started_at: Time.now)
       assert_equal '0', format_ticks(run)
     end
 
+    test '#format_ticks returns nil if the run has not started' do
+      run = Run.new(tick_count: 0, tick_total: 10)
+      assert_nil format_ticks(run)
+    end
+
     test '#format_ticks renders a <progress> element' do
-      run = Run.new(tick_count: 42, tick_total: 84)
+      run = Run.new(tick_count: 42, tick_total: 84, started_at: Time.now)
       render(inline: '<%= format_ticks(run) %>', locals: { run: run })
       assert_select 'progress[value=42][max=84]'
     end

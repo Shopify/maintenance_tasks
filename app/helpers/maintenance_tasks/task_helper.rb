@@ -17,11 +17,14 @@ module MaintenanceTasks
     # Formats the ticks.
     #
     # Only shows the ticks or if the total is available, shows the ticks,
-    # total and percentage.
+    # total and percentage. Does not show ticks if run has not started.
     #
     # @param run [Run] the run for which the ticks are formatted.
-    # @return [String] the progress information properly formatted.
+    # @return [String, nil] the progress information properly formatted, or
+    #   nil if the run has not started yet.
     def format_ticks(run)
+      return unless run.started?
+
       if run.tick_total.to_i > 0
         safe_join([
           tag.progress(value: run.tick_count, max: run.tick_total,
