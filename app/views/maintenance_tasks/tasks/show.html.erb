@@ -23,11 +23,13 @@
   <thead>
     <tr>
       <th>Created at</th>
+      <th>Started at</th>
       <th>Status</th>
       <th>Progress</th>
       <th>Error Class</th>
       <th>Error Message</th>
       <th>Backtrace</th>
+      <th>Ended at</th>
     </tr>
   </thead>
 
@@ -35,11 +37,13 @@
     <% @runs.each do |run| %>
       <tr>
         <td><%= formatted_datetime(run.created_at) %></td>
+        <td><%= formatted_datetime(run.started_at) if run.started_at %></td>
         <td><%= status_tag(run.status) %></td>
         <td><%= format_ticks(run) %></td>
         <td><%= run.error_class %></td>
         <td><%= run.error_message %></td>
         <td><%= format_backtrace(run.backtrace) %></td>
+        <td><%= formatted_datetime(run.ended_at) if run.ended_at %></td>
       </tr>
     <% end %>
   </tbody>

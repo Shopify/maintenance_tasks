@@ -54,17 +54,27 @@ module MaintenanceTasks
     end
 
     def job_started
-      @run.update!(tick_total: @task.count)
+      @run.update!(
+        started_at: Time.now,
+        tick_total: @task.count
+      )
     end
 
     def job_completed
-      @run.succeeded!
+      @run.update!(
+        status: :succeeded,
+        ended_at: Time.now
+      )
     end
 
     def shutdown_job
-      @run.cursor = cursor_position
-      @run.status = :interrupted unless @run.stopped?
-      @run.save!
+      if @run.cancelled?
+        @run.touch(:ended_at)
+      else
+        @run.cursor = cursor_position
+        @run.status = :interrupted unless @run.paused?
+        @run.save!
+      end
     end
 
     def job_errored(exception)
@@ -76,7 +86,8 @@ module MaintenanceTasks
         status: :errored,
         error_class: exception_class,
         error_message: exception_message,
-        backtrace: backtrace
+        backtrace: backtrace,
+        ended_at: Time.now
       )
     end
 

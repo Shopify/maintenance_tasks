@@ -13,7 +13,7 @@ module MaintenanceTasks
       assert_title 'Maintenance::UpdatePostsTask'
       assert_text 'Task Maintenance::UpdatePostsTask enqueued.'
       assert_table with_rows: [
-        ['January 09, 2020 09:41', 'enqueued', '0', '', '', ''],
+        ['January 09, 2020 09:41', '', 'enqueued', '0', '', '', '', ''],
       ]
       assert_no_button 'Run'
     end
@@ -26,7 +26,7 @@ module MaintenanceTasks
       click_on 'Pause'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', 'paused', '0', '', '', ''],
+        ['January 09, 2020 09:41', '', 'paused', '0', '', '', '', ''],
       ]
     end
 
@@ -39,7 +39,7 @@ module MaintenanceTasks
       click_on 'Resume'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', 'enqueued', '0', '', '', ''],
+        ['January 09, 2020 09:41', '', 'enqueued', '0', '', '', '', ''],
       ]
     end
 
@@ -51,7 +51,7 @@ module MaintenanceTasks
       click_on 'Cancel'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', 'cancelled', '0', '', '', ''],
+        ['January 09, 2020 09:41', '', 'cancelled', '0', '', '', '', ''],
       ]
     end
 
@@ -69,11 +69,13 @@ module MaintenanceTasks
       assert_table rows: [
         [
           'January 09, 2020 09:41',
+          'January 09, 2020 09:41',
           'errored',
           '0',
           'ArgumentError',
           'Something went wrong',
           "app/tasks/maintenance/error_task.rb:9:in `process'",
+          'January 09, 2020 09:41',
         ],
       ]
     end

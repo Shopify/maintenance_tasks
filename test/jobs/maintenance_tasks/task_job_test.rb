@@ -40,6 +40,17 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
+    test '.perform_now persists ended_at when the Run is cancelled' do
+      freeze_time
+      TestTask.any_instance.expects(:process).once.with do
+        @run.cancelled!
+      end
+
+      TaskJob.perform_now(@run)
+
+      assert_equal Time.now, @run.reload.ended_at
+    end
+
     test '.perform_now skips iterations when Run is paused' do
       @run.paused!
 
@@ -79,14 +90,16 @@ module MaintenanceTasks
       assert_equal 1, @run.reload.tick_count
     end
 
-    test '.perform_now updates tick_total when the job starts' do
+    test '.perform_now persists started_at and updates tick_total when the job starts' do
+      freeze_time
       TestTask.any_instance.expects(:process).once.with do
         @run.cancelled!
       end
 
       TaskJob.perform_now(@run)
 
-      assert_equal 2, @run.reload.tick_total
+      assert_equal Time.now, @run.reload.started_at
+      assert_equal 2, @run.tick_total
     end
 
     test '.perform_now updates Run to running and persists job_id when job starts performing' do
@@ -100,11 +113,13 @@ module MaintenanceTasks
       assert_equal job.job_id, @run.reload.job_id
     end
 
-    test '.perform_now updates Run to succeeded when job finishes successfully' do
+    test '.perform_now updates Run to succeeded and persists ended_at when job finishes successfully' do
+      freeze_time
       TestTask.any_instance.expects(:process).twice
       TaskJob.perform_now(@run)
 
-      assert_predicate @run.reload, :succeeded?
+      assert_equal Time.now, @run.reload.ended_at
+      assert_predicate @run, :succeeded?
     end
 
     test '.perform_now updates Run to interrupted when job is interrupted' do
@@ -123,7 +138,8 @@ module MaintenanceTasks
       assert_enqueued_with(job: TaskJob) { TaskJob.perform_now(@run) }
     end
 
-    test '.perform_now updates Run to errored when exception is raised' do
+    test '.perform_now updates Run to errored and persists ended_at when exception is raised' do
+      freeze_time
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 
       TaskJob.perform_now(run)
@@ -135,6 +151,7 @@ module MaintenanceTasks
       assert_equal 'Something went wrong', run.error_message
       expected = ["app/tasks/maintenance/error_task.rb:9:in `process'"]
       assert_equal expected, run.backtrace
+      assert_equal Time.now, run.ended_at
     end
 
     test '.perform_now does not enqueue another job if Run errors' do
