@@ -52,9 +52,9 @@ module MaintenanceTasks
       assert_no_invalid_transitions([:running, :interrupted], :succeeded)
     end
 
-    test 'run can go from enqueued or running to cancelled' do
+    test 'run can go from enqueued or running to cancelling' do
       enqueued_run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-      enqueued_run.status = :cancelled
+      enqueued_run.status = :cancelling
 
       assert enqueued_run.valid?
 
@@ -62,16 +62,16 @@ module MaintenanceTasks
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running
       )
-      running_run.status = :cancelled
+      running_run.status = :cancelling
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions([:enqueued, :running], :cancelled)
+      assert_no_invalid_transitions([:enqueued, :running], :cancelling)
     end
 
-    test 'run can go from enqueued or running to paused' do
+    test 'run can go from enqueued or running to pausing' do
       enqueued_run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-      enqueued_run.status = :paused
+      enqueued_run.status = :pausing
 
       assert enqueued_run.valid?
 
@@ -79,11 +79,35 @@ module MaintenanceTasks
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running
       )
-      running_run.status = :paused
+      running_run.status = :pausing
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions([:enqueued, :running], :paused)
+      assert_no_invalid_transitions([:enqueued, :running], :pausing)
+    end
+
+    test 'run can go from pausing to paused' do
+      pausing_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :pausing
+      )
+      pausing_run.status = :paused
+
+      assert pausing_run.valid?
+
+      assert_no_invalid_transitions([:pausing], :paused)
+    end
+
+    test 'run can go from cancelling to cancelled' do
+      cancelling_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :cancelling
+      )
+      cancelling_run.status = :cancelled
+
+      assert cancelling_run.valid?
+
+      assert_no_invalid_transitions([:cancelling], :cancelled)
     end
 
     test 'run can go from running to interrupted' do

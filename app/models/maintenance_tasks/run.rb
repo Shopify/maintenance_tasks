@@ -4,23 +4,17 @@ module MaintenanceTasks
   #
   # @api private
   class Run < ApplicationRecord
-    # Various statuses a run can be in:
-    #
-    # enqueued      The task has been enqueued by the user.
-    # running       The task is being performed by a job worker.
-    # succeeded     The task finished without error.
-    # cancelled     The user explicitly halted the task's execution.
-    # interrupted   The task was interrupted by the job infrastructure.
-    # paused        The task was paused in the middle of the run by the user.
-    # errored       The task code produced an unhandled exception.
+    # Various statuses a run can be in.
     STATUSES = [
-      :enqueued,
-      :running,
-      :succeeded,
-      :cancelled,
-      :interrupted,
-      :paused,
-      :errored,
+      :enqueued,    # The task has been enqueued by the user.
+      :running,     # The task is being performed by a job worker.
+      :succeeded,   # The task finished without error.
+      :cancelling,  # The task has been told to cancel but is finishing work.
+      :cancelled,   # The user explicitly halted the task's execution.
+      :interrupted, # The task was interrupted by the job infrastructure.
+      :pausing,     # The task has been told to pause but is finishing work.
+      :paused,      # The task was paused in the middle of the run by the user.
+      :errored,     # The task code produced an unhandled exception.
     ]
 
     ACTIVE_STATUSES = [:enqueued, :running, :paused]

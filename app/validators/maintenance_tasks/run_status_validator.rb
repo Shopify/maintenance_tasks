@@ -7,11 +7,13 @@ module MaintenanceTasks
   class RunStatusValidator < ActiveModel::Validator
     # Valid status transitions a Run can make.
     VALID_STATUS_TRANSITIONS = {
-      'enqueued' => ['running', 'paused', 'cancelled'],
+      'enqueued' => ['running', 'pausing', 'cancelling'],
+      'pausing' => ['paused'],
+      'cancelling' => ['cancelled'],
       'running' => [
         'succeeded',
-        'paused',
-        'cancelled',
+        'pausing',
+        'cancelling',
         'interrupted',
         'errored',
       ],
