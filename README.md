@@ -19,7 +19,13 @@ $ bundle
 $ rails generate maintenance_tasks:install
 ```
 
+The generator creates and runs a migration to add the necessary table to your
+database. It also mounts Mainteance Tasks in your `config/routes.rb`. By default
+the web UI can be accessed in the new `/maintenance_tasks` path.
+
 ## Usage
+
+### Creating a Task
 
 A generator is provided to create tasks. Generate a new task by running:
 
@@ -37,7 +43,7 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 * `count`: return the number of rows that will be iterated over (optional,
   to be able to show progress)
 
-### Example
+Example:
 
 ```ruby
 # app/tasks/maintenance/update_posts_task.rb
@@ -56,6 +62,17 @@ module Maintenance
     end
   end
 end
+```
+
+### Running a Task
+
+You can run your new Task by accessing the Web UI and clicking on "Run".
+
+You can also run a Task in Ruby by sending `run` with a Task name to a Runner
+instance:
+
+```ruby
+MaintenanceTasks::Runner.new.run('Mainteance::UpdatePostsTask')
 ```
 
 ### Configuring the Gem

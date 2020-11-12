@@ -28,6 +28,7 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
   test "doesn't leak its internals" do
     expected_public_constants = [
       :Engine,  # to mount
+      :Runner,  # to run a Task
       :Task,    # to define tasks
       :TaskJob, # to customize the job
     ]
