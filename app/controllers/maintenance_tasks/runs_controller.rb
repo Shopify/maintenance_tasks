@@ -11,13 +11,13 @@ module MaintenanceTasks
 
     # Updates a Run status to paused.
     def pause
-      @run.paused!
+      @run.pausing!
       redirect_to(task_path(@task))
     end
 
-    # Updates a Run status to cancelled.
+    # Updates a Run status to cancelling.
     def cancel
-      @run.cancelled!
+      @run.cancelling!
       redirect_to(task_path(@task))
     end
 

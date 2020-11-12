@@ -18,9 +18,9 @@ module MaintenanceTasks
       @run = Run.create!(task_name: 'MaintenanceTasks::TaskJobTest::TestTask')
     end
 
-    test '.perform_now exits job when Run is paused' do
+    test '.perform_now exits job when Run is paused, and updates Run status from pausing to paused' do
       TestTask.any_instance.expects(:process).once.with do
-        @run.paused!
+        @run.pausing!
       end
 
       TaskJob.perform_now(@run)
@@ -29,9 +29,9 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
-    test '.perform_now exits job when Run is cancelled' do
+    test '.perform_now exits job when Run is cancelled, and updates Run status from cancelling to cancelled' do
       TestTask.any_instance.expects(:process).once.with do
-        @run.cancelled!
+        @run.cancelling!
       end
 
       TaskJob.perform_now(@run)
@@ -43,7 +43,7 @@ module MaintenanceTasks
     test '.perform_now persists ended_at when the Run is cancelled' do
       freeze_time
       TestTask.any_instance.expects(:process).once.with do
-        @run.cancelled!
+        @run.cancelling!
       end
 
       TaskJob.perform_now(@run)
@@ -52,7 +52,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now skips iterations when Run is paused' do
-      @run.paused!
+      @run.pausing!
 
       TestTask.any_instance.expects(:process).never
 
@@ -63,7 +63,7 @@ module MaintenanceTasks
     end
 
     test '.perform_now skips iterations when Run is cancelled' do
-      @run.cancelled!
+      @run.cancelling!
 
       TestTask.any_instance.expects(:process).never
 
@@ -93,7 +93,7 @@ module MaintenanceTasks
     test '.perform_now persists started_at and updates tick_total when the job starts' do
       freeze_time
       TestTask.any_instance.expects(:process).once.with do
-        @run.cancelled!
+        @run.cancelling!
       end
 
       TaskJob.perform_now(@run)
@@ -162,7 +162,7 @@ module MaintenanceTasks
 
     test '.perform_now persists cursor when job shuts down' do
       TestTask.any_instance.expects(:process).once.with do
-        @run.paused!
+        @run.pausing!
       end
 
       TaskJob.perform_now(@run)
