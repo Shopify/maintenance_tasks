@@ -17,7 +17,7 @@ module MaintenanceTasks
       :errored,     # The task code produced an unhandled exception.
     ]
 
-    ACTIVE_STATUSES = [:enqueued, :running, :paused]
+    ACTIVE_STATUSES = [:enqueued, :running, :paused, :pausing, :cancelling]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
     COMPLETED_RUNS_LIMIT = 10
 
