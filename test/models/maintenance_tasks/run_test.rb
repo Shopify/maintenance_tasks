@@ -65,6 +65,19 @@ module MaintenanceTasks
       assert_predicate run, :stopped?
     end
 
+    test '#started? returns false if the Run has no started_at timestamp' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+      refute_predicate run, :started?
+    end
+
+    test '#started? returns true if the Run has a started_at timestamp' do
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        started_at: Time.now
+      )
+      assert_predicate run, :started?
+    end
+
     private
 
     def count_uncached_queries(&block)

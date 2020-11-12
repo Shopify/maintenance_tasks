@@ -13,7 +13,7 @@ module MaintenanceTasks
       assert_title 'Maintenance::UpdatePostsTask'
       assert_text 'Task Maintenance::UpdatePostsTask enqueued.'
       assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'enqueued', '0', '', '', '', ''],
+        ['January 09, 2020 09:41', '', 'enqueued', '', '', '', ''],
       ]
       assert_no_button 'Run'
     end
@@ -26,7 +26,7 @@ module MaintenanceTasks
       click_on 'Pause'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'paused', '0', '', '', '', ''],
+        ['January 09, 2020 09:41', '', 'paused', '', '', '', ''],
       ]
     end
 
@@ -39,7 +39,7 @@ module MaintenanceTasks
       click_on 'Resume'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'enqueued', '0', '', '', '', ''],
+        ['January 09, 2020 09:41', '', 'enqueued', '', '', '', ''],
       ]
     end
 
@@ -51,7 +51,7 @@ module MaintenanceTasks
       click_on 'Cancel'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'cancelled', '0', '', '', '', ''],
+        ['January 09, 2020 09:41', '', 'cancelled', '', '', '', ''],
       ]
     end
 
