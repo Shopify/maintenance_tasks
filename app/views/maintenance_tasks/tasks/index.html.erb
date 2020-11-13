@@ -16,6 +16,7 @@
       <th>Created at</th>
       <th>Status</th>
       <th>Progress</th>
+      <th>Estimated time to completion</th>
     </tr>
   </thead>
 
@@ -26,6 +27,7 @@
         <td><%= formatted_datetime(run.created_at) %></td>
         <td><%= status_tag(run.status) %></td>
         <td><%= format_ticks(run) %></td>
+        <td><%= estimated_time_to_completion(run) %></td>
       </tr>
     <% end %>
   </tbody>

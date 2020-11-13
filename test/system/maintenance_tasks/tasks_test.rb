@@ -29,6 +29,7 @@ module MaintenanceTasks
           '',
           '',
           '',
+          '',
           'January 01, 2020 01:00',
         ],
       ]
@@ -48,6 +49,7 @@ module MaintenanceTasks
           'Maintenance::UpdatePostsTask',
           'January 09, 2020 09:41',
           'enqueued',
+          '',
           '',
         ],
       ]

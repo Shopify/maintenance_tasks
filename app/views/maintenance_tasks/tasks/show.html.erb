@@ -29,6 +29,7 @@
       <th>Error Class</th>
       <th>Error Message</th>
       <th>Backtrace</th>
+      <th>Estimated time to completion</th>
       <th>Ended at</th>
     </tr>
   </thead>
@@ -43,6 +44,7 @@
         <td><%= run.error_class %></td>
         <td><%= run.error_message %></td>
         <td><%= format_backtrace(run.backtrace) %></td>
+        <td><%= estimated_time_to_completion(run) %></td>
         <td><%= formatted_datetime(run.ended_at) if run.ended_at %></td>
       </tr>
     <% end %>
