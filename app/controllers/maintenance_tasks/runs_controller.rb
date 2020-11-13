@@ -13,13 +13,10 @@ module MaintenanceTasks
     #
     # Creates a new Run with the given parameters.
     def create
-      run = Run.new(task_name: @task.name)
-      if run.enqueue
-        redirect_to(task_path(@task), notice: "Task #{run.task_name} enqueued.")
-      else
-        errors = run.errors.full_messages.join(' ')
-        redirect_to(task_path(@task), notice: errors)
-      end
+      Runner.new.run(name: @task.name)
+      redirect_to(task_path(@task), notice: "Task #{@task.name} enqueued.")
+    rescue Runner::RunError => error
+      redirect_to(task_path(@task), notice: error.message)
     end
 
     # Updates a Run status to paused.
