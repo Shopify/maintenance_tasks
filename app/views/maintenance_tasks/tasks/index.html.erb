@@ -16,19 +16,18 @@
       <th>Created at</th>
       <th>Status</th>
       <th>Progress</th>
-      <th>Estimated time to finish</th>
+      <th>Estimated time to completion</th>
     </tr>
   </thead>
 
   <tbody>
     <% @active_runs.each do |run| %>
-      <% estimated_completion_time = run.estimated_completion_time %>
       <tr>
         <td><%= link_to run.task_name, task_path(run.task_name) %></td>
         <td><%= formatted_datetime(run.created_at) %></td>
         <td><%= status_tag(run.status) %></td>
         <td><%= format_ticks(run) %></td>
-        <td><%= distance_of_time_in_words_to_now(estimated_completion_time) if estimated_completion_time %></td>
+        <td><%= estimated_time_to_completion(run) %></td>
       </tr>
     <% end %>
   </tbody>

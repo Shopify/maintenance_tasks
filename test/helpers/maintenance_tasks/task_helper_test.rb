@@ -63,5 +63,16 @@ module MaintenanceTasks
         assert_equal expected_result, status_tag(status)
       end
     end
+
+    test "#estimated_time_to_completion returns the Run's estimated_completion_time in words" do
+      run = Run.new
+      run.stubs(estimated_completion_time: Time.now + 2.minutes)
+      assert_equal '2 minutes', estimated_time_to_completion(run)
+    end
+
+    test '#estimated_time_to_completion returns nil if the Run has no estimated_completion_time' do
+      run = Run.new
+      assert_nil estimated_time_to_completion(run)
+    end
   end
 end
