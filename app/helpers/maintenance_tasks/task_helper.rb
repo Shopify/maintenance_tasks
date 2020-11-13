@@ -47,8 +47,10 @@ module MaintenanceTasks
         'enqueued' => 'primary',
         'running' => 'info',
         'interrupted' => 'warning',
+        'pausing' => 'warning is-light',
         'paused' => 'warning',
         'succeeded' => 'success',
+        'cancelling' => 'dark',
         'cancelled' => 'dark',
         'errored' => 'danger',
       }

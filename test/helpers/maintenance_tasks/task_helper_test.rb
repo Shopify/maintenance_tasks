@@ -52,8 +52,10 @@ module MaintenanceTasks
         'enqueued' => 'tag is-primary',
         'running' => 'tag is-info',
         'interrupted' => 'tag is-warning',
+        'pausing' => 'tag is-warning is-light',
         'paused' => 'tag is-warning',
         'succeeded' => 'tag is-success',
+        'cancelling' => 'tag is-dark',
         'cancelled' => 'tag is-dark',
         'errored' => 'tag is-danger',
       }
