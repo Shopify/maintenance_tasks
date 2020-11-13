@@ -44,13 +44,6 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
-    # Enqueues the job after validating and persisting the run.
-    def enqueue
-      if save
-        MaintenanceTasks.job.perform_later(self)
-      end
-    end
-
     # Increments +tick_count+ by +number_of_ticks+, directly in the DB.
     # The attribute value is not set in the current instance, you need
     # to reload the record.
