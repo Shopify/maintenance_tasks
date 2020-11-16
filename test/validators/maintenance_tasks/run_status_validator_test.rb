@@ -32,7 +32,7 @@ module MaintenanceTasks
       assert_no_invalid_transitions([:paused], :enqueued)
     end
 
-    test 'run can go from running or interrupted to succeeded' do
+    test 'run can go from running, interrupted, or paused to succeeded' do
       running_run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running
@@ -47,12 +47,21 @@ module MaintenanceTasks
       )
       interrupted_run.status = :succeeded
 
-      assert interrupted_run.valid?
+      paused_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :paused
+      )
+      paused_run.status = :succeeded
 
-      assert_no_invalid_transitions([:running, :interrupted], :succeeded)
+      assert paused_run.valid?
+
+      assert_no_invalid_transitions(
+        [:running, :interrupted, :paused],
+        :succeeded
+      )
     end
 
-    test 'run can go from enqueued or running to cancelling' do
+    test 'run can go from enqueued, running, interrupted, pausing or paused to cancelling' do
       enqueued_run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
       enqueued_run.status = :cancelling
 
@@ -66,14 +75,49 @@ module MaintenanceTasks
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions([:enqueued, :running], :cancelling)
+      interrupted_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :interrupted
+      )
+      interrupted_run.status = :cancelling
+
+      assert interrupted_run.valid?
+
+      pausing_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :pausing
+      )
+      pausing_run.status = :cancelling
+
+      assert pausing_run.valid?
+
+      paused_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :paused
+      )
+      paused_run.status = :cancelling
+
+      assert paused_run.valid?
+
+      assert_no_invalid_transitions(
+        [:enqueued, :running, :interrupted, :pausing, :paused],
+        :cancelling
+      )
     end
 
-    test 'run can go from enqueued or running to pausing' do
+    test 'run can go from enqueued, interrupted or running to pausing' do
       enqueued_run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
       enqueued_run.status = :pausing
 
       assert enqueued_run.valid?
+
+      interrupted_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :interrupted
+      )
+      interrupted_run.status = :pausing
+
+      assert interrupted_run.valid?
 
       running_run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
@@ -83,7 +127,10 @@ module MaintenanceTasks
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions([:enqueued, :running], :pausing)
+      assert_no_invalid_transitions(
+        [:enqueued, :interrupted, :running],
+        :pausing
+      )
     end
 
     test 'run can go from pausing to paused' do
@@ -110,7 +157,7 @@ module MaintenanceTasks
       assert_no_invalid_transitions([:cancelling], :cancelled)
     end
 
-    test 'run can go from running to interrupted' do
+    test 'run can go from running or pausing to interrupted' do
       running_run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running
@@ -119,7 +166,15 @@ module MaintenanceTasks
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions([:running], :interrupted)
+      pausing_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :pausing
+      )
+      pausing_run.status = :interrupted
+
+      assert pausing_run.valid?
+
+      assert_no_invalid_transitions([:running, :pausing], :interrupted)
     end
 
     test 'run can go from running to errored' do
