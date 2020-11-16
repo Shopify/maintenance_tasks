@@ -25,5 +25,9 @@ module MaintenanceTasks
     config.after_initialize do
       eager_load! unless Rails.autoloaders.zeitwerk_enabled?
     end
+
+    config.action_dispatch.rescue_responses.merge!(
+      'MaintenanceTasks::Task::NotFoundError' => :not_found,
+    )
   end
 end
