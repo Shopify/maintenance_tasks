@@ -4,28 +4,46 @@ require 'test_helper'
 
 module MaintenanceTasks
   class RunnerTest < ActiveSupport::TestCase
+    include ActiveJob::TestHelper
+
     setup do
       @name = 'Maintenance::UpdatePostsTask'
-      @run = mock
       @runner = Runner.new
     end
 
-    test '#run creates a Run for the given Task name and enqueues the Run' do
-      Run.expects(:new).with(task_name: @name).returns(@run)
-      @run.expects(enqueue: true)
-
-      @runner.run(name: @name)
+    test '#run creates and performs a Run for the given Task when there is no active Run' do
+      assert_difference -> { Maintenance::UpdatePostsTask.runs.count }, 1 do
+        assert_enqueued_with(job: MaintenanceTasks.job) do
+          assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
+        end
+      end
     end
 
-    test '#run raises a Run Error with validation errors when Run enqueue fails' do
-      Run.expects(:new).with(task_name: @name).returns(@run)
-      @run.expects(enqueue: false)
-      @run.expects(errors: mock(full_messages: ['error 1', 'error 2']))
+    test '#run enqueues the existing active Run for the given Task' do
+      run = Run.create!(task_name: @name)
+      run.paused!
 
-      error = assert_raises(Runner::RunError) do
-        @runner.run(name: @name)
+      assert_no_difference -> { Maintenance::UpdatePostsTask.runs.count } do
+        assert_enqueued_with(job: MaintenanceTasks.job, args: [run]) do
+          assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
+          assert run.reload.enqueued?
+        end
       end
-      assert_equal 'error 1 error 2', error.message
+    end
+
+    test '#run raises validation errors' do
+      assert_no_difference -> { Maintenance::UpdatePostsTask.runs.count } do
+        assert_no_enqueued_jobs do
+          error = assert_raises(ActiveRecord::RecordInvalid) do
+            @runner.run(name: 'Invalid')
+          end
+
+          assert_equal(
+            'Validation failed: Task name is not included in the list',
+            error.message
+          )
+        end
+      end
     end
   end
 end

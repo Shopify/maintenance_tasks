@@ -3,17 +3,6 @@ require 'test_helper'
 
 module MaintenanceTasks
   class RunTest < ActiveSupport::TestCase
-    include ActiveJob::TestHelper
-
-    test '#enqueue enqueues the Task Job for the current Run' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
-
-      assert_enqueued_with job: MaintenanceTasks.job, args: [run] do
-        run.enqueue
-        assert_predicate run, :persisted?
-      end
-    end
-
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: 'Maintenance::DoesNotExist')
       refute run.valid?

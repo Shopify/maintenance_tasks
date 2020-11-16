@@ -8,9 +8,9 @@
 
 <div class="buttons">
   <% if @active_run.nil? %>
-    <%= button_to 'Run', task_runs_path(@task), class: 'button is-success' %>
+    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success' %>
   <% elsif @active_run.paused? %>
-    <%= button_to 'Resume', resume_task_run_path(@task, @active_run), method: :put, class: 'button is-primary' %>
+    <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary' %>
   <% else %>
     <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning' %>
     <%= button_to 'Cancel', cancel_task_run_path(@task, @active_run), method: :put, class: 'button is-danger' %>

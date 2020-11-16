@@ -9,16 +9,6 @@ module MaintenanceTasks
     before_action :set_run, only: [:pause, :cancel, :resume]
     before_action :set_task
 
-    # POST /maintenance_tasks/runs
-    #
-    # Creates a new Run with the given parameters.
-    def create
-      Runner.new.run(name: @task.name)
-      redirect_to(task_path(@task), notice: "Task #{@task.name} enqueued.")
-    rescue Runner::RunError => error
-      redirect_to(task_path(@task), notice: error.message)
-    end
-
     # Updates a Run status to paused.
     def pause
       @run.paused!
@@ -28,13 +18,6 @@ module MaintenanceTasks
     # Updates a Run status to cancelled.
     def cancel
       @run.cancelled!
-      redirect_to(task_path(@task))
-    end
-
-    # Updates a Run status from paused to running.
-    def resume
-      @run.enqueued!
-      @run.enqueue
       redirect_to(task_path(@task))
     end
 

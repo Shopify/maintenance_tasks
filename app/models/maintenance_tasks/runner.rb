@@ -3,8 +3,6 @@
 module MaintenanceTasks
   # This class is responsible for running a given Task.
   class Runner
-    class RunError < StandardError; end
-
     # Runs a Task.
     #
     # This method creates a Run record for the given Task name and enqueues the
@@ -12,12 +10,16 @@ module MaintenanceTasks
     #
     # @param name [String] the name of the Task to be run.
     #
-    # @raise [RunError] if validation errors occur while creating the Run.
+    # @return [Task] the Task that was run.
+    #
+    # @raise [ActiveRecord::RecordInvalid] if validation errors occur while
+    #   creating the Run.
     def run(name:)
-      run = Run.new(task_name: name)
-      unless run.enqueue
-        raise RunError, run.errors.full_messages.join(' ')
-      end
+      run = Run.active.find_by(task_name: name) || Run.create!(task_name: name)
+
+      run.enqueued!
+      MaintenanceTasks.job.perform_later(run)
+      Task.named(name)
     end
   end
 end
