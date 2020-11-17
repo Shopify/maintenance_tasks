@@ -14,6 +14,8 @@ module MaintenanceTasks
     before_perform(:setup_ticker)
     on_shutdown(:record_tick)
 
+    after_perform(:save_run)
+
     rescue_from StandardError, with: :job_errored
 
     private
@@ -63,21 +65,22 @@ module MaintenanceTasks
       )
     end
 
-    def job_completed
-      @run.update!(
-        status: :succeeded,
-        ended_at: Time.now
-      )
-    end
-
     def shutdown_job
       if @run.cancelled?
-        @run.touch(:ended_at)
+        @run.ended_at = Time.now
       else
         @run.cursor = cursor_position
         @run.status = :interrupted unless @run.paused?
-        @run.save!
       end
+    end
+
+    def job_completed
+      @run.status = :succeeded
+      @run.ended_at = Time.now
+    end
+
+    def save_run
+      @run.save!
     end
 
     def job_errored(exception)
