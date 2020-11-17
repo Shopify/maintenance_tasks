@@ -5,13 +5,20 @@ module MaintenanceTasks
   class Task
     extend ActiveSupport::DescendantsTracker
 
+    class NotFoundError < StandardError; end
+
     class << self
-      # Given the name of a Task, returns the Task subclass. Returns nil if
-      # there's no task with that name.
+      # Finds a Task with the given name.
+      #
+      # @param name [String] the name of the Task to be found.
+      #
+      # @return [Task] the Task with the given name.
+      #
+      # @raise [NotFoundError] if a Task with the given name does not exist.
       def named(name)
         name.constantize
       rescue NameError
-        nil
+        raise NotFoundError
       end
 
       # Returns a list of concrete classes that inherit from the Task

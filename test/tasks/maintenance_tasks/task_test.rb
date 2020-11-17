@@ -18,8 +18,10 @@ module MaintenanceTasks
       assert_equal expected_task, Task.named('Maintenance::UpdatePostsTask')
     end
 
-    test ".named returns nil if the task doesn't exist" do
-      assert_nil Task.named('Maintenance::DoesNotExist')
+    test ".named raises Not Found Error if the task doesn't exist" do
+      assert_raises Task::NotFoundError do
+        Task.named('Maintenance::DoesNotExist')
+      end
     end
 
     test '.runs returns the Active Record relation of the runs associated with a Task' do
