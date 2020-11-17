@@ -5,7 +5,7 @@ module MaintenanceTasks
   class Task
     extend ActiveSupport::DescendantsTracker
 
-    class NotFoundError < StandardError; end
+    class NotFoundError < NameError; end
 
     class << self
       # Finds a Task with the given name.
@@ -18,7 +18,7 @@ module MaintenanceTasks
       def named(name)
         name.constantize
       rescue NameError
-        raise NotFoundError
+        raise NotFoundError.new("Task #{name} not found.", name)
       end
 
       # Returns a list of concrete classes that inherit from the Task

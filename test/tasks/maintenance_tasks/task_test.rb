@@ -19,9 +19,11 @@ module MaintenanceTasks
     end
 
     test ".named raises Not Found Error if the task doesn't exist" do
-      assert_raises Task::NotFoundError do
+      error = assert_raises(Task::NotFoundError) do
         Task.named('Maintenance::DoesNotExist')
       end
+      assert_equal 'Task Maintenance::DoesNotExist not found.', error.message
+      assert_equal 'Maintenance::DoesNotExist', error.name
     end
 
     test '.runs returns the Active Record relation of the runs associated with a Task' do
