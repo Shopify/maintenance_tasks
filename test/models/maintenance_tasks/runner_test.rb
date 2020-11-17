@@ -20,8 +20,7 @@ module MaintenanceTasks
     end
 
     test '#run enqueues the existing active Run for the given Task' do
-      run = Run.create!(task_name: @name)
-      run.paused!
+      run = Run.create!(task_name: @name, status: :paused)
 
       assert_no_difference -> { Maintenance::UpdatePostsTask.runs.count } do
         assert_enqueued_with(job: MaintenanceTasks.job, args: [run]) do

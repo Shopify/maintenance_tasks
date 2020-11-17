@@ -26,7 +26,7 @@ module MaintenanceTasks
       click_on 'Pause'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'paused', '', '', '', ''],
+        ['January 09, 2020 09:41', '', 'pausing', '', '', '', ''],
       ]
     end
 
@@ -36,6 +36,8 @@ module MaintenanceTasks
       within('.menu') { click_on('Maintenance::UpdatePostsTask') }
       click_on 'Run'
       click_on 'Pause'
+      perform_enqueued_jobs
+      page.refresh
       click_on 'Resume'
 
       assert_table with_rows: [
@@ -51,7 +53,7 @@ module MaintenanceTasks
       click_on 'Cancel'
 
       assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'cancelled', '', '', '', ''],
+        ['January 09, 2020 09:41', '', 'cancelling', '', '', '', ''],
       ]
     end
 

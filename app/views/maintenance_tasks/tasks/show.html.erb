@@ -9,10 +9,16 @@
 <div class="buttons">
   <% if @active_run.nil? %>
     <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success' %>
-  <% elsif @active_run.paused? %>
-    <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary' %>
+  <% elsif @active_run.cancelling? %>
+    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
   <% else %>
-    <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning' %>
+      <% if @active_run.pausing? %>
+        <%= button_to 'Pausing', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning', disabled: true %>
+      <% elsif @active_run.paused? %>
+        <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary' %>
+      <% else %>
+        <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning' %>
+      <% end%>
     <%= button_to 'Cancel', cancel_task_run_path(@task, @active_run), method: :put, class: 'button is-danger' %>
   <% end %>
 </div>

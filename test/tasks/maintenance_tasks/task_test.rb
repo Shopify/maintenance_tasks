@@ -29,19 +29,14 @@ module MaintenanceTasks
       assert_equal run, Maintenance::UpdatePostsTask.runs.first
     end
 
-    test '.active_run returns the only enqueued, running, or paused run associated with a Task' do
-      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-      assert_equal run, Maintenance::UpdatePostsTask.active_run
+    test '.active_run returns the first active run associated with a Task' do
+      Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :succeeded
+      )
+      active_run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
 
-      run.paused!
-      assert_equal run, Maintenance::UpdatePostsTask.active_run
-
-      run.enqueued!
-      run.running!
-      assert_equal run, Maintenance::UpdatePostsTask.active_run
-
-      run.succeeded!
-      assert_nil Maintenance::UpdatePostsTask.active_run
+      assert_equal active_run, Maintenance::UpdatePostsTask.active_run
     end
 
     test '#count is nil by default' do

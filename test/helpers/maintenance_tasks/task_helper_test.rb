@@ -51,9 +51,11 @@ module MaintenanceTasks
       tag_classes = {
         'enqueued' => 'tag is-primary',
         'running' => 'tag is-info',
-        'interrupted' => 'tag is-warning',
+        'interrupted' => 'tag is-info is-light',
+        'pausing' => 'tag is-warning is-light',
         'paused' => 'tag is-warning',
         'succeeded' => 'tag is-success',
+        'cancelling' => 'tag is-light',
         'cancelled' => 'tag is-dark',
         'errored' => 'tag is-danger',
       }

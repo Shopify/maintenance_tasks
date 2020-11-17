@@ -39,10 +39,12 @@ module MaintenanceTasks
     # @param input [Object] the current element from the enumerator.
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
-      @run.reload_status
       throw(:abort, :skip_complete_callbacks) if @run.stopped?
       @task.process(input)
       @ticker.tick
+      @run.reload_status
+
+      handle_stop
     end
 
     def job_running
@@ -50,6 +52,7 @@ module MaintenanceTasks
       @task = Task.named(@run.task_name).new
       @run.job_id = job_id
 
+      handle_stop
       @run.running! unless @run.stopped?
     end
 
@@ -89,6 +92,14 @@ module MaintenanceTasks
         backtrace: backtrace,
         ended_at: Time.now
       )
+    end
+
+    def handle_stop
+      if @run.pausing?
+        @run.paused!
+      elsif @run.cancelling?
+        @run.cancelled!
+      end
     end
 
     def setup_ticker

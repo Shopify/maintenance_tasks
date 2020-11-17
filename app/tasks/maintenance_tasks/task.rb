@@ -32,7 +32,6 @@ module MaintenanceTasks
       end
 
       # Returns the active Run associated with the Task, if any.
-      # An active run is defined as enqueued, running, or paused.
       #
       # @return [MaintenanceTasks::Run] the Run record.
       def active_run
