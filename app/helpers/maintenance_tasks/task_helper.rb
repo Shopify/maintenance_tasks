@@ -46,11 +46,11 @@ module MaintenanceTasks
       tag_labels = {
         'enqueued' => 'primary',
         'running' => 'info',
-        'interrupted' => 'warning',
+        'interrupted' => 'info is-light',
         'pausing' => 'warning is-light',
         'paused' => 'warning',
         'succeeded' => 'success',
-        'cancelling' => 'dark',
+        'cancelling' => 'light',
         'cancelled' => 'dark',
         'errored' => 'danger',
       }
