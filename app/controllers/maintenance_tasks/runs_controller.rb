@@ -17,7 +17,7 @@ module MaintenanceTasks
 
     # Updates a Run status to cancelling.
     def cancel
-      @run.cancelling!
+      @run.cancel
       redirect_to(task_path(@task))
     end
 

@@ -107,6 +107,21 @@ module MaintenanceTasks
       seconds_to_finished = ticks_left / processed_per_second
       Time.now + seconds_to_finished
     end
+
+    # Cancels a Run.
+    #
+    # If the Run is paused, it will transition directly to cancelled, since the
+    # Task is not being performed. In this case, the ended_at timestamp
+    # will be updated.
+    #
+    # If the Run is not paused, the Run will transition to cancelling.
+    def cancel
+      if paused?
+        update!(status: :cancelled, ended_at: Time.now)
+      else
+        cancelling!
+      end
+    end
   end
   private_constant :Run
 end
