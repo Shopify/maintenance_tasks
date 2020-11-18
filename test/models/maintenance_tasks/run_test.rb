@@ -39,19 +39,19 @@ module MaintenanceTasks
       assert_equal 2, query_count
     end
 
-    test '#stopped? returns true if status is paused or cancelled' do
+    test '#stopping? returns true if status is pausing or cancelling' do
       run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
 
-      (Run.statuses.keys - ['paused', 'cancelled']).each do |status|
+      (Run.statuses.keys - ['pausing', 'cancelling']).each do |status|
         run.status = status
-        refute_predicate run, :stopped?
+        refute_predicate run, :stopping?
       end
 
-      run.status = :paused
-      assert_predicate run, :stopped?
+      run.status = :pausing
+      assert_predicate run, :stopping?
 
-      run.status = :cancelled
-      assert_predicate run, :stopped?
+      run.status = :cancelling
+      assert_predicate run, :stopping?
     end
 
     test '#started? returns false if the Run has no started_at timestamp' do
