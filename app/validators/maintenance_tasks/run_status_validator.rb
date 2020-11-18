@@ -46,13 +46,11 @@ module MaintenanceTasks
       'paused' => ['enqueued', 'succeeded', 'cancelling'],
       # interrupted -> running occurs when the task is resumed after being
       #   interrupted by the job infrastructure.
-      # interrupted -> succeeded occurs when the task is shut down just prior
-      #   to completing successfully.
       # interrupted -> pausing occurs when the task is paused by the user while
       #   it is interrupted
       # interrupted -> cancelling occurs when the task is cancelled by the user
       #   while it is interrupted
-      'interrupted' => ['running', 'succeeded', 'pausing', 'cancelling'],
+      'interrupted' => ['running', 'pausing', 'cancelling'],
     }
 
     # Validate whether a transition from one Run status
