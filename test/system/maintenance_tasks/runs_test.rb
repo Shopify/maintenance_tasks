@@ -82,5 +82,21 @@ module MaintenanceTasks
         ],
       ]
     end
+
+    test 'errors are shown' do
+      visit maintenance_tasks_path
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+
+      url = page.current_url
+      using_session(:other_tab) do
+        visit url
+        click_on 'Run'
+        click_on 'Pause'
+      end
+
+      click_on 'Run'
+
+      assert_text 'Validation failed'
+    end
   end
 end
