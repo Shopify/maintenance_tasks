@@ -42,8 +42,8 @@ module MaintenanceTasks
       #   being paused. This can happen if the task is on its last iteration
       #   when it is paused, or if the task is paused after enqueue but has
       #   nothing in its collection to process.
-      # paused -> cancelling when the user cancels the task after it is paused.
-      'paused' => ['enqueued', 'succeeded', 'cancelling'],
+      # paused -> cancelled when the user cancels the task after it is paused.
+      'paused' => ['enqueued', 'succeeded', 'cancelled'],
       # interrupted -> running occurs when the task is resumed after being
       #   interrupted by the job infrastructure.
       # interrupted -> pausing occurs when the task is paused by the user while

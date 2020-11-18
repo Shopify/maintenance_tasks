@@ -127,6 +127,30 @@ module MaintenanceTasks
       assert_equal expected_completion_time, run.estimated_completion_time
     end
 
+    test '#cancel transitions the Run to cancelling if not paused' do
+      [:enqueued, :running, :pausing, :interrupted].each do |status|
+        run = Run.create!(
+          task_name: 'Maintenance::UpdatePostsTask',
+          status: status,
+        )
+        run.cancel
+
+        assert_predicate run, :cancelling?
+      end
+    end
+
+    test '#cancel transitions the Run to cancelled if paused and updates ended_at' do
+      freeze_time
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :paused,
+      )
+      run.cancel
+
+      assert_predicate run, :cancelled?
+      assert_equal Time.now, run.ended_at
+    end
+
     private
 
     def count_uncached_queries(&block)
