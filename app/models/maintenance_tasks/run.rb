@@ -69,12 +69,12 @@ module MaintenanceTasks
       self
     end
 
-    # Returns whether the Run is stopped, which is defined as
-    # having a status of paused or cancelled.
+    # Returns whether the Run is stopping, which is defined as
+    # having a status of pausing or cancelled.
     #
-    # @return [Boolean] whether the Run is stopped.
-    def stopped?
-      paused? || cancelled?
+    # @return [Boolean] whether the Run is stopping.
+    def stopping?
+      pausing? || cancelling?
     end
 
     # Returns whether the Run has been started, which is indicated by the
