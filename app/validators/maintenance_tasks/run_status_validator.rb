@@ -18,10 +18,16 @@ module MaintenanceTasks
       #   after it was paused by the user, but before performing halted.
       # pausing -> cancelling occurs when the user cancels a task immediately
       #   after it was paused, such that the task had not actually halted yet.
-      'pausing' => ['paused', 'interrupted', 'cancelling'],
+      # pausing -> succeeded occurs when the task completes immediately after
+      #   being paused. This can happen if the task is on its last iteration
+      #   when it is paused, or if the task is paused after enqueue but has
+      #   nothing in its collection to process.
+      'pausing' => ['paused', 'interrupted', 'cancelling', 'succeeded'],
       # cancelling -> cancelled occurs when the task actually halts performing
       #   and occupies a status of cancelled.
-      'cancelling' => ['cancelled'],
+      # cancelling -> succeeded occurs when the task completes immediately after
+      #   being cancelled. See description for pausing -> succeeded.
+      'cancelling' => ['cancelled', 'succeeded'],
       # running -> succeeded occurs when the task completes successfully.
       # running -> pausing occurs when a user pauses the task as
       #   it's performing.
@@ -38,18 +44,15 @@ module MaintenanceTasks
         'errored',
       ],
       # paused -> enqueued occurs when the task is resumed after being paused.
-      # paused -> succeeded occurs when the task completes immediately after
-      #   being paused. This can happen if the task is on its last iteration
-      #   when it is paused, or if the task is paused after enqueue but has
-      #   nothing in its collection to process.
+      # paused -> cancelling when the user cancels the task after it is paused.
       # paused -> cancelled when the user cancels the task after it is paused.
-      'paused' => ['enqueued', 'succeeded', 'cancelled'],
+      'paused' => ['enqueued', 'cancelling', 'cancelled'],
       # interrupted -> running occurs when the task is resumed after being
       #   interrupted by the job infrastructure.
       # interrupted -> pausing occurs when the task is paused by the user while
-      #   it is interrupted
+      #   it is interrupted.
       # interrupted -> cancelling occurs when the task is cancelled by the user
-      #   while it is interrupted
+      #   while it is interrupted.
       'interrupted' => ['running', 'pausing', 'cancelling'],
     }
 
