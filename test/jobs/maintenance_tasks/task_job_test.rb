@@ -178,6 +178,42 @@ module MaintenanceTasks
       TaskJob.perform_now(@run)
     end
 
+    test '.perform_now persists last_resumed_at to Run if the job was paused and resumes' do
+      freeze_time
+
+      @run.pausing!
+      @run.update!(status: :paused, time_running: 1.minute)
+
+      TestTask.any_instance.expects(:process).twice
+
+      @run.enqueued!
+      TaskJob.perform_now(@run)
+
+      assert_equal Time.now, @run.reload.last_resumed_at
+    end
+
+    test '.perform_now does not persist last_resumed_at to Run if job was interrupted and re-enqueued' do
+      freeze_time
+      JobIteration.stubs(interruption_adapter: -> { true })
+      TestTask.any_instance.expects(:process).twice
+
+      TaskJob.perform_now(@run)
+
+      assert_predicate @run.reload, :interrupted?
+
+      TaskJob.perform_now(@run)
+
+      assert_nil @run.reload.last_resumed_at
+    end
+
+    test '.perform_now persists time_running to Run on shutdown' do
+      TestTask.any_instance.expects(:process).twice
+
+      TaskJob.perform_now(@run)
+
+      assert_equal 0, @run.reload.time_running
+    end
+
     test '.perform_now accepts Active Record Relations as collection' do
       TestTask.any_instance.stubs(collection: Post.all)
       TestTask.any_instance.expects(:process).times(Post.count)

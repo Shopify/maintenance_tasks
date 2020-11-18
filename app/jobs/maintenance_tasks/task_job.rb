@@ -52,7 +52,10 @@ module MaintenanceTasks
       @task = Task.named(@run.task_name).new
       @run.job_id = job_id
 
-      @run.running! unless @run.stopping?
+      unless @run.stopping?
+        @run.last_resumed_at = Time.now if @run.enqueued? && @run.time_running?
+        @run.running!
+      end
     end
 
     def job_started
@@ -63,6 +66,7 @@ module MaintenanceTasks
     end
 
     def shutdown_job
+      @run.time_running = total_time
       if @run.cancelling?
         @run.status = :cancelled
         @run.ended_at = Time.now

@@ -151,6 +151,72 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
+    test '#estimated_completion_time computes completion time correctly when run is paused' do
+      started_at = Time.utc(2020, 1, 9, 9, 41, 44)
+      travel_to started_at + 9.seconds
+
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        started_at: started_at,
+        status: :running,
+        tick_count: 9,
+        tick_total: 10
+      )
+
+      run.assign_attributes(status: :paused, time_running: 9.seconds)
+
+      travel 2.minutes
+
+      expected_completion_time = Time.utc(2020, 1, 9, 9, 43, 54)
+      assert_equal expected_completion_time, run.estimated_completion_time
+    end
+
+    test '#estimated_completion_time computes completion time correctly when run was paused and resumed' do
+      started_at = Time.utc(2020, 1, 9, 9, 41, 44)
+      travel_to started_at + 6.seconds
+
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        started_at: started_at,
+        status: :running,
+        tick_count: 6,
+        tick_total: 10
+      )
+
+      run.assign_attributes(status: :paused, time_running: 6.seconds)
+
+      travel 2.minutes
+
+      run.assign_attributes(status: :running, last_resumed_at: Time.now)
+
+      expected_completion_time = Time.utc(2020, 1, 9, 9, 43, 54)
+      assert_equal expected_completion_time, run.estimated_completion_time
+    end
+
+    test '#estimated_completion_time computes completion time correctly when run is paused multiple times' do
+      started_at = Time.utc(2020, 1, 9, 9, 41, 44)
+      travel_to started_at + 6.seconds
+
+      run = Run.new(
+        task_name: 'Maintenance::UpdatePostsTask',
+        started_at: started_at,
+        status: :running,
+        tick_count: 6,
+        tick_total: 10
+      )
+
+      run.assign_attributes(status: :paused, time_running: 6.seconds)
+
+      travel 2.minutes
+      run.assign_attributes(status: :running, last_resumed_at: Time.now)
+
+      travel 2.seconds
+      run.tick_count = 8
+
+      expected_completion_time = Time.utc(2020, 1, 9, 9, 43, 54)
+      assert_equal expected_completion_time, run.estimated_completion_time
+    end
+
     private
 
     def count_uncached_queries(&block)
