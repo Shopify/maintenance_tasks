@@ -16,6 +16,8 @@ ActiveRecord::Schema.define(version: 2020_10_26_180058) do
     t.string "task_name", null: false
     t.datetime "started_at"
     t.datetime "ended_at"
+    t.datetime "last_resumed_at"
+    t.float "time_running", default: 0.0, null: false
     t.integer "tick_count", default: 0, null: false
     t.integer "tick_total"
     t.string "job_id"
