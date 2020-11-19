@@ -17,5 +17,8 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     Maintenance::UpdatePostsTask.fast_task = false
   end
 
-  teardown { Maintenance::UpdatePostsTask.fast_task = true }
+  teardown do
+    assert_empty page.driver.browser.manage.logs.get(:browser)
+    Maintenance::UpdatePostsTask.fast_task = true
+  end
 end
