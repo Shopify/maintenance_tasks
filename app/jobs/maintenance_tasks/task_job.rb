@@ -66,7 +66,7 @@ module MaintenanceTasks
     end
 
     def shutdown_job
-      @run.time_running = total_time
+      @run.adjust_time_running
       if @run.cancelling?
         @run.status = :cancelled
         @run.ended_at = Time.now

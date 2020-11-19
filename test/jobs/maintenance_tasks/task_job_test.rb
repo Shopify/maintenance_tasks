@@ -193,7 +193,6 @@ module MaintenanceTasks
     end
 
     test '.perform_now does not persist last_resumed_at to Run if job was interrupted and re-enqueued' do
-      freeze_time
       JobIteration.stubs(interruption_adapter: -> { true })
       TestTask.any_instance.expects(:process).twice
 
@@ -206,12 +205,12 @@ module MaintenanceTasks
       assert_nil @run.reload.last_resumed_at
     end
 
-    test '.perform_now persists time_running to Run on shutdown' do
+    test '.perform_now tells Run to adjust time_running during shutdown' do
       TestTask.any_instance.expects(:process).twice
 
       TaskJob.perform_now(@run)
 
-      assert_equal 0, @run.reload.time_running
+      refute_equal 0, @run.reload.time_running
     end
 
     test '.perform_now accepts Active Record Relations as collection' do
