@@ -151,38 +151,6 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
-    test "#adjust_time_running sets time_running to the difference between now and Run's started_at" do
-      freeze_time
-      run = Run.new(
-        task_name: 'Maintenance::UpdatePostsTask',
-        started_at: Time.now
-      )
-
-      travel 2.seconds
-
-      run.adjust_time_running
-      assert_equal 2, run.time_running
-    end
-
-    test '#adjust_time_running adds to existing time_running if Run has last_resumed_at timestamp' do
-      freeze_time
-      started_at = Time.now
-      travel 2.seconds
-
-      run = Run.create!(
-        task_name: 'Maintenance::UpdatePostsTask',
-        started_at: started_at,
-        time_running: 2
-      )
-
-      run.update!(status: :running, last_resumed_at: Time.now)
-
-      travel 1.second
-
-      run.adjust_time_running
-      assert_equal 3, run.time_running
-    end
-
     test '#estimated_completion_time computes completion time correctly when run is paused' do
       started_at = Time.utc(2020, 1, 9, 9, 41, 44)
       travel_to started_at + 9.seconds
@@ -219,7 +187,7 @@ module MaintenanceTasks
 
       travel 2.minutes
 
-      run.assign_attributes(status: :running, last_resumed_at: Time.now)
+      run.assign_attributes(status: :running, latest_running_at: Time.now)
 
       expected_completion_time = Time.utc(2020, 1, 9, 9, 43, 54)
       assert_equal expected_completion_time, run.estimated_completion_time
@@ -240,7 +208,7 @@ module MaintenanceTasks
       run.assign_attributes(status: :paused, time_running: 6.seconds)
 
       travel 2.minutes
-      run.assign_attributes(status: :running, last_resumed_at: Time.now)
+      run.assign_attributes(status: :running, latest_running_at: Time.now)
 
       travel 2.seconds
       run.tick_count = 8

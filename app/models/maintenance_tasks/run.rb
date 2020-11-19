@@ -45,6 +45,8 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
+    attr_accessor :latest_running_at
+
     # Increments +tick_count+ by +number_of_ticks+, directly in the DB.
     # The attribute value is not set in the current instance, you need
     # to reload the record.
@@ -93,24 +95,6 @@ module MaintenanceTasks
       COMPLETED_STATUSES.include?(status.to_sym)
     end
 
-    # Adjusts the Run's time_running attribute.
-    #
-    # If the Run was previously paused, time_running is calculated as the
-    # existing time_running plus the time between now and when the Run resumed.
-    #
-    # If the Run has never been paused, time_running is calculated as the time
-    # between now and when the Run started.
-    #
-    # Note that the time a Run spends interrupted is counted towards its
-    # time_running value.
-    def adjust_time_running
-      self.time_running = if last_resumed_at?
-        time_running + (Time.now - last_resumed_at)
-      else
-        Time.now - started_at
-      end
-    end
-
     # Returns the estimated time the task will finish based on the the number of
     # ticks left and the average time needed to process a tick.
     # Returns nil if the Run is completed, or if the tick_count or tick_total is
@@ -122,8 +106,8 @@ module MaintenanceTasks
 
       time_elapsed = if paused?
         time_running
-      elsif last_resumed_at?
-        Time.now - last_resumed_at + time_running
+      elsif latest_running_at.present?
+        Time.now - latest_running_at + time_running
       else
         Time.now - started_at
       end
