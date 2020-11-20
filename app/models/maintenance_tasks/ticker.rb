@@ -41,8 +41,10 @@ module MaintenanceTasks
     # row will call the block at most once (if it had been throttled).
     def persist
       return if @ticks_recorded == 0
-      @last_persisted = Time.now
-      @persist.call(@ticks_recorded)
+      now = Time.now
+      duration = now - @last_persisted
+      @last_persisted = now
+      @persist.call(@ticks_recorded, duration)
       @ticks_recorded = 0
     end
 

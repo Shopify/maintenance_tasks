@@ -4,10 +4,17 @@ require 'test_helper'
 
 module MaintenanceTasks
   class TickerTest < ActiveSupport::TestCase
+    setup { freeze_time }
+
     test '#ticks persists if enough time has passed' do
-      ticker = Ticker.new(0) { |ticks| @ticks = ticks }
+      ticker = Ticker.new(0) do |ticks, duration|
+        @ticks = ticks
+        @duration = duration
+      end
+
       ticker.tick
       assert_equal 1, @ticks
+      assert_equal 0, @duration
     end
 
     test "#tick doesn't persist immediately if not enough time has passed" do
@@ -18,18 +25,26 @@ module MaintenanceTasks
     end
 
     test '#tick persists if the tick happens after the duration has passed' do
-      ticker = Ticker.new(1.second) { |ticks| @ticks = ticks }
+      ticker = Ticker.new(1.second) do |ticks, duration|
+        @ticks = ticks
+        @duration = duration
+      end
       travel 2.seconds
       ticker.tick
       assert_equal 1, @ticks
+      assert_equal 2, @duration
     end
 
     test '#tick persists multiple ticks after the duration has passed' do
-      ticker = Ticker.new(1.second) { |ticks| @ticks = ticks }
+      ticker = Ticker.new(1.second) do |ticks, duration|
+        @ticks = ticks
+        @duration = duration
+      end
       ticker.tick
       travel 2.seconds
       ticker.tick
       assert_equal 2, @ticks
+      assert_equal 2, @duration
     end
 
     test "#persist doesn't persist if no tick happened" do
