@@ -110,7 +110,7 @@ module MaintenanceTasks
     def estimated_completion_time
       return if completed? || tick_count == 0 || tick_total.to_i == 0
 
-      processed_per_second = (tick_count.to_f / (Time.now - started_at))
+      processed_per_second = (tick_count.to_f / time_running)
       ticks_left = (tick_total - tick_count)
       seconds_to_finished = ticks_left / processed_per_second
       Time.now + seconds_to_finished

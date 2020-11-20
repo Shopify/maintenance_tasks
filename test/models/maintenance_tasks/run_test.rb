@@ -123,7 +123,8 @@ module MaintenanceTasks
         started_at: started_at,
         status: :running,
         tick_count: 9,
-        tick_total: 10
+        tick_total: 10,
+        time_running: 9,
       )
 
       expected_completion_time = Time.utc(2020, 1, 9, 9, 41, 54)
