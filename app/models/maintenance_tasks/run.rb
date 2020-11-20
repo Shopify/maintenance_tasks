@@ -45,13 +45,21 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
-    # Increments +tick_count+ by +number_of_ticks+, directly in the DB.
-    # The attribute value is not set in the current instance, you need
+    # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
+    # +duration+, both directly in the DB.
+    # The attribute values are not set in the current instance, you need
     # to reload the record.
     #
     # @param number_of_ticks [Integer] number of ticks to add to tick_count.
-    def increment_ticks(number_of_ticks)
-      self.class.update_counters(id, tick_count: number_of_ticks, touch: true)
+    # @param duration [Float] the time in seconds that elapsed since the last
+    #   increment of ticks.
+    def persist_progress(number_of_ticks, duration)
+      self.class.update_counters(
+        id,
+        tick_count: number_of_ticks,
+        time_running: duration,
+        touch: true
+      )
     end
 
     # Refreshes just the status attribute on the Active Record object, and
