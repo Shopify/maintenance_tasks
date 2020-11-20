@@ -5,25 +5,23 @@
 # For further information see the following documentation
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 
-# Rails.application.config.content_security_policy do |policy|
-#   policy.default_src :self, :https
-#   policy.font_src    :self, :https, :data
-#   policy.img_src     :self, :https, :data
-#   policy.object_src  :none
-#   policy.script_src  :self, :https
-#   policy.style_src   :self, :https
+Rails.application.config.content_security_policy do |policy|
+  policy.base_uri(:none)
+  policy.default_src(:self)
+  policy.object_src(:none)
+  policy.script_src(:self, :strict_dynamic)
 
-#   # Specify URI for violation reports
-#   # policy.report_uri "/csp-violation-report-endpoint"
-# end
+  policy.block_all_mixed_content
 
-# If you are using UJS then enable automatic nonce generation
-# Rails.application.config.content_security_policy_nonce_generator =
-#   -> request { SecureRandom.base64(16) }
+  # Specify URI for violation reports
+  # policy.report_uri "/csp-violation-report-endpoint"
+end
 
-# Set the nonce only to specific directives
-# Rails.application.config.content_security_policy_nonce_directives =
-#   %w(script-src)
+Rails.application.config.content_security_policy_nonce_generator =
+  ->(_request) { SecureRandom.base64(16) }
+
+Rails.application.config.content_security_policy_nonce_directives =
+  ['script-src']
 
 # Report CSP violations to a specified URI
 # For further information see the following documentation:

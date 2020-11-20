@@ -7,6 +7,12 @@ module MaintenanceTasks
   class ApplicationController < ActionController::Base
     include Pagy::Backend
 
+    BULMA_CDN = 'https://cdn.jsdelivr.net'
+
+    content_security_policy do |policy|
+      policy.style_src(BULMA_CDN)
+    end
+
     protect_from_forgery with: :exception
   end
   private_constant :ApplicationController
