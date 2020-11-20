@@ -5,6 +5,7 @@ class CreateMaintenanceTasksRuns < ActiveRecord::Migration[6.0]
       t.string(:task_name, null: false)
       t.datetime(:started_at)
       t.datetime(:ended_at)
+      t.float(:time_running, default: 0.0, null: false)
       t.integer(:tick_count, default: 0, null: false)
       t.integer(:tick_total)
       t.string(:job_id)

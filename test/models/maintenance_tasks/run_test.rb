@@ -8,15 +8,18 @@ module MaintenanceTasks
       refute run.valid?
     end
 
-    test '#increment_ticks persists an increment to the tick count' do
+    test '#persist_progress persists increments to tick count and time_running' do
       run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
         tick_count: 40,
+        time_running: 10.2,
       )
       run.tick_count = 21
-      run.increment_ticks(2)
+      run.persist_progress(2, 2)
+
       assert_equal 21, run.tick_count # record is not used or updated
       assert_equal 42, run.reload.tick_count
+      assert_equal 12.2, run.time_running
     end
 
     test '#reload_status reloads status and clears dirty tracking' do

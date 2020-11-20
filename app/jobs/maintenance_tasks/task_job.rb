@@ -96,8 +96,8 @@ module MaintenanceTasks
     end
 
     def setup_ticker
-      @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks|
-        @run.increment_ticks(ticks)
+      @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
+        @run.persist_progress(ticks, duration)
       end
     end
 
