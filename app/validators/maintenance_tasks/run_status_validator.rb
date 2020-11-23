@@ -14,15 +14,13 @@ module MaintenanceTasks
       'enqueued' => ['running', 'pausing', 'cancelling'],
       # pausing -> paused occurs when the task actually halts performing and
       #   occupies a status of paused.
-      # pausing -> interrupted occurs when the job infra shuts down the task
-      #   after it was paused by the user, but before performing halted.
       # pausing -> cancelling occurs when the user cancels a task immediately
       #   after it was paused, such that the task had not actually halted yet.
       # pausing -> succeeded occurs when the task completes immediately after
       #   being paused. This can happen if the task is on its last iteration
       #   when it is paused, or if the task is paused after enqueue but has
       #   nothing in its collection to process.
-      'pausing' => ['paused', 'interrupted', 'cancelling', 'succeeded'],
+      'pausing' => ['paused', 'cancelling', 'succeeded'],
       # cancelling -> cancelled occurs when the task actually halts performing
       #   and occupies a status of cancelled.
       # cancelling -> succeeded occurs when the task completes immediately after
