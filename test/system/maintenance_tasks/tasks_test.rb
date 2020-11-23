@@ -93,5 +93,13 @@ module MaintenanceTasks
 
       assert_title 'Maintenance::UpdatePostsTask'
     end
+
+    test 'visit main page through iframe' do
+      visit root_path
+
+      within_frame('maintenance-tasks-iframe') do
+        assert_content 'Maintenance Tasks'
+      end
+    end
   end
 end

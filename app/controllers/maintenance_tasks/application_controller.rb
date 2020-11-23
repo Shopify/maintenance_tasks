@@ -11,6 +11,7 @@ module MaintenanceTasks
 
     content_security_policy do |policy|
       policy.style_src(BULMA_CDN)
+      policy.frame_ancestors(:self)
     end
 
     protect_from_forgery with: :exception
