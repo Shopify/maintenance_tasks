@@ -102,6 +102,15 @@ module MaintenanceTasks
       assert_equal 2, @run.tick_total
     end
 
+    test '.perform_now does not set started_at or tick_total when the job starts if it is cancelling' do
+      @run.cancelling!
+
+      TaskJob.perform_now(@run)
+
+      assert_nil @run.reload.started_at
+      assert_nil @run.tick_total
+    end
+
     test '.perform_now updates Run to running and persists job_id when job starts performing' do
       TestTask.any_instance.expects(:process).twice.with do
         assert_predicate @run.reload, :running?
