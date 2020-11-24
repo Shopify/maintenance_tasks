@@ -15,7 +15,7 @@ module MaintenanceTasks
     # @raise [ActiveRecord::RecordInvalid] if validation errors occur while
     #   creating the Run.
     def run(name:)
-      run = Run.active.find_by(task_name: name) || Run.create!(task_name: name)
+      run = Run.active.find_by(task_name: name) || Run.new(task_name: name)
 
       run.enqueued!
       MaintenanceTasks.job.perform_later(run)
