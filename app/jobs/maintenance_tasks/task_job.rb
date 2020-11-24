@@ -53,6 +53,9 @@ module MaintenanceTasks
       @run.job_id = job_id
 
       @run.running! unless @run.stopping?
+    rescue ActiveRecord::StaleObjectError
+      @run.reload_status
+      retry
     end
 
     def job_started
@@ -99,6 +102,7 @@ module MaintenanceTasks
     def setup_ticker
       @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
         @run.persist_progress(ticks, duration)
+        @run.lock_version += 1
       end
     end
 

@@ -13,6 +13,7 @@
 ActiveRecord::Schema.define(version: 2020_10_26_180058) do
 
   create_table "maintenance_tasks_runs", force: :cascade do |t|
+    t.integer "lock_version", default: 0, null: false
     t.string "task_name", null: false
     t.datetime "started_at"
     t.datetime "ended_at"

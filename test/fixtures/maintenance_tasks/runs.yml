@@ -1,6 +1,7 @@
 # Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
 
 update_posts_task:
+  lock_version: 4
   task_name: Maintenance::UpdatePostsTask
   tick_count: 10
   tick_total: 10

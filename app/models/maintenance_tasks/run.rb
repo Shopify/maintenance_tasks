@@ -69,18 +69,20 @@ module MaintenanceTasks
       )
     end
 
-    # Refreshes just the status attribute on the Active Record object, and
-    # ensures ActiveModel::Dirty does not mark the object as changed.
-    # This allows us to get the Run's most up-to-date status without needing
-    # to reload the entire record.
+    # Refreshes just the status and lock_version attributes on the ActiveRecord
+    # object, and ensures ActiveModel::Dirty does not mark the object as
+    # changed.
+    # This allows us to get the Run's most up-to-date status without needing to
+    # reload the entire record.
     #
     # @return [MaintenanceTasks::Run] the Run record with its updated status.
     def reload_status
-      updated_status = Run.uncached do
-        Run.where(id: id).pluck(:status).first
+      updated_status, updated_lock_version = Run.uncached do
+        Run.where(id: id).pluck(:status, :lock_version).first
       end
       self.status = updated_status
-      clear_attribute_changes([:status])
+      self.lock_version = updated_lock_version
+      clear_attribute_changes([:status, :lock_version])
       self
     end
 
