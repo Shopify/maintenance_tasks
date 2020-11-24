@@ -1,0 +1,13 @@
+#!/usr/bin/env ruby -w
+
+# frozen_string_literal: true
+
+require File.expand_path('config/application', Dir.pwd)
+
+Rails.application.require_environment!
+
+require 'maintenance_tasks/cli'
+
+module MaintenanceTasks
+  CLI.start(ARGV)
+end

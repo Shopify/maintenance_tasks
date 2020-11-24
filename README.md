@@ -68,6 +68,12 @@ end
 
 You can run your new Task by accessing the Web UI and clicking on "Run".
 
+Alternatively, you can run your Task in the command line:
+
+```bash
+$ bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
+```
+
 You can also run a Task in Ruby by sending `run` with a Task name to a Runner
 instance:
 

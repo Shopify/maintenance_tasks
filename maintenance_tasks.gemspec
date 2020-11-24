@@ -15,6 +15,8 @@ Gem::Specification.new do |spec|
   }
 
   spec.files = Dir['{app,config,db,lib}/**/*', 'Rakefile', 'README.md']
+  spec.bindir = 'exe'
+  spec.executables = ['maintenance_tasks']
 
   spec.add_dependency('actionpack', '>= 6.0')
   spec.add_dependency('activejob', '>= 6.0')
