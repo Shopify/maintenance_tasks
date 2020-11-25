@@ -32,14 +32,19 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
       :Task,    # to define tasks
       :TaskJob, # to customize the job
     ]
-    public_constants = MaintenanceTasks.constants.select do |constant|
+    assert_equal expected_public_constants, public_constants(MaintenanceTasks)
+    assert_equal [], public_constants(MaintenanceTasks::Runner)
+    assert_equal [:NotFoundError], public_constants(MaintenanceTasks::Task)
+  end
+
+  def public_constants(a_module)
+    a_module.constants.select do |constant|
       constant =
-        eval("MaintenanceTasks::#{constant}") # rubocop:disable Security/Eval
+        eval("#{a_module}::#{constant}") # rubocop:disable Security/Eval
       next if constant.is_a?(Class) && constant < Minitest::Test
       true
     rescue NameError
       false
-    end
-    assert_equal expected_public_constants.sort, public_constants.sort
+    end.sort
   end
 end
