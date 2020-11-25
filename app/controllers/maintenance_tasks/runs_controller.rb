@@ -7,7 +7,7 @@ module MaintenanceTasks
   # @api private
   class RunsController < ApplicationController
     before_action :set_run, only: [:pause, :cancel, :resume]
-    before_action :set_task
+    before_action :set_task, except: [:cancel]
 
     # Updates a Run status to paused.
     def pause
@@ -17,6 +17,7 @@ module MaintenanceTasks
 
     # Updates a Run status to cancelling.
     def cancel
+      @task = Task.named_or_deleted(params.fetch(:task_id))
       @run.cancel
       redirect_to(task_path(@task))
     end
