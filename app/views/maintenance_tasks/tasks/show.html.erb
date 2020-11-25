@@ -4,6 +4,8 @@
 
 <% if notice %>
   <div class="notification is-success"><%= notice %></div>
+<% elsif alert %>
+  <div class="notification is-warning"><%= alert %></div>
 <% end %>
 
 <div class="buttons">

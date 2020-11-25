@@ -13,12 +13,16 @@ module MaintenanceTasks
     def pause
       @run.pausing!
       redirect_to(task_path(@task))
+    rescue ActiveRecord::RecordInvalid => error
+      redirect_to(task_path(@run.task_name), alert: error.message)
     end
 
     # Updates a Run status to cancelling.
     def cancel
       @run.cancel
       redirect_to(task_path(@task))
+    rescue ActiveRecord::RecordInvalid => error
+      redirect_to(task_path(@run.task_name), alert: error.message)
     end
 
     private
