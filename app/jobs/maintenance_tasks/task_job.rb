@@ -86,6 +86,7 @@ module MaintenanceTasks
       exception_message = exception.message
       backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
 
+      record_tick
       @run.update!(
         status: :errored,
         error_class: exception_class,

@@ -5,8 +5,8 @@ module Maintenance
       [1, 2]
     end
 
-    def process(*)
-      raise ArgumentError, 'Something went wrong'
+    def process(input)
+      raise ArgumentError, 'Something went wrong' if input == 2
     end
   end
 end
