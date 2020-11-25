@@ -51,7 +51,7 @@ module MaintenanceTasks
       assert_equal Time.now, @run.reload.ended_at
     end
 
-    test '.perform_now handles data race where Run is stale' do
+    test '.perform_now handles data race in transition to running where Run is stale' do
       Run.find(@run.id).pausing!
 
       assert_nothing_raised do
@@ -59,6 +59,19 @@ module MaintenanceTasks
       end
 
       assert_predicate @run.reload, :paused?
+    end
+
+    test '.perform_now handles data race in on_start update where Run is stale' do
+      TestTask.any_instance.expects(:count).with do
+        Run.find(@run.id).cancelling!
+      end
+      TestTask.any_instance.expects(:count).returns(2)
+
+      assert_nothing_raised do
+        TaskJob.perform_now(@run)
+      end
+
+      assert_predicate @run.reload, :cancelled?
     end
 
     test '.perform_now skips iterations when Run is paused' do
