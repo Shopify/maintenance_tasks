@@ -1,6 +1,13 @@
 <% content_for :page_title, @task %>
 
-<h1 class="title is-1"><%= @task %></h1>
+<% removed = !@task.is_a?(Class) %>
+
+<h1 class="title is-1">
+  <%= @task %>
+  <% if removed %>
+    <span class="tag is-large is-danger ml-2">Removed</span>
+  <% end %>
+</h1>
 
 <% if notice %>
   <div class="notification is-success"><%= notice %></div>
@@ -8,18 +15,18 @@
 
 <div class="buttons">
   <% if @active_run.nil? %>
-    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success' %>
+    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: removed %>
   <% elsif @active_run.cancelling? %>
     <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
   <% else %>
       <% if @active_run.pausing? %>
         <%= button_to 'Pausing', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning', disabled: true %>
       <% elsif @active_run.paused? %>
-        <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary' %>
+        <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: removed %>
       <% else %>
-        <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning' %>
+        <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning', disabled: removed %>
       <% end%>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, @active_run), method: :put, class: 'button is-danger' %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, @active_run), method: :put, class: 'button is-danger', disabled: removed %>
   <% end %>
 </div>
 

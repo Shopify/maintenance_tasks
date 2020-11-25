@@ -7,6 +7,43 @@ module MaintenanceTasks
 
     class NotFoundError < NameError; end
 
+    # Methods for Tasks to find Run records.
+    module FinderMethods
+      # Returns the set of Run records associated with the Task.
+      #
+      # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]
+      #   the relation of Run records.
+      def runs
+        Run.where(task_name: name)
+      end
+
+      # Returns the active Run associated with the Task, if any.
+      #
+      # @return [MaintenanceTasks::Run] the Run record.
+      def active_run
+        runs.active.first
+      end
+    end
+    private_constant :FinderMethods
+
+    extend FinderMethods
+
+    # Substitute for Task subclasses that have been deleted.
+    class Deleted
+      # Create a Task::Deleted for that name.
+      #
+      # @param name [String] Name of the Task that was deleted.
+      def initialize(name)
+        @name = name
+      end
+
+      attr_reader :name
+      alias_method :to_s, :name
+
+      include FinderMethods
+    end
+    private_constant :Deleted
+
     class << self
       # Finds a Task with the given name.
       #
@@ -21,6 +58,18 @@ module MaintenanceTasks
         raise NotFoundError.new("Task #{name} not found.", name)
       end
 
+      # Finds a Task with a given name, handling deleted tasks.
+      #
+      # @param name [String] the name of the Task to be found.
+      #
+      # @return [Task, Task::Deleted] the Task with the given name, or a
+      #   Task::Deleted in its place.
+      def named_or_deleted(name)
+        named(name)
+      rescue NotFoundError
+        Deleted.new(name)
+      end
+
       # Returns a list of concrete classes that inherit from the Task
       # superclass.
       #
@@ -28,21 +77,6 @@ module MaintenanceTasks
       def available_tasks
         load_constants
         descendants
-      end
-
-      # Returns the set of Run records associated with the Task.
-      #
-      # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]
-      #   the relation of Run records.
-      def runs
-        Run.where(task_name: name)
-      end
-
-      # Returns the active Run associated with the Task, if any.
-      #
-      # @return [MaintenanceTasks::Run] the Run record.
-      def active_run
-        runs.active.first
       end
 
       private
