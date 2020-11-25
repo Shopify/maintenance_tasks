@@ -4,14 +4,28 @@
 end
 
 module MaintenanceTasks
-  10.times do
+  time = Time.now
+  9.times do |id|
     Run.create!(
+      id: 10 - id,
       task_name: 'Maintenance::UpdatePostsTask',
-      started_at: Time.now,
+      created_at: time,
+      started_at: time + rand(1.minute),
       tick_count: 10,
       tick_total: 10,
       status: :succeeded,
-      ended_at: Time.now
+      ended_at: time + rand(10.minutes),
     )
+    time -= rand(7.days)
   end
+  Run.new(
+    id: 1,
+    task_name: 'Maintenance::DeletedTask',
+    created_at: time,
+    started_at: time + rand(10.seconds),
+    tick_count: 42,
+    tick_total: 42,
+    status: :errored,
+    ended_at: time + rand(10.minutes),
+  ).save(validate: false)
 end
