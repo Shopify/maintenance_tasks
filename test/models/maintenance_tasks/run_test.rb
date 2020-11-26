@@ -206,6 +206,32 @@ module MaintenanceTasks
       end
     end
 
+    test '#start persists started_at and tick_total to the Run' do
+      freeze_time
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :running
+      )
+      run.start(2)
+
+      assert_equal 2, run.tick_total
+      assert_equal Time.now, run.started_at
+    end
+
+    test '#start rescues and retries ActiveRecord::StaleObjectError' do
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :running
+      )
+      Run.find(run.id).cancelling!
+
+      assert_nothing_raised do
+        run.start(2)
+      end
+
+      assert_predicate run, :cancelling?
+    end
+
     private
 
     def count_uncached_queries(&block)

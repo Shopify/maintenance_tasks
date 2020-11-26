@@ -61,19 +61,6 @@ module MaintenanceTasks
       assert_predicate @run.reload, :paused?
     end
 
-    test '.perform_now handles data race in on_start update where Run is stale' do
-      TestTask.any_instance.expects(:count).with do
-        Run.find(@run.id).cancelling!
-      end
-      TestTask.any_instance.expects(:count).returns(2)
-
-      assert_nothing_raised do
-        TaskJob.perform_now(@run)
-      end
-
-      assert_predicate @run.reload, :cancelled?
-    end
-
     test '.perform_now skips iterations when Run is paused' do
       @run.pausing!
 
@@ -113,16 +100,11 @@ module MaintenanceTasks
       assert_equal 1, @run.reload.tick_count
     end
 
-    test '.perform_now persists started_at and updates tick_total when the job starts' do
-      freeze_time
-      TestTask.any_instance.expects(:process).once.with do
-        @run.cancelling!
-      end
+    test '.perform_now tells the Run to start when job starts' do
+      @run.expects(:start).with(2)
+      TestTask.any_instance.expects(:process).twice
 
       TaskJob.perform_now(@run)
-
-      assert_equal Time.now, @run.reload.started_at
-      assert_equal 2, @run.tick_total
     end
 
     test '.perform_now updates Run to running and persists job_id when job starts performing' do

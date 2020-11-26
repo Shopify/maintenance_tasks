@@ -55,6 +55,10 @@ module MaintenanceTasks
       retry
     end
 
+    # Starts a Run, setting it's started_at timestamp and tick_total.
+    #
+    # @param task_count [Integer] the total iterations to be performed, as
+    #   specified by the Task.
     def start(task_count)
       update!(started_at: Time.now, tick_total: task_count)
     rescue ActiveRecord::StaleObjectError
