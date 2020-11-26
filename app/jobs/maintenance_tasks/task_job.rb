@@ -50,12 +50,7 @@ module MaintenanceTasks
     def job_running
       @run = arguments.first
       @task = Task.named(@run.task_name).new
-      @run.job_id = job_id
-
-      @run.running! unless @run.stopping?
-    rescue ActiveRecord::StaleObjectError
-      @run.reload_status
-      retry
+      @run.run(job_id)
     end
 
     def job_started

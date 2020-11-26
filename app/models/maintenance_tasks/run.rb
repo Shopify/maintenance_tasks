@@ -55,6 +55,18 @@ module MaintenanceTasks
       retry
     end
 
+    # Sets the job_id, and additionally updates the run status to running
+    # unless the Run is stopping.
+    #
+    # @param job_id [String] the job_id of the job being performed for the Run
+    def run(job_id)
+      self.job_id = job_id
+      running! unless stopping?
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
     # Starts a Run, setting it's started_at timestamp and tick_total.
     #
     # @param task_count [Integer] the total iterations to be performed, as

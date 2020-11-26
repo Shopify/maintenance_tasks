@@ -197,12 +197,42 @@ module MaintenanceTasks
     test '#enqueued! rescues and retries ActiveRecord::StaleObjectError' do
       run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
-        status: :paused
+        status: :paused,
       )
       Run.find(run.id).enqueued!
 
       assert_raises(ActiveRecord::RecordInvalid) do
         run.enqueued!
+      end
+    end
+
+    test '#run persists job_id and updates status to running' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+
+      run.run('123')
+
+      assert_equal '123', run.job_id
+      assert_predicate run, :running?
+    end
+
+    test '#run persists job_id but does not update status to running if run is stopping' do
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :pausing,
+      )
+
+      run.run('123')
+
+      assert_equal '123', run.job_id
+      assert_predicate run, :pausing?
+    end
+
+    test '#run rescues and retries ActiveRecord::StaleObjectError' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.run('123')
       end
     end
 

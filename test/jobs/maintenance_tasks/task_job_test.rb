@@ -51,16 +51,6 @@ module MaintenanceTasks
       assert_equal Time.now, @run.reload.ended_at
     end
 
-    test '.perform_now handles data race in transition to running where Run is stale' do
-      Run.find(@run.id).pausing!
-
-      assert_nothing_raised do
-        TaskJob.perform_now(@run)
-      end
-
-      assert_predicate @run.reload, :paused?
-    end
-
     test '.perform_now skips iterations when Run is paused' do
       @run.pausing!
 
@@ -107,15 +97,14 @@ module MaintenanceTasks
       TaskJob.perform_now(@run)
     end
 
-    test '.perform_now updates Run to running and persists job_id when job starts performing' do
-      TestTask.any_instance.expects(:process).twice.with do
-        assert_predicate @run.reload, :running?
+    test '.perform_now tells Run to run when job starts performing' do
+      TestTask.any_instance.expects(:process).with do
+        @run.cancelling!
       end
-
       job = TaskJob.new(@run)
-      job.perform_now
+      @run.expects(:run).with(job.job_id)
 
-      assert_equal job.job_id, @run.reload.job_id
+      job.perform_now
     end
 
     test '.perform_now updates Run to succeeded and persists ended_at when job finishes successfully' do
