@@ -52,6 +52,34 @@ module MaintenanceTasks
       super
     end
 
+    # Cancels a Run, rescuing and retrying if an ActiveRecord::StaleObjectError
+    # is encountered.
+    #
+    # If the Run is paused, it will transition directly to cancelled, since the
+    # Task is not being performed. In this case, the ended_at timestamp
+    # will be updated.
+    #
+    # If the Run is not paused, the Run will transition to cancelling.
+    def cancel
+      if paused?
+        update!(status: :cancelled, ended_at: Time.now)
+      else
+        cancelling!
+      end
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
+    # Sets the Run status to pausing, rescuing and retrying if an
+    # ActiveRecord::StaleObjectError is encountered.
+    def pausing!
+      super
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
     # +duration+, both directly in the DB.
     # The attribute values are not set in the current instance, you need
@@ -123,21 +151,6 @@ module MaintenanceTasks
       ticks_left = (tick_total - tick_count)
       seconds_to_finished = ticks_left / processed_per_second
       Time.now + seconds_to_finished
-    end
-
-    # Cancels a Run.
-    #
-    # If the Run is paused, it will transition directly to cancelled, since the
-    # Task is not being performed. In this case, the ended_at timestamp
-    # will be updated.
-    #
-    # If the Run is not paused, the Run will transition to cancelling.
-    def cancel
-      if paused?
-        update!(status: :cancelled, ended_at: Time.now)
-      else
-        cancelling!
-      end
     end
   end
   private_constant :Run

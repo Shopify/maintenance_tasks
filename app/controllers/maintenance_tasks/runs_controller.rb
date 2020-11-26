@@ -15,9 +15,6 @@ module MaintenanceTasks
       redirect_to(task_path(@task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(@run.task_name), alert: error.message)
-    rescue ActiveRecord::StaleObjectError
-      @run.reload_status
-      retry
     end
 
     # Updates a Run status to cancelling.
@@ -26,9 +23,6 @@ module MaintenanceTasks
       redirect_to(task_path(@task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(@run.task_name), alert: error.message)
-    rescue ActiveRecord::StaleObjectError
-      @run.reload_status
-      retry
     end
 
     private

@@ -158,6 +158,28 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
+    test '#cancel rescues and retries ActiveRecord::StaleObjectError' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.cancel
+      end
+
+      assert_predicate run, :cancelling?
+    end
+
+    test '#pausing! rescues and retries ActiveRecord::StaleObjectError' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.find(run.id).running!
+
+      assert_nothing_raised do
+        run.pausing!
+      end
+
+      assert_predicate run, :pausing?
+    end
+
     test '#enqueued! ensures the status is marked as changed' do
       run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
       run.enqueued!
