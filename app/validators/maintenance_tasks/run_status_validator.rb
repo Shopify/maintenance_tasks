@@ -59,10 +59,7 @@ module MaintenanceTasks
     #
     #  @param record [MaintenanceTasks::Run] the Run object being validated.
     def validate(record)
-      previous_status = record.status_was
-      new_status = record.status
-
-      return if previous_status == new_status
+      return unless (previous_status, new_status = record.status_change)
 
       valid_new_statuses = VALID_STATUS_TRANSITIONS.fetch(previous_status, [])
 

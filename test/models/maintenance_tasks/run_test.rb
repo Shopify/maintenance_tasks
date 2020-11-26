@@ -155,6 +155,20 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
+    test '#enqueued! ensures the status is marked as changed' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+      run.enqueued!
+      assert_equal ['enqueued', 'enqueued'], run.status_previous_change
+    end
+
+    test '#enqueued! prevents already enqueued Run to be enqueued' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+      run.enqueued!
+      assert_raises(ActiveRecord::RecordInvalid) do
+        run.enqueued!
+      end
+    end
+
     private
 
     def count_uncached_queries(&block)

@@ -45,6 +45,13 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
+    # Sets the run status to enqueued, making sure the transition is validated
+    # in case it's already enqueued.
+    def enqueued!
+      status_will_change!
+      super
+    end
+
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
     # +duration+, both directly in the DB.
     # The attribute values are not set in the current instance, you need
