@@ -83,7 +83,7 @@ module MaintenanceTasks
       ]
     end
 
-    test 'errors are shown' do
+    test 'errors for double enqueue are shown' do
       visit maintenance_tasks_path
       within('.menu') { click_on('Maintenance::UpdatePostsTask') }
 
@@ -96,7 +96,28 @@ module MaintenanceTasks
 
       click_on 'Run'
 
-      assert_text 'Validation failed'
+      alert_text = 'Validation failed: ' \
+        'Status Cannot transition run from status pausing to enqueued'
+      assert_text alert_text
+    end
+
+    test 'errors for invalid pause or cancel due to stale UI are shown' do
+      visit maintenance_tasks_path
+      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+
+      url = page.current_url
+      click_on 'Run'
+
+      using_session(:other_tab) do
+        visit url
+        click_on 'Cancel'
+      end
+
+      click_on 'Pause'
+
+      alert_text = 'Validation failed: ' \
+        'Status Cannot transition run from status cancelling to pausing'
+      assert_text alert_text
     end
   end
 end
