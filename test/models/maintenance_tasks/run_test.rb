@@ -194,6 +194,18 @@ module MaintenanceTasks
       end
     end
 
+    test '#enqueued! rescues and retries ActiveRecord::StaleObjectError' do
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :paused
+      )
+      Run.find(run.id).enqueued!
+
+      assert_raises(ActiveRecord::RecordInvalid) do
+        run.enqueued!
+      end
+    end
+
     private
 
     def count_uncached_queries(&block)

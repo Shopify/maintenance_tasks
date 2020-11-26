@@ -50,6 +50,16 @@ module MaintenanceTasks
     def enqueued!
       status_will_change!
       super
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
+    def start(task_count)
+      update!(started_at: Time.now, tick_total: task_count)
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     # Cancels a Run, rescuing and retrying if an ActiveRecord::StaleObjectError

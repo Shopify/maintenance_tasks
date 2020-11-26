@@ -59,13 +59,7 @@ module MaintenanceTasks
     end
 
     def job_started
-      @run.update!(
-        started_at: Time.now,
-        tick_total: @task.count
-      )
-    rescue ActiveRecord::StaleObjectError
-      @run.reload_status
-      retry
+      @run.start(@task.count)
     end
 
     def shutdown_job
