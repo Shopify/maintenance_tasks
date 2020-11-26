@@ -73,7 +73,7 @@ module MaintenanceTasks
           'January 09, 2020 09:41',
           'January 09, 2020 09:41',
           'errored',
-          '0',
+          '1',
           'ArgumentError',
           'Something went wrong',
           "app/tasks/maintenance/error_task.rb:9:in `process'",

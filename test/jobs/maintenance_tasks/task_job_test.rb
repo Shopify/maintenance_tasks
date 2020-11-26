@@ -160,6 +160,16 @@ module MaintenanceTasks
       assert_no_enqueued_jobs { TaskJob.perform_now(run) }
     end
 
+    test '.perform_now updates tick_count when job is errored' do
+      TestTask.any_instance.expects(:process).twice
+        .returns(nil)
+        .raises(ArgumentError)
+
+      TaskJob.perform_now(@run)
+
+      assert_equal 1, @run.reload.tick_count
+    end
+
     test '.perform_now persists cursor when job shuts down' do
       TestTask.any_instance.expects(:process).once.with do
         @run.pausing!
