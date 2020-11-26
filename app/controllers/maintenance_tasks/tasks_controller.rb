@@ -29,7 +29,7 @@ module MaintenanceTasks
       task = Runner.new.run(name: params.fetch(:id))
       redirect_to(task_path(task), notice: "Task #{task.name} enqueued.")
     rescue ActiveRecord::RecordInvalid => error
-      redirect_to(task_path(error.record.task_name), notice: error.message)
+      redirect_to(task_path(error.record.task_name), alert: error.message)
     end
 
     private
