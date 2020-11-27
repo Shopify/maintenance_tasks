@@ -6,17 +6,15 @@ module MaintenanceTasks
   class TaskJob < ActiveJob::Base
     include JobIteration::Iteration
 
-    before_perform(:job_running)
-    on_start(:job_started)
-    on_complete(:job_completed)
-    on_shutdown(:shutdown_job)
+    before_perform(:before_perform)
 
-    before_perform(:setup_ticker)
-    on_shutdown(:record_tick)
+    on_start(:on_start)
+    on_complete(:on_complete)
+    on_shutdown(:on_shutdown)
 
-    after_perform(:save_run)
+    after_perform(:after_perform)
 
-    rescue_from StandardError, with: :job_errored
+    rescue_from StandardError, with: :on_error
 
     private
 
@@ -47,22 +45,28 @@ module MaintenanceTasks
       @run.reload_status
     end
 
-    def job_running
+    def before_perform
       @run = arguments.first
       @task = Task.named(@run.task_name).new
       @run.job_id = job_id
 
       @run.running! unless @run.stopping?
+
+      @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
+        @run.persist_progress(ticks, duration)
+      end
     end
 
-    def job_started
-      @run.update!(
-        started_at: Time.now,
-        tick_total: @task.count
-      )
+    def on_start
+      @run.update!(started_at: Time.now, tick_total: @task.count)
     end
 
-    def shutdown_job
+    def on_complete
+      @run.status = :succeeded
+      @run.ended_at = Time.now
+    end
+
+    def on_shutdown
       if @run.cancelling?
         @run.status = :cancelled
         @run.ended_at = Time.now
@@ -70,40 +74,24 @@ module MaintenanceTasks
         @run.status = @run.pausing? ? :paused : :interrupted
         @run.cursor = cursor_position
       end
+
+      @ticker.persist
     end
 
-    def job_completed
-      @run.status = :succeeded
-      @run.ended_at = Time.now
-    end
-
-    def save_run
+    def after_perform
       @run.save!
     end
 
-    def job_errored(exception)
-      exception_class = exception.class.to_s
-      exception_message = exception.message
-      backtrace = Rails.backtrace_cleaner.clean(exception.backtrace)
+    def on_error(error)
+      @ticker.persist
 
-      record_tick
       @run.update!(
         status: :errored,
-        error_class: exception_class,
-        error_message: exception_message,
-        backtrace: backtrace,
+        error_class: error.class.to_s,
+        error_message: error.message,
+        backtrace: Rails.backtrace_cleaner.clean(error.backtrace),
         ended_at: Time.now
       )
-    end
-
-    def setup_ticker
-      @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
-        @run.persist_progress(ticks, duration)
-      end
-    end
-
-    def record_tick
-      @ticker.persist
     end
   end
 end
