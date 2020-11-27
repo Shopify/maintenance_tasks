@@ -17,14 +17,13 @@ module MaintenanceTasks
       assert_equal 'pagination', pagination(@pagy)
     end
 
-    test '#formatted_datetime returns time element with local datetime and ISO 8601 UTC time in title attribute' do
+    test '#time_ago returns a time element with the given datetime worded as relative to now and ISO 8601 UTC time in title attribute' do
+      travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
       time = Time.zone.local(2020, 01, 01, 01, 00, 00)
 
-      datetime = '2020-01-01T01:00:00Z'
-      title = '2020-01-01T01:00:00Z'
-      text = 'January 01, 2020 01:00'
-      exp = "<time datetime=\"#{datetime}\" title=\"#{title}\">#{text}</time>"
-      assert_equal exp, formatted_datetime(time)
+      expected = '<time datetime="2020-01-01T01:00:00Z" '\
+        'title="2020-01-01T01:00:00Z" class="is-clickable">8 days ago</time>'
+      assert_equal expected, time_ago(time)
     end
   end
 end

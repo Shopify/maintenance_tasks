@@ -38,11 +38,12 @@ module MaintenanceTasks
         Run.where(task_name: name)
       end
 
-      # Returns the active Run associated with the Task, if any.
+      # Retrieves the latest Run associated with the Task.
       #
       # @return [MaintenanceTasks::Run] the Run record.
-      def active_run
-        runs.active.first
+      # @return [nil] if there are no Runs associated with the Task.
+      def last_run
+        runs.last
       end
 
       private

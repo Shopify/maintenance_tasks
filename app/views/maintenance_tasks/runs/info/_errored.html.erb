@@ -1,0 +1,23 @@
+<p>
+  Ran for <%= time_running_in_words run  %> until an error happened
+  <%= time_ago run.ended_at %>.
+</p>
+
+</p>
+
+<div class="card">
+  <header class="card-header">
+    <p class="card-header-title">
+      <%= run.error_class %>
+    </p>
+  </header>
+
+  <div class="card-content">
+    <div class="content">
+      <p><%= run.error_message %></p>
+
+      <code><%= format_backtrace(run.backtrace) %></code>
+
+    </div>
+  </div>
+</div>

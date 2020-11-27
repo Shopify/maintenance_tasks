@@ -1,62 +1,39 @@
 <% content_for :page_title, @task %>
 
-<h1 class="title is-1"><%= @task %></h1>
+<h1 class="title is-1">
+  <%= @task %>
+  <% if @last_run %>
+    <%= status_tag(@last_run.status) %>
+  <% else %>
+    <span class="tag is-primary">New</span>
+  <% end %>
+</h1>
 
-<% if notice %>
-  <div class="notification is-success"><%= notice %></div>
-<% elsif alert %>
-  <div class="notification is-warning"><%= alert %></div>
-<% end %>
+<%= render 'maintenance_tasks/runs/info', run: @last_run if @last_run %>
 
 <div class="buttons">
-  <% if @active_run.nil? %>
+  <% if @last_run.nil? || @last_run.completed? %>
     <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success' %>
-  <% elsif @active_run.cancelling? %>
+  <% elsif @last_run.cancelling? %>
     <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
   <% else %>
-      <% if @active_run.pausing? %>
-        <%= button_to 'Pausing', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning', disabled: true %>
-      <% elsif @active_run.paused? %>
+      <% if @last_run.pausing? %>
+        <%= button_to 'Pausing', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning', disabled: true %>
+      <% elsif @last_run.paused? %>
         <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary' %>
       <% else %>
-        <%= button_to 'Pause', pause_task_run_path(@task, @active_run), method: :put, class: 'button is-warning' %>
+        <%= button_to 'Pause', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning' %>
       <% end%>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, @active_run), method: :put, class: 'button is-danger' %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, @last_run), method: :put, class: 'button is-danger' %>
   <% end %>
 </div>
 
-<h2 class="title is-2">Runs</h2>
+<% if @previous_runs.present? %>
+  <hr/>
 
-<table class="table is-bordered is-striped">
-  <thead>
-    <tr>
-      <th>Created at</th>
-      <th>Started at</th>
-      <th>Status</th>
-      <th>Progress</th>
-      <th>Error Class</th>
-      <th>Error Message</th>
-      <th>Backtrace</th>
-      <th>Estimated time to completion</th>
-      <th>Ended at</th>
-    </tr>
-  </thead>
+  <h4 class="title is-4">Previous Runs</h4>
 
-  <tbody>
-    <% @runs.each do |run| %>
-      <tr>
-        <td><%= formatted_datetime(run.created_at) %></td>
-        <td><%= formatted_datetime(run.started_at) if run.started_at %></td>
-        <td><%= status_tag(run.status) %></td>
-        <td><%= format_ticks(run) %></td>
-        <td><%= run.error_class %></td>
-        <td><%= run.error_message %></td>
-        <td><%= format_backtrace(run.backtrace) %></td>
-        <td><%= estimated_time_to_completion(run) %></td>
-        <td><%= formatted_datetime(run.ended_at) if run.ended_at %></td>
-      </tr>
-    <% end %>
-  </tbody>
-</table>
+  <%= render @previous_runs %>
 
-<%= pagination(@pagy) %>
+  <%= pagination(@pagy) %>
+<% end %>
