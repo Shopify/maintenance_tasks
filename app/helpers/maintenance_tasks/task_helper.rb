@@ -5,6 +5,18 @@ module MaintenanceTasks
   #
   # @api private
   module TaskHelper
+    STATUS_COLOURS = {
+      'enqueued' => ['is-primary is-light'],
+      'running' => ['is-info'],
+      'interrupted' => ['is-info', 'is-light'],
+      'pausing' => ['is-warning', 'is-light'],
+      'paused' => ['is-warning'],
+      'succeeded' => ['is-success'],
+      'cancelling' => ['is-light'],
+      'cancelled' => ['is-dark'],
+      'errored' => ['is-danger'],
+    }
+
     # Formats a run backtrace.
     #
     # @param backtrace [Array<String>] the backtrace associated with an
@@ -14,26 +26,38 @@ module MaintenanceTasks
       safe_join(backtrace.to_a, tag.br)
     end
 
-    # Formats the ticks.
+    # Renders the progress bar.
     #
-    # Only shows the ticks or if the total is available, shows the ticks,
-    # total and percentage. Does not show ticks if run has not started.
+    # The style of the progress tag depends on the Run status. It also renders
+    # an infinite progress when a Run is active but there is no total
+    # information to estimate completion.
     #
-    # @param run [Run] the run for which the ticks are formatted.
-    # @return [String, nil] the progress information properly formatted, or
-    #   nil if the run has not started yet.
-    def format_ticks(run)
+    # @param run [Run] the Run which the progress bar will be based on.
+    #
+    # @return [String] the progress information properly formatted.
+    # @return [nil] if the run has not started yet.
+    def progress(run)
       return unless run.started?
 
+      value = run.tick_count
+      max = run.tick_total
+      title = "Processed #{pluralize(run.tick_count, 'item')}."
+
       if run.tick_total.to_i > 0
-        safe_join([
-          tag.progress(value: run.tick_count, max: run.tick_total,
-            class: 'progress is-small'),
-          progress_text(run),
-        ], ' ')
+        percentage = 100.0 * run.tick_count / run.tick_total
+        title = "Processed #{run.tick_count} out of #{run.tick_total} "\
+        "(#{number_to_percentage(percentage.floor, precision: 0)})"
       else
-        run.tick_count.to_s
+        max = run.tick_count
+        value = nil unless run.completed? || run.paused?
       end
+
+      tag.progress(
+        value: value,
+        max: max,
+        title: title,
+        class: ['progress'] + STATUS_COLOURS.fetch(run.status)
+      )
     end
 
     # Renders a span with a Run's status, with the corresponding tag class
@@ -43,19 +67,7 @@ module MaintenanceTasks
     # @return [String] the span element containing the status, with the
     #   appropriate tag class attached.
     def status_tag(status)
-      tag_labels = {
-        'enqueued' => 'primary',
-        'running' => 'info',
-        'interrupted' => 'info is-light',
-        'pausing' => 'warning is-light',
-        'paused' => 'warning',
-        'succeeded' => 'success',
-        'cancelling' => 'light',
-        'cancelled' => 'dark',
-        'errored' => 'danger',
-      }
-
-      tag.span(status, class: "tag is-#{tag_labels.fetch(status)}")
+      tag.span(status.capitalize, class: ['tag'] + STATUS_COLOURS.fetch(status))
     end
 
     # Returns the distance between now and the Run's expected completion time,
@@ -72,12 +84,14 @@ module MaintenanceTasks
       end
     end
 
-    private
-
-    def progress_text(run)
-      percentage = 100.0 * run.tick_count / run.tick_total
-      "#{run.tick_count} / #{run.tick_total} "\
-        "(#{number_to_percentage(percentage.floor, precision: 0)})"
+    # Reports the approximate elapsed time a Run has been processed so far based
+    # on the Run's time running attribute.
+    #
+    # @param run [Run] the source of the time to be reported.
+    #
+    # @return [String] the description of the time running attribute.
+    def time_running_in_words(run)
+      distance_of_time_in_words(0, run.time_running, include_seconds: true)
     end
   end
   private_constant :TaskHelper

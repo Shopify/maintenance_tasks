@@ -37,11 +37,6 @@ module MaintenanceTasks
     serialize :backtrace
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
-    scope :latest_completed, -> {
-      where(status: COMPLETED_STATUSES)
-        .order(created_at: :desc)
-        .limit(COMPLETED_RUNS_LIMIT)
-    }
 
     validates_with RunStatusValidator, on: :update
 

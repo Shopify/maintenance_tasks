@@ -7,85 +7,72 @@ module MaintenanceTasks
     test 'run a Task' do
       visit maintenance_tasks_path
 
-      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+      click_on('Maintenance::UpdatePostsTask')
       click_on 'Run'
 
       assert_title 'Maintenance::UpdatePostsTask'
-      assert_text 'Task Maintenance::UpdatePostsTask enqueued.'
-      assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'enqueued', '', '', '', ''],
-      ]
+      assert_text 'Enqueued'
+      assert_text 'Waiting to start.'
       assert_no_button 'Run'
     end
 
     test 'pause a Run' do
       visit maintenance_tasks_path
 
-      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+      click_on('Maintenance::UpdatePostsTask')
       click_on 'Run'
       click_on 'Pause'
 
-      assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'pausing', '', '', '', ''],
-      ]
+      assert_text 'Pausing'
+      assert_text 'Pausing, please hold...'
     end
 
     test 'resume a Run' do
       visit maintenance_tasks_path
 
-      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+      click_on('Maintenance::UpdatePostsTask')
       click_on 'Run'
       click_on 'Pause'
       perform_enqueued_jobs
       page.refresh
       click_on 'Resume'
 
-      assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'enqueued', '', '', '', ''],
-      ]
+      assert_text 'Enqueued'
+      assert_text 'Waiting to start.'
     end
 
     test 'cancel a Run' do
       visit maintenance_tasks_path
 
-      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+      click_on('Maintenance::UpdatePostsTask')
       click_on 'Run'
       click_on 'Cancel'
 
-      assert_table with_rows: [
-        ['January 09, 2020 09:41', '', 'cancelling', '', '', '', ''],
-      ]
+      assert_text 'Cancelling'
+      assert_text 'Cancelling…'
     end
 
-    test 'run a task that errors' do
+    test 'run a Task that errors' do
       visit maintenance_tasks_path
 
-      within('.menu') { click_on('Maintenance::ErrorTask') }
+      click_on('Maintenance::ErrorTask')
 
       perform_enqueued_jobs do
         click_on 'Run'
       end
 
-      assert_text 'Task Maintenance::ErrorTask enqueued.'
-
-      assert_table rows: [
-        [
-          'January 09, 2020 09:41',
-          'January 09, 2020 09:41',
-          'errored',
-          '1',
-          'ArgumentError',
-          'Something went wrong',
-          "app/tasks/maintenance/error_task.rb:9:in `process'",
-          '',
-          'January 09, 2020 09:41',
-        ],
-      ]
+      assert_text 'Errored'
+      assert_text 'Ran for less than 5 seconds until an error happened '\
+        'less than a minute ago.'
+      assert_text 'ArgumentError'
+      assert_text 'Something went wrong'
+      assert_text "app/tasks/maintenance/error_task.rb:9:in `process'"
     end
 
     test 'errors for double enqueue are shown' do
       visit maintenance_tasks_path
-      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+
+      click_on('Maintenance::UpdatePostsTask')
 
       url = page.current_url
       using_session(:other_tab) do
@@ -103,7 +90,7 @@ module MaintenanceTasks
 
     test 'errors for invalid pause or cancel due to stale UI are shown' do
       visit maintenance_tasks_path
-      within('.menu') { click_on('Maintenance::UpdatePostsTask') }
+      click_on('Maintenance::UpdatePostsTask')
 
       url = page.current_url
       click_on 'Run'

@@ -16,54 +16,42 @@ module MaintenanceTasks
       assert_equal expected_trace, format_backtrace(backtrace)
     end
 
-    test '#format_ticks shows only the ticks if tick_total is not set' do
-      run = Run.new(tick_count: 42, started_at: Time.now)
-      assert_equal '42', format_ticks(run)
-    end
-
-    test '#format_ticks shows only the ticks if tick_total is 0' do
-      run = Run.new(tick_count: 0, tick_total: 0, started_at: Time.now)
-      assert_equal '0', format_ticks(run)
-    end
-
-    test '#format_ticks returns nil if the run has not started' do
-      run = Run.new(tick_count: 0, tick_total: 10)
-      assert_nil format_ticks(run)
-    end
-
-    test '#format_ticks renders a <progress> element' do
+    test '#progress renders a <progress> with value and progress information title' do
       run = Run.new(tick_count: 42, tick_total: 84, started_at: Time.now)
-      render(inline: '<%= format_ticks(run) %>', locals: { run: run })
-      assert_select 'progress[value=42][max=84]'
+      expected = '<progress value="42" max="84" title="Processed 42 out '\
+        'of 84 (50%)" class="progress is-primary is-light"></progress>'
+      assert_equal expected, progress(run)
     end
 
-    test '#progress_text shows the ticks, total and percentage' do
-      run = Run.new(tick_count: 42, tick_total: 84)
-      assert_equal '42 / 84 (50%)', progress_text(run)
+    test '#progress returns a <progress> with no value when tick_total is not set' do
+      run = Run.new(tick_count: 42, started_at: Time.now)
+      expected = '<progress max="42" title="Processed 42 items." '\
+        'class="progress is-primary is-light"></progress>'
+      assert_equal expected, progress(run)
     end
 
-    test '#progress_text percentage rounds down to the nearest integer' do
-      run = Run.new(tick_count: 999, tick_total: 1000)
-      assert_equal '999 / 1000 (99%)', progress_text(run)
+    test '#progress returns a <progress> with value when tick_total is not set and Run has completed' do
+      run = Run.new(tick_count: 42, started_at: Time.now, status: :succeeded)
+      expected = '<progress value="42" max="42" title="Processed 42 items." '\
+        'class="progress is-success"></progress>'
+      assert_equal expected, progress(run)
+    end
+
+    test '#progress returns a <progress> with no value when tick_total is 0' do
+      run = Run.new(tick_count: 0, tick_total: 0, started_at: Time.now)
+      expected = '<progress max="0" title="Processed 0 items." '\
+        'class="progress is-primary is-light"></progress>'
+      assert_equal expected, progress(run)
+    end
+
+    test '#progress returns nil if the Run has not started' do
+      run = Run.new(tick_count: 0, tick_total: 10)
+      assert_nil progress(run)
     end
 
     test '#status_tag renders a span with the appropriate tag based on status' do
-      tag_classes = {
-        'enqueued' => 'tag is-primary',
-        'running' => 'tag is-info',
-        'interrupted' => 'tag is-info is-light',
-        'pausing' => 'tag is-warning is-light',
-        'paused' => 'tag is-warning',
-        'succeeded' => 'tag is-success',
-        'cancelling' => 'tag is-light',
-        'cancelled' => 'tag is-dark',
-        'errored' => 'tag is-danger',
-      }
-
-      tag_classes.each do |status, tag_class|
-        expected_result = "<span class=\"#{tag_class}\">#{status}</span>"
-        assert_equal expected_result, status_tag(status)
-      end
+      expected = '<span class="tag is-warning is-light">Pausing</span>'
+      assert_equal expected, status_tag('pausing')
     end
 
     test "#estimated_time_to_completion returns the Run's estimated_completion_time in words" do
@@ -75,6 +63,11 @@ module MaintenanceTasks
     test '#estimated_time_to_completion returns nil if the Run has no estimated_completion_time' do
       run = Run.new
       assert_nil estimated_time_to_completion(run)
+    end
+
+    test '#time_running_in_words reports the approximate time running of the given Run' do
+      run = Run.new(time_running: 182.5)
+      assert_equal '3 minutes', time_running_in_words(run)
     end
   end
 end

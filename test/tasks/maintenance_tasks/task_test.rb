@@ -33,14 +33,14 @@ module MaintenanceTasks
       assert_equal run, Maintenance::UpdatePostsTask.runs.first
     end
 
-    test '.active_run returns the first active run associated with a Task' do
+    test '.last_task returns the last Run associated with the Task' do
       Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :succeeded
       )
-      active_run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      latest = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
 
-      assert_equal active_run, Maintenance::UpdatePostsTask.active_run
+      assert_equal latest, Maintenance::UpdatePostsTask.last_run
     end
 
     test '#count is nil by default' do

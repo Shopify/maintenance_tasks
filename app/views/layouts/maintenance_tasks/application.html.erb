@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <html lang="<%= I18n.locale %>">
   <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <title>
       <% if content_for?(:page_title) %>
         <%= content_for :page_title %> -
@@ -29,6 +32,12 @@
 
     <section class="section">
       <div class="container">
+        <% if notice %>
+          <div class="notification is-success"><%= notice %></div>
+        <% elsif alert %>
+          <div class="notification is-warning"><%= alert %></div>
+        <% end %>
+
         <%= yield %>
       </div>
     </div>

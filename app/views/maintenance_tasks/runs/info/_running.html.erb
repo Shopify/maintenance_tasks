@@ -1,0 +1,7 @@
+<p>
+  <% if run.estimated_completion_time %>
+    <%= estimated_time_to_completion(run).capitalize %> remaining.
+  <% else %>
+    Processed <%= pluralize run.tick_count, 'item' %> so far.
+  <% end %>
+</p>
