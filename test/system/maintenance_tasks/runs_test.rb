@@ -24,7 +24,7 @@ module MaintenanceTasks
       click_on 'Pause'
 
       assert_text 'Pausing'
-      assert_text 'Pausing, please hold...'
+      assert_text 'Pausing…'
     end
 
     test 'resume a Run' do
