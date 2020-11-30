@@ -83,6 +83,8 @@ module MaintenanceTasks
     end
 
     def on_error(error)
+      raise error if @run.invalid?
+
       @ticker.persist
 
       @run.update!(

@@ -210,5 +210,18 @@ module MaintenanceTasks
         'must be either an Active Record Relation or an Array.'
       assert_equal expected_message, @run.error_message
     end
+
+    test 'raises original error in rescue if run is invalid' do
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskJobTest::TestTask',
+        status: :paused,
+      )
+
+      error = assert_raises(ActiveRecord::RecordInvalid) do
+        TaskJob.perform_now(run)
+      end
+      assert_match 'Status Cannot transition run from status paused to running',
+        error.message
+    end
   end
 end
