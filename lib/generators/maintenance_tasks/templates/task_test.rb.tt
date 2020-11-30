@@ -4,8 +4,8 @@ require 'test_helper'
 module <%= tasks_module %>
 <% module_namespacing do -%>
   class <%= class_name %>TaskTest < ActiveSupport::TestCase
-    # test "the truth" do
-    #   assert true
+    # test "#process performs a task iteration" do
+    #   <%= tasks_module %>::<%= class_name %>Task.new.process(element)
     # end
   end
 <% end -%>
