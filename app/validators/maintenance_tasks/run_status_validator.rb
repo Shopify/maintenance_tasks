@@ -20,12 +20,16 @@ module MaintenanceTasks
       #   being paused. This can happen if the task is on its last iteration
       #   when it is paused, or if the task is paused after enqueue but has
       #   nothing in its collection to process.
-      'pausing' => ['paused', 'cancelling', 'succeeded'],
+      # pausing -> errored occurs when the job raises an exception after the
+      #   user has paused it.
+      'pausing' => ['paused', 'cancelling', 'succeeded', 'errored'],
       # cancelling -> cancelled occurs when the task actually halts performing
       #   and occupies a status of cancelled.
       # cancelling -> succeeded occurs when the task completes immediately after
       #   being cancelled. See description for pausing -> succeeded.
-      'cancelling' => ['cancelled', 'succeeded'],
+      # cancelling -> errored occurs when the job raises an exception after the
+      #   user has cancelled it.
+      'cancelling' => ['cancelled', 'succeeded', 'errored'],
       # running -> succeeded occurs when the task completes successfully.
       # running -> pausing occurs when a user pauses the task as
       #   it's performing.

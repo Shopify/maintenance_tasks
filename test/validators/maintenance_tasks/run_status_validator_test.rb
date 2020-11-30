@@ -179,7 +179,7 @@ module MaintenanceTasks
       assert_no_invalid_transitions([:running], :interrupted)
     end
 
-    test 'run can go from running to errored' do
+    test 'run can go from running, pausing or cancelling to errored' do
       running_run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
         status: :running
@@ -188,7 +188,23 @@ module MaintenanceTasks
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions([:running], :errored)
+      pausing_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :pausing
+      )
+      pausing_run.status = :errored
+
+      assert pausing_run.valid?
+
+      cancelling_run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :cancelling
+      )
+      cancelling_run.status = :errored
+
+      assert cancelling_run.valid?
+
+      assert_no_invalid_transitions([:running, :pausing, :cancelling], :errored)
     end
 
     private
