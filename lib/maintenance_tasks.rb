@@ -4,6 +4,7 @@ require 'action_view'
 require 'active_job'
 require 'active_record'
 
+require 'job-iteration'
 require 'maintenance_tasks/engine'
 require 'pagy'
 require 'pagy/extras/bulma'

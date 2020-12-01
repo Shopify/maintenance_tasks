@@ -24,6 +24,7 @@ module MaintenanceTasks
 
     config.after_initialize do
       eager_load! unless Rails.autoloaders.zeitwerk_enabled?
+      JobIteration.max_job_runtime ||= 5.minutes
     end
 
     config.action_dispatch.rescue_responses.merge!(
