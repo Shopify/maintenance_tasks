@@ -20,9 +20,13 @@ module MaintenanceTasks
     def show
       @task = Task.named(params.fetch(:id))
       @last_run = @task.last_run
-      @pagy, @previous_runs = pagy(
-        @task.runs.where.not(id: @last_run&.id).order(created_at: :desc)
-      )
+      if @last_run
+        @pagy, @previous_runs = pagy(
+          @task.runs.where.not(id: @last_run.id).order(created_at: :desc)
+        )
+      else
+        @previous_runs = []
+      end
     end
 
     # Runs a given Task and redirects to the Task page.
