@@ -64,6 +64,32 @@ module Maintenance
 end
 ```
 
+### Writing Tests for a Task
+
+The task generator will also create a test file for your task in the folder
+`test/tasks/maintenance/`. At a minimum, it's recommended that the `#process`
+method in your task be tested. You may also want to test the `#collection` and
+`#count` methods for your task if they are sufficiently complex.
+
+Example:
+```ruby
+# test/tasks/maintenance/update_posts_task_test.rb
+
+require 'test_helper'
+
+module Maintenance
+  class UpdatePostsTaskTest < ActiveSupport::TestCase
+    test "#process performs a task iteration" do
+      post = Post.new
+
+      Maintenance::UpdatePostsTask.new.process(post)
+
+      assert_equal 'New content!', post.content
+    end
+  end
+end
+```
+
 ### Running a Task
 
 You can run your new Task by accessing the Web UI and clicking on "Run".
