@@ -26,16 +26,19 @@ module MaintenanceTasks
     # @return [Integer] if progress can be determined or the Run is stopped.
     # @return [nil] if progress can't be determined and the Run isn't stopped.
     def value
-      @run.tick_count if total_present? || @run.stopped?
+      @run.tick_count if estimatable? || @run.stopped?
     end
 
     # The maximum amount of work expected to be done. This is extracted from the
     # Run's tick total attribute when present, or it is equal to the Run's
     # tick count.
     #
+    # This amount is enqual to the Run's tick count if the tick count is greater
+    # than the tick total. This represents that the total was underestimated.
+    #
     # @return [Integer] the progress maximum amount.
     def max
-      total_present? ? @run.tick_total : @run.tick_count
+      estimatable? ? @run.tick_total : @run.tick_count
     end
 
     # The title for the progress information. This is a text that describes the
@@ -44,20 +47,27 @@ module MaintenanceTasks
     #
     # @return [String] the title for the Run progress.
     def title
-      if total_present?
+      if !total?
+        "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)}."
+      elsif @run.tick_count > @run.tick_total
+        "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)} " \
+          "(expected #{@run.tick_total})."
+      else
         percentage = 100.0 * @run.tick_count / @run.tick_total
 
         "Processed #{@run.tick_count} out of #{@run.tick_total} "\
           "(#{number_to_percentage(percentage, precision: 0)})"
-      else
-        "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)}."
       end
     end
 
     private
 
-    def total_present?
+    def total?
       @run.tick_total.to_i > 0
+    end
+
+    def estimatable?
+      total? && @run.tick_total > @run.tick_count
     end
   end
   private_constant :Progress
