@@ -87,6 +87,14 @@ module MaintenanceTasks
       pausing? || cancelling?
     end
 
+    # Returns whether the Run is stopped, which is defined as having a status of
+    # paused, succeeded, cancelled, or errored.
+    #
+    # @return [Boolean] whether the Run is stopped.
+    def stopped?
+      completed? || paused?
+    end
+
     # Returns whether the Run has been started, which is indicated by the
     # started_at timestamp being present.
     #

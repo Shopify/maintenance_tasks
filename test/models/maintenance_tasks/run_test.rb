@@ -57,6 +57,31 @@ module MaintenanceTasks
       assert_predicate run, :stopping?
     end
 
+    test '#stopped? is true if Run is paused' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+
+      run.status = :paused
+      assert_predicate run, :stopped?
+    end
+
+    test '#stopped? is true if Run is completed' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+
+      Run::COMPLETED_STATUSES.each do |status|
+        run.status = status
+        assert_predicate run, :stopped?
+      end
+    end
+
+    test '#stopped? is false if Run is not paused nor completed' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+
+      Run::STATUSES.excluding(Run::COMPLETED_STATUSES, :paused).each do |status|
+        run.status = status
+        refute_predicate run, :stopped?
+      end
+    end
+
     test '#started? returns false if the Run has no started_at timestamp' do
       run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
       refute_predicate run, :started?

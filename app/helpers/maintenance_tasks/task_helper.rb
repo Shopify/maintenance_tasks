@@ -39,23 +39,12 @@ module MaintenanceTasks
     def progress(run)
       return unless run.started?
 
-      value = run.tick_count
-      max = run.tick_total
-      title = "Processed #{pluralize(run.tick_count, 'item')}."
-
-      if run.tick_total.to_i > 0
-        percentage = 100.0 * run.tick_count / run.tick_total
-        title = "Processed #{run.tick_count} out of #{run.tick_total} "\
-        "(#{number_to_percentage(percentage.floor, precision: 0)})"
-      else
-        max = run.tick_count
-        value = nil unless run.completed? || run.paused?
-      end
+      progress = Progress.new(run)
 
       tag.progress(
-        value: value,
-        max: max,
-        title: title,
+        value: progress.value,
+        max: progress.max,
+        title: progress.title,
         class: ['progress'] + STATUS_COLOURS.fetch(run.status)
       )
     end
