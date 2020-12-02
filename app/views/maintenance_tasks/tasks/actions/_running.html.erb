@@ -1,2 +1,2 @@
 <%= button_to 'Pause', pause_task_run_path(task, task.last_run), method: :put, class: 'button is-warning', disabled: task.deleted? %>
-<%= button_to 'Cancel', cancel_task_run_path(task, task.last_run), method: :put, class: 'button is-danger', disabled: task.deleted? %>
+<%= button_to 'Cancel', cancel_task_run_path(task, task.last_run), method: :put, class: 'button is-danger' %>

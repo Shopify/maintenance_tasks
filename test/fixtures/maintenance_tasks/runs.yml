@@ -19,3 +19,12 @@ deleted_task:
   created_at: '01 Jan 2020 01:00:00'
   started_at: '01 Jan 2020 01:00:25'
   ended_at: '01 Jan 2020 01:00:36'
+
+paused_deleted_task:
+  task_name: Maintenance::PausedDeletedTask
+  tick_count: 5
+  tick_total: 10
+  job_id: '123abc'
+  status: 'paused'
+  created_at: '09 Jan 2020 09:30:00'
+  started_at: '09 Jan 2020 09:30:25'
