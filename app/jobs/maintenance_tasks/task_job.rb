@@ -13,7 +13,11 @@ module MaintenanceTasks
 
     after_perform(:after_perform)
 
-    rescue_from StandardError, with: :on_error
+    class UserError < StandardError; end
+
+    class InvalidCollectionError < StandardError; end
+
+    rescue_from UserError, InvalidCollectionError, with: :on_user_error
 
     private
 
@@ -27,8 +31,8 @@ module MaintenanceTasks
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor)
       else
-        raise ArgumentError, "#{@task.class.name}#collection must be either "\
-          'an Active Record Relation or an Array.'
+        raise InvalidCollectionError, "#{@task.class.name}#collection must be "\
+        'either an Active Record Relation or an Array.'
       end
     end
 
@@ -39,7 +43,11 @@ module MaintenanceTasks
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
-      @task.process(input)
+      begin
+        @task.process(input)
+      rescue
+        raise UserError
+      end
       @ticker.tick
       @run.reload_status
     end
@@ -57,7 +65,13 @@ module MaintenanceTasks
     end
 
     def on_start
-      @run.update!(started_at: Time.now, tick_total: @task.count)
+      tick_total =
+        begin
+          @task.count
+        rescue
+          raise UserError
+        end
+      @run.update!(started_at: Time.now, tick_total: tick_total)
     end
 
     def on_complete
@@ -81,14 +95,16 @@ module MaintenanceTasks
       @run.save!
     end
 
-    def on_error(error)
+    def on_user_error(error)
+      original_error = error.cause || error
+
       @ticker.persist
 
       @run.update!(
         status: :errored,
-        error_class: error.class.to_s,
-        error_message: error.message,
-        backtrace: Rails.backtrace_cleaner.clean(error.backtrace),
+        error_class: original_error.class.to_s,
+        error_message: original_error.message,
+        backtrace: Rails.backtrace_cleaner.clean(original_error.backtrace),
         ended_at: Time.now
       )
     end

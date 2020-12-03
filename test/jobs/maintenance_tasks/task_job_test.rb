@@ -102,6 +102,21 @@ module MaintenanceTasks
       assert_equal 2, @run.tick_total
     end
 
+    test '.perform_now persists error information on the Run when the job starts if Task#count fails' do
+      freeze_time
+      TestTask.any_instance.expects(:count).raises('Wrong!')
+
+      TaskJob.perform_now(@run)
+
+      @run.reload
+
+      assert_predicate @run, :errored?
+      assert_equal 'RuntimeError', @run.error_class
+      assert_equal 'Wrong!', @run.error_message
+      assert_empty @run.backtrace
+      assert_equal Time.now, @run.ended_at
+    end
+
     test '.perform_now updates Run to running and persists job_id when job starts performing' do
       TestTask.any_instance.expects(:process).twice.with do
         assert_predicate @run.reload, :running?
@@ -138,7 +153,7 @@ module MaintenanceTasks
       assert_enqueued_with(job: TaskJob) { TaskJob.perform_now(@run) }
     end
 
-    test '.perform_now updates Run to errored and persists ended_at when exception is raised' do
+    test '.perform_now updates error information when exception is raised in Task#process' do
       freeze_time
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 
@@ -204,11 +219,24 @@ module MaintenanceTasks
       @run.reload
 
       assert_predicate @run, :errored?
-      assert_equal 'ArgumentError', @run.error_class
-      assert_empty @run.backtrace
+
+      expected_error_class = 'MaintenanceTasks::TaskJob::InvalidCollectionError'
       expected_message = 'MaintenanceTasks::TaskJobTest::TestTask#collection '\
-        'must be either an Active Record Relation or an Array.'
+      'must be either an Active Record Relation or an Array.'
+      assert_equal expected_error_class, @run.error_class
       assert_equal expected_message, @run.error_message
+      assert_empty @run.backtrace
+    end
+
+    test '.perform_now does not resuce non-user errors' do
+      run = Run.create!(
+        task_name: 'MaintenanceTasks::TaskJobTest::TestTask',
+        status: :paused,
+      )
+
+      assert_raises(ActiveRecord::RecordInvalid) do
+        TaskJob.perform_now(run)
+      end
     end
   end
 end
