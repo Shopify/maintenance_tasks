@@ -73,22 +73,19 @@ module MaintenanceTasks
         started_at: Time.now,
         ended_at: Time.now,
       )
-      Maintenance.const_set('FooTask', Class.new(Task) {})
 
       available_tasks = [
         Maintenance::ErrorTask,
-        Maintenance::FooTask,
+        MaintenanceTasks::TaskJobTest::TestTask,
         Maintenance::UpdatePostsTask,
       ]
 
       expected = [
         Maintenance::UpdatePostsTask,
-        Maintenance::FooTask,
+        MaintenanceTasks::TaskJobTest::TestTask,
         Maintenance::ErrorTask,
       ]
       assert_equal(expected, sorted_tasks(available_tasks))
-    ensure
-      Maintenance.send(:remove_const, :FooTask)
     end
   end
 end
