@@ -64,5 +64,31 @@ module MaintenanceTasks
       @run.time_running = 182.5
       assert_equal '3 minutes', time_running_in_words(@run)
     end
+
+    test '#sorted_tasks orders list of tasks by active, new, then old' do
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.create!(
+        task_name: 'Maintenance::ErrorTask',
+        status: :errored,
+        started_at: Time.now,
+        ended_at: Time.now,
+      )
+      Maintenance.const_set('FooTask', Class.new(Task) {})
+
+      available_tasks = [
+        Maintenance::ErrorTask,
+        Maintenance::FooTask,
+        Maintenance::UpdatePostsTask,
+      ]
+
+      expected = [
+        Maintenance::UpdatePostsTask,
+        Maintenance::FooTask,
+        Maintenance::ErrorTask,
+      ]
+      assert_equal(expected, sorted_tasks(available_tasks))
+    ensure
+      Maintenance.send(:remove_const, :FooTask)
+    end
   end
 end

@@ -109,6 +109,20 @@ module MaintenanceTasks
       end
     end
 
+    test '#active? returns true if status is among Run::ACTIVE_STATUSES' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+
+      (Run::STATUSES - Run::ACTIVE_STATUSES).each do |status|
+        run.status = status
+        refute_predicate run, :active?
+      end
+
+      Run::ACTIVE_STATUSES.each do |status|
+        run.status = status
+        assert_predicate run, :active?
+      end
+    end
+
     test '#estimated_completion_time returns nil if the run is completed' do
       run = Run.new(
         task_name: 'Maintenance::UpdatePostsTask',

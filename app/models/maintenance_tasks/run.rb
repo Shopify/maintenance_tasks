@@ -111,6 +111,15 @@ module MaintenanceTasks
       COMPLETED_STATUSES.include?(status.to_sym)
     end
 
+    # Returns whether the Run is active, which is defined as
+    # having a status of enqueued, running, pausing, cancelling,
+    # paused or interrupted.
+    #
+    # @return [Boolean] whether the Run is active.
+    def active?
+      ACTIVE_STATUSES.include?(status.to_sym)
+    end
+
     # Returns the estimated time the task will finish based on the the number of
     # ticks left and the average time needed to process a tick.
     # Returns nil if the Run is completed, or if the tick_count or tick_total is
