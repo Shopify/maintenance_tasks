@@ -13,26 +13,32 @@ module MaintenanceTasks
 
     after_perform(:after_perform)
 
-    class UserError < StandardError; end
+    class TaskError < StandardError; end
 
-    class InvalidCollectionError < StandardError; end
+    class InvalidCollectionError < TaskError; end
 
-    rescue_from UserError, InvalidCollectionError, with: :on_user_error
+    rescue_from TaskError, with: :on_user_error
 
     private
 
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
-      collection = @task.collection
-
-      case collection
-      when ActiveRecord::Relation
-        enumerator_builder.active_record_on_records(collection, cursor: cursor)
-      when Array
-        enumerator_builder.build_array_enumerator(collection, cursor: cursor)
-      else
-        raise InvalidCollectionError, "#{@task.class.name}#collection must be "\
-        'either an Active Record Relation or an Array.'
+      begin
+        collection = @task.collection
+        case collection
+        when ActiveRecord::Relation
+          enumerator_builder.active_record_on_records(
+            collection,
+            cursor: cursor
+          )
+        when Array
+          enumerator_builder.build_array_enumerator(collection, cursor: cursor)
+        else
+          raise InvalidCollectionError, "#{@task.class.name}#collection must "\
+            'be either an Active Record Relation or an Array.'
+        end
+      rescue
+        raise TaskError
       end
     end
 
@@ -46,7 +52,7 @@ module MaintenanceTasks
       begin
         @task.process(input)
       rescue
-        raise UserError
+        raise TaskError
       end
       @ticker.tick
       @run.reload_status
@@ -69,7 +75,7 @@ module MaintenanceTasks
         begin
           @task.count
         rescue
-          raise UserError
+          raise TaskError
         end
       @run.update!(started_at: Time.now, tick_total: tick_total)
     end
@@ -96,10 +102,9 @@ module MaintenanceTasks
     end
 
     def on_user_error(error)
-      original_error = error.cause || error
-
       @ticker.persist
 
+      original_error = error.cause
       @run.update!(
         status: :errored,
         error_class: original_error.class.to_s,

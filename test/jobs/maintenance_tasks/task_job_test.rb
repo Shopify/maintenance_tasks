@@ -222,7 +222,7 @@ module MaintenanceTasks
 
       expected_error_class = 'MaintenanceTasks::TaskJob::InvalidCollectionError'
       expected_message = 'MaintenanceTasks::TaskJobTest::TestTask#collection '\
-      'must be either an Active Record Relation or an Array.'
+        'must be either an Active Record Relation or an Array.'
       assert_equal expected_error_class, @run.error_class
       assert_equal expected_message, @run.error_message
       assert_empty @run.backtrace
