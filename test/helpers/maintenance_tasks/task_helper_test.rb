@@ -74,17 +74,13 @@ module MaintenanceTasks
         ended_at: Time.now,
       )
 
-      available_tasks = [
-        Maintenance::ErrorTask,
-        MaintenanceTasks::TaskJobTest::TestTask,
-        Maintenance::UpdatePostsTask,
-      ]
+      old_task = TaskData.new('Maintenance::ErrorTask')
+      new_task = TaskData.new('Maintenance::SomeNewTask')
+      active_task = TaskData.new('Maintenance::UpdatePostsTask')
 
-      expected = [
-        Maintenance::UpdatePostsTask,
-        MaintenanceTasks::TaskJobTest::TestTask,
-        Maintenance::ErrorTask,
-      ]
+      available_tasks = [old_task, new_task, active_task]
+      expected = [active_task, new_task, old_task]
+
       assert_equal(expected, sorted_tasks(available_tasks))
     end
   end
