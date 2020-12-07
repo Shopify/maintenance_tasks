@@ -53,5 +53,13 @@ module MaintenanceTasks
 
       assert_equal latest, task_data.last_run
     end
+
+    test '#deleted? returns true if the Task does not exist' do
+      assert_predicate TaskData.new('Maintenance::DoesNotExist'), :deleted?
+    end
+
+    test '#deleted? returns false for an existing Task' do
+      refute_predicate TaskData.new('Maintenance::UpdatePostsTask'), :deleted?
+    end
   end
 end

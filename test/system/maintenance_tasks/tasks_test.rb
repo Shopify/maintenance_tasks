@@ -23,6 +23,14 @@ module MaintenanceTasks
       assert_text 'Ran for less than 5 seconds, finished 8 days ago.'
     end
 
+    test 'show a deleted Task' do
+      visit maintenance_tasks_path + '/tasks/Maintenance::DeletedTask'
+
+      assert_title 'Maintenance::DeletedTask'
+      assert_text 'Succeeded'
+      assert_button 'Run', disabled: true
+    end
+
     test 'visit main page through iframe' do
       visit root_path
 

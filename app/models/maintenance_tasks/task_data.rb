@@ -63,6 +63,14 @@ module MaintenanceTasks
       return @last_run if defined?(@last_run)
       @last_run = runs.last
     end
+
+    # @return [Boolean] whether the Task has been deleted.
+    def deleted?
+      Task.named(name)
+      false
+    rescue Task::NotFoundError
+      true
+    end
   end
   private_constant :TaskData
 end

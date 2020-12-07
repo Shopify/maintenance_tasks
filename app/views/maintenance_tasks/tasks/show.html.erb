@@ -13,18 +13,18 @@
 
 <div class="buttons">
   <% if @last_run.nil? || @last_run.completed? %>
-    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success' %>
+    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: @task.deleted? %>
   <% elsif @last_run.cancelling? %>
     <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
   <% else %>
       <% if @last_run.pausing? %>
         <%= button_to 'Pausing', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning', disabled: true %>
       <% elsif @last_run.paused? %>
-        <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary' %>
+        <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
       <% else %>
-        <%= button_to 'Pause', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning' %>
+        <%= button_to 'Pause', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
       <% end%>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, @last_run), method: :put, class: 'button is-danger' %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, @last_run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
   <% end %>
 </div>
 
