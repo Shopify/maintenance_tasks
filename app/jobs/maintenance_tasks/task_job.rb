@@ -99,6 +99,8 @@ module MaintenanceTasks
         backtrace: Rails.backtrace_cleaner.clean(error.backtrace),
         ended_at: Time.now
       )
+
+      MaintenanceTasks.error_handler.call(error)
     end
   end
 end

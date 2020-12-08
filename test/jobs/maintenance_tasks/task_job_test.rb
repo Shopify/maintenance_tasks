@@ -216,5 +216,32 @@ module MaintenanceTasks
         Class.new(TaskJob) { retry_on StandardError }
       end
     end
+
+    test '.perform_now calls the error handler when there was an Error' do
+      error_handler_before = MaintenanceTasks.error_handler
+      handled_error = nil
+      MaintenanceTasks.error_handler = ->(error) { handled_error = error }
+      run = Run.create!(task_name: 'Maintenance::ErrorTask')
+
+      TaskJob.perform_now(run)
+
+      assert_equal(ArgumentError, handled_error.class)
+    ensure
+      MaintenanceTasks.error_handler = error_handler_before
+    end
+
+    test '.perform_now still persists the error properly if the error handler raises' do
+      error_handler_before = MaintenanceTasks.error_handler
+      MaintenanceTasks.error_handler = ->(error) { raise error }
+      run = Run.create!(task_name: 'Maintenance::ErrorTask')
+
+      assert_raises { TaskJob.perform_now(run) }
+      run.reload
+
+      assert_predicate(run, :errored?)
+      assert_equal(1, run.tick_count)
+    ensure
+      MaintenanceTasks.error_handler = error_handler_before
+    end
   end
 end
