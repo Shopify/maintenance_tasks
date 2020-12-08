@@ -155,6 +155,12 @@ MaintenanceTasks.ticker_delay = 2.seconds
 
 If no value is specified, it will default to 1 second.
 
+## Contributing
+
+Would you like to report an issue or contribute with code? We accept issues and
+pull requests. You can find the contribution guidelines on
+[CONTRIBUTING.md](https://github.com/Shopify/maintenance_tasks/blob/main/.github/CONTRIBUTING.md).
+
 ## Releasing new versions
 
 This gem is published to packagecloud. The procedure to publish a new version:
