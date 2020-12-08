@@ -142,6 +142,9 @@ end
 
 The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
 
+Note that `retry_on` is not supported for custom Job
+classes, so failed jobs cannot be retried.
+
 #### Customizing the rate at which task progress gets updated
 
 `MaintenanceTasks.ticker_delay` can be configured to customize how frequently
