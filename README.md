@@ -20,7 +20,7 @@ $ rails generate maintenance_tasks:install
 ```
 
 The generator creates and runs a migration to add the necessary table to your
-database. It also mounts Mainteance Tasks in your `config/routes.rb`. By default
+database. It also mounts Maintenance Tasks in your `config/routes.rb`. By default
 the web UI can be accessed in the new `/maintenance_tasks` path.
 
 ## Usage
@@ -109,8 +109,21 @@ MaintenanceTasks::Runner.new.run('Mainteance::UpdatePostsTask')
 
 ### Configuring the Gem
 
-There are a couple configurable options for the gem.
+There are a few configurable options for the gem.
 Custom configurations should be placed in a `maintenance_tasks.rb` initializer.
+
+#### Customizing the error handler
+
+Exceptions raised while a Task is performing are rescued and information about
+the error is persisted and visible in the UI.
+
+If you want to integrate with an exception monitoring service (e.g. Bugsnag),
+you can define an error handler:
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+MaintenanceTasks.error_handler = ->(error) { Bugsnag.notify(error) }
+```
 
 #### Customizing the maintenance tasks module
 
