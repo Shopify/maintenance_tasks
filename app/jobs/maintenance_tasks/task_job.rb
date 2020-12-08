@@ -15,9 +15,9 @@ module MaintenanceTasks
 
     class TaskError < StandardError; end
 
-    class InvalidCollectionError < TaskError; end
+    class InvalidCollectionError < StandardError; end
 
-    rescue_from TaskError, with: :on_user_error
+    rescue_from TaskError, with: :on_task_error
 
     private
 
@@ -101,7 +101,7 @@ module MaintenanceTasks
       @run.save!
     end
 
-    def on_user_error(error)
+    def on_task_error(error)
       @ticker.persist
 
       original_error = error.cause
