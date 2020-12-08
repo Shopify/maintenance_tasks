@@ -8,5 +8,7 @@ module Maintenance
     def process(input)
       raise ArgumentError, 'Something went wrong' if input == 2
     end
+
+    class Error < StandardError; end
   end
 end
