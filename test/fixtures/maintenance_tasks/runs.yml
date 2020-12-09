@@ -9,3 +9,13 @@ update_posts_task:
   created_at: '01 Jan 2020 01:00:00'
   started_at: '01 Jan 2020 01:00:25'
   ended_at: '01 Jan 2020 01:00:36'
+
+deleted_task:
+  task_name: Maintenance::DeletedTask
+  tick_count: 10
+  tick_total: 10
+  job_id: '123abc'
+  status: 'succeeded'
+  created_at: '01 Jan 2020 01:00:00'
+  started_at: '01 Jan 2020 01:00:25'
+  ended_at: '01 Jan 2020 01:00:36'

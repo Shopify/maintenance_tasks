@@ -12,17 +12,21 @@ module MaintenanceTasks
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users.
     def index
-      @tasks = Task.available_tasks
+      @tasks = TaskData.available_tasks
     end
 
     # Renders the page responsible for providing Task actions to users.
     # Shows running and completed instances of the Task.
     def show
-      @task = Task.named(params.fetch(:id))
+      @task = TaskData.find(params.fetch(:id))
       @last_run = @task.last_run
-      @pagy, @previous_runs = pagy(
-        @task.runs.where.not(id: @last_run&.id).order(created_at: :desc)
-      )
+      if @last_run
+        @pagy, @previous_runs = pagy(
+          @task.runs.where.not(id: @last_run.id).order(created_at: :desc)
+        )
+      else
+        @previous_runs = []
+      end
     end
 
     # Runs a given Task and redirects to the Task page.

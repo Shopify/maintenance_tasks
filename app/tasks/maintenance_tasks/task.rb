@@ -30,22 +30,6 @@ module MaintenanceTasks
         descendants
       end
 
-      # Returns the set of Run records associated with the Task.
-      #
-      # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]
-      #   the relation of Run records.
-      def runs
-        Run.where(task_name: name)
-      end
-
-      # Retrieves the latest Run associated with the Task.
-      #
-      # @return [MaintenanceTasks::Run] the Run record.
-      # @return [nil] if there are no Runs associated with the Task.
-      def last_run
-        runs.last
-      end
-
       private
 
       def load_constants
