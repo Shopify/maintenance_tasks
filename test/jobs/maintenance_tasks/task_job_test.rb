@@ -210,5 +210,11 @@ module MaintenanceTasks
         'must be either an Active Record Relation or an Array.'
       assert_equal expected_message, @run.error_message
     end
+
+    test '.retry_on raises NotImplementedError' do
+      assert_raises NotImplementedError do
+        Class.new(TaskJob) { retry_on StandardError }
+      end
+    end
   end
 end

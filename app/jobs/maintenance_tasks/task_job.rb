@@ -15,6 +15,14 @@ module MaintenanceTasks
 
     rescue_from StandardError, with: :on_error
 
+    class << self
+      # Overrides ActiveJob::Exceptions.retry_on to declare it unsupported.
+      # The use of rescue_from prevents retry_on from being usable.
+      def retry_on(*, **)
+        raise NotImplementedError, 'retry_on is not supported'
+      end
+    end
+
     private
 
     def build_enumerator(_run, cursor:)
