@@ -29,8 +29,9 @@ module MaintenanceTasks
         TaskData.available_tasks.map(&:name).sort
     end
 
-    test '#to_s returns the name of the Task' do
-      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+    test '#new sets last_run if one is passed as an argument' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      task_data = TaskData.new('Maintenance::UpdatePostsTask', run)
 
       assert_equal 'Maintenance::UpdatePostsTask', task_data.to_s
     end
@@ -64,6 +65,12 @@ module MaintenanceTasks
       task_data = TaskData.new('Maintenance::UpdatePostsTask')
 
       assert_equal latest, task_data.last_run
+    end
+
+    test '#to_s returns the name of the Task' do
+      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+
+      assert_equal 'Maintenance::UpdatePostsTask', task_data.to_s
     end
 
     test '#deleted? returns true if the Task does not exist' do

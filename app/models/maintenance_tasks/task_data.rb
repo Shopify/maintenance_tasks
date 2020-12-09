@@ -35,11 +35,14 @@ module MaintenanceTasks
       end
     end
 
-    # Initializes a Task Data with a name.
+    # Initializes a Task Data with a name and optionally a last_run.
     #
     # @param name [String] the name of the Task subclass.
-    def initialize(name)
+    # @param last_run [MaintenanceTasks::Run] optionally, a Run record to
+    #   set for the Task.
+    def initialize(name, last_run = :none_passed)
       @name = name
+      @last_run = last_run unless last_run == :none_passed
     end
 
     # @return [String] the name of the Task.
