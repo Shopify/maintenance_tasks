@@ -85,28 +85,6 @@ module MaintenanceTasks
       distance_of_time_in_words(0, run.time_running, include_seconds: true)
     end
 
-    # Returns the list of Task classes, sorted in the following order:
-    #
-    #   * Active tasks (tasks where the last run is active)
-    #   * New tasks
-    #   * Old tasks (tasks where the last run is completed)
-    #
-    # @param tasks [Array<Class>] the list of Task classes to sort.
-    # @return [Array<Class>] the sorted list of Task classes.
-    def sorted_tasks(tasks)
-      tasks.sort_by do |task|
-        last_run = task.last_run
-
-        if last_run.present? && last_run.active?
-          0
-        elsif last_run.nil?
-          1
-        else
-          2
-        end
-      end
-    end
-
     # Very simple syntax highlighter based on Ripper.
     #
     # It returns the same code except identifiers, keywords, etc. are wrapped

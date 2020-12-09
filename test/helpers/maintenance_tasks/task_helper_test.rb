@@ -65,25 +65,6 @@ module MaintenanceTasks
       assert_equal '3 minutes', time_running_in_words(@run)
     end
 
-    test '#sorted_tasks orders list of tasks by active, new, then old' do
-      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-      Run.create!(
-        task_name: 'Maintenance::ErrorTask',
-        status: :errored,
-        started_at: Time.now,
-        ended_at: Time.now,
-      )
-
-      old_task = TaskData.new('Maintenance::ErrorTask')
-      new_task = TaskData.new('Maintenance::SomeNewTask')
-      active_task = TaskData.new('Maintenance::UpdatePostsTask')
-
-      available_tasks = [old_task, new_task, active_task]
-      expected = [active_task, new_task, old_task]
-
-      assert_equal(expected, sorted_tasks(available_tasks))
-    end
-
     test '#highlight_code returns a HTML safe string' do
       assert_predicate highlight_code('self'), :html_safe?
     end
