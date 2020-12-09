@@ -47,6 +47,16 @@ module MaintenanceTasks
 
     alias_method :to_s, :name
 
+    # The Task's source code.
+    #
+    # @return [String] the contents of the file which defines the Task.
+    # @return [nil] if the Task file was deleted.
+    def code
+      return if deleted?
+      file = Object.const_source_location(name).first
+      File.read(file)
+    end
+
     # Returns the set of Run records associated with the Task.
     #
     # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]

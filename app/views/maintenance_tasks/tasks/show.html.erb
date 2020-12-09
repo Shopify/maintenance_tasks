@@ -28,6 +28,10 @@
   <% end %>
 </div>
 
+<% if (code = @task.code) %>
+  <pre><code><%= code %></code></pre>
+<% end %>
+
 <% if @previous_runs.present? %>
   <hr/>
 

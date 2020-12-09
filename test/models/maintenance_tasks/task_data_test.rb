@@ -35,6 +35,18 @@ module MaintenanceTasks
       assert_equal 'Maintenance::UpdatePostsTask', task_data.to_s
     end
 
+    test '#code returns the code source of the Task' do
+      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+
+      assert_equal 'class UpdatePostsTask < MaintenanceTasks::Task',
+        task_data.code.each_line.grep(/UpdatePostsTask/).first.squish
+    end
+
+    test '#code returns nil if the Task does not exist' do
+      task_data = TaskData.new('Maintenance::DoesNotExist')
+      assert_nil task_data.code
+    end
+
     test '#runs returns the Active Record relation of the runs associated with a Task' do
       run = maintenance_tasks_runs(:update_posts_task)
       task_data = TaskData.new('Maintenance::UpdatePostsTask')
