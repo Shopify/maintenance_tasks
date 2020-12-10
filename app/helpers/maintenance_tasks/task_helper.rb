@@ -8,6 +8,7 @@ module MaintenanceTasks
   # @api private
   module TaskHelper
     STATUS_COLOURS = {
+      'new' => ['is-primary'],
       'enqueued' => ['is-primary is-light'],
       'running' => ['is-info'],
       'interrupted' => ['is-info', 'is-light'],
