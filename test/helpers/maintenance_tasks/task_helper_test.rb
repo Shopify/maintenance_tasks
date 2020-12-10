@@ -83,5 +83,25 @@ module MaintenanceTasks
 
       assert_equal(expected, sorted_tasks(available_tasks))
     end
+
+    test '#highlight_code returns a HTML safe string' do
+      assert_predicate highlight_code('self'), :html_safe?
+    end
+
+    test '#highlight_code wraps syntax in span' do
+      assert_equal '<span class="ruby-kw">self</span>', highlight_code('self')
+      assert_equal '<span class="ruby-const">CSV</span>', highlight_code('CSV')
+      assert_equal '<span class="ruby-int">42</span>', highlight_code('42')
+      assert_equal '<span class="ruby-float">4.2</span>', highlight_code('4.2')
+      assert_equal '<span class="ruby-ivar">@foo</span>', highlight_code('@foo')
+    end
+
+    test '#highlight_code does not wrap whitespace' do
+      assert_equal '<span class="ruby-int">1</span>' + "\n"\
+        '<span class="ruby-int">2</span>', highlight_code("1\n2")
+      assert_equal '<span class="ruby-int">1</span>' + ' '\
+        '<span class="ruby-int">2</span>', highlight_code('1 2')
+      assert_equal "\n", highlight_code("\n")
+    end
   end
 end

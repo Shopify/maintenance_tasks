@@ -13,7 +13,6 @@
     </title>
 
     <%= csrf_meta_tags %>
-    <%= csp_meta_tag %>
 
     <%=
       stylesheet_link_tag URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.1/css/bulma.css'),
@@ -21,6 +20,16 @@
         integrity: 'sha256-67AR2JVjhMZCLVxapLuBSMap5RrXbksv4vlllenHBSE=',
         crossorigin: 'anonymous'
     %>
+
+    <style nonce="<%= content_security_policy_nonce %>">
+      .ruby-comment { color: #6a737d;}
+      .ruby-const { color: #e36209; }
+      .ruby-embexpr-beg, .ruby-embexpr-end, .ruby-period { color: #24292e; }
+      .ruby-ident, .ruby-symbeg { color: #6f42c1; }
+      .ruby-ivar, .ruby-cvar, .ruby-gvar, .ruby-int, .ruby-imaginary, .ruby-float, .ruby-rational { color: #005cc5; }
+      .ruby-kw { color: #d73a49; }
+      .ruby-label, .ruby-tstring-beg, .ruby-tstring-content, .ruby-tstring-end { color: #032f62; }
+    </style>
 
     <% if defined?(@refresh) %>
       <meta http-equiv="refresh" content="<%= @refresh %>">

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'ripper'
+
 module MaintenanceTasks
   # Helpers for formatting data in the maintenance_tasks views.
   #
@@ -103,6 +105,26 @@ module MaintenanceTasks
           2
         end
       end
+    end
+
+    # Very simple syntax highlighter based on Ripper.
+    #
+    # It returns the same code except identifiers, keywords, etc. are wrapped
+    # in +<span>+ tags with CSS classes that match the types returned by
+    # Ripper.lex.
+    #
+    # @param code [String] the Ruby code source to syntax highlight.
+    # @return [ActiveSupport::SafeBuffer] HTML of the code.
+    def highlight_code(code)
+      tokens = Ripper.lex(code).map do |(_position, type, content, _state)|
+        case type
+        when :on_nl, :on_sp, :on_ignored_nl
+          content
+        else
+          tag.span(content, class: type.to_s.sub('on_', 'ruby-').dasherize)
+        end
+      end
+      safe_join(tokens)
     end
   end
   private_constant :TaskHelper
