@@ -27,11 +27,25 @@ module MaintenanceTasks
         task_data
       end
 
-      # Returns a list of Task Data objects that represent the available Tasks.
+      # Returns a list of sorted Task Data objects that represent the
+      # available Tasks.
+      #
+      # Tasks are sorted by category, and within a category, by Task name.
+      # Determining a Task's category require its latest Run record.
+      # To optimize calls to the database, a single query is done to get the
+      # last Run for each Task, and Task Data instances are initialized with
+      # these last_run values.
       #
       # @return [Array<TaskData>] the list of Task Data.
       def available_tasks
-        Task.available_tasks.map { |task| TaskData.new(task.name) }
+        last_runs = Run.where(
+          id: Run.select('MAX(id) as id').group(:task_name)
+        )
+
+        Task.available_tasks.map do |task|
+          last_run = last_runs.find { |run| run.task_name == task.name }
+          TaskData.new(task.name, last_run)
+        end.sort!
       end
     end
 
@@ -84,6 +98,32 @@ module MaintenanceTasks
       false
     rescue Task::NotFoundError
       true
+    end
+
+    # Compares the current Task Data with another Task Data for sorting.
+    # Tasks are sorted first by category (active, new, then old), and then
+    # by Task name.
+    #
+    # @param other [TaskData] the Task Data instance being compared.
+    # @return [Integer] 1 if the current Task takes priority, -1 if the other
+    #   Task takes priority, and 0 if the Tasks are equal.
+    def <=>(other)
+      [category, name] <=> [other.category, other.name]
+    end
+
+    protected
+
+    # Retrieves the task's category, which is one of active, new, or completed.
+    #
+    # @return [Symbol] the category of the Task.
+    def category
+      if last_run.present? && last_run.active?
+        :active
+      elsif last_run.nil?
+        :new
+      else
+        :old
+      end
     end
   end
   private_constant :TaskData
