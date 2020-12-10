@@ -53,7 +53,8 @@ module MaintenanceTasks
     # @return [nil] if the Task file was deleted.
     def code
       return if deleted?
-      file = Object.const_source_location(name).first
+      task = Task.named(name)
+      file = task.instance_method(:collection).source_location.first
       File.read(file)
     end
 
