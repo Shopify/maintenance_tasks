@@ -29,7 +29,7 @@
 </div>
 
 <% if (code = @task.code) %>
-  <pre><code><%= code %></code></pre>
+  <pre><code><%= highlight_code(code) %></code></pre>
 <% end %>
 
 <% if @previous_runs.present? %>
