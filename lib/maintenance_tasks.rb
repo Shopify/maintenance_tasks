@@ -32,6 +32,9 @@ module MaintenanceTasks
   #   the ticker during Task iterations.
   mattr_accessor :ticker_delay, default: 1.second
 
+  # Defines a callback to be performed when an error occurs in the task.
+  mattr_accessor :error_handler, default: ->(_error) {}
+
   # Retrieves the module that Tasks are namespaced in.
   #
   # @return [Module] the constantized tasks_module value.
