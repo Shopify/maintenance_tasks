@@ -158,6 +158,17 @@ MaintenanceTasks.ticker_delay = 2.seconds
 
 If no value is specified, it will default to 1 second.
 
+## Upgrading
+
+Use bundler to check for and upgrade to newer versions. After installing a new
+version, re-run the install command:
+
+```bash
+$ rails generate maintenance_tasks:install
+```
+
+This ensures that new migrations are installed and run as well.
+
 ## Contributing
 
 Would you like to report an issue or contribute with code? We accept issues and
