@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2020_10_26_180058) do
+ActiveRecord::Schema.define(version: 2020_12_11_151756) do
 
   create_table "maintenance_tasks_runs", force: :cascade do |t|
     t.string "task_name", null: false
@@ -28,8 +28,7 @@ ActiveRecord::Schema.define(version: 2020_10_26_180058) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["created_at"], name: "index_maintenance_tasks_runs_on_created_at"
-    t.index ["ended_at"], name: "index_maintenance_tasks_runs_on_ended_at"
-    t.index ["started_at"], name: "index_maintenance_tasks_runs_on_started_at"
+    t.index ["task_name"], name: "index_maintenance_tasks_runs_on_task_name"
   end
 
   create_table "posts", force: :cascade do |t|
