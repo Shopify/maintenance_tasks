@@ -1,31 +1,13 @@
 <% content_for :page_title, @task %>
 
 <h1 class="title is-1">
-  <%= @task %>
-  <% if @last_run %>
-    <%= status_tag(@last_run.status) %>
-  <% else %>
-    <span class="tag is-primary">New</span>
-  <% end %>
+  <%= @task %> <%= status_tag(@task.status) %>
 </h1>
 
-<%= render 'maintenance_tasks/runs/info', run: @last_run if @last_run %>
+<%= render 'maintenance_tasks/runs/info', run: @task.last_run if @task.last_run %>
 
 <div class="buttons">
-  <% if @last_run.nil? || @last_run.completed? %>
-    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: @task.deleted? %>
-  <% elsif @last_run.cancelling? %>
-    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
-  <% else %>
-      <% if @last_run.pausing? %>
-        <%= button_to 'Pausing', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning', disabled: true %>
-      <% elsif @last_run.paused? %>
-        <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
-      <% else %>
-        <%= button_to 'Pause', pause_task_run_path(@task, @last_run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
-      <% end%>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, @last_run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
-  <% end %>
+  <%= render "maintenance_tasks/tasks/actions/#{@task.status}", task: @task %>
 </div>
 
 <% if (code = @task.code) %>

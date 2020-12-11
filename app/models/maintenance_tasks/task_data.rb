@@ -75,21 +75,25 @@ module MaintenanceTasks
       File.read(file)
     end
 
-    # Returns the set of Run records associated with the Task.
-    #
-    # @return [ActiveRecord::Relation<MaintenanceTasks::Run>]
-    #   the relation of Run records.
-    def runs
-      Run.where(task_name: name)
-    end
-
     # Retrieves the latest Run associated with the Task.
     #
     # @return [MaintenanceTasks::Run] the Run record.
     # @return [nil] if there are no Runs associated with the Task.
     def last_run
       return @last_run if defined?(@last_run)
-      @last_run = runs.last
+      @last_run = runs.first
+    end
+
+    # Returns the set of Run records associated with the Task previous to the
+    # last Run. This collection represents a historic of past Runs for
+    # information purposes, since the base for Task Data information comes
+    # primarily from the last Run.
+    #
+    # @return [ActiveRecord::Relation<MaintenanceTasks::Run>] the relation of
+    #   record previous to the last Run.
+    def previous_runs
+      return Run.none unless last_run
+      runs.where.not(id: last_run.id)
     end
 
     # @return [Boolean] whether the Task has been deleted.
@@ -111,6 +115,14 @@ module MaintenanceTasks
       [category, name] <=> [other.category, other.name]
     end
 
+    # The Task status. It returns the status of the last Run, if present. If the
+    # Task does not have any Runs, the Task status is `new`.
+    #
+    # @return [String] the Task status.
+    def status
+      last_run&.status || 'new'
+    end
+
     protected
 
     # Retrieves the task's category, which is one of active, new, or completed.
@@ -124,6 +136,12 @@ module MaintenanceTasks
       else
         :old
       end
+    end
+
+    private
+
+    def runs
+      Run.where(task_name: name).order(created_at: :desc)
     end
   end
   private_constant :TaskData

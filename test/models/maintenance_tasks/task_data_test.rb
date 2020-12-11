@@ -68,14 +68,6 @@ module MaintenanceTasks
       assert_nil task_data.code
     end
 
-    test '#runs returns the Active Record relation of the runs associated with a Task' do
-      run = maintenance_tasks_runs(:update_posts_task)
-      task_data = TaskData.new('Maintenance::UpdatePostsTask')
-
-      assert_equal 1, task_data.runs.count
-      assert_equal run, task_data.runs.first
-    end
-
     test '#last_run returns the last Run associated with the Task' do
       Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',
@@ -93,12 +85,49 @@ module MaintenanceTasks
       assert_equal 'Maintenance::UpdatePostsTask', task_data.to_s
     end
 
+    test '#previous_runs returns all Runs for the Task except the first one' do
+      run_1 = maintenance_tasks_runs(:update_posts_task)
+
+      run_2 = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :succeeded
+      )
+
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+
+      task_data = TaskData.find('Maintenance::UpdatePostsTask')
+
+      assert_equal 2, task_data.previous_runs.count
+      assert_equal run_2, task_data.previous_runs.first
+      assert_equal run_1, task_data.previous_runs.last
+    end
+
+    test '#previous_runs is empty when there are no Runs for the Task' do
+      Run.destroy_all
+
+      task_data = TaskData.find('Maintenance::UpdatePostsTask')
+
+      assert_empty task_data.previous_runs
+    end
+
     test '#deleted? returns true if the Task does not exist' do
       assert_predicate TaskData.new('Maintenance::DoesNotExist'), :deleted?
     end
 
     test '#deleted? returns false for an existing Task' do
       refute_predicate TaskData.new('Maintenance::UpdatePostsTask'), :deleted?
+    end
+
+    test '#status is new when Task does not have any Runs' do
+      Run.destroy_all
+      task_data = TaskData.find('Maintenance::UpdatePostsTask')
+      assert_equal 'new', task_data.status
+    end
+
+    test '#status is the latest Run status' do
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask', status: :paused)
+      task_data = TaskData.find('Maintenance::UpdatePostsTask')
+      assert_equal 'paused', task_data.status
     end
   end
 end
