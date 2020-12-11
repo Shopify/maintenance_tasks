@@ -19,18 +19,39 @@ module MaintenanceTasks
       end
     end
 
-    test '.available_tasks returns a list of Tasks as TaskData' do
-      expected_task_names = [
+    test '.available_tasks returns a list of Tasks as TaskData, ordered by active, new, then old' do
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.create!(
+        task_name: 'Maintenance::ErrorTask',
+        status: :errored,
+        started_at: Time.now,
+        ended_at: Time.now,
+      )
+
+      old_task = 'Maintenance::ErrorTask'
+      new_task = 'MaintenanceTasks::TaskJobTest::TestTask'
+      active_task = 'Maintenance::UpdatePostsTask'
+
+      assert_equal [active_task, new_task, old_task],
+        TaskData.available_tasks.map(&:name)
+    end
+
+    test '.available_tasks orders TaskData of the same category alphabetically' do
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      Run.create!(task_name: 'Maintenance::ErrorTask')
+      Run.create!(task_name: 'MaintenanceTasks::TaskJobTest::TestTask')
+
+      expected = [
         'Maintenance::ErrorTask',
         'Maintenance::UpdatePostsTask',
         'MaintenanceTasks::TaskJobTest::TestTask',
       ]
-      assert_equal expected_task_names,
-        TaskData.available_tasks.map(&:name).sort
+      assert_equal expected, TaskData.available_tasks.map(&:name)
     end
 
-    test '#to_s returns the name of the Task' do
-      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+    test '#new sets last_run if one is passed as an argument' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      task_data = TaskData.new('Maintenance::UpdatePostsTask', run)
 
       assert_equal 'Maintenance::UpdatePostsTask', task_data.to_s
     end
@@ -64,6 +85,12 @@ module MaintenanceTasks
       task_data = TaskData.new('Maintenance::UpdatePostsTask')
 
       assert_equal latest, task_data.last_run
+    end
+
+    test '#to_s returns the name of the Task' do
+      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+
+      assert_equal 'Maintenance::UpdatePostsTask', task_data.to_s
     end
 
     test '#deleted? returns true if the Task does not exist' do
