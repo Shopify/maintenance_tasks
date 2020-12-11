@@ -9,9 +9,21 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
 
+mysql: &mysql
+  adapter: mysql2
+  database: maintenance_tasks_<%= Rails.env %>
+  username: root
+
+postgresql: &postgresql
+  adapter: postgresql
+  database: maintenance_tasks_<%= Rails.env %>
+
 development:
   <<: *default
   database: db/development.sqlite3
+  # uncomment one of these to enable mysql or postgresql
+  #<<: *mysql
+  #<<: *pg
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".

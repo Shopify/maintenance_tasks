@@ -6,6 +6,8 @@ gemspec
 
 gem 'capybara'
 gem 'mocha'
+gem 'mysql2'
+gem 'pg'
 gem 'pry-byebug'
 gem 'puma'
 gem 'rails'
