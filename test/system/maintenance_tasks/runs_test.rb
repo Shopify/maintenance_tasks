@@ -52,6 +52,18 @@ module MaintenanceTasks
       assert_text 'Cancelling…'
     end
 
+    test 'cancel a pausing Run' do
+      visit maintenance_tasks_path
+
+      click_on('Maintenance::UpdatePostsTask')
+      click_on 'Run'
+      click_on 'Pause'
+      assert_text 'Pausing'
+
+      click_on 'Cancel'
+      assert_text 'Cancelling…'
+    end
+
     test 'run a Task that errors' do
       visit maintenance_tasks_path
 
