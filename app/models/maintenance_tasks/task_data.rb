@@ -38,13 +38,15 @@ module MaintenanceTasks
       #
       # @return [Array<TaskData>] the list of Task Data.
       def available_tasks
-        last_runs = Run.where(
-          id: Run.select('MAX(id) as id').group(:task_name)
+        task_names = Task.available_tasks.map(&:name)
+        available_task_runs = Run.where(task_name: task_names)
+        last_runs = available_task_runs.where(
+          id: available_task_runs.select('MAX(id) as id').group(:task_name)
         )
 
-        Task.available_tasks.map do |task|
-          last_run = last_runs.find { |run| run.task_name == task.name }
-          TaskData.new(task.name, last_run)
+        task_names.map do |task_name|
+          last_run = last_runs.find { |run| run.task_name == task_name }
+          TaskData.new(task_name, last_run)
         end.sort!
       end
     end
