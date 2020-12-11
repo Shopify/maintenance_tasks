@@ -11,6 +11,7 @@ gem 'puma'
 gem 'rails'
 gem 'rubocop-shopify'
 gem 'selenium-webdriver'
+gem 'sidekiq'
 gem 'sqlite3'
 gem 'webdrivers', require: false
 gem 'yard'
