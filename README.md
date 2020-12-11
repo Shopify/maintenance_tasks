@@ -104,7 +104,7 @@ You can also run a Task in Ruby by sending `run` with a Task name to a Runner
 instance:
 
 ```ruby
-MaintenanceTasks::Runner.new.run('Mainteance::UpdatePostsTask')
+MaintenanceTasks::Runner.new.run('Maintenance::UpdatePostsTask')
 ```
 
 ### Configuring the Gem
