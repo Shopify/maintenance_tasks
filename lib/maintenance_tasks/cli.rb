@@ -16,7 +16,7 @@ module MaintenanceTasks
     desc 'perform [TASK NAME]', 'Runs the given Maintenance Task'
 
     long_desc <<-LONGDESC
-      `maintenance_tasks perform` will run the Mainteance Task specified by the
+      `maintenance_tasks perform` will run the Maintenance Task specified by the
       [TASK NAME] argument.
 
       Available Tasks:
