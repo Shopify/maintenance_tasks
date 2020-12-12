@@ -9,12 +9,12 @@ module MaintenanceTasks
     destination SAMPLE_APP_PATH
     setup :prepare_destination
 
-    def setup
-      super
+    setup do
+      skip 'This test is too slow' if ENV['SKIP_SLOW'].present?
       setup_sample_app
     end
 
-    def teardown
+    teardown do
       FileUtils.rm_rf(SAMPLE_APP_PATH)
     end
 
