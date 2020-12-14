@@ -107,6 +107,62 @@ instance:
 MaintenanceTasks::Runner.new.run('Maintenance::UpdatePostsTask')
 ```
 
+### How Maintenance Tasks runs a Task
+
+Maintenance tasks can be running for a long time, and the purpose of the gem is
+to make it easy to continue running tasks through deploys, [Kubernetes Pod
+scheduling][k8s-scheduling], [Heroku dyno restarts][heroku-cycles] or other
+infrastructure or code changes.
+
+[k8s-scheduling]: https://kubernetes.io/docs/concepts/scheduling-eviction/
+[heroku-cycles]: https://www.heroku.com/dynos/lifecycle
+
+This means a Task can safely be interrupted, re-enqueued and resumed without any
+intervention at the end of an iteration, after the `process` method returns.
+
+By default, a running Task will be interrupted after running for more 5 minutes.
+This is [configured in the `job-iteration` gem][max-job-runtime] and can be
+tweaked in an initializer if necessary.
+
+[max-job-runtime]: https://github.com/Shopify/job-iteration/blob/master/guides/best-practices.md#max-job-runtime
+
+Running tasks will also be interrupted and re-enqueued when needed. For example
+[when Sidekiq workers shuts down for a deploy][sidekiq-deploy]:
+
+[sidekiq-deploy]: https://github.com/mperham/sidekiq/wiki/Deployment
+
+* When Sidekiq receives a TSTP or TERM signal, it will consider itself to be
+  stopping.
+* When Sidekiq is stopping, JobIteration stops iterating over the enumerator.
+  The position in the iteration is saved, a new job is enqueued to resume work,
+  and the Task is marked as interrupted.
+
+When Sidekiq is stopping, it will give workers 25 seconds to finish before
+forcefully terminating them (this is the default but can be configured with the
+`--timeout` option).  Before the worker threads are terminated, Sidekiq will try
+to re-enqueue the job so your Task will be resumed. However, the position in the
+collection won't be persisted so at least one iteration may run again.
+
+### Writing Tasks
+
+MaintenanceTasks relies on the queue adapter configured for your application to
+run the job which is processing your Task. The guidelines for writing Task may
+depend on the queue adapter but in general, you should follow these rules:
+
+* Duration of `Task#process`: processing a single element of the collection
+  should take less than 25 seconds, or the duration set as a timeout for Sidekiq
+  or the queue adapter configured in your application. It allows the Task to be
+  safely interrupted and resumed.
+* Idempotency of `Task#process`: it should be safe to run `process` multiple
+  times for the same element of the collection. Read more in [this Sidekiq best
+  practice][sidekiq-idempotent]. It's important if the Task errors and you run
+  it again, because the same element that errored the Task may well be processed
+  again. It especially matters in the situation described above, when the
+  iteration duration exceeds the timeout: if the job is re-enqueued, multiple
+  elements may be processed again.
+
+[sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
+
 ### Configuring the Gem
 
 There are a few configurable options for the gem. Custom configurations should
