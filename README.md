@@ -117,12 +117,15 @@ Custom configurations should be placed in a `maintenance_tasks.rb` initializer.
 Exceptions raised while a Task is performing are rescued and information about
 the error is persisted and visible in the UI.
 
-If you want to integrate with an exception monitoring service (e.g. Bugsnag),
-you can define an error handler:
+If your application uses Bugsnag to monitor errors, the gem will automatically
+notify Bugsnag of any errors raised while a Task is performing.
+
+If you want to integrate with another exception monitoring service or customize
+error handling, a callback can be defined:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
-MaintenanceTasks.error_handler = ->(error) { Bugsnag.notify(error) }
+MaintenanceTasks.error_handler = ->(error) { MyErrorMonitor.notify(error) }
 ```
 
 #### Customizing the maintenance tasks module
