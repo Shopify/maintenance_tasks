@@ -125,9 +125,7 @@ module MaintenanceTasks
       last_run&.status || 'new'
     end
 
-    protected
-
-    # Retrieves the task's category, which is one of active, new, or completed.
+    # Retrieves the Task's category, which is one of active, new, or completed.
     #
     # @return [Symbol] the category of the Task.
     def category
@@ -136,7 +134,7 @@ module MaintenanceTasks
       elsif last_run.nil?
         :new
       else
-        :old
+        :completed
       end
     end
 

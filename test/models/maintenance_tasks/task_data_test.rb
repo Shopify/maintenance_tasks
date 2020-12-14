@@ -129,5 +129,24 @@ module MaintenanceTasks
       task_data = TaskData.find('Maintenance::UpdatePostsTask')
       assert_equal 'paused', task_data.status
     end
+
+    test '#category returns :active if the task is active' do
+      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+      assert_equal :active, task_data.category
+    end
+
+    test '#category returns :new if the task is new' do
+      assert_equal :new, TaskData.new('Maintenance::SomeNewTask').category
+    end
+
+    test '#category returns :completed if the task is completed' do
+      Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :succeeded
+      )
+      task_data = TaskData.new('Maintenance::UpdatePostsTask')
+      assert_equal :completed, task_data.category
+    end
   end
 end
