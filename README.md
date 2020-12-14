@@ -20,8 +20,8 @@ $ rails generate maintenance_tasks:install
 ```
 
 The generator creates and runs a migration to add the necessary table to your
-database. It also mounts Maintenance Tasks in your `config/routes.rb`. By default
-the web UI can be accessed in the new `/maintenance_tasks` path.
+database. It also mounts Maintenance Tasks in your `config/routes.rb`. By
+default the web UI can be accessed in the new `/maintenance_tasks` path.
 
 ## Usage
 
@@ -40,8 +40,8 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 * `collection`: return an Active Record Relation or an Array to be iterated
   over.
 * `process`: do the work of your maintenance task on a single record
-* `count`: return the number of rows that will be iterated over (optional,
-  to be able to show progress)
+* `count`: return the number of rows that will be iterated over (optional, to be
+  able to show progress)
 
 Example:
 
@@ -109,8 +109,8 @@ MaintenanceTasks::Runner.new.run('Maintenance::UpdatePostsTask')
 
 ### Configuring the Gem
 
-There are a few configurable options for the gem.
-Custom configurations should be placed in a `maintenance_tasks.rb` initializer.
+There are a few configurable options for the gem. Custom configurations should
+be placed in a `maintenance_tasks.rb` initializer.
 
 #### Customizing the error handler
 
@@ -139,9 +139,9 @@ If no value is specified, it will default to `Maintenance`.
 
 #### Customizing the underlying job class
 
-`MaintenanceTasks.job` can be configured to define a Job class for your tasks
-to use. This is a global configuration, so this Job class will be used across
-all maintenance tasks in your application.
+`MaintenanceTasks.job` can be configured to define a Job class for your tasks to
+use. This is a global configuration, so this Job class will be used across all
+maintenance tasks in your application.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
@@ -186,7 +186,9 @@ This ensures that new migrations are installed and run as well.
 
 Would you like to report an issue or contribute with code? We accept issues and
 pull requests. You can find the contribution guidelines on
-[CONTRIBUTING.md](https://github.com/Shopify/maintenance_tasks/blob/main/.github/CONTRIBUTING.md).
+[CONTRIBUTING.md][contributing].
+
+[contributing]: https://github.com/Shopify/maintenance_tasks/blob/main/.github/CONTRIBUTING.md
 
 ## Releasing new versions
 
@@ -195,5 +197,10 @@ This gem is published to packagecloud. The procedure to publish a new version:
 * Update `spec.version` in `maintenance_tasks.gemspec`.
 * Run `bundle install` to bump the `Gemfile.lock` version of the gem.
 * Open a PR and merge on approval.
-* Create a [release on GitHub](https://help.github.com/articles/creating-releases/) with a version number that matches the version defined in the gemspec.
-* Deploy via [Shipit](https://shipit.shopify.io/shopify/maintenance_tasks/packagecloud) and see the new version on https://gems.shopify.io/packages/.
+* Create a [release on GitHub][release] with a version number that matches the
+  version defined in the gemspec.
+* Deploy via [Shipit][shipit] and see the new version on
+  <https://gems.shopify.io/packages/>.
+
+[release]: https://help.github.com/articles/creating-releases/
+[shipit]: https://shipit.shopify.io/shopify/maintenance_tasks/packagecloud
