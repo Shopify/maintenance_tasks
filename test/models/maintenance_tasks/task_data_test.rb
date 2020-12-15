@@ -19,28 +19,7 @@ module MaintenanceTasks
       end
     end
 
-    test '.available_tasks returns a list of Tasks as TaskData, ordered by active, new, then old' do
-      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-      Run.create!(
-        task_name: 'Maintenance::ErrorTask',
-        status: :errored,
-        started_at: Time.now,
-        ended_at: Time.now,
-      )
-
-      old_task = 'Maintenance::ErrorTask'
-      new_task = 'MaintenanceTasks::TaskJobTest::TestTask'
-      active_task = 'Maintenance::UpdatePostsTask'
-
-      assert_equal [active_task, new_task, old_task],
-        TaskData.available_tasks.map(&:name)
-    end
-
-    test '.available_tasks orders TaskData of the same category alphabetically' do
-      Run.create!(task_name: 'Maintenance::UpdatePostsTask')
-      Run.create!(task_name: 'Maintenance::ErrorTask')
-      Run.create!(task_name: 'MaintenanceTasks::TaskJobTest::TestTask')
-
+    test '.available_tasks returns a list of Tasks as TaskData, ordered alphabetically by name' do
       expected = [
         'Maintenance::ErrorTask',
         'Maintenance::UpdatePostsTask',

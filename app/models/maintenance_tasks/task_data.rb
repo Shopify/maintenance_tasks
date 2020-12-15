@@ -47,7 +47,7 @@ module MaintenanceTasks
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }
           TaskData.new(task_name, last_run)
-        end.sort!
+        end.sort_by!(&:name)
       end
     end
 
@@ -104,17 +104,6 @@ module MaintenanceTasks
       false
     rescue Task::NotFoundError
       true
-    end
-
-    # Compares the current Task Data with another Task Data for sorting.
-    # Tasks are sorted first by category (active, new, then old), and then
-    # by Task name.
-    #
-    # @param other [TaskData] the Task Data instance being compared.
-    # @return [Integer] 1 if the current Task takes priority, -1 if the other
-    #   Task takes priority, and 0 if the Tasks are equal.
-    def <=>(other)
-      [category, name] <=> [other.category, other.name]
     end
 
     # The Task status. It returns the status of the last Run, if present. If the
