@@ -32,6 +32,7 @@ module MaintenanceTasks
     # Fix stylesheet_link_tag to handle integrity when preloading.
     # To be reverted once fixed upstream in Rails.
     def stylesheet_link_tag(*sources)
+      return super unless respond_to?(:send_preload_links_header, true)
       options = sources.extract_options!.stringify_keys
       path_options = options.extract!('protocol', 'host', 'skip_pipeline')
         .symbolize_keys
