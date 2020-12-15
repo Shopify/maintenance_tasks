@@ -41,7 +41,7 @@ module MaintenanceTasks
     end
 
     def tasks_module_file_path
-      tasks_module.to_s.underscore
+      tasks_module.underscore
     end
   end
   private_constant :TaskGenerator

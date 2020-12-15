@@ -32,8 +32,7 @@ module MaintenanceTasks
     end
 
     test 'generator uses configured tasks module' do
-      previous_task_module = MaintenanceTasks.tasks_module.name
-      Object.const_set('Foo', Module.new {})
+      previous_task_module = MaintenanceTasks.tasks_module
       MaintenanceTasks.tasks_module = 'Foo'
 
       run_generator(['sleepy'])
@@ -42,7 +41,6 @@ module MaintenanceTasks
       end
     ensure
       MaintenanceTasks.tasks_module = previous_task_module
-      Object.send(:remove_const, :Foo)
     end
 
     test 'generator namespaces task properly' do

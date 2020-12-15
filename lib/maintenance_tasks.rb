@@ -13,9 +13,9 @@ require 'pagy/extras/bulma'
 # application's code and the engine-specific code. Top-level engine constants
 # and variables are defined under this module.
 module MaintenanceTasks
-  # Sets the value of tasks_module, the intended module to namespace Tasks in.
-  # Defaults to 'Maintenance'.
-  mattr_writer :tasks_module, default: 'Maintenance'
+  # The module to namespace Tasks in, as a String. Defaults to 'Maintenance'.
+  # @param [String] the tasks_module value.
+  mattr_accessor :tasks_module, default: 'Maintenance'
 
   # Defines the job to be used to perform Tasks. This job must be either
   # `MaintenanceTasks::TaskJob` or a class that inherits from it.
@@ -36,13 +36,6 @@ module MaintenanceTasks
   mattr_accessor :error_handler, default: ->(_error) {}
 
   class << self
-    # Retrieves the module that Tasks are namespaced in.
-    #
-    # @return [Module] the constantized tasks_module value.
-    def tasks_module
-      @@tasks_module.constantize
-    end
-
     # Retrieves the class that is configured as the Task Job to be used to
     # perform Tasks.
     #
