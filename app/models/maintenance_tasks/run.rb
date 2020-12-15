@@ -142,12 +142,24 @@ module MaintenanceTasks
     # will be updated.
     #
     # If the Run is not paused, the Run will transition to cancelling.
+    #
+    # If the Run is already cancelling, and has last been updated more than 5
+    # minutes ago, it will transition to cancelled, and the ended_at timestamp
+    # will be updated.
     def cancel
-      if paused?
+      if paused? || stuck?
         update!(status: :cancelled, ended_at: Time.now)
       else
         cancelling!
       end
+    end
+
+    # Returns whether a Run is stuck, which is defined as having a status of
+    # cancelling, and not having been updated in the last 5 minutes.
+    #
+    # @return [Boolean] whether the Run is stuck.
+    def stuck?
+      cancelling? && updated_at <= 5.minutes.ago
     end
   end
   private_constant :Run

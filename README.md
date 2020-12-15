@@ -143,6 +143,17 @@ forcefully terminating them (this is the default but can be configured with the
 to re-enqueue the job so your Task will be resumed. However, the position in the
 collection won't be persisted so at least one iteration may run again.
 
+#### Help: my Task is stuck
+
+Finally, if the queue adapter configured for your application doesn't have this
+property, or if Sidekiq crashes, is forcefully terminated, or is unable to
+re-enqueue the jobs that were in progress, the Task may be in a seemingly stuck
+situation where it appears to be running but is not. In that situation, pausing
+or cancelling it will not result in the Task being paused or cancelled, as the
+Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
+if a Task is `cancelling` for more than 5 minutes, you will be able to cancel it
+for good, which will just mark it as cancelled, allowing you to run it again.
+
 ### Writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to
