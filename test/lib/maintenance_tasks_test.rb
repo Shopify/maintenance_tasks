@@ -3,18 +3,16 @@ require 'test_helper'
 
 class MaintenanceTasksTest < ActiveSupport::TestCase
   test '.tasks_module defaults to constant Maintenance' do
-    assert_equal Maintenance, MaintenanceTasks.tasks_module
+    assert_equal('Maintenance', MaintenanceTasks.tasks_module)
   end
 
   test '.tasks_module can be set' do
-    previous_task_module = MaintenanceTasks.tasks_module.name
+    previous_task_module = MaintenanceTasks.tasks_module
 
-    Object.const_set('Task', Module.new {})
     MaintenanceTasks.tasks_module = 'Task'
-    assert_equal(Task, MaintenanceTasks.tasks_module)
+    assert_equal('Task', MaintenanceTasks.tasks_module)
   ensure
     MaintenanceTasks.tasks_module = previous_task_module
-    Object.send(:remove_const, :Task)
   end
 
   test '.job can be set' do

@@ -33,7 +33,8 @@ module MaintenanceTasks
       private
 
       def load_constants
-        namespace = MaintenanceTasks.tasks_module
+        namespace = MaintenanceTasks.tasks_module.safe_constantize
+        return unless namespace
         namespace.constants.map { |constant| namespace.const_get(constant) }
       end
     end

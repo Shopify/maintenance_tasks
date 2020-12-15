@@ -9,15 +9,9 @@ module MaintenanceTasks
 
     config.to_prepare do
       unless Rails.autoloaders.zeitwerk_enabled?
-        begin
-          tasks_module = MaintenanceTasks.tasks_module.name.underscore
-        rescue NameError
-          nil
-        end
-        if tasks_module
-          Dir["#{Rails.root}/app/tasks/#{tasks_module}/*.rb"].each do |file|
-            require_dependency(file)
-          end
+        tasks_module = MaintenanceTasks.tasks_module.underscore
+        Dir["#{Rails.root}/app/tasks/#{tasks_module}/*.rb"].each do |file|
+          require_dependency(file)
         end
       end
     end
