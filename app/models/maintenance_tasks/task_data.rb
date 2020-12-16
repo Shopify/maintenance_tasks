@@ -40,14 +40,14 @@ module MaintenanceTasks
       def available_tasks
         task_names = Task.available_tasks.map(&:name)
         available_task_runs = Run.where(task_name: task_names)
-        last_runs = available_task_runs.where(
+        last_runs = Run.where(
           id: available_task_runs.select('MAX(id) as id').group(:task_name)
         )
 
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }
           TaskData.new(task_name, last_run)
-        end.sort!
+        end.sort_by!(&:name)
       end
     end
 
@@ -106,17 +106,6 @@ module MaintenanceTasks
       true
     end
 
-    # Compares the current Task Data with another Task Data for sorting.
-    # Tasks are sorted first by category (active, new, then old), and then
-    # by Task name.
-    #
-    # @param other [TaskData] the Task Data instance being compared.
-    # @return [Integer] 1 if the current Task takes priority, -1 if the other
-    #   Task takes priority, and 0 if the Tasks are equal.
-    def <=>(other)
-      [category, name] <=> [other.category, other.name]
-    end
-
     # The Task status. It returns the status of the last Run, if present. If the
     # Task does not have any Runs, the Task status is `new`.
     #
@@ -125,9 +114,7 @@ module MaintenanceTasks
       last_run&.status || 'new'
     end
 
-    protected
-
-    # Retrieves the task's category, which is one of active, new, or completed.
+    # Retrieves the Task's category, which is one of active, new, or completed.
     #
     # @return [Symbol] the category of the Task.
     def category
@@ -136,7 +123,7 @@ module MaintenanceTasks
       elsif last_run.nil?
         :new
       else
-        :old
+        :completed
       end
     end
 

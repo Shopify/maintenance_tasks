@@ -1,1 +1,12 @@
-<%= render partial: 'task', collection: @tasks %>
+<% if active_tasks = @available_tasks[:active] %>
+  <h3 class="title is-3">Active Tasks</h3>
+  <%= render partial: 'task', collection: active_tasks %>
+<% end %>
+<% if new_tasks = @available_tasks[:new] %>
+  <h3 class="title is-3">New Tasks</h3>
+  <%= render partial: 'task', collection: new_tasks %>
+<% end %>
+<% if completed_tasks = @available_tasks[:completed] %>
+  <h3 class="title is-3">Completed Tasks</h3>
+  <%= render partial: 'task', collection: completed_tasks %>
+<% end %>

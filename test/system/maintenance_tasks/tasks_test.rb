@@ -13,6 +13,19 @@ module MaintenanceTasks
       assert_link 'Maintenance::ErrorTask'
     end
 
+    test 'lists tasks by category' do
+      visit maintenance_tasks_path
+
+      expected = [
+        'New Tasks',
+        "Maintenance::ErrorTask\nNew",
+        'Completed Tasks',
+        "Maintenance::UpdatePostsTask\nSucceeded",
+      ]
+
+      assert_equal expected, page.all('h3').map(&:text)
+    end
+
     test 'show a Task' do
       visit maintenance_tasks_path
 
