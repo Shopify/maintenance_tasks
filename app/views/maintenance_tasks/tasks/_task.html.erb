@@ -1,13 +1,8 @@
 <div class="box">
   <h3 class="title is-3">
     <%= link_to task, task_path(task) %>
-
-    <% if run = task.last_run %>
-      <%= status_tag(run.status) %>
-    <% else %>
-      <span class="tag is-primary">New</span>
-    <% end %>
+    <%= status_tag(task.status) %>
   </h3>
 
-  <%= render 'maintenance_tasks/runs/info', run: run if run %>
+  <%= render 'maintenance_tasks/runs/info', run: task.last_run if task.last_run %>
 </div>
