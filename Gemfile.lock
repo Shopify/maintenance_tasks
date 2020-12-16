@@ -7,7 +7,7 @@ PATH
       activerecord (>= 6.0)
       job-iteration (~> 1.1)
       pagy (~> 3.9)
-      railties (~> 6.0)
+      railties (>= 6.0)
 
 GEM
   remote: https://rubygems.org/
