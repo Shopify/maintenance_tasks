@@ -31,6 +31,21 @@ module MaintenanceTasks
       end
     end
 
+    test 'generator creates a task spec if the application is using RSpec' do
+      generators_config = Rails.application.config.generators
+      old_test_framework = generators_config.options[:rails][:test_framework]
+      generators_config.options[:rails][:test_framework] = :rspec
+
+      run_generator(['sleepy'])
+
+      assert_file('spec/tasks/maintenance/sleepy_task_spec.rb') do |task_spec|
+        assert_match(/module Maintenance/, task_spec)
+        assert_match(/RSpec.describe SleepyTask/, task_spec)
+      end
+    ensure
+      generators_config.options[:rails][:test_framework] = old_test_framework
+    end
+
     test 'generator uses configured tasks module' do
       previous_task_module = MaintenanceTasks.tasks_module
       MaintenanceTasks.tasks_module = 'Foo'

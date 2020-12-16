@@ -1,0 +1,14 @@
+# frozen_string_literal: true
+require 'rails_helper'
+
+module <%= tasks_module %>
+<% module_namespacing do -%>
+  RSpec.describe <%= class_name %>Task do
+    # describe '#process' do
+      # it 'performs a task iteration' do
+        # <%= tasks_module %>::<%= class_name %>Task.new.process(element)
+      # end
+    # end
+  end
+<% end -%>
+end
