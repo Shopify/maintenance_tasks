@@ -15,8 +15,8 @@ class CreateMaintenanceTasksRuns < ActiveRecord::Migration[6.0]
       t.string(:error_message)
       t.text(:backtrace)
       t.timestamps
-      t.index(:created_at)
       t.index(:task_name)
+      t.index([:task_name, :created_at], order: { created_at: :desc })
     end
   end
 end
