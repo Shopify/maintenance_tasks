@@ -22,8 +22,8 @@ module MaintenanceTasks
     test '.available_tasks returns a list of Tasks as TaskData, ordered alphabetically by name' do
       expected = [
         'Maintenance::ErrorTask',
+        'Maintenance::TestTask',
         'Maintenance::UpdatePostsTask',
-        'MaintenanceTasks::TaskJobTest::TestTask',
       ]
       assert_equal expected, TaskData.available_tasks.map(&:name)
     end

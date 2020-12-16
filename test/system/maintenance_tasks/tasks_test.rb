@@ -19,6 +19,7 @@ module MaintenanceTasks
       expected = [
         'New Tasks',
         "Maintenance::ErrorTask\nNew",
+        "Maintenance::TestTask\nNew",
         'Completed Tasks',
         "Maintenance::UpdatePostsTask\nSucceeded",
       ]
