@@ -6,8 +6,7 @@ module MaintenanceTasks
   #
   # @api private
   class RunsController < ApplicationController
-    before_action :set_run, only: [:pause, :cancel, :resume]
-    before_action :set_task
+    before_action :set_run, :set_task
 
     # Updates a Run status to paused.
     def pause
