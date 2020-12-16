@@ -6,8 +6,8 @@ module MaintenanceTasks
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
       expected = [
         'Maintenance::ErrorTask',
+        'Maintenance::TestTask',
         'Maintenance::UpdatePostsTask',
-        'MaintenanceTasks::TaskJobTest::TestTask',
       ]
       assert_equal expected,
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
