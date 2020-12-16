@@ -64,6 +64,23 @@ module MaintenanceTasks
       assert_text 'Cancelling…'
     end
 
+    test 'cancel a stuck Run' do
+      visit maintenance_tasks_path
+
+      click_on('Maintenance::UpdatePostsTask')
+      click_on 'Run'
+      click_on 'Cancel'
+
+      assert_text 'Cancelling…'
+      refute_button 'Cancel'
+
+      travel 5.minutes
+
+      refresh
+      click_on 'Cancel'
+      assert_text 'Cancelled'
+    end
+
     test 'run a Task that errors' do
       visit maintenance_tasks_path
 

@@ -194,6 +194,47 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
+    test '#stuck? returns true if the Run is cancelling and has not been updated in more than 5 minutes' do
+      freeze_time
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :cancelling,
+      )
+      refute_predicate run, :stuck?
+
+      travel 5.minutes
+      assert_predicate run, :stuck?
+    end
+
+    test '#stuck? does not return true for other statuses' do
+      freeze_time
+      Run.statuses.except('cancelling').each_key do |status|
+        run = Run.create!(
+          task_name: 'Maintenance::UpdatePostsTask',
+          status: status,
+        )
+        travel 5.minutes
+        refute_predicate run, :stuck?
+      end
+    end
+
+    test '#cancel transitions from cancelling to cancelled if it has not been updated in more than 5 minutes' do
+      freeze_time
+      run = Run.create!(
+        task_name: 'Maintenance::UpdatePostsTask',
+        status: :cancelling,
+      )
+
+      run.cancel
+      assert_predicate run, :cancelling?
+      assert_nil run.ended_at
+
+      travel 5.minutes
+      run.cancel
+      assert_predicate run, :cancelled?
+      assert_equal Time.now, run.ended_at
+    end
+
     test '#enqueued! ensures the status is marked as changed' do
       run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
       run.enqueued!
