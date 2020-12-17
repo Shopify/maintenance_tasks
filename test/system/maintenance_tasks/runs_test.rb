@@ -117,6 +117,24 @@ module MaintenanceTasks
       assert_text alert_text
     end
 
+    test 'errors when enqueuing are shown' do
+      visit maintenance_tasks_path
+
+      click_on 'Maintenance::EnqueueErrorTask'
+      click_on 'Run'
+      assert_text 'The job to perform Maintenance::EnqueueErrorTask '\
+        'could not be enqueued'
+      assert_text 'Error enqueuing'
+
+      visit maintenance_tasks_path
+      click_on 'Maintenance::CancelledEnqueueTask'
+      click_on 'Run'
+      assert_text 'The job to perform Maintenance::CancelledEnqueueTask '\
+        'could not be enqueued'
+      assert_text 'The job to perform Maintenance::CancelledEnqueueTask '\
+        'could not be enqueued. Enqueuing has been prevented by a callback.'
+    end
+
     test 'errors for invalid pause or cancel due to stale UI are shown' do
       visit maintenance_tasks_path
       click_on('Maintenance::UpdatePostsTask')

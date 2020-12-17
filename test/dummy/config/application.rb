@@ -21,6 +21,10 @@ module Dummy
       config.autoloader = :classic
     end
 
+    config.to_prepare do
+      MaintenanceTasks.job = 'CustomTaskJob'
+    end
+
     # Settings in config/environments/* take precedence over those specified
     # here.
     # Application configuration can go into files in config/initializers
