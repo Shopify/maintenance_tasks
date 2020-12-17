@@ -44,5 +44,41 @@ module MaintenanceTasks
         end
       end
     end
+
+    test '#run raises enqueuing errors if enqueuing raises' do
+      MaintenanceTasks.job.expects(:perform_later).raises(RuntimeError, 'error')
+      assert_no_enqueued_jobs do
+        error = assert_raises(Runner::EnqueuingError) do
+          @runner.run(name: @name)
+        end
+
+        assert_equal(
+          "The job to perform #{@name} could not be enqueued",
+          error.message
+        )
+        assert_kind_of RuntimeError, error.cause
+        assert_equal 'error', error.cause.message
+      end
+    end
+
+    test '#run raises enqueuing errors if enqueuing is unsuccessful' do
+      MaintenanceTasks.job.expects(:perform_later).returns(false)
+      assert_no_enqueued_jobs do
+        error = assert_raises(Runner::EnqueuingError) do
+          @runner.run(name: @name)
+        end
+
+        assert_equal(
+          "The job to perform #{@name} could not be enqueued",
+          error.message
+        )
+        assert_kind_of RuntimeError, error.cause
+        assert_equal(
+          "The job to perform #{@name} could not be enqueued. "\
+          'Enqueuing has been prevented by a callback.',
+          error.cause.message
+        )
+      end
+    end
   end
 end
