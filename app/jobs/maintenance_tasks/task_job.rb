@@ -91,15 +91,7 @@ module MaintenanceTasks
 
     def on_error(error)
       @ticker.persist
-
-      @run.update!(
-        status: :errored,
-        error_class: error.class.to_s,
-        error_message: error.message,
-        backtrace: Rails.backtrace_cleaner.clean(error.backtrace),
-        ended_at: Time.now
-      )
-
+      @run.persist_error(error)
       MaintenanceTasks.error_handler.call(error)
     end
   end

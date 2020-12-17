@@ -22,6 +22,21 @@ module MaintenanceTasks
       assert_equal 12.2, run.time_running
     end
 
+    test '#persist_error updates Run to errored and sets ended_at' do
+      freeze_time
+      run = Run.create!(task_name: 'Maintenance::ErrorTask')
+
+      error = ArgumentError.new('Something went wrong')
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+      run.persist_error(error)
+
+      assert_predicate run, :errored?
+      assert_equal 'ArgumentError', run.error_class
+      assert_equal 'Something went wrong', run.error_message
+      assert_equal ["lib/foo.rb:42:in `bar'"], run.backtrace
+      assert_equal Time.now, run.ended_at
+    end
+
     test '#reload_status reloads status and clears dirty tracking' do
       run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
       Run.find(run.id).running!
