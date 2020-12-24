@@ -15,6 +15,19 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
     MaintenanceTasks.tasks_module = previous_task_module
   end
 
+  test '.tasks_location defaults to "tasks"' do
+    assert_equal('tasks', MaintenanceTasks.tasks_location)
+  end
+
+  test '.tasks_location can be set' do
+    previous_task_location = MaintenanceTasks.tasks_location
+
+    MaintenanceTasks.tasks_location = 'jobs'
+    assert_equal('jobs', MaintenanceTasks.tasks_location)
+  ensure
+    MaintenanceTasks.tasks_location = previous_task_location
+  end
+
   test '.job can be set' do
     original_job = MaintenanceTasks.job.name
     MaintenanceTasks.job = 'CustomTaskJob'

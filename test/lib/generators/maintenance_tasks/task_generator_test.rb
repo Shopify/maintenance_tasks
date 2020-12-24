@@ -58,6 +58,18 @@ module MaintenanceTasks
       MaintenanceTasks.tasks_module = previous_task_module
     end
 
+    test 'generator uses configured tasks location' do
+      previous_task_location = MaintenanceTasks.tasks_location
+      MaintenanceTasks.tasks_location = 'jobs'
+
+      run_generator(['sleepy'])
+      assert_file('app/jobs/sleepy_task.rb') do |task|
+        refute_match(/jobs/, task)
+      end
+    ensure
+      MaintenanceTasks.tasks_location = previous_task_location
+    end
+
     test 'generator namespaces task properly' do
       run_generator ['admin/sleepy']
       assert_file 'app/tasks/maintenance/admin/sleepy_task.rb' do |task|
