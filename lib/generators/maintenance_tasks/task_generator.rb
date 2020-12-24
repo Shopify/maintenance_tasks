@@ -14,7 +14,7 @@ module MaintenanceTasks
     # Creates the Task file.
     def create_task_file
       template_file = File.join(
-        "app/tasks/#{tasks_module_file_path}",
+        "app/#{tasks_location}/#{tasks_module_file_path}",
         class_path,
         "#{file_name}_task.rb"
       )
@@ -38,7 +38,7 @@ module MaintenanceTasks
 
     def create_task_test_file
       template_file = File.join(
-        "test/tasks/#{tasks_module_file_path}",
+        "test/#{tasks_location}/#{tasks_module_file_path}",
         class_path,
         "#{file_name}_task_test.rb"
       )
@@ -47,7 +47,7 @@ module MaintenanceTasks
 
     def create_task_spec_file
       template_file = File.join(
-        "spec/tasks/#{tasks_module_file_path}",
+        "spec/#{tasks_location}/#{tasks_module_file_path}",
         class_path,
         "#{file_name}_task_spec.rb"
       )
@@ -60,6 +60,10 @@ module MaintenanceTasks
 
     def tasks_module
       MaintenanceTasks.tasks_module
+    end
+
+    def tasks_location
+      MaintenanceTasks.tasks_location
     end
 
     def tasks_module_file_path

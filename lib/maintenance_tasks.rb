@@ -17,6 +17,15 @@ module MaintenanceTasks
   # @param [String] the tasks_module value.
   mattr_accessor :tasks_module, default: 'Maintenance'
 
+  # The default file location where Tasks were be located, as a String.
+  # Defaults to 'tasks'.
+  #
+  # i.e.  tasks and corresponding tests will be stored under
+  #       app/tasks/maintenance and {test|spec}/tasks/maintenance
+  #
+  # @param [String] the tasks_location value.
+  mattr_accessor :tasks_location, default: 'tasks'
+
   # Defines the job to be used to perform Tasks. This job must be either
   # `MaintenanceTasks::TaskJob` or a class that inherits from it.
   #
