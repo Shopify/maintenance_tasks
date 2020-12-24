@@ -63,7 +63,7 @@ module MaintenanceTasks
       MaintenanceTasks.tasks_location = 'jobs'
 
       run_generator(['sleepy'])
-      assert_file('app/jobs/sleepy_task.rb') do |task|
+      assert_file('app/jobs/maintenance/sleepy_task.rb') do |task|
         refute_match(/jobs/, task)
       end
     ensure
