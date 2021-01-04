@@ -1,2 +1,15 @@
+<div class="block">
+  <%= form_with url: runs_path, method: :get do |form| %>
+    <div class="field has-addons">
+      <div class="control">
+        <%= form.search_field :task_name, value: params[:task_name], placeholder: "Task name", class: "input" %>
+      </div>
+      <div class="control">
+        <%= form.submit "Search", class: "button is-link" %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
 <%= render @runs, task_name: true %>
 <%= pagination(@pagy) %>
