@@ -78,6 +78,13 @@ module MaintenanceTasks
 
       refresh
       click_on 'Cancel'
+    end
+
+    test 'cancel a deleted task' do
+      visit maintenance_tasks_path + '/tasks/Maintenance::PausedDeletedTask'
+
+      click_on 'Cancel'
+
       assert_text 'Cancelled'
     end
 
