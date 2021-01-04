@@ -16,7 +16,9 @@
     <div class="content">
       <p><%= run.error_message %></p>
 
-      <code><%= format_backtrace(run.backtrace) %></code>
+      <% if run.backtrace.present? %>
+        <code><%= format_backtrace(run.backtrace) %></code>
+      <% end %>
 
     </div>
   </div>

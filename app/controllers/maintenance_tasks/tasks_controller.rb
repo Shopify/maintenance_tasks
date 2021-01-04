@@ -28,6 +28,8 @@ module MaintenanceTasks
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(error.record.task_name), alert: error.message)
+    rescue Runner::EnqueuingError => error
+      redirect_to(task_path(error.run.task_name), alert: error.message)
     end
 
     private

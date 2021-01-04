@@ -18,6 +18,8 @@ module MaintenanceTasks
 
       expected = [
         'New Tasks',
+        "Maintenance::CancelledEnqueueTask\nNew",
+        "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
         "Maintenance::TestTask\nNew",
         'Completed Tasks',

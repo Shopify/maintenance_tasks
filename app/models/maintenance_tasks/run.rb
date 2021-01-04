@@ -64,6 +64,19 @@ module MaintenanceTasks
       )
     end
 
+    # Marks the run as errored and persists the error data.
+    #
+    # @param error [StandardError] the Error being persisted.
+    def persist_error(error)
+      update!(
+        status: :errored,
+        error_class: error.class.to_s,
+        error_message: error.message,
+        backtrace: Rails.backtrace_cleaner.clean(error.backtrace),
+        ended_at: Time.now,
+      )
+    end
+
     # Refreshes just the status attribute on the Active Record object, and
     # ensures ActiveModel::Dirty does not mark the object as changed.
     # This allows us to get the Run's most up-to-date status without needing
