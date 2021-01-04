@@ -10,6 +10,14 @@ ActiveRecord::Migrator.migrations_paths <<
 require 'rails/test_help'
 require 'mocha/minitest'
 
+Mocha.configure do |c|
+  c.display_matching_invocations_on_failure = true
+  c.stubbing_method_on_non_mock_object      = :allow
+  c.stubbing_method_unnecessarily           = :prevent
+  c.stubbing_non_existent_method            = :prevent
+  c.stubbing_non_public_method              = :prevent
+end
+
 # Filter out the backtrace from minitest while preserving the one from other
 # libraries.
 Minitest.backtrace_filter = Minitest::BacktraceFilter.new

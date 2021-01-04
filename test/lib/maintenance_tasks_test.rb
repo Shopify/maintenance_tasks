@@ -35,9 +35,14 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
     # Stub Bugsnag being installed on host application
     Object.const_set(:Bugsnag, Class.new)
     main_self = TOPLEVEL_BINDING.receiver
-    main_self.expects(:require).with('bugsnag').returns(true)
+    Mocha::Configuration.override(
+      stubbing_non_public_method: :allow,
+      stubbing_non_existent_method: :allow,
+    ) do
+      main_self.expects(:require).with('bugsnag').returns(true)
+      Bugsnag.expects(:notify).with('Something went wrong')
+    end
 
-    Bugsnag.expects(:notify).with('Something went wrong')
     MaintenanceTasks.configure_bugsnag_integration
     MaintenanceTasks.error_handler.call('Something went wrong')
   ensure
