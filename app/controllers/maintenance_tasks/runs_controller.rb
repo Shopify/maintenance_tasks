@@ -6,7 +6,12 @@ module MaintenanceTasks
   #
   # @api private
   class RunsController < ApplicationController
-    before_action :set_run
+    before_action :set_run, except: :index
+
+    # Shows a full list of Runs.
+    def index
+      @pagy, @runs = pagy(Run.all.order(id: :desc))
+    end
 
     # Updates a Run status to paused.
     def pause

@@ -1,4 +1,9 @@
 <div class="box">
+  <% if task_name %>
+    <h3 class="title is-3">
+      <%= link_to run.task_name, task_path(run.task_name) %>
+    </h3>
+  <% end %>
   <h5 class="title is-5">
     <%= time_tag run.created_at, title: run.created_at %>
     <%= status_tag run.status %>

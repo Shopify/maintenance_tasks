@@ -160,5 +160,13 @@ module MaintenanceTasks
         'Status Cannot transition run from status cancelling to pausing'
       assert_text alert_text
     end
+
+    test 'list Runs including from deleted Tasks' do
+      visit maintenance_tasks_path
+      click_on 'Runs'
+
+      assert_text 'Ran for', count: 3
+      assert_text 'Maintenance::DeletedTask'
+    end
   end
 end
