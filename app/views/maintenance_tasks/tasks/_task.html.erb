@@ -4,5 +4,5 @@
     <%= status_tag(task.status) %>
   </h3>
 
-  <%= render 'maintenance_tasks/runs/info', run: task.last_run if task.last_run %>
+  <%= render 'maintenance_tasks/runs/info', run: task.last_run, with_status: false if task.last_run %>
 </div>
