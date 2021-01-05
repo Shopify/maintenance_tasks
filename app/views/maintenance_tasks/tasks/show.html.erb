@@ -19,7 +19,7 @@
 
   <h4 class="title is-4">Previous Runs</h4>
 
-  <%= render @previous_runs %>
+  <%= render @previous_runs, task_name: false %>
 
   <%= pagination(@pagy) %>
 <% end %>
