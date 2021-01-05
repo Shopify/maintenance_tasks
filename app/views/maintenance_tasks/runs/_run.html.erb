@@ -3,6 +3,9 @@
     <%= time_tag run.created_at, title: run.created_at %>
     <%= status_tag run.status %>
   </h5>
+  <%= progress run %>
 
-  <%= render 'maintenance_tasks/runs/info', run: run %>
+  <div class="content">
+    <%= render "maintenance_tasks/runs/info/#{run.status}", run: run %>
+  </div>
 </div>

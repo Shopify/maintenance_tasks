@@ -1,10 +1,10 @@
 <% content_for :page_title, @task %>
 
 <h1 class="title is-1">
-  <%= @task %> <%= status_tag(@task.status) %>
+  <%= @task %> <%= status_tag(@task.status) unless @task.last_run %>
 </h1>
 
-<%= render 'maintenance_tasks/runs/info', run: @task.last_run if @task.last_run %>
+<%= render @task.last_run if @task.last_run %>
 
 <div class="buttons">
   <%= render "maintenance_tasks/tasks/actions/#{@task.status}", task: @task %>
