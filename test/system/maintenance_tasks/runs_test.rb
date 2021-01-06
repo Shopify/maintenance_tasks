@@ -78,13 +78,6 @@ module MaintenanceTasks
 
       refresh
       click_on 'Cancel'
-    end
-
-    test 'cancel a deleted task' do
-      visit maintenance_tasks_path + '/tasks/Maintenance::PausedDeletedTask'
-
-      click_on 'Cancel'
-
       assert_text 'Cancelled'
     end
 
@@ -161,11 +154,11 @@ module MaintenanceTasks
       assert_text alert_text
     end
 
-    test 'list Runs including from deleted Tasks' do
+    test 'list Runs' do
       visit maintenance_tasks_path
       click_on 'Runs'
 
-      assert_text 'Ran for', count: 3
+      assert_text 'Ran for', count: 2
       assert_text 'Maintenance::DeletedTask'
     end
 
@@ -176,9 +169,8 @@ module MaintenanceTasks
       fill_in 'Task name', with: 'deleted'
       click_on 'Search'
 
-      assert_text 'Ran for', count: 2
+      assert_text 'Ran for', count: 1
       assert_text 'Maintenance::DeletedTask'
-      assert_text 'Maintenance::PausedDeletedTask'
     end
   end
 end

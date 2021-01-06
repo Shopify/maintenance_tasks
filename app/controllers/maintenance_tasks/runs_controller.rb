@@ -6,7 +6,7 @@ module MaintenanceTasks
   #
   # @api private
   class RunsController < ApplicationController
-    before_action :set_run, except: :index
+    before_action :set_run, :set_task, except: :index
 
     # Shows a full list of Runs.
     def index
@@ -21,7 +21,7 @@ module MaintenanceTasks
     # Updates a Run status to paused.
     def pause
       @run.pausing!
-      redirect_to(task_path(@run.task_name))
+      redirect_to(task_path(@task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(@run.task_name), alert: error.message)
     end
@@ -29,7 +29,7 @@ module MaintenanceTasks
     # Updates a Run status to cancelling.
     def cancel
       @run.cancel
-      redirect_to(task_path(@run.task_name))
+      redirect_to(task_path(@task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(@run.task_name), alert: error.message)
     end
@@ -38,6 +38,10 @@ module MaintenanceTasks
 
     def set_run
       @run = Run.find(params.fetch(:id))
+    end
+
+    def set_task
+      @task = Task.named(params.fetch(:task_id))
     end
   end
   private_constant :RunsController
