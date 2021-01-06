@@ -72,6 +72,7 @@ method in your task be tested. You may also want to test the `#collection` and
 `#count` methods for your task if they are sufficiently complex.
 
 Example:
+
 ```ruby
 # test/tasks/maintenance/update_posts_task_test.rb
 
@@ -106,6 +107,28 @@ instance:
 ```ruby
 MaintenanceTasks::Runner.new.run('Maintenance::UpdatePostsTask')
 ```
+
+### Monitoring your Task's status
+
+The web UI will provide updates on the status of your Task. Here are the states
+a Task can be in:
+
+* **new**: A Task that has not yet been run.
+* **enqueued**: A Task that is waiting to be performed after a user has
+  instructed it to run.
+* **running**: A Task that is currently being performed by a job worker.
+* **pausing**: A Task that was paused by a user, but needs to finish work
+  before stopping.
+* **paused**: A Task that was paused by a user and is not performing. It can be
+  resumed.
+* **interrupted**: A Task that has been momentarily interrupted by the job
+  infrastructure.
+* **cancelling**: A Task that was cancelled by a user, but needs to finish work
+  before stopping.
+* **cancelled**: A Task that was cancelled by a user and is not performing. It
+  cannot be resumed.
+* **succeeded**: A Task that finished successfully.
+* **errored**: A Task that encountered an unhandled exception while performing.
 
 ### How Maintenance Tasks runs a Task
 
