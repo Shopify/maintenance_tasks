@@ -6,13 +6,13 @@ A Rails engine for queuing and managing maintenance tasks.
 * [Installation](#installation)
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
-    * [Considerations when Writing Tasks](#considerations-when-writing-tasks)
-  * [Writing Tests for a Task](#writing-tests-for-a-task)
+    * [Considerations when writing Tasks](#considerations-when-writing-tasks)
+  * [Writing tests for a Task](#writing-tests-for-a-task)
   * [Running a Task](#running-a-task)
-  * [Monitoring your Task's Status](#monitoring-your-tasks-status)
+  * [Monitoring your Task's status](#monitoring-your-tasks-status)
   * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
     * [Help! My Task is stuck](#help-my-task-is-stuck)
-  * [Configuring the Gem](#configuring-the-gem)
+  * [Configuring the gem](#configuring-the-gem)
     * [Customizing the error handler](#customizing-the-error-handler)
     * [Customizing the maintenance tasks module](#customizing-the-maintenance-tasks-module)
     * [Customizing the underlying job class](#customizing-the-underlying-job-class)
@@ -83,7 +83,7 @@ module Maintenance
 end
 ```
 
-#### Considerations when Writing Tasks
+#### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to
 run the job which is processing your Task. The guidelines for writing Task may
@@ -103,7 +103,7 @@ depend on the queue adapter but in general, you should follow these rules:
 
 [sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
 
-### Writing Tests for a Task
+### Writing tests for a Task
 
 The task generator will also create a test file for your task in the folder
 `test/tasks/maintenance/`. At a minimum, it's recommended that the `#process`
@@ -216,7 +216,7 @@ Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
 if a Task is `cancelling` for more than 5 minutes, you will be able to cancel it
 for good, which will just mark it as cancelled, allowing you to run it again.
 
-### Configuring the Gem
+### Configuring the gem
 
 There are a few configurable options for the gem. Custom configurations should
 be placed in a `maintenance_tasks.rb` initializer.
