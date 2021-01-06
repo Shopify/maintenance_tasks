@@ -2,6 +2,25 @@
 
 A Rails engine for queuing and managing maintenance tasks.
 
+## Table of Contents
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Creating a Task](#creating-a-task)
+    * [Considerations when Writing Tasks](#considerations-when-writing-tasks)
+  * [Writing Tests for a Task](#writing-tests-for-a-task)
+  * [Running a Task](#running-a-task)
+  * [Monitoring your Task's Status](#monitoring-your-tasks-status)
+  * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
+    * [Help! My Task is stuck](#help-my-task-is-stuck)
+  * [Configuring the Gem](#configuring-the-gem)
+    * [Customizing the error handler](#customizing-the-error-handler)
+    * [Customizing the maintenance tasks module](#customizing-the-maintenance-tasks-module)
+    * [Customizing the underlying job class](#customizing-the-underlying-job-class)
+    * [Customizing the rate at which task progress gets updated](#customizing-the-rate-at-which-task-progress-gets-updated)
+* [Upgrading](#upgrading)
+* [Contributing](#contributing)
+* [Releasing new versions](#releasing-new-versions)
+
 ## Installation
 
 Add this line to your application's Gemfile:
