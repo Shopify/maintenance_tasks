@@ -11,7 +11,7 @@ Gem::Specification.new do |spec|
   spec.metadata = {
     'source_code_uri' =>
       "https://github.com/Shopify/maintenance_tasks/tree/v#{spec.version}",
-    'allowed_push_host' => 'https://packages.shopify.io',
+    'allowed_push_host' => 'https://rubygems.org',
   }
 
   spec.files = Dir['{app,config,db,lib}/**/*', 'Rakefile', 'README.md']
