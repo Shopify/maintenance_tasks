@@ -2,6 +2,25 @@
 
 A Rails engine for queuing and managing maintenance tasks.
 
+## Table of Contents
+* [Installation](#installation)
+* [Usage](#usage)
+  * [Creating a Task](#creating-a-task)
+    * [Considerations when writing Tasks](#considerations-when-writing-tasks)
+  * [Writing tests for a Task](#writing-tests-for-a-task)
+  * [Running a Task](#running-a-task)
+  * [Monitoring your Task's status](#monitoring-your-tasks-status)
+  * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
+    * [Help! My Task is stuck](#help-my-task-is-stuck)
+  * [Configuring the gem](#configuring-the-gem)
+    * [Customizing the error handler](#customizing-the-error-handler)
+    * [Customizing the maintenance tasks module](#customizing-the-maintenance-tasks-module)
+    * [Customizing the underlying job class](#customizing-the-underlying-job-class)
+    * [Customizing the rate at which task progress gets updated](#customizing-the-rate-at-which-task-progress-gets-updated)
+* [Upgrading](#upgrading)
+* [Contributing](#contributing)
+* [Releasing new versions](#releasing-new-versions)
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -64,7 +83,27 @@ module Maintenance
 end
 ```
 
-### Writing Tests for a Task
+#### Considerations when writing Tasks
+
+MaintenanceTasks relies on the queue adapter configured for your application to
+run the job which is processing your Task. The guidelines for writing Task may
+depend on the queue adapter but in general, you should follow these rules:
+
+* Duration of `Task#process`: processing a single element of the collection
+  should take less than 25 seconds, or the duration set as a timeout for Sidekiq
+  or the queue adapter configured in your application. It allows the Task to be
+  safely interrupted and resumed.
+* Idempotency of `Task#process`: it should be safe to run `process` multiple
+  times for the same element of the collection. Read more in [this Sidekiq best
+  practice][sidekiq-idempotent]. It's important if the Task errors and you run
+  it again, because the same element that errored the Task may well be processed
+  again. It especially matters in the situation described above, when the
+  iteration duration exceeds the timeout: if the job is re-enqueued, multiple
+  elements may be processed again.
+
+[sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
+
+### Writing tests for a Task
 
 The task generator will also create a test file for your task in the folder
 `test/tasks/maintenance/`. At a minimum, it's recommended that the `#process`
@@ -166,7 +205,7 @@ forcefully terminating them (this is the default but can be configured with the
 to re-enqueue the job so your Task will be resumed. However, the position in the
 collection won't be persisted so at least one iteration may run again.
 
-#### Help: my Task is stuck
+#### Help! My Task is stuck
 
 Finally, if the queue adapter configured for your application doesn't have this
 property, or if Sidekiq crashes, is forcefully terminated, or is unable to
@@ -177,27 +216,7 @@ Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
 if a Task is `cancelling` for more than 5 minutes, you will be able to cancel it
 for good, which will just mark it as cancelled, allowing you to run it again.
 
-### Writing Tasks
-
-MaintenanceTasks relies on the queue adapter configured for your application to
-run the job which is processing your Task. The guidelines for writing Task may
-depend on the queue adapter but in general, you should follow these rules:
-
-* Duration of `Task#process`: processing a single element of the collection
-  should take less than 25 seconds, or the duration set as a timeout for Sidekiq
-  or the queue adapter configured in your application. It allows the Task to be
-  safely interrupted and resumed.
-* Idempotency of `Task#process`: it should be safe to run `process` multiple
-  times for the same element of the collection. Read more in [this Sidekiq best
-  practice][sidekiq-idempotent]. It's important if the Task errors and you run
-  it again, because the same element that errored the Task may well be processed
-  again. It especially matters in the situation described above, when the
-  iteration duration exceeds the timeout: if the job is re-enqueued, multiple
-  elements may be processed again.
-
-[sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
-
-### Configuring the Gem
+### Configuring the gem
 
 There are a few configurable options for the gem. Custom configurations should
 be placed in a `maintenance_tasks.rb` initializer.
