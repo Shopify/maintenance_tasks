@@ -1,11 +1,8 @@
 <div class="box">
-  <% if with_task_name %>
-    <h3 class="title is-3">
-      <%= link_to run.task_name, task_path(run.task_name) %>
-      <%= status_tag run.status %>
-    </h3>
-    <%= render 'maintenance_tasks/runs/info', run: run, with_status: false %>
-  <% else %>
-    <%= render 'maintenance_tasks/runs/info', run: run, with_status: true %>
-  <% end %>
+  <h5 class="title is-5">
+    <%= time_tag run.created_at, title: run.created_at %>
+    <%= status_tag run.status %>
+  </h5>
+
+  <%= render 'maintenance_tasks/runs/info', run: run %>
 </div>
