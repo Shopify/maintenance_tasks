@@ -26,9 +26,7 @@ A Rails engine for queuing and managing maintenance tasks.
 Add this line to your application's Gemfile:
 
 ```ruby
-source 'https://packages.shopify.io/shopify/gems' do
-  gem 'maintenance_tasks'
-end
+gem 'maintenance_tasks'
 ```
 
 And then execute:
@@ -312,7 +310,7 @@ This gem is published to packagecloud. The procedure to publish a new version:
 * Create a [release on GitHub][release] with a version number that matches the
   version defined in the gemspec.
 * Deploy via [Shipit][shipit] and see the new version on
-  <https://gems.shopify.io/packages/>.
+  <https://rubygems.org/gems/maintenance_tasks>.
 
 [release]: https://help.github.com/articles/creating-releases/
-[shipit]: https://shipit.shopify.io/shopify/maintenance_tasks/packagecloud
+[shipit]: https://shipit.shopify.io/shopify/maintenance_tasks/rubygems
