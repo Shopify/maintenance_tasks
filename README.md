@@ -64,6 +64,26 @@ module Maintenance
 end
 ```
 
+#### Considerations when Writing Tasks
+
+MaintenanceTasks relies on the queue adapter configured for your application to
+run the job which is processing your Task. The guidelines for writing Task may
+depend on the queue adapter but in general, you should follow these rules:
+
+* Duration of `Task#process`: processing a single element of the collection
+  should take less than 25 seconds, or the duration set as a timeout for Sidekiq
+  or the queue adapter configured in your application. It allows the Task to be
+  safely interrupted and resumed.
+* Idempotency of `Task#process`: it should be safe to run `process` multiple
+  times for the same element of the collection. Read more in [this Sidekiq best
+  practice][sidekiq-idempotent]. It's important if the Task errors and you run
+  it again, because the same element that errored the Task may well be processed
+  again. It especially matters in the situation described above, when the
+  iteration duration exceeds the timeout: if the job is re-enqueued, multiple
+  elements may be processed again.
+
+[sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
+
 ### Writing Tests for a Task
 
 The task generator will also create a test file for your task in the folder
@@ -166,7 +186,7 @@ forcefully terminating them (this is the default but can be configured with the
 to re-enqueue the job so your Task will be resumed. However, the position in the
 collection won't be persisted so at least one iteration may run again.
 
-#### Help: my Task is stuck
+#### Help! My Task is stuck
 
 Finally, if the queue adapter configured for your application doesn't have this
 property, or if Sidekiq crashes, is forcefully terminated, or is unable to
@@ -176,26 +196,6 @@ or cancelling it will not result in the Task being paused or cancelled, as the
 Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
 if a Task is `cancelling` for more than 5 minutes, you will be able to cancel it
 for good, which will just mark it as cancelled, allowing you to run it again.
-
-### Writing Tasks
-
-MaintenanceTasks relies on the queue adapter configured for your application to
-run the job which is processing your Task. The guidelines for writing Task may
-depend on the queue adapter but in general, you should follow these rules:
-
-* Duration of `Task#process`: processing a single element of the collection
-  should take less than 25 seconds, or the duration set as a timeout for Sidekiq
-  or the queue adapter configured in your application. It allows the Task to be
-  safely interrupted and resumed.
-* Idempotency of `Task#process`: it should be safe to run `process` multiple
-  times for the same element of the collection. Read more in [this Sidekiq best
-  practice][sidekiq-idempotent]. It's important if the Task errors and you run
-  it again, because the same element that errored the Task may well be processed
-  again. It especially matters in the situation described above, when the
-  iteration duration exceeds the timeout: if the job is re-enqueued, multiple
-  elements may be processed again.
-
-[sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
 
 ### Configuring the Gem
 
