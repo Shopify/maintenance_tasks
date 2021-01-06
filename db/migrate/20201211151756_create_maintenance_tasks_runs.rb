@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 class CreateMaintenanceTasksRuns < ActiveRecord::Migration[6.0]
   def change
-    create_table(:maintenance_tasks_runs, force: true) do |t|
+    create_table(:maintenance_tasks_runs) do |t|
       t.string(:task_name, null: false)
       t.datetime(:started_at)
       t.datetime(:ended_at)
