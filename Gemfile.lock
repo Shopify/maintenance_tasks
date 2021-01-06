@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    maintenance_tasks (0.3.0)
+    maintenance_tasks (1.0.0)
       actionpack (>= 6.0)
       activejob (>= 6.0)
       activerecord (>= 6.0)
@@ -93,7 +93,7 @@ GEM
       activesupport (>= 4.2.0)
     i18n (1.8.5)
       concurrent-ruby (~> 1.0)
-    job-iteration (1.1.8)
+    job-iteration (1.1.9)
       activejob (>= 5.2)
     loofah (2.8.0)
       crass (~> 1.0.2)
