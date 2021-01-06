@@ -40,6 +40,11 @@ The generator creates and runs a migration to add the necessary table to your
 database. It also mounts Maintenance Tasks in your `config/routes.rb`. By
 default the web UI can be accessed in the new `/maintenance_tasks` path.
 
+In case you use an exception reporting service (e.g. Bugsnag) you might want to
+define an error handler. See
+[Customizing the error handler](#customizing-the-error-handler) for more
+information.
+
 ## Usage
 
 ### Creating a Task
@@ -224,15 +229,12 @@ be placed in a `maintenance_tasks.rb` initializer.
 Exceptions raised while a Task is performing are rescued and information about
 the error is persisted and visible in the UI.
 
-If your application uses Bugsnag to monitor errors, the gem will automatically
-notify Bugsnag of any errors raised while a Task is performing.
-
-If you want to integrate with another exception monitoring service or customize
-error handling, a callback can be defined:
+If you want to integrate with an exception monitoring service (e.g. Bugsnag),
+you can define an error handler:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
-MaintenanceTasks.error_handler = ->(error) { MyErrorMonitor.notify(error) }
+MaintenanceTasks.error_handler = ->(error) { Bugsnag.notify(error) }
 ```
 
 #### Customizing the maintenance tasks module

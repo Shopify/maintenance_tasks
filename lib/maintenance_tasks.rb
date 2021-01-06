@@ -34,17 +34,4 @@ module MaintenanceTasks
 
   # Defines a callback to be performed when an error occurs in the task.
   mattr_accessor :error_handler, default: ->(_error) {}
-
-  class << self
-    # Attempts to configure Bugsnag integration. If the application uses
-    # Bugsnag, it is automatically configured to report on errors raised while
-    # a Task is performing.
-    def configure_bugsnag_integration
-      load('maintenance_tasks/integrations/bugsnag_handler.rb')
-    rescue LoadError
-      nil
-    end
-  end
 end
-
-MaintenanceTasks.configure_bugsnag_integration
