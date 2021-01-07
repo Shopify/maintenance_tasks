@@ -21,7 +21,7 @@ module MaintenanceTasks
   # `MaintenanceTasks::TaskJob` or a class that inherits from it.
   #
   # @param [String] the name of the job class.
-  mattr_writer :job, default: 'MaintenanceTasks::TaskJob'
+  mattr_accessor :job, default: 'MaintenanceTasks::TaskJob'
 
   # After each iteration, the progress of the task may be updated. This duration
   # in seconds limits these updates, skipping if the duration since the last
@@ -36,14 +36,6 @@ module MaintenanceTasks
   mattr_accessor :error_handler, default: ->(_error) {}
 
   class << self
-    # Retrieves the class that is configured as the Task Job to be used to
-    # perform Tasks.
-    #
-    # @return [TaskJob] the job class.
-    def job
-      @@job.constantize
-    end
-
     # Attempts to configure Bugsnag integration. If the application uses
     # Bugsnag, it is automatically configured to report on errors raised while
     # a Task is performing.

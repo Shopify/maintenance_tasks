@@ -40,7 +40,7 @@ module MaintenanceTasks
     private
 
     def enqueue(run)
-      unless MaintenanceTasks.job.perform_later(run)
+      unless MaintenanceTasks.job.constantize.perform_later(run)
         raise "The job to perform #{run.task_name} could not be enqueued. "\
           'Enqueuing has been prevented by a callback.'
       end
