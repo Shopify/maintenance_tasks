@@ -9,11 +9,12 @@ module MaintenanceTasks
     setup do
       @name = 'Maintenance::UpdatePostsTask'
       @runner = Runner.new
+      @job = MaintenanceTasks.job.constantize
     end
 
     test '#run creates and performs a Run for the given Task when there is no active Run' do
       assert_difference -> { Run.where(task_name: @name).count }, 1 do
-        assert_enqueued_with(job: MaintenanceTasks.job) do
+        assert_enqueued_with(job: @job) do
           assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
         end
       end
@@ -23,7 +24,7 @@ module MaintenanceTasks
       run = Run.create!(task_name: @name, status: :paused)
 
       assert_no_difference -> { Run.where(task_name: @name).count } do
-        assert_enqueued_with(job: MaintenanceTasks.job, args: [run]) do
+        assert_enqueued_with(job: @job, args: [run]) do
           assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
           assert run.reload.enqueued?
         end
@@ -46,7 +47,7 @@ module MaintenanceTasks
     end
 
     test '#run raises enqueuing errors if enqueuing raises' do
-      MaintenanceTasks.job.expects(:perform_later).raises(RuntimeError, 'error')
+      @job.expects(:perform_later).raises(RuntimeError, 'error')
       assert_no_enqueued_jobs do
         error = assert_raises(Runner::EnqueuingError) do
           @runner.run(name: @name)
@@ -62,7 +63,7 @@ module MaintenanceTasks
     end
 
     test '#run raises enqueuing errors if enqueuing is unsuccessful' do
-      MaintenanceTasks.job.expects(:perform_later).returns(false)
+      @job.expects(:perform_later).returns(false)
       assert_no_enqueued_jobs do
         error = assert_raises(Runner::EnqueuingError) do
           @runner.run(name: @name)

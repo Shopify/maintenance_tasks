@@ -15,14 +15,6 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
     MaintenanceTasks.tasks_module = previous_task_module
   end
 
-  test '.job can be set' do
-    original_job = MaintenanceTasks.job.name
-    MaintenanceTasks.job = 'CustomTaskJob'
-    assert_equal(CustomTaskJob, MaintenanceTasks.job)
-  ensure
-    MaintenanceTasks.job = original_job
-  end
-
   test '.configure_bugsnag_integration keeps original error handler if no Bugsnag' do
     original_error_handler = MaintenanceTasks.error_handler
     MaintenanceTasks.configure_bugsnag_integration
