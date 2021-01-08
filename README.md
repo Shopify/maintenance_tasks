@@ -142,7 +142,7 @@ You can also run a Task in Ruby by sending `run` with a Task name to a Runner
 instance:
 
 ```ruby
-MaintenanceTasks::Runner.new.run('Maintenance::UpdatePostsTask')
+MaintenanceTasks::Runner.new.run(name: 'Maintenance::UpdatePostsTask')
 ```
 
 ### Monitoring your Task's status
