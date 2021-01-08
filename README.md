@@ -3,6 +3,7 @@
 A Rails engine for queuing and managing maintenance tasks.
 
 ## Table of Contents
+
 * [Installation](#installation)
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
@@ -41,9 +42,8 @@ database. It also mounts Maintenance Tasks in your `config/routes.rb`. By
 default the web UI can be accessed in the new `/maintenance_tasks` path.
 
 In case you use an exception reporting service (e.g. Bugsnag) you might want to
-define an error handler. See
-[Customizing the error handler](#customizing-the-error-handler) for more
-information.
+define an error handler. See [Customizing the error
+handler](#customizing-the-error-handler) for more information.
 
 ## Usage
 
