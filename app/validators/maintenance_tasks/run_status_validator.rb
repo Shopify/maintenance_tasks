@@ -57,7 +57,9 @@ module MaintenanceTasks
       #   it is interrupted.
       # interrupted -> cancelling occurs when the task is cancelled by the user
       #   while it is interrupted.
-      'interrupted' => ['running', 'pausing', 'cancelling'],
+      # interrupted -> errored occurs when the task is deleted while it is
+      #   interrupted.
+      'interrupted' => ['running', 'pausing', 'cancelling', 'errored'],
     }
 
     # Validate whether a transition from one Run status
