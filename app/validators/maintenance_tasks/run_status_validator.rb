@@ -11,7 +11,8 @@ module MaintenanceTasks
       # enqueued -> pausing occurs when the task is paused before starting.
       # enqueued -> cancelling occurs when the task is cancelled
       #   before starting.
-      # enqueued -> errored occurs when the task job fails to be enqueued.
+      # enqueued -> errored occurs when the task job fails to be enqueued, or
+      #   if the Task is deleted before is starts running.
       'enqueued' => ['running', 'pausing', 'cancelling', 'errored'],
       # pausing -> paused occurs when the task actually halts performing and
       #   occupies a status of paused.

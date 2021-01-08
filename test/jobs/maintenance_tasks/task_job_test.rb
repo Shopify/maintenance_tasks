@@ -142,6 +142,16 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
     end
 
+    test '.perform_now handles when the Task cannot be found' do
+      run = Run.new(task_name: 'Maintenance::DeletedTask')
+      run.save(validate: false)
+
+      TaskJob.perform_now(run)
+
+      assert_equal 'MaintenanceTasks::Task::NotFoundError', run.error_class
+      assert_equal 'Task Maintenance::DeletedTask not found.', run.error_message
+    end
+
     test '.perform_now does not enqueue another job if Run errors' do
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 

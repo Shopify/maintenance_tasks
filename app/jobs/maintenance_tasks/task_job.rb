@@ -90,7 +90,7 @@ module MaintenanceTasks
     end
 
     def on_error(error)
-      @ticker.persist
+      @ticker.persist if defined?(@ticker)
       @run.persist_error(error)
       MaintenanceTasks.error_handler.call(error)
     end
