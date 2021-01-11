@@ -48,6 +48,15 @@ module MaintenanceTasks
         new.collection
       end
 
+      # Returns the count of items for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the count of items.
+      def count
+        new.count
+      end
+
       private
 
       def load_constants
