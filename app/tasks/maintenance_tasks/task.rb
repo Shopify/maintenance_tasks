@@ -30,6 +30,15 @@ module MaintenanceTasks
         descendants
       end
 
+      # Processes one item.
+      #
+      # Especially useful for tests.
+      #
+      # @param item the item to process.
+      def process(item)
+        new.process(item)
+      end
+
       private
 
       def load_constants

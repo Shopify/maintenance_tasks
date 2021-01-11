@@ -6,7 +6,7 @@ module <%= tasks_module %>
   RSpec.describe <%= class_name %>Task do
     # describe '#process' do
       # it 'performs a task iteration' do
-        # <%= tasks_module %>::<%= class_name %>Task.new.process(element)
+        # <%= tasks_module %>::<%= class_name %>Task.process(element)
       # end
     # end
   end

@@ -132,7 +132,7 @@ module Maintenance
     test "#process performs a task iteration" do
       post = Post.new
 
-      Maintenance::UpdatePostsTask.new.process(post)
+      Maintenance::UpdatePostsTask.process(post)
 
       assert_equal 'New content!', post.content
     end
