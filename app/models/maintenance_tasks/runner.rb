@@ -2,7 +2,9 @@
 
 module MaintenanceTasks
   # This class is responsible for running a given Task.
-  class Runner
+  module Runner
+    extend self
+
     # Exception raised when a Task Job couldn't be enqueued.
     class EnqueuingError < StandardError
       # Initializes a Enqueuing Error.

@@ -16,14 +16,14 @@ module MaintenanceTasks
     test '#perfom runs the given Task and prints a success message' do
       task = mock(name: 'MyTask')
 
-      Runner.any_instance.expects(:run).with(name: 'MyTask').returns(task)
+      Runner.expects(:run).with(name: 'MyTask').returns(task)
       @cli.expects(:say_status).with(:success, 'MyTask was enqueued.', :green)
 
       @cli.perform('MyTask')
     end
 
     test '#perfom prints an error message when the runner raises' do
-      Runner.any_instance.expects(:run).with(name: 'Wrong').raises('Invalid!')
+      Runner.expects(:run).with(name: 'Wrong').raises('Invalid!')
       @cli.expects(:say_status).with(:error, 'Invalid!', :red)
 
       @cli.perform('Wrong')

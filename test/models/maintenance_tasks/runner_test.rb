@@ -8,7 +8,7 @@ module MaintenanceTasks
 
     setup do
       @name = 'Maintenance::UpdatePostsTask'
-      @runner = Runner.new
+      @runner = Runner
       @job = MaintenanceTasks.job.constantize
     end
 
