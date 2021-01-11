@@ -39,6 +39,15 @@ module MaintenanceTasks
         new.process(item)
       end
 
+      # Returns the collection for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the collection.
+      def collection
+        new.collection
+      end
+
       private
 
       def load_constants

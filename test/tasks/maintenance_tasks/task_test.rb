@@ -34,6 +34,10 @@ module MaintenanceTasks
       Maintenance::TestTask.process(item)
     end
 
+    test '.collection calls #collection' do
+      assert_equal [1, 2], Maintenance::TestTask.collection
+    end
+
     test '#count is nil by default' do
       task = Task.new
       assert_nil task.count
