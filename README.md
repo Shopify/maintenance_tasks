@@ -4,6 +4,7 @@ A Rails engine for queuing and managing maintenance tasks.
 
 ## Table of Contents
 
+* [Demo](#demo)
 * [Installation](#installation)
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
@@ -21,6 +22,12 @@ A Rails engine for queuing and managing maintenance tasks.
 * [Upgrading](#upgrading)
 * [Contributing](#contributing)
 * [Releasing new versions](#releasing-new-versions)
+
+## Demo
+
+Watch this demo video to see the gem in action:
+
+[![Link to demo video](static/demo.png)](https://www.youtube.com/watch?v=BTuvTQxlFzs)
 
 ## Installation
 
