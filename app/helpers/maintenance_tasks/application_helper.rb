@@ -28,40 +28,6 @@ module MaintenanceTasks
         time_ago_in_words(datetime) + ' ago'
       end
     end
-
-    # Fix stylesheet_link_tag to handle integrity when preloading.
-    # To be reverted once fixed upstream in Rails.
-    def stylesheet_link_tag(*sources)
-      return super unless respond_to?(:send_preload_links_header, true)
-      options = sources.extract_options!.stringify_keys
-      path_options = options.extract!('protocol', 'host', 'skip_pipeline')
-        .symbolize_keys
-      preload_links = []
-      crossorigin = options.delete('crossorigin')
-      crossorigin = 'anonymous' if crossorigin == true
-      nopush = options['nopush'].nil? ? true : options.delete('nopush')
-      integrity = options['integrity']
-
-      sources_tags = sources.uniq.map do |source|
-        href = path_to_stylesheet(source, path_options)
-        preload_link = "<#{href}>; rel=preload; as=style"
-        preload_link += "; crossorigin=#{crossorigin}" unless crossorigin.nil?
-        preload_link += "; integrity=#{integrity}" unless integrity.nil?
-        preload_link += '; nopush' if nopush
-        preload_links << preload_link
-        tag_options = {
-          'rel' => 'stylesheet',
-          'media' => 'screen',
-          'crossorigin' => crossorigin,
-          'href' => href,
-        }.merge!(options)
-        tag(:link, tag_options)
-      end
-
-      send_preload_links_header(preload_links)
-
-      safe_join(sources_tags)
-    end
   end
   private_constant :ApplicationHelper
 end
