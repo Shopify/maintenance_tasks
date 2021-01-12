@@ -28,6 +28,20 @@ module MaintenanceTasks
       assert_equal 'Maintenance::DoesNotExist', error.name
     end
 
+    test '.process calls #process' do
+      item = mock
+      Maintenance::TestTask.any_instance.expects(:process).with(item)
+      Maintenance::TestTask.process(item)
+    end
+
+    test '.collection calls #collection' do
+      assert_equal [1, 2], Maintenance::TestTask.collection
+    end
+
+    test '.count calls #count' do
+      assert_equal 2, Maintenance::TestTask.count
+    end
+
     test '#count is nil by default' do
       task = Task.new
       assert_nil task.count

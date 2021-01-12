@@ -132,7 +132,7 @@ module Maintenance
     test "#process performs a task iteration" do
       post = Post.new
 
-      Maintenance::UpdatePostsTask.new.process(post)
+      Maintenance::UpdatePostsTask.process(post)
 
       assert_equal 'New content!', post.content
     end
@@ -150,11 +150,10 @@ Alternatively, you can run your Task in the command line:
 $ bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
 ```
 
-You can also run a Task in Ruby by sending `run` with a Task name to a Runner
-instance:
+You can also run a Task in Ruby by sending `run` with a Task name to Runner:
 
 ```ruby
-MaintenanceTasks::Runner.new.run(name: 'Maintenance::UpdatePostsTask')
+MaintenanceTasks::Runner.run(name: 'Maintenance::UpdatePostsTask')
 ```
 
 ### Monitoring your Task's status

@@ -30,6 +30,33 @@ module MaintenanceTasks
         descendants
       end
 
+      # Processes one item.
+      #
+      # Especially useful for tests.
+      #
+      # @param item the item to process.
+      def process(item)
+        new.process(item)
+      end
+
+      # Returns the collection for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the collection.
+      def collection
+        new.collection
+      end
+
+      # Returns the count of items for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the count of items.
+      def count
+        new.count
+      end
+
       private
 
       def load_constants

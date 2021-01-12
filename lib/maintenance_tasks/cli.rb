@@ -30,7 +30,7 @@ module MaintenanceTasks
     #
     # @param name [String] the name of the Task to be run.
     def perform(name)
-      task = Runner.new.run(name: name)
+      task = Runner.run(name: name)
       say_status(:success, "#{task.name} was enqueued.", :green)
     rescue => error
       say_status(:error, error.message, :red)
