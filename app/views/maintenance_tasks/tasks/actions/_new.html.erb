@@ -1,1 +1,14 @@
-<%= button_to 'Run', run_task_path(task), method: :put, class: 'button is-success', disabled: task.deleted? %>
+<%= form_with url: run_task_path(task), method: :put do |form| %>
+  <% if task.csv_task? %>
+    <div class="block">
+      <%= form.label :csv_file %>
+      <%= form.file_field :csv_file %>
+    </div>
+  <% end %>
+
+  <div class="block">
+    <%= form.submit "Run", class: "button is-success", disabled: task.deleted? %>
+  </div>
+<% end %>
+
+<%# To Do: Update other partials %>

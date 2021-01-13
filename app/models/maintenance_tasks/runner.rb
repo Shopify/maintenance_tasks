@@ -31,8 +31,9 @@ module MaintenanceTasks
     # @raise [EnqueuingError] if an error occurs while enqueuing the Run.
     # @raise [ActiveRecord::RecordInvalid] if validation errors occur while
     #   creating the Run.
-    def run(name:)
+    def run(name:, csv_file: nil)
       run = Run.active.find_by(task_name: name) || Run.new(task_name: name)
+      run.csv_file.attach(csv_file) if csv_file
 
       run.enqueued!
       enqueue(run)

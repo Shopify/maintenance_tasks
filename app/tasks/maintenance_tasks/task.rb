@@ -8,6 +8,10 @@ module MaintenanceTasks
     class NotFoundError < NameError; end
 
     class << self
+      def csv_task?
+        false
+      end
+
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -27,7 +31,7 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants
+        descendants - [CsvTask]
       end
 
       # Processes one item.

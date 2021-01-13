@@ -24,7 +24,10 @@ module MaintenanceTasks
 
     # Runs a given Task and redirects to the Task page.
     def run
-      task = Runner.run(name: params.fetch(:id))
+      task = Runner.run(
+        name: params.fetch(:id),
+        csv_file: params[:csv_file]
+      )
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(error.record.task_name), alert: error.message)
@@ -35,7 +38,7 @@ module MaintenanceTasks
     private
 
     def set_refresh
-      @refresh = 3
+      # @refresh = 3
     end
   end
   private_constant :TasksController

@@ -127,6 +127,10 @@ module MaintenanceTasks
       end
     end
 
+    def csv_task?
+      Task.named(name).csv_task?
+    end
+
     private
 
     def runs
