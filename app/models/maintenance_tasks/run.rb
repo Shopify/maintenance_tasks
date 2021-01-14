@@ -41,6 +41,8 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
+    has_one_attached :csv_file
+
     # Sets the run status to enqueued, making sure the transition is validated
     # in case it's already enqueued.
     def enqueued!

@@ -22,17 +22,22 @@ module MaintenanceTasks
     # Runs a Task.
     #
     # This method creates a Run record for the given Task name and enqueues the
-    # Run.
+    # Run. If a CSV file is provided, it is attached to the Run record.
     #
     # @param name [String] the name of the Task to be run.
+    # @param csv_file [attachable, nil] a CSV file that provides the collection
+    #   for the Task to iterate over when running, in the form of an attachable
+    #   (see https://edgeapi.rubyonrails.org/classes/ActiveStorage/Attached/One.html#method-i-attach).
+    #   Value is nil if the Task does not use CSV iteration.
     #
     # @return [Task] the Task that was run.
     #
     # @raise [EnqueuingError] if an error occurs while enqueuing the Run.
     # @raise [ActiveRecord::RecordInvalid] if validation errors occur while
     #   creating the Run.
-    def run(name:)
+    def run(name:, csv_file: nil)
       run = Run.active.find_by(task_name: name) || Run.new(task_name: name)
+      run.csv_file.attach(csv_file) if csv_file
 
       run.enqueued!
       enqueue(run)
