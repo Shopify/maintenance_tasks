@@ -60,10 +60,5 @@ module MaintenanceTasks
       message = 'MaintenanceTasks::Task must implement `process`.'
       assert_equal message, error.message
     end
-
-    test '#enumerator_builder is an instance of JobIteration::EnumeratorBuilder' do
-      task = Task.new
-      assert_kind_of JobIteration::EnumeratorBuilder, task.enumerator_builder
-    end
   end
 end
