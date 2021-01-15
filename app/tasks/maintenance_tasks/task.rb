@@ -97,14 +97,5 @@ module MaintenanceTasks
     # @return [Integer, nil]
     def count
     end
-
-    # Convenience method to allow tasks define enumerators with cursors for
-    # compatibility with Job Iteration.
-    #
-    # @return [JobIteration::EnumeratorBuilder] instance of an enumerator
-    #   builder available to tasks.
-    def enumerator_builder
-      JobIteration.enumerator_builder.new(nil)
-    end
   end
 end
