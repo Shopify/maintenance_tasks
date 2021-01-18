@@ -81,5 +81,15 @@ module MaintenanceTasks
         )
       end
     end
+
+    test '#run attaches CSV file to Run if one is provided' do
+      csv_file = file_fixture('sample.csv')
+      uploaded_csv = Rack::Test::UploadedFile.new(csv_file, 'text/csv')
+      @runner.run(name: @name, csv_file: uploaded_csv)
+
+      run = Run.last
+      assert_predicate run.csv_file, :attached?
+      assert_equal File.read(csv_file), run.csv_file.download
+    end
   end
 end
