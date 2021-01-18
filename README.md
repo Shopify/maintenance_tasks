@@ -8,8 +8,10 @@ A Rails engine for queuing and managing maintenance tasks.
 * [Installation](#installation)
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
-    * [Considerations when writing Tasks](#considerations-when-writing-tasks)
+  * [Creating a CSV Task](#creating-a-csv-task)
+  * [Considerations when writing Tasks](#considerations-when-writing-tasks)
   * [Writing tests for a Task](#writing-tests-for-a-task)
+  * [Writing tests for a CSV Task](#writing-tests-for-a-csv-task)
   * [Running a Task](#running-a-task)
   * [Monitoring your Task's status](#monitoring-your-tasks-status)
   * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
@@ -93,7 +95,38 @@ module Maintenance
 end
 ```
 
-#### Considerations when writing Tasks
+### Creating a CSV Task
+
+You can also write a Task that iterates on a CSV file. Generate one by running:
+
+```bash
+$ rails generate maintenance_tasks:task import_posts --csv
+```
+
+The generated task is a subclass of `MaintenanceTasks::Task` that includes a
+`MaintenanceTasks::CsvTask` module and implements:
+* `process`: do the work of your maintenance task on a `CSV::Row`
+
+```ruby
+# app/tasks/maintenance/import_posts_task.rb
+module Maintenance
+  class ImportPostsTask < MaintenanceTasks::Task
+    include MaintenanceTasks::CsvTask
+
+    def process(row)
+      Post.create!(title: row["title"], content: row["content"])
+    end
+  end
+end
+```
+
+```csv
+# posts.csv
+title,content
+My Title,Hello World!
+```
+
+### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to
 run the job which is processing your Task. The guidelines for writing Task may
@@ -135,6 +168,32 @@ module Maintenance
       Maintenance::UpdatePostsTask.process(post)
 
       assert_equal 'New content!', post.content
+    end
+  end
+end
+```
+
+### Writing tests for a CSV Task
+
+You should write tests for your `#process` method in a CSV Task as well. It
+takes a `CSV::Row` as an argument. You can pass a row, or a hash with string
+keys to `#process` from your test.
+
+```ruby
+# app/tasks/maintenance/import_posts_task_test.rb
+module Maintenance
+  class ImportPostsTaskTest < ActiveSupport::TestCase
+    test "#process performs a task iteration" do
+      assert_difference -> { Post.count } do
+        Maintenance::UpdatePostsTask.process({
+          'title' => 'My Title',
+          'content' => 'Hello World!',
+        })
+      end
+
+      post = Post.last
+      assert_equal 'My Title', post.title
+      assert_equal 'Hello World!', post.content
     end
   end
 end
