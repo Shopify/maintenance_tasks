@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+module <%= tasks_module %>
+<% module_namespacing do -%>
+  class <%= class_name %>Task < MaintenanceTasks::Task
+    include MaintenanceTasks::CsvTask
+
+    def process(row)
+      # The work to be done on a row of the CSV
+    end
+  end
+<% end -%>
+end
