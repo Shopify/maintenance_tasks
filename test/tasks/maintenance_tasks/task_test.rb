@@ -8,6 +8,7 @@ module MaintenanceTasks
         'Maintenance::CancelledEnqueueTask',
         'Maintenance::EnqueueErrorTask',
         'Maintenance::ErrorTask',
+        'Maintenance::TestCsvTask',
         'Maintenance::TestTask',
         'Maintenance::UpdatePostsTask',
       ]
