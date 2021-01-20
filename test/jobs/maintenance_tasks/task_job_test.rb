@@ -208,12 +208,12 @@ module MaintenanceTasks
     end
 
     test '.perform_now accepts CSVs as collection' do
-      Maintenance::TestCsvTask.any_instance.stubs(
+      Maintenance::ImportPostsTask.any_instance.stubs(
         csv_content: file_fixture('sample.csv').read
       )
-      Maintenance::TestCsvTask.any_instance.expects(:process).times(11)
+      Maintenance::ImportPostsTask.any_instance.expects(:process).times(5)
 
-      run = Run.new(task_name: 'Maintenance::TestCsvTask')
+      run = Run.new(task_name: 'Maintenance::ImportPostsTask')
       TaskJob.perform_now(run)
 
       assert_predicate run.reload, :succeeded?

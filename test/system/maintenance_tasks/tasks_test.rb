@@ -21,7 +21,7 @@ module MaintenanceTasks
         "Maintenance::CancelledEnqueueTask\nNew",
         "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
-        "Maintenance::TestCsvTask\nNew",
+        "Maintenance::ImportPostsTask\nNew",
         "Maintenance::TestTask\nNew",
         'Completed Tasks',
         "Maintenance::UpdatePostsTask\nSucceeded",

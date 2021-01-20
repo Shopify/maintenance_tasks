@@ -24,7 +24,7 @@ module MaintenanceTasks
         'Maintenance::CancelledEnqueueTask',
         'Maintenance::EnqueueErrorTask',
         'Maintenance::ErrorTask',
-        'Maintenance::TestCsvTask',
+        'Maintenance::ImportPostsTask',
         'Maintenance::TestTask',
         'Maintenance::UpdatePostsTask',
       ]
