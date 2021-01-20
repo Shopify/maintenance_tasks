@@ -37,8 +37,13 @@ module MaintenanceTasks
       when CSV
         JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
       else
-        raise ArgumentError, "#{@task.class.name}#collection must be either "\
-          'an Active Record Relation, Array, or CSV.'
+        if dynamic_collection?(collection)
+          collection.call(cursor: cursor)
+        else
+          raise ArgumentError, "#{@task.class.name}#collection must be either "\
+            'an Active Record Relation, an Array, a CSV, or an object ' \
+            'responding to .call(cursor:).'
+        end
       end
     end
 
@@ -98,6 +103,10 @@ module MaintenanceTasks
       @ticker.persist if defined?(@ticker)
       @run.persist_error(error)
       MaintenanceTasks.error_handler.call(error)
+    end
+
+    def dynamic_collection?(collection)
+      collection.respond_to?(:call)
     end
   end
 end
