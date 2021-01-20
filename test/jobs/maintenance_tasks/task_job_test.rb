@@ -207,6 +207,18 @@ module MaintenanceTasks
       assert_predicate @run.reload, :succeeded?
     end
 
+    test '.perform_now accepts CSVs as collection' do
+      Maintenance::TestCsvTask.any_instance.stubs(
+        csv_content: file_fixture('sample.csv').read
+      )
+      Maintenance::TestCsvTask.any_instance.expects(:process).times(11)
+
+      run = Run.new(task_name: 'Maintenance::TestCsvTask')
+      TaskJob.perform_now(run)
+
+      assert_predicate run.reload, :succeeded?
+    end
+
     test '.perform_now sets the Run as errored when the Task collection is invalid' do
       Maintenance::TestTask.any_instance.stubs(collection: 'not a collection')
 
@@ -217,7 +229,7 @@ module MaintenanceTasks
       assert_equal 'ArgumentError', @run.error_class
       assert_empty @run.backtrace
       expected_message = 'Maintenance::TestTask#collection '\
-        'must be either an Active Record Relation or an Array.'
+        'must be either an Active Record Relation, Array, or CSV.'
       assert_equal expected_message, @run.error_message
     end
 
