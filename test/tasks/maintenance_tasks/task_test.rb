@@ -6,6 +6,7 @@ module MaintenanceTasks
     test '.available_tasks returns list of tasks that inherit from the Task superclass' do
       expected = [
         'Maintenance::CancelledEnqueueTask',
+        'Maintenance::DynamicTask',
         'Maintenance::EnqueueErrorTask',
         'Maintenance::ErrorTask',
         'Maintenance::ImportPostsTask',
