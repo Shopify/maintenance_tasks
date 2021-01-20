@@ -268,7 +268,29 @@ module MaintenanceTasks
       assert_predicate @run, :errored?
       assert_equal 'ArgumentError', @run.error_class
       assert_empty @run.backtrace
-      expected_message = 'wrong number of arguments (given 1, expected 0)'
+      expected_message = 'Maintenance::DynamicTask#collection '\
+        'must be either an Active Record Relation, an Array, a CSV, or an ' \
+        'object responding to .call(cursor:).'
+      assert_equal expected_message, @run.error_message
+    end
+
+    test '.perform_now rejects improperly callable object collection' do
+      @run = Run.create!(task_name: 'Maintenance::DynamicTask')
+
+      Maintenance::DynamicTask.any_instance.stubs(
+        collection: CallableMissingCursorKeyword.new,
+      )
+      Maintenance::DynamicTask.any_instance.expects(:process).never
+
+      TaskJob.perform_now(@run)
+      @run.reload
+
+      assert_predicate @run, :errored?
+      assert_equal 'ArgumentError', @run.error_class
+      assert_empty @run.backtrace
+      expected_message = 'Maintenance::DynamicTask#collection '\
+        'must be either an Active Record Relation, an Array, a CSV, or an ' \
+        'object responding to .call(cursor:).'
       assert_equal expected_message, @run.error_message
     end
 
@@ -304,5 +326,12 @@ module MaintenanceTasks
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
+
+    class CallableMissingCursorKeyword
+      def call
+        raise 'should not be called; missing cursor: keyword parameter!'
+      end
+    end
+    private_constant :CallableMissingCursorKeyword
   end
 end

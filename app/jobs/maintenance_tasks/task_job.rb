@@ -106,7 +106,24 @@ module MaintenanceTasks
     end
 
     def dynamic_collection?(collection)
-      collection.respond_to?(:call)
+      return false unless collection.respond_to?(:call)
+
+      # Objects like Proc, Proc (lambda) and Method's .call method actually
+      # forward arguments to the code they wrap. In those cases we want to check
+      # the parameters of the wrapped code, not of the call method (which
+      # accepts any params).
+      parameters = if collection.respond_to?(:parameters)
+        collection
+      else
+        collection.method(:call)
+      end.parameters
+
+      parameters.any? do |parameter|
+        type = parameter.first
+
+        ((type == :key || type == :keyreq) && parameter.last == :cursor) ||
+          (type == :rest || type == :keyrest)
+      end
     end
   end
 end
