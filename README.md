@@ -97,7 +97,14 @@ end
 
 ### Creating a CSV Task
 
-You can also write a Task that iterates on a CSV file. Generate one by running:
+You can also write a Task that iterates on a CSV file. Note that writing CSV
+Tasks **requires ActiveStorage to be configured**. Ensure that the dependency
+is specified in your application's Gemfile, and that you've followed the
+[setup instuctions][setup].
+
+[setup]: https://edgeguides.rubyonrails.org/active_storage_overview.html#setup
+
+Generate a CSV Task by running:
 
 ```bash
 $ rails generate maintenance_tasks:task import_posts --csv
