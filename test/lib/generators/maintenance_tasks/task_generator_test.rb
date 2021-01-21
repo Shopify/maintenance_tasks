@@ -71,5 +71,13 @@ module MaintenanceTasks
       assert_no_file 'app/tasks/maintenance/sleepy_task_task.rb'
       assert_file 'app/tasks/maintenance/sleepy_task.rb'
     end
+
+    test 'generator creates a CSV Task if the --csv option is supplied' do
+      run_generator ['sleepy', '--csv']
+      assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
+        assert_match(/include MaintenanceTasks::CsvTask/, task)
+        assert_match(/def process\(row\)/, task)
+      end
+    end
   end
 end

@@ -34,9 +34,11 @@ module MaintenanceTasks
         enumerator_builder.active_record_on_records(collection, cursor: cursor)
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor)
+      when CSV
+        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
       else
         raise ArgumentError, "#{@task.class.name}#collection must be either "\
-          'an Active Record Relation or an Array.'
+          'an Active Record Relation, Array, or CSV.'
       end
     end
 
@@ -55,6 +57,9 @@ module MaintenanceTasks
     def before_perform
       @run = arguments.first
       @task = Task.named(@run.task_name).new
+      if @task.respond_to?(:csv_content=)
+        @task.csv_content = @run.csv_file.download
+      end
       @run.job_id = job_id
 
       @run.running! unless @run.stopping?

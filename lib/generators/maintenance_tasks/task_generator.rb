@@ -9,6 +9,9 @@ module MaintenanceTasks
     desc 'This generator creates a task file at app/tasks and a corresponding '\
       'test.'
 
+    class_option :csv, type: :boolean, default: false,
+      desc: 'Generate a CSV Task.'
+
     check_class_collision suffix: 'Task'
 
     # Creates the Task file.
@@ -18,7 +21,11 @@ module MaintenanceTasks
         class_path,
         "#{file_name}_task.rb"
       )
-      template('task.rb', template_file)
+      if options[:csv]
+        template('csv_task.rb', template_file)
+      else
+        template('task.rb', template_file)
+      end
     end
 
     # Creates the Task test file, according to the app's test framework.

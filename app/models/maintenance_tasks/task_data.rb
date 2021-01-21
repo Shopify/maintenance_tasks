@@ -73,7 +73,7 @@ module MaintenanceTasks
     def code
       return if deleted?
       task = Task.named(name)
-      file = task.instance_method(:collection).source_location.first
+      file = task.instance_method(:process).source_location.first
       File.read(file)
     end
 
