@@ -6,6 +6,7 @@ A Rails engine for queuing and managing maintenance tasks.
 
 * [Demo](#demo)
 * [Installation](#installation)
+  * [Active Job Dependency](#active-job-dependency)
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
     * [Considerations when writing Tasks](#considerations-when-writing-tasks)
@@ -51,6 +52,18 @@ default the web UI can be accessed in the new `/maintenance_tasks` path.
 In case you use an exception reporting service (e.g. Bugsnag) you might want to
 define an error handler. See [Customizing the error
 handler](#customizing-the-error-handler) for more information.
+
+### Active Job Dependency
+
+The Maintenance Tasks framework relies on ActiveJob behind the scenes to run
+Tasks. The default queuing backend for ActiveJob is
+[asynchronous][async-adapter]. It is **strongly recommended** to change this to
+a persistent backend so that Task progress is not lost during code or
+infrastructure changes. For more information on configuring a queuing backend,
+take a look at the [ActiveJob documentation][active-job-docs].
+
+[async-adapter]: https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/AsyncAdapter.html
+[active-job-docs]: https://guides.rubyonrails.org/active_job_basics.html#setting-the-backend
 
 ## Usage
 
