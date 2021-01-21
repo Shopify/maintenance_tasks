@@ -16,6 +16,19 @@ module MaintenanceTasks
       assert_no_button 'Run'
     end
 
+    test 'run a CSV Task' do
+      visit maintenance_tasks_path
+
+      click_on('Maintenance::ImportPostsTask')
+      attach_file('csv_file', 'test/fixtures/files/sample.csv')
+      click_on 'Run'
+
+      assert_title 'Maintenance::ImportPostsTask'
+      assert_text 'Enqueued'
+      assert_text 'Waiting to start.'
+      assert_no_button 'Run'
+    end
+
     test 'pause a Run' do
       visit maintenance_tasks_path
 

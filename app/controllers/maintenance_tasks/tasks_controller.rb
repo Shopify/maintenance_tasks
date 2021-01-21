@@ -19,12 +19,16 @@ module MaintenanceTasks
     # Shows running and completed instances of the Task.
     def show
       @task = TaskData.find(params.fetch(:id))
+      set_refresh if @task.last_run.active?
       @pagy, @previous_runs = pagy(@task.previous_runs)
     end
 
     # Runs a given Task and redirects to the Task page.
     def run
-      task = Runner.run(name: params.fetch(:id))
+      task = Runner.run(
+        name: params.fetch(:id),
+        csv_file: params[:csv_file]
+      )
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(error.record.task_name), alert: error.message)

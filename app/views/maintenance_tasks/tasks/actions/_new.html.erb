@@ -1,1 +1,7 @@
-<%= button_to 'Run', run_task_path(task), method: :put, class: 'button is-success', disabled: task.deleted? %>
+<%= form_with url: run_task_path(task), method: :put do |form| %>
+  <%= render 'maintenance_tasks/tasks/upload_csv', form: form if task.csv_task? %>
+
+  <div class="block">
+    <%= form.submit 'Run', class: "button is-success", disabled: task.deleted? %>
+  </div>
+<% end %>
