@@ -7,7 +7,7 @@ module MaintenanceTasks
   #
   # @api private
   class TasksController < ApplicationController
-    before_action :set_refresh, only: [:index, :show]
+    before_action :set_refresh, only: [:index]
 
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
@@ -19,7 +19,7 @@ module MaintenanceTasks
     # Shows running and completed instances of the Task.
     def show
       @task = TaskData.find(params.fetch(:id))
-      set_refresh if @task.last_run.active?
+      set_refresh if @task.last_run&.active?
       @pagy, @previous_runs = pagy(@task.previous_runs)
     end
 
