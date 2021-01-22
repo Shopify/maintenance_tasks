@@ -48,16 +48,14 @@ module MaintenanceTasks
       assert_nil task.count
     end
 
-    test '#collection raises NotImplementedError' do
-      error = assert_raises(NotImplementedError) { Task.new.collection }
+    test '#collection raises NoMethodError' do
+      error = assert_raises(NoMethodError) { Task.new.collection }
       message = 'MaintenanceTasks::Task must implement `collection`.'
       assert_equal message, error.message
     end
 
-    test '#process raises NotImplementedError' do
-      error = assert_raises(NotImplementedError) do
-        Task.new.process('an item')
-      end
+    test '#process raises NoMethodError' do
+      error = assert_raises(NoMethodError) { Task.new.process('an item') }
       message = 'MaintenanceTasks::Task must implement `process`.'
       assert_equal message, error.message
     end

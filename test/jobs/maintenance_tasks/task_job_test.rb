@@ -233,6 +233,26 @@ module MaintenanceTasks
       assert_equal expected_message, @run.error_message
     end
 
+    test '.perform_now sets the Run as errored when the Task collection is not defined' do
+      collection_method = Maintenance::TestTask.instance_method(:collection)
+      Maintenance::TestTask.remove_method(:collection)
+      TaskJob.perform_now(@run)
+      @run.reload
+      assert_predicate(@run, :errored?)
+    ensure
+      Maintenance::TestTask.define_method(:collection, collection_method)
+    end
+
+    test '.perform_now sets the Run as errored when the Task process is not defined' do
+      collection_method = Maintenance::TestTask.instance_method(:process)
+      Maintenance::TestTask.remove_method(:process)
+      TaskJob.perform_now(@run)
+      @run.reload
+      assert_predicate(@run, :errored?)
+    ensure
+      Maintenance::TestTask.define_method(:process, collection_method)
+    end
+
     test '.retry_on raises NotImplementedError' do
       assert_raises NotImplementedError do
         Class.new(TaskJob) { retry_on StandardError }
