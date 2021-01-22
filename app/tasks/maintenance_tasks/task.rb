@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'maintenance_tasks/adapters/active_record'
+# TODO: require other adapters, or make this dynamic somehow
+
 module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
@@ -39,13 +42,13 @@ module MaintenanceTasks
         new.process(item)
       end
 
-      # Returns the collection for this Task.
+      # Returns the enumerator for this Task.
       #
       # Especially useful for tests.
       #
-      # @return the collection.
-      def collection
-        new.collection
+      # @return the enumerator.
+      def enumerator(cursor:)
+        new.enumerator(cursor: cursor)
       end
 
       # Returns the count of items for this Task.
@@ -71,9 +74,10 @@ module MaintenanceTasks
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
-    def collection
+    def enumerator(cursor:)
       raise NotImplementedError,
-        "#{self.class.name} must implement `collection`."
+        "#{self.class.name} must implement `enumerator` or include a module which does."
+      # TODO: Could make error string list available adapters
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
