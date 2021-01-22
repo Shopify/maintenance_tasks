@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 module Maintenance
+  # TODO: Rename this & update tests
   class DynamicTask < MaintenanceTasks::Task
-    def collection
-      ->(cursor:) { [1, 2, 3].lazy.with_index.drop(cursor || 0) }
+    def enumerator(context:)
+      [1, 2, 3].lazy.with_index.drop(context.cursor || 0)
     end
 
     def count

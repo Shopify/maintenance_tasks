@@ -39,6 +39,15 @@ module MaintenanceTasks
         new.process(item)
       end
 
+      # Returns the enumerator for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the enumerator.
+      def enumerator(context:) # TODO: Test this
+        new.enumerator(context: context)
+      end
+
       # Returns the collection for this Task.
       #
       # Especially useful for tests.
@@ -63,6 +72,50 @@ module MaintenanceTasks
         namespace = MaintenanceTasks.tasks_module.safe_constantize
         return unless namespace
         namespace.constants.map { |constant| namespace.const_get(constant) }
+      end
+    end
+
+    # Generate an enumerator suitable for enumerating over the Task's
+    # collection.
+    #
+    # Subclasses wanting to iterate over collections without built-in support
+    # should override this and return a custom enumerator. An execution context
+    # is provided, allowing the cursor to be used to resume iteration.
+    #
+    #     class SomeAPITask < Task
+    #       def enumerator(context:
+    #         SomeAPI.each_record(after: job.cursor).lazy.map do |api_record|
+    #           [api_record, api_record.id]
+    #         end
+    #       end
+    #
+    #       def process(resource)
+    #         puts "Processed #{resource}"
+    #       end
+    #     end
+    #
+    # @param context [EnumeratorContext] context for the enumerator, including
+    # a cursor
+    # @return the enumerator.
+    def enumerator(context:)
+      collection = self.collection
+
+      case collection
+      when ActiveRecord::Relation
+        context.enumerator_builder.active_record_on_records(
+          collection,
+          cursor: context.cursor,
+        )
+      when Array
+        context.enumerator_builder.build_array_enumerator(
+          collection,
+          cursor: context.cursor,
+        )
+      when CSV
+        JobIteration::CsvEnumerator.new(collection).rows(cursor: context.cursor)
+      else
+        raise ArgumentError, "#{self.class.name}#collection must be either "\
+          'an Active Record Relation, an Array, or a CSV.'
       end
     end
 
