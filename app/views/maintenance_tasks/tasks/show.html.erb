@@ -7,7 +7,34 @@
 <%= render 'maintenance_tasks/runs/info', run: @task.last_run, with_status: false if @task.last_run %>
 
 <div class="buttons">
-  <%= render "maintenance_tasks/tasks/actions/#{@task.status}", task: @task %>
+  <% last_run = @task.last_run %>
+  <% if last_run.nil? || last_run.completed? %>
+    <%= form_with url: run_task_path(@task), method: :put do |form| %>
+      <% if @task.csv_task? %>
+        <div class="block">
+          <%= form.label :csv_file %>
+          <%= form.file_field :csv_file %>
+        </div>
+      <% end %>
+      <div class="block">
+        <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
+      </div>
+    <% end %>
+  <% elsif last_run.cancelling? %>
+    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
+    <% if last_run.stuck? %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
+    <% end %>
+  <% elsif last_run.pausing? %>
+    <%= button_to 'Pausing', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: true %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
+  <% elsif last_run.paused? %>
+    <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
+  <% else %>
+    <%= button_to 'Pause', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
+    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
+  <% end%>
 </div>
 
 <% if (code = @task.code) %>
