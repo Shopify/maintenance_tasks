@@ -27,7 +27,7 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants
+        descendants.without(CsvTask)
       end
 
       # Processes one item.

@@ -3,8 +3,9 @@
 require 'csv'
 
 module MaintenanceTasks
-  # A mixin that provides a Task with the ability to process CSV files.
-  module CsvTask
+  # Base class that is inherited by the host application's Task classes for
+  # processing CSV files.
+  class CsvTask < Task
     # The contents of a CSV file to be processed by a Task.
     #
     # @return [String] the content of the CSV file to process.
