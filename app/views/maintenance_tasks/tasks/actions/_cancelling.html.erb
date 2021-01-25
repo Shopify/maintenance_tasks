@@ -1,4 +1,0 @@
-<%= button_to 'Run', run_task_path(task), method: :put, class: 'button is-success', disabled: true %>
-<% if task.last_run.stuck? %>
-  <%= button_to 'Cancel', cancel_task_run_path(task, task.last_run), method: :put, class: 'button is-danger', disabled: task.deleted? %>
-<% end %>

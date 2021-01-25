@@ -130,5 +130,17 @@ module MaintenanceTasks
       task_data = TaskData.new('Maintenance::UpdatePostsTask')
       assert_equal :completed, task_data.category
     end
+
+    test '#csv_task? returns true if the Task includes the CsvTask module' do
+      assert_predicate TaskData.new('Maintenance::ImportPostsTask'), :csv_task?
+    end
+
+    test '#csv_task? returns false if the Task does not include the CsvTask module' do
+      refute_predicate TaskData.new('Maintenance::UpdatePostsTask'), :csv_task?
+    end
+
+    test '#csv_task? returns false if the Task is deleted' do
+      refute_predicate TaskData.new('Maintenance::DoesNotExist'), :csv_task?
+    end
   end
 end

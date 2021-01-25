@@ -1,2 +1,0 @@
-<%= button_to 'Resume', run_task_path(task), method: :put, class: 'button is-primary', disabled: task.deleted? %>
-<%= button_to 'Cancel', cancel_task_run_path(task, task.last_run), method: :put, class: 'button is-danger' %>

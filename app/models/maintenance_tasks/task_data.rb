@@ -127,6 +127,11 @@ module MaintenanceTasks
       end
     end
 
+    # @return [Boolean] whether the Task inherits from CsvTask.
+    def csv_task?
+      !deleted? && Task.named(name) < CsvTask
+    end
+
     private
 
     def runs
