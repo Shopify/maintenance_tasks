@@ -27,7 +27,11 @@ module MaintenanceTasks
 
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
-      collection = @task.collection
+      begin
+        collection = @task.collection
+      rescue NotImplementedError
+        raise ArgumentError, "#{@task.class}#collection not implemented"
+      end
 
       case collection
       when ActiveRecord::Relation
@@ -49,7 +53,11 @@ module MaintenanceTasks
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
-      @task.process(input)
+      begin
+        @task.process(input)
+      rescue NotImplementedError
+        raise ArgumentError, "#{@task.class}#process not implemented"
+      end
       @ticker.tick
       @run.reload_status
     end
