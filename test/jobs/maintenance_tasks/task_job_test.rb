@@ -243,6 +243,19 @@ module MaintenanceTasks
       Maintenance::TestTask.define_method(:collection, collection_method)
     end
 
+    test '.perform_now lets the Run crash when the Task collection raises NotImplementedError' do
+      collection_method = Maintenance::TestTask.instance_method(:collection)
+      Maintenance::TestTask.redefine_method(:collection) do
+        raise NotImplementedError
+      end
+      assert_raises(NotImplementedError) do
+        TaskJob.perform_now(@run)
+      end
+    ensure
+      Maintenance::TestTask.remove_method(:collection)
+      Maintenance::TestTask.define_method(:collection, collection_method)
+    end
+
     test '.perform_now sets the Run as errored when the Task process is not defined' do
       collection_method = Maintenance::TestTask.instance_method(:process)
       Maintenance::TestTask.remove_method(:process)
@@ -251,6 +264,19 @@ module MaintenanceTasks
       assert_predicate(@run, :errored?)
     ensure
       Maintenance::TestTask.define_method(:process, collection_method)
+    end
+
+    test '.perform_now lets the Run crash when the Task process raises NotImplementedError' do
+      process_method = Maintenance::TestTask.instance_method(:process)
+      Maintenance::TestTask.redefine_method(:process) do |_|
+        raise NotImplementedError
+      end
+      assert_raises(NotImplementedError) do
+        TaskJob.perform_now(@run)
+      end
+    ensure
+      Maintenance::TestTask.remove_method(:process)
+      Maintenance::TestTask.define_method(:process, process_method)
     end
 
     test '.retry_on raises NotImplementedError' do

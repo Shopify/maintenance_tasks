@@ -29,7 +29,7 @@ module MaintenanceTasks
       cursor ||= @run.cursor
       begin
         collection = @task.collection
-      rescue NotImplementedError
+      rescue Task::MethodNotImplementedError
         raise ArgumentError, "#{@task.class}#collection not implemented"
       end
 
@@ -55,7 +55,7 @@ module MaintenanceTasks
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
       begin
         @task.process(input)
-      rescue NotImplementedError
+      rescue Task::MethodNotImplementedError
         raise ArgumentError, "#{@task.class}#process not implemented"
       end
       @ticker.tick

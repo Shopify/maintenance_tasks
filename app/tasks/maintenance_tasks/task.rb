@@ -7,6 +7,10 @@ module MaintenanceTasks
 
     class NotFoundError < NameError; end
 
+    # rubocop:disable Lint/InheritException
+    class MethodNotImplementedError < ::NotImplementedError; end
+    # rubocop:enable Lint/InheritException
+
     class << self
       # Finds a Task with the given name.
       #
@@ -69,10 +73,10 @@ module MaintenanceTasks
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
     #
-    # @raise [NotImplementedError] with a message advising subclasses to
+    # @raise [MethodNotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
     def collection
-      raise NotImplementedError,
+      raise MethodNotImplementedError,
         "#{self.class.name} must implement `collection`."
     end
 
@@ -81,10 +85,10 @@ module MaintenanceTasks
     #
     # @param _item [Object] the current item from the enumerator being iterated.
     #
-    # @raise [NotImplementedError] with a message advising subclasses to
+    # @raise [MethodNotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
     def process(_item)
-      raise NotImplementedError,
+      raise MethodNotImplementedError,
         "#{self.class.name} must implement `process`."
     end
 
