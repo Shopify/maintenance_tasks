@@ -1,3 +1,0 @@
-module MaintenanceTasks::Adapters::Array
-  # ...
-end

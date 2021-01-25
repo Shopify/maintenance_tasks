@@ -11,6 +11,10 @@ module MaintenanceTasks
     # @return [String] the content of the CSV file to process.
     attr_accessor :csv_content
 
+    def enumerator(cursor:)
+       JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
+    end
+
     # Defines the collection to be iterated over, based on the provided CSV.
     #
     # @return [CSV] the CSV object constructed from the specified CSV content,

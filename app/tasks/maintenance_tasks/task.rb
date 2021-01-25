@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
-require 'maintenance_tasks/adapters/active_record'
+require 'maintenance_tasks/active_record_task'
+require 'maintenance_tasks/array_task'
+require 'maintenance_tasks/csv_task'
 # TODO: require other adapters, or make this dynamic somehow
 
 module MaintenanceTasks
