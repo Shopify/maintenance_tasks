@@ -1,11 +1,19 @@
 # frozen_string_literal: true
 
+require 'maintenance_tasks/active_record_task'
+require 'maintenance_tasks/array_task'
+require 'maintenance_tasks/csv_task'
+# TODO: require other adapters, or make this dynamic somehow
+
 module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
     extend ActiveSupport::DescendantsTracker
 
+    # TODO: Might need to be abstract_class, even if just for consistency
+
     class NotFoundError < NameError; end
+    EnumerationContext = Struct.new(:cursor, keyword_init: true)
 
     class << self
       # Finds a Task with the given name.
@@ -27,7 +35,7 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants.without(CsvTask)
+        descendants.without(CsvTask) # TODO: Would need abstract_class check
       end
 
       # Processes one item.
@@ -39,13 +47,13 @@ module MaintenanceTasks
         new.process(item)
       end
 
-      # Returns the collection for this Task.
+      # Returns the enumerator for this Task.
       #
       # Especially useful for tests.
       #
-      # @return the collection.
-      def collection
-        new.collection
+      # @return the enumerator.
+      def enumerator(cursor:)
+        new.enumerator(cursor: cursor)
       end
 
       # Returns the count of items for this Task.
@@ -71,9 +79,10 @@ module MaintenanceTasks
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
-    def collection
+    def enumerator_builder
       raise NotImplementedError,
-        "#{self.class.name} must implement `collection`."
+        "#{self.class.name} must implement `#{__method__}` or inherit from a class which does"
+      # TODO: Could make error string list available adapters
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
