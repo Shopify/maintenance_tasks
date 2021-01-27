@@ -7,11 +7,17 @@ module MaintenanceTasks
 
     # TODO: Specify abstract_class
 
+    EnumeratorBuilder = Struct.new(:collection) do
+      def enumerator(context:)
+        enumerator_builder.array(collection, cursor: context.cursor)
+      end
+    end
+
     def enumerator(context:)
       collection = self.collection
       assert_array!(collection)
 
-      enumerator_builder.array(collection, cursor: context.cursor)
+      EnumeratorBuilder.new(collection)
     end
 
     def collection

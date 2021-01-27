@@ -8,13 +8,19 @@ module MaintenanceTasks
   class CsvTask < Task
     # TODO: specify abstract_class
 
+    EnumeratorBuilder = Struct.new(:collection) do
+      def enumerator(context:)
+        JobIteration::CsvEnumerator.new(collection).rows(cursor: context.cursor)
+      end
+    end
+
     # The contents of a CSV file to be processed by a Task.
     #
     # @return [String] the content of the CSV file to process.
     attr_accessor :csv_content
 
-    def enumerator(context:)
-      JobIteration::CsvEnumerator.new(collection).rows(cursor: context.cursor)
+    def enumerator_builder(context:)
+      EnumeratorBuilder.new(collection)
     end
 
     # The number of rows to be processed. Excludes the header row from the count

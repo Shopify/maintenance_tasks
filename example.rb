@@ -25,20 +25,26 @@ class BetaFlagTask < MaintenanceTasks::CsvTask
 end
 
 class PaymentTask < MaintenanceTasks::Task
-  # Consumers implement .enumerator instead of .collection, without having to
-  # know that other tasks actually also use .enumerator internally
-  def enumerator(context:)
-    Enumerator.new do |yielder|
-      cursor = context.cursor
-      loop do
-        page = cursor ? InvoiceAPI.fetch(after: cursor) : InvoiceAPI.fetch_all
-        break if page.empty?
-        page.each do |invoice|
-          cursor = invoice.id
-          yielder.yield(invoice, cursor)
+  # Consumers implement .build_enumerator instead of .collection, without
+  # having to know that other tasks actually also use it internally
+  class EnumeratorBuilder
+    def enumerator(context:)
+      Enumerator.new do |yielder|
+        cursor = context.cursor
+        loop do
+          page = cursor ? InvoiceAPI.fetch(after: cursor) : InvoiceAPI.fetch_all
+          break if page.empty?
+          page.each do |invoice|
+            cursor = invoice.id
+            yielder.yield(invoice, cursor)
+          end
         end
       end
     end
+  end
+
+  def build_enumerator
+    Enumerator.new
   end
 
   # Again, can be implemented if appropriate
