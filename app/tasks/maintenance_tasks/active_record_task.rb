@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 module MaintenanceTasks
-  module ActiveRecordTask
+  class ActiveRecordTask < Task
     # TODO: define replacement for Task.collection, delegating to instance
     # Probably simplest to make this an ActiveSupport::Concern
+
+    # TODO: specify abstract_class
 
     def enumerator(cursor:)
       collection = self.collection

@@ -1,7 +1,4 @@
-class ProductTask < MaintenanceTasks::Task
-  # This could be a child class instead of module, but would need an
-  # "abstract_class" mechanism like ActiveRecord itself.
-  include MaintenanceTasks::ActiveRecordTask
+class ProductTask < MaintenanceTasks::ActiveRecordTask
   # Consumers implement these method
   def collection() Product.all end
   def process(product) product.discontinue! end
@@ -15,18 +12,14 @@ class ProductTask < MaintenanceTasks::Task
   #   def batch_size() 50 end
 end
 
-class SeedTask < MaintenanceTasks::Task
-  include MaintenanceTasks::ArrayTask
-
+class SeedTask < MaintenanceTasks::ArrayTask
   # Similar API to ActiveRecordTask
   def collection() %w[Alice Bob Chantalle] end
   def process(name) Person.create!(name: name) end
   # Again, .count provided
 end
 
-class BetaFlagTask < MaintenanceTasks::Task
-  include MaintenanceTasks::CSVTask
-
+class BetaFlagTask < MaintenanceTasks::CsvTask
   # CSV infra handles everything except .process
   def process(row) BetaFlag[:whatever].enable(row.shop_id) end
 end

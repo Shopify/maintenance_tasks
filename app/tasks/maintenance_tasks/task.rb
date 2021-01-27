@@ -10,6 +10,8 @@ module MaintenanceTasks
   class Task
     extend ActiveSupport::DescendantsTracker
 
+    # TODO: Might need to be abstract_class, even if just for consistency
+
     class NotFoundError < NameError; end
 
     class << self
@@ -32,7 +34,7 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants.without(CsvTask)
+        descendants.without(CsvTask) # TODO: Would need abstract_class check
       end
 
       # Processes one item.
@@ -78,7 +80,7 @@ module MaintenanceTasks
     #   implement an override for this method.
     def enumerator(cursor:)
       raise NotImplementedError,
-        "#{self.class.name} must implement `enumerator` or include a module which does."
+        "#{self.class.name} must implement `enumerator` or inherit from a class which does"
       # TODO: Could make error string list available adapters
     end
 
