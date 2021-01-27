@@ -70,7 +70,7 @@ module MaintenanceTasks
 
       private
 
-      def csv!
+      def handles_csv
         # The contents of a CSV file to be processed by a Task.
         #
         # @return [String] the content of the CSV file to process.

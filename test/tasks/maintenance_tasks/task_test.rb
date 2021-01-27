@@ -61,5 +61,16 @@ module MaintenanceTasks
       message = 'MaintenanceTasks::Task must implement `process`.'
       assert_equal message, error.message
     end
+
+    test '.descendants includes no other framework classes' do
+      framework_subclasses = Task.descendants.map(&:name).select do |class_name|
+        class_name.start_with?('MaintenanceTasks::')
+      end
+
+      assert_empty(
+        framework_subclasses,
+        'MaintenanceTasks should not define any subclasses of Task',
+        )
+    end
   end
 end
