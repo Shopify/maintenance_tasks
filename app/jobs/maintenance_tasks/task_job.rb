@@ -26,8 +26,9 @@ module MaintenanceTasks
     private
 
     def build_enumerator(_run, cursor:)
-      cursor ||= @run.cursor
-      @task.enumerator(cursor: cursor)
+      context = Task::EnumerationContext.new(cursor: cursor || @run.cursor)
+
+      @task.enumerator(context: context)
     end
 
     # Performs task iteration logic for the current input returned by the

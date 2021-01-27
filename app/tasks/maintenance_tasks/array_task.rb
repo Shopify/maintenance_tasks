@@ -7,11 +7,11 @@ module MaintenanceTasks
 
     # TODO: Specify abstract_class
 
-    def enumerator(cursor:)
+    def enumerator(context:)
       collection = self.collection
       assert_array!(collection)
 
-      enumerator_builder.array(collection, cursor: cursor)
+      enumerator_builder.array(collection, cursor: context.cursor)
     end
 
     def collection

@@ -27,8 +27,9 @@ end
 class PaymentTask < MaintenanceTasks::Task
   # Consumers implement .enumerator instead of .collection, without having to
   # know that other tasks actually also use .enumerator internally
-  def enumerator(cursor:)
+  def enumerator(context:)
     Enumerator.new do |yielder|
+      cursor = context.cursor
       loop do
         page = cursor ? InvoiceAPI.fetch(after: cursor) : InvoiceAPI.fetch_all
         break if page.empty?

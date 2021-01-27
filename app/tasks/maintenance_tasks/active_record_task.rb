@@ -7,11 +7,11 @@ module MaintenanceTasks
 
     # TODO: specify abstract_class
 
-    def enumerator(cursor:)
+    def enumerator(context:)
       collection = self.collection
       assert_relation!(collection)
 
-      enumerator_builder.active_record_on_records(collection, cursor: cursor)
+      enumerator_builder.active_record_on_records(collection, cursor: context.cursor)
     end
 
     def collection

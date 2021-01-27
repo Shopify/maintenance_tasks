@@ -13,8 +13,8 @@ module MaintenanceTasks
     # @return [String] the content of the CSV file to process.
     attr_accessor :csv_content
 
-    def enumerator(cursor:)
-       JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
+    def enumerator(context:)
+      JobIteration::CsvEnumerator.new(collection).rows(cursor: context.cursor)
     end
 
     # The number of rows to be processed. Excludes the header row from the count

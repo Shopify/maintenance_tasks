@@ -13,6 +13,7 @@ module MaintenanceTasks
     # TODO: Might need to be abstract_class, even if just for consistency
 
     class NotFoundError < NameError; end
+    EnumerationContext = Struct.new(:cursor, keyword_init: true)
 
     class << self
       # Finds a Task with the given name.
@@ -78,7 +79,7 @@ module MaintenanceTasks
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
-    def enumerator(cursor:)
+    def enumerator(context:)
       raise NotImplementedError,
         "#{self.class.name} must implement `enumerator` or inherit from a class which does"
       # TODO: Could make error string list available adapters
