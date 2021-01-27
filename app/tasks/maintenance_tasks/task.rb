@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'csv'
+
 module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
@@ -39,6 +41,15 @@ module MaintenanceTasks
         new.process(item)
       end
 
+      # Returns the enumerator_builder for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the enumerator_builder.
+      def enumerator_builder
+        new.enumerator_builder
+      end
+
       # Returns the collection for this Task.
       #
       # Especially useful for tests.
@@ -59,10 +70,64 @@ module MaintenanceTasks
 
       private
 
+      def csv!
+        # The contents of a CSV file to be processed by a Task.
+        #
+        # @return [String] the content of the CSV file to process.
+        attr_accessor :csv_content
+      end
+
       def load_constants
         namespace = MaintenanceTasks.tasks_module.safe_constantize
         return unless namespace
         namespace.constants.map { |constant| namespace.const_get(constant) }
+      end
+    end
+
+
+    # @api private
+    ActiveRecordEnumeratorBuilder = Struct.new(:relation) do
+      def enumerator(context:)
+        JobIteration::EnumeratorBuilder.new(nil).active_record_on_records(
+          relation,
+          cursor: context.cursor,
+        )
+      end
+    end
+    private_constant :ActiveRecordEnumeratorBuilder
+
+    # @api private
+    ArrayEnumeratorBuilder = Struct.new(:array) do
+      def enumerator(context:)
+        JobIteration::EnumeratorBuilder.new(nil).build_array_enumerator(
+          array,
+          cursor: context.cursor,
+        )
+      end
+    end
+    private_constant :ArrayEnumeratorBuilder
+
+    # @api private
+    CsvEnumeratorBuilder = Struct.new(:csv) do
+      def enumerator(context:)
+        JobIteration::CsvEnumerator.new(csv).rows(cursor: context.cursor)
+      end
+    end
+    private_constant :CsvEnumeratorBuilder
+
+    def enumerator_builder
+      collection = self.collection
+
+      case collection
+      when ActiveRecord::Relation
+        ActiveRecordEnumeratorBuilder.new(collection)
+      when Array
+        ArrayEnumeratorBuilder.new(collection)
+      when CSV
+        CsvEnumeratorBuilder.new(collection)
+      else
+        raise ArgumentError, "#{@task.class.name}#collection must be either "\
+          'an Active Record Relation, Array, or CSV.'
       end
     end
 
@@ -72,6 +137,8 @@ module MaintenanceTasks
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
     def collection
+      return CSV.new(csv_content, headers: true) if respond_to?(:csv_content)
+
       raise NotImplementedError,
         "#{self.class.name} must implement `collection`."
     end
@@ -96,6 +163,18 @@ module MaintenanceTasks
     #
     # @return [Integer, nil]
     def count
+      collection = self.collection
+
+      case collection
+      when ActiveRecord::Relation
+        nil # assume the relation is too expensive to count
+      when Array
+        collection.length
+      when CSV
+        csv_content.count("\n") - 1
+      end
+    rescue NotImplementedError
+      nil
     end
   end
 end
