@@ -9,6 +9,11 @@ require 'maintenance_tasks/engine'
 require 'pagy'
 require 'pagy/extras/bulma'
 
+require 'maintenance_tasks/progress'
+require 'maintenance_tasks/runner'
+require 'maintenance_tasks/task_data'
+require 'maintenance_tasks/ticker'
+
 # The engine's namespace module. It provides isolation between the host
 # application's code and the engine-specific code. Top-level engine constants
 # and variables are defined under this module.
