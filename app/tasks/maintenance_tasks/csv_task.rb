@@ -19,7 +19,7 @@ module MaintenanceTasks
     # @return [String] the content of the CSV file to process.
     attr_accessor :csv_content
 
-    def enumerator_builder(context:)
+    def enumerator_builder
       EnumeratorBuilder.new(collection)
     end
 

@@ -79,7 +79,7 @@ module MaintenanceTasks
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
-    def enumerator_builder(context:)
+    def enumerator_builder
       raise NotImplementedError,
         "#{self.class.name} must implement `#{__method__}` or inherit from a class which does"
       # TODO: Could make error string list available adapters

@@ -43,8 +43,8 @@ class PaymentTask < MaintenanceTasks::Task
     end
   end
 
-  def build_enumerator
-    Enumerator.new
+  def enumerator_builder
+    EnumeratorBuilder.new
   end
 
   # Again, can be implemented if appropriate

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module MaintenanceTasks
-  class ActiveRecordTask < Task
+  class ArrayTask < Task
     # TODO: define replacement for Task.collection, delegating to instance
     # Probably simplest to make this an ActiveSupport::Concern
 
@@ -13,7 +13,7 @@ module MaintenanceTasks
       end
     end
 
-    def enumerator(context:)
+    def enumerator_builder
       collection = self.collection
       assert_array!(collection)
 

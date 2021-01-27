@@ -13,7 +13,7 @@ module MaintenanceTasks
       end
     end
 
-    def enumerator(context:)
+    def enumerator_builder
       collection = self.collection
       assert_relation!(collection)
 
