@@ -2,7 +2,9 @@
 
 module <%= tasks_module %>
 <% module_namespacing do -%>
-  class <%= class_name %>Task < MaintenanceTasks::CsvTask
+  class <%= class_name %>Task < MaintenanceTasks::Task
+    csv_collection
+
     def process(row)
       # The work to be done on a row of the CSV
     end

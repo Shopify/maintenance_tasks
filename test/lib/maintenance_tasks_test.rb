@@ -7,7 +7,6 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
       :Engine,  # to mount
       :Runner,  # to run a Task
       :Task,    # to define Tasks
-      :CsvTask, # to define CSV Tasks
       :TaskJob, # to customize the job
     ]
     public_constants = MaintenanceTasks.constants.select do |constant|

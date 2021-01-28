@@ -3,9 +3,11 @@
 require 'csv'
 
 module MaintenanceTasks
-  # Base class that is inherited by the host application's Task classes for
+  # Module that is included into Task classes by Task.csv_collection for
   # processing CSV files.
-  class CsvTask < Task
+  #
+  # @api private
+  module CsvCollection
     # The contents of a CSV file to be processed by a Task.
     #
     # @return [String] the content of the CSV file to process.
@@ -28,4 +30,5 @@ module MaintenanceTasks
       csv_content.count("\n") - 1
     end
   end
+  private_constant :CsvCollection
 end

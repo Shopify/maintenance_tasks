@@ -27,7 +27,15 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants.without(CsvTask)
+        descendants
+      end
+
+      # Make this Task a task that handles CSV.
+      #
+      # An input to upload a CSV will be added in the form to start a Run. The
+      # collection and count method are implemented.
+      def csv_collection
+        include(CsvCollection)
       end
 
       # Processes one item.
