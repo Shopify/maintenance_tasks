@@ -72,8 +72,7 @@ module MaintenanceTasks
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
     def collection
-      raise NotImplementedError,
-        "#{self.class.name} must implement `collection`."
+      raise NoMethodError, "#{self.class.name} must implement `collection`."
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
@@ -84,8 +83,7 @@ module MaintenanceTasks
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
     def process(_item)
-      raise NotImplementedError,
-        "#{self.class.name} must implement `process`."
+      raise NoMethodError, "#{self.class.name} must implement `process`."
     end
 
     # Total count of iterations to be performed.
