@@ -84,5 +84,14 @@ module MaintenanceTasks
         '<span class="ruby-int">2</span>', highlight_code('1 2')
       assert_equal "\n", highlight_code("\n")
     end
+
+    test '#csv_file_download_path generates a download link to the CSV attachment for a Run' do
+      run = Run.create!(task_name: 'Maintenance::ImportPostsTask')
+      csv = Rack::Test::UploadedFile.new(file_fixture('sample.csv'), 'text/csv')
+      run.csv_file.attach(csv)
+
+      assert_match %r{rails\/active_storage\/blobs\/redirect\/\S+\/sample.csv},
+        csv_file_download_path(run)
+    end
   end
 end

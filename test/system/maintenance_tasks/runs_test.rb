@@ -29,6 +29,26 @@ module MaintenanceTasks
       assert_no_button 'Run'
     end
 
+    test 'download the CSV attached to a run for a CSV Task' do
+      visit(maintenance_tasks_path)
+
+      click_on('Maintenance::ImportPostsTask')
+      attach_file('csv_file', 'test/fixtures/files/sample.csv')
+      click_on('Run')
+
+      perform_enqueued_jobs
+      page.refresh
+
+      click_on('Download CSV')
+
+      downloaded_csv = 'test/dummy/tmp/downloads/sample.csv'
+
+      Timeout.timeout(1) do
+        sleep(0.1) until File.exist?(downloaded_csv)
+      end
+      assert(File.exist?(downloaded_csv))
+    end
+
     test 'pause a Run' do
       visit maintenance_tasks_path
 

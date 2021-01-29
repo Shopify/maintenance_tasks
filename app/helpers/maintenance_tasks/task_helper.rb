@@ -105,6 +105,14 @@ module MaintenanceTasks
       end
       safe_join(tokens)
     end
+
+    # Returns a download link for a Run's CSV attachment
+    def csv_file_download_path(run)
+      Rails.application.routes.url_helpers.rails_blob_path(
+        run.csv_file,
+        only_path: true
+      )
+    end
   end
   private_constant :TaskHelper
 end
