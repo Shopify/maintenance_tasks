@@ -10,7 +10,7 @@ module MaintenanceTasks
 
     # Shows a full list of Runs.
     def index
-      query = Run.all.order(id: :desc)
+      query = Run.with_attached_csv_file.all.order(id: :desc)
       if params[:task_name].present?
         task_name = Run.sanitize_sql_like(params[:task_name])
         query = query.where('task_name LIKE ?', "%#{task_name}%")
