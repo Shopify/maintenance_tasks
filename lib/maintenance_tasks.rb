@@ -32,6 +32,23 @@ module MaintenanceTasks
   #   the ticker during Task iterations.
   mattr_accessor :ticker_delay, default: 1.second
 
+  # Retrieves the callback to be performed when an error occurs in the task.
+  def self.error_handler
+    return @error_handler if defined?(@error_handler)
+    @error_handler = ->(_error, _task_context, _errored_element) {}
+  end
+
   # Defines a callback to be performed when an error occurs in the task.
-  mattr_accessor :error_handler, default: ->(_error) {}
+  def self.error_handler=(error_handler)
+    unless error_handler.arity == 3
+      ActiveSupport::Deprecation.warn(
+        'MaintenanceTasks.error_handler should be a lambda that takes three '\
+         'arguments: error, task_context, and errored_element.'
+      )
+      @error_handler = ->(error, _task_context, _errored_element) do
+        error_handler.call(error)
+      end
+    end
+    @error_handler = error_handler
+  end
 end

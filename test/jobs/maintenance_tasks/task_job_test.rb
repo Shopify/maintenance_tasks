@@ -262,19 +262,31 @@ module MaintenanceTasks
     test '.perform_now calls the error handler when there was an Error' do
       error_handler_before = MaintenanceTasks.error_handler
       handled_error = nil
-      MaintenanceTasks.error_handler = ->(error) { handled_error = error }
+      handled_task_context = nil
+      handled_errored_element = nil
+
+      MaintenanceTasks.error_handler = ->(error, task_context, errored_el) do
+        handled_error = error
+        handled_task_context = task_context
+        handled_errored_element = errored_el
+      end
+
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 
       TaskJob.perform_now(run)
 
       assert_equal(ArgumentError, handled_error.class)
+      assert_equal('Maintenance::ErrorTask', handled_task_context[:task_name])
+      assert_equal(2, handled_errored_element)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
 
     test '.perform_now still persists the error properly if the error handler raises' do
       error_handler_before = MaintenanceTasks.error_handler
-      MaintenanceTasks.error_handler = ->(error) { raise error }
+      MaintenanceTasks.error_handler = ->(error, _task_context, _errored_el) do
+        raise error
+      end
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 
       assert_raises { TaskJob.perform_now(run) }
