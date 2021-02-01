@@ -123,13 +123,16 @@ Generate a CSV Task by running:
 $ rails generate maintenance_tasks:task import_posts --csv
 ```
 
-The generated task is a subclass of `MaintenanceTasks::CsvTask` that implements:
+The generated task is a subclass of `MaintenanceTasks::Task` that implements:
+
 * `process`: do the work of your maintenance task on a `CSV::Row`
 
 ```ruby
 # app/tasks/maintenance/import_posts_task.rb
 module Maintenance
-  class ImportPostsTask < MaintenanceTasks::CsvTask
+  class ImportPostsTask < MaintenanceTasks::Task
+    csv_collection
+
     def process(row)
       Post.create!(title: row["title"], content: row["content"])
     end
