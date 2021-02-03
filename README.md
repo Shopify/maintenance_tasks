@@ -140,6 +140,51 @@ title,content
 My Title,Hello World!
 ```
 
+### Creating a custom Task
+
+```ruby
+# app/tasks/maintenance/pay_last_months_invoices_task.rb
+module Maintenance
+  class PayLastMonthsInvoicesTask < MaintenanceTasks::Task
+    def enumerator_builder
+      InvoiceEnumerator.new
+    end
+
+    def count
+      InvoiceAPI.last_month.count
+    end
+
+    def process(invoice)
+      invoice.pay!
+    end
+
+    class InvoiceEnumerator
+      def enumerator(context:)
+        Enumerator.new do |yielder|
+          cursor = context.cursor
+
+          loop do
+            page = if cursor.nil?
+              InvoiceAPI.last_month(max: 100)
+            else
+              InvoiceAPI.last_month(max: 100, after: context.cursor)
+            end
+
+            page.entries.each do |invoice|
+              cursor = invoice.id
+              yielder.yield [invoice, cursor]
+            end
+
+            break unless page.has_next?
+          end
+        end
+      end
+    end
+  end
+end
+```
+
+
 ### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to

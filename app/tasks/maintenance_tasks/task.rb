@@ -47,6 +47,15 @@ module MaintenanceTasks
         new.process(item)
       end
 
+      # Returns the enumerator builder for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the enumerator builder.
+      def enumerator_builder
+        new.enumerator_builder
+      end
+
       # Returns the collection for this Task.
       #
       # Especially useful for tests.
@@ -71,6 +80,52 @@ module MaintenanceTasks
         namespace = MaintenanceTasks.tasks_module.safe_constantize
         return unless namespace
         namespace.constants.map { |constant| namespace.const_get(constant) }
+      end
+    end
+
+    # @api private
+    ActiveRecordEnumeratorBuilder = Struct.new(:relation) do
+      def enumerator(context:)
+        JobIteration::EnumeratorBuilder.new(nil).active_record_on_records(
+          relation,
+          cursor: context.cursor,
+        )
+      end
+    end
+    private_constant :ActiveRecordEnumeratorBuilder
+
+    # @api private
+    ArrayEnumeratorBuilder = Struct.new(:array) do
+      def enumerator(context:)
+        JobIteration::EnumeratorBuilder.new(nil).build_array_enumerator(
+          array,
+          cursor: context.cursor,
+        )
+      end
+    end
+    private_constant :ArrayEnumeratorBuilder
+
+    # @api private
+    CsvEnumeratorBuilder = Struct.new(:csv) do
+      def enumerator(context:)
+        JobIteration::CsvEnumerator.new(csv).rows(cursor: context.cursor)
+      end
+    end
+    private_constant :CsvEnumeratorBuilder
+
+    def enumerator_builder
+      collection = self.collection
+
+      case collection
+      when ActiveRecord::Relation
+        ActiveRecordEnumeratorBuilder.new(collection)
+      when Array
+        ArrayEnumeratorBuilder.new(collection)
+      when CSV
+        CsvEnumeratorBuilder.new(collection)
+      else
+        raise ArgumentError, "#{self.class.name}#collection must be either "\
+          'an Active Record Relation, Array, or CSV.'
       end
     end
 
