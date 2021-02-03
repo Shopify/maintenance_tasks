@@ -6,17 +6,7 @@ module MaintenanceTasks
   #
   # @api private
   class RunsController < ApplicationController
-    before_action :set_run, except: :index
-
-    # Shows a full list of Runs.
-    def index
-      query = Run.with_attached_csv_file.all.order(id: :desc)
-      if params[:task_name].present?
-        task_name = Run.sanitize_sql_like(params[:task_name])
-        query = query.where('task_name LIKE ?', "%#{task_name}%")
-      end
-      @pagy, @runs = pagy(query)
-    end
+    before_action :set_run
 
     # Updates a Run status to paused.
     def pause
