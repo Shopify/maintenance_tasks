@@ -105,14 +105,6 @@ module MaintenanceTasks
     end
     private_constant :ArrayEnumeratorBuilder
 
-    # @api private
-    CsvEnumeratorBuilder = Struct.new(:csv) do
-      def enumerator(context:)
-        JobIteration::CsvEnumerator.new(csv).rows(cursor: context.cursor)
-      end
-    end
-    private_constant :CsvEnumeratorBuilder
-
     def enumerator_builder
       collection = self.collection
 
@@ -121,11 +113,11 @@ module MaintenanceTasks
         ActiveRecordEnumeratorBuilder.new(collection)
       when Array
         ArrayEnumeratorBuilder.new(collection)
-      when CSV
-        CsvEnumeratorBuilder.new(collection)
       else
         raise ArgumentError, "#{self.class.name}#collection must be either "\
-          'an Active Record Relation, Array, or CSV.'
+          'an Active Record Relation, or Array.' # TODO: update
+        # If you want CSVs, do this
+        # If you want custom enum, do this
       end
     end
 

@@ -230,7 +230,7 @@ module MaintenanceTasks
       assert_equal 'ArgumentError', @run.error_class
       assert_empty @run.backtrace
       expected_message = 'Maintenance::TestTask#collection '\
-        'must be either an Active Record Relation, Array, or CSV.'
+        'must be either an Active Record Relation, or Array.'
       assert_equal expected_message, @run.error_message
     end
 
