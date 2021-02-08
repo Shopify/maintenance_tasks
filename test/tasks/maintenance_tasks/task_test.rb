@@ -35,6 +35,13 @@ module MaintenanceTasks
       Maintenance::TestTask.process(item)
     end
 
+    test '.enumerator_builder calls #enumerator_builder' do
+      enumerator_builder = stub('FakeEnumeratorBuilder')
+      Maintenance::TestTask.any_instance.expects(:enumerator_builder)
+        .with.returns(enumerator_builder)
+      assert_equal enumerator_builder, Maintenance::TestTask.enumerator_builder
+    end
+
     test '.collection calls #collection' do
       assert_equal [1, 2], Maintenance::TestTask.collection
     end
