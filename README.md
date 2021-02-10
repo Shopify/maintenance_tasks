@@ -10,9 +10,11 @@ A Rails engine for queuing and managing maintenance tasks.
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
   * [Creating a CSV Task](#creating-a-csv-task)
+  * [Creating a custom Task](#creating-a-custom-task)
   * [Considerations when writing Tasks](#considerations-when-writing-tasks)
   * [Writing tests for a Task](#writing-tests-for-a-task)
   * [Writing tests for a CSV Task](#writing-tests-for-a-csv-task)
+  * [Writing tests for a custom Task](#writing-tests-for-a-custom-task)
   * [Running a Task](#running-a-task)
   * [Monitoring your Task's status](#monitoring-your-tasks-status)
   * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
@@ -142,6 +144,12 @@ My Title,Hello World!
 
 ### Creating a custom Task
 
+If you have a special use case requiring iteration over an unsupported resource, you can implement the `enumerator_builder` method instead. For example, you may need to iterate over external resources fetch from some API.
+
+This method should return an object responding to `enumerator(context:)` with an Enumerator, yielding pairs of `[item, item_cursor]`. In order for your enumerator to support resuming iteration part way through, you may use the `context.cursor`.
+
+You may optionally provide an implementation for `count`, if appropriate.
+
 ```ruby
 # app/tasks/maintenance/pay_last_months_invoices_task.rb
 module Maintenance
@@ -184,6 +192,33 @@ module Maintenance
 end
 ```
 
+In some cases, you may have no use for a cursor (e.g. iterating over some collection until it is empty), in which case your Enumerator may yield `nil` cursors (i.e. pairs of `[item, nil]`).
+
+```ruby
+# app/tasks/maintenance/pay_last_months_invoices_task.rb
+module Maintenance
+  class UnbanUsersTask < MaintenanceTasks::Task
+    def enumerator_builder
+      ExpiredBansEnumerator.new
+    end
+
+    def process(expired_ban)
+      expired_ban.user.unban!
+    end
+
+    class ExpiredBansEnumerator
+      def enumerator(context:)
+        UserManagementAPI
+          .resource(:bans)
+          .filter("expires_at <= #{Time.now}")
+          .auto_paginate
+          .lazy
+          .map { |ban| [ban, nil] }
+      end
+    end
+  end
+end
+```
 
 ### Considerations when writing Tasks
 
@@ -253,6 +288,57 @@ module Maintenance
       post = Post.last
       assert_equal 'My Title', post.title
       assert_equal 'Hello World!', post.content
+    end
+  end
+end
+```
+
+### Writing test for a custom Task
+
+As with other tasks, you should write tests for your `#process` method. It will receive the first item in each pair your custom Enumerator yields (`[item, item_cursor]`).
+
+You should also ensure your Enumerator is tested by unit testing it in isolation, testing your `#enumerator_builder` method, or both. Make sure you test how your Enumerator handles the absence or presence of a `context.cursor`, if applicable.
+
+```ruby
+# app/tasks/maintenance/shopping_list_task.rb
+module Maintenance
+  class ShoppingListTask < ActiveSupport::TestCase
+    test "#process adds the recipe's ingredients to the shopping list" do
+      ShoppingList.clear
+      recipe = recipes(:tacos)
+      ingredient = recipe.ingredient.first
+
+      Maintenance::ShoppingListTask.process(ingredient)
+
+      assert_includes ShoppingList, ingredient
+    end
+
+    test "#build_enumerator's enumerator yields all ingredients for all recipes, when no cursor provided" do
+      all_ingredient_pairs = ingredient_pairs
+      enumerator = Maintenance::ShoppingListTask.build_enumerator.enumerator(context: stub(cursor: nil))
+
+      assert_equal all_ingredient_pairs, enumerator.to_a
+    end
+
+    test "#build_enumerator's enumerator yields remaining ingredients for all recipes, when cursor provided" do
+      remaining_ingredient_pairs = ingredient_pairs
+      previous_ingredient_pairs = remaining_ingredient_pairs.shift(5)
+      cursor = previous_ingredient_pairs.last.last
+
+      enumerator = Maintenance::ShoppingListTask.build_enumerator.enumerator(context: stub(cursor: cursor))
+
+      assert_equal remaining_ingredient_pairs, enumerator.to_a
+    end
+
+    private
+
+    def ingredient_pairs
+      recipes.flat_map do |recipe|
+        recipe.ingredients.map do |ingredient|
+          cursor = { recipe_id: recipe.id, ingredient_id: ingredient.id }
+          [ingredient, cursor]
+        end
+      end
     end
   end
 end
