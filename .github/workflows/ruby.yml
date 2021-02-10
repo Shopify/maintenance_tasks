@@ -11,7 +11,7 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v2
     - name: Set up Ruby
-      uses: actions/setup-ruby@v1.1.2
+      uses: actions/setup-ruby@v1.1.3
       with:
         ruby-version: '2.7.2'
     - name: Restore cache
