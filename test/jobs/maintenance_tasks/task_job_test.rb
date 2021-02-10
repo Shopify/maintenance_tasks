@@ -293,5 +293,21 @@ module MaintenanceTasks
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
+
+    test '.perform_now throttles when running Task that uses throttle_on' do
+      Maintenance::UpdatePostsThrottledTask.throttle = true
+      run = Run.new(task_name: 'Maintenance::UpdatePostsThrottledTask')
+
+      assert_enqueued_with(job: TaskJob) { TaskJob.perform_now(run) }
+
+      assert_predicate run.reload, :interrupted?
+
+      Maintenance::UpdatePostsThrottledTask.throttle = false
+      Maintenance::UpdatePostsThrottledTask.any_instance.expects(:process).once
+
+      perform_enqueued_jobs
+
+      assert_predicate run.reload, :succeeded?
+    end
   end
 end

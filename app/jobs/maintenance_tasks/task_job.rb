@@ -32,7 +32,15 @@ module MaintenanceTasks
         cursor: cursor || @run.cursor,
       )
 
-      @task.enumerator_builder.enumerator(context: context)
+      if @task.throttle_condition
+        JobIteration::EnumeratorBuilder.new(self).build_throttle_enumerator(
+          @task.enumerator_builder.enumerator(context: context),
+          throttle_on: @task.throttle_condition,
+          backoff: @task.throttle_backoff
+        )
+      else
+        @task.enumerator_builder.enumerator(context: context)
+      end
     end
 
     # Performs task iteration logic for the current input returned by the

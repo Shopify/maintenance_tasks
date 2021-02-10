@@ -8,6 +8,8 @@ module MaintenanceTasks
     class NotFoundError < NameError; end
 
     class << self
+      attr_reader :throttle_condition, :throttle_backoff
+
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -72,6 +74,18 @@ module MaintenanceTasks
       # @return the count of items.
       def count
         new.count
+      end
+
+      # Define throttling for this Task.
+      #
+      # @param condition [Proc] defines the condition under which the Task
+      #   should be throttled.
+      # @param backoff [ActiveSupport::Duration] optionally, a custom backoff
+      #   can be specified. This is the time to wait before retrying the Task.
+      #   If no value is specified, it defaults to 30 seconds.
+      def throttle_on(condition, backoff: 30.seconds)
+        @throttle_condition = condition
+        @throttle_backoff = backoff
       end
 
       private
@@ -159,6 +173,20 @@ module MaintenanceTasks
     #
     # @return [Integer, nil]
     def count
+    end
+
+    # Return condition under which the Task should throttle.
+    #
+    # @return [Proc, nil]
+    def throttle_condition
+      self.class.throttle_condition
+    end
+
+    # Return throttle backoff defined for the Task.
+    #
+    # @return [ActiveSupport::Duration, nil]
+    def throttle_backoff
+      self.class.throttle_backoff
     end
   end
 end

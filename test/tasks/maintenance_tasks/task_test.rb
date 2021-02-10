@@ -12,6 +12,7 @@ module MaintenanceTasks
         'Maintenance::ImportPostsTask',
         'Maintenance::TestTask',
         'Maintenance::UpdatePostsTask',
+        'Maintenance::UpdatePostsThrottledTask',
       ]
       assert_equal expected,
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
