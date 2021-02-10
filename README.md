@@ -34,16 +34,10 @@ Watch this demo video to see the gem in action:
 
 ## Installation
 
-Add this line to your application's Gemfile:
-
-```ruby
-gem 'maintenance_tasks'
-```
-
-And then execute:
+To install the gem and run the install generator, execute:
 
 ```bash
-$ bundle
+$ bundle add maintenance_tasks
 $ rails generate maintenance_tasks:install
 ```
 
