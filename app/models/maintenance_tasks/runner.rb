@@ -5,6 +5,14 @@ module MaintenanceTasks
   module Runner
     extend self
 
+    # @deprecated Use {Runner} directly instead.
+    def new
+      ActiveSupport::Deprecation.warn(
+        'Use Runner.run instead of Runner.new.run'
+      )
+      self
+    end
+
     # Exception raised when a Task Job couldn't be enqueued.
     class EnqueuingError < StandardError
       # Initializes a Enqueuing Error.

@@ -91,5 +91,12 @@ module MaintenanceTasks
       assert_predicate run.csv_file, :attached?
       assert_equal File.read(csv_file), run.csv_file.download
     end
+
+    test '#new raises deprecation warning and returns self' do
+      dep_msg = 'Use Runner.run instead of Runner.new.run'
+      assert_deprecated(dep_msg) do
+        assert_equal Runner, Runner.new
+      end
+    end
   end
 end
