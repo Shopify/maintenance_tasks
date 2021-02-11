@@ -219,6 +219,14 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test '.perform_now accepts custom enumerated tasks' do
+      skip 'TODO: custom enumeration test to be implemented!'
+    end
+
+    test '.perform_now can resume custom enumerated tasks' do
+      skip 'TODO: custom enumeration resumption test to be implemented!'
+    end
+
     test '.perform_now sets the Run as errored when the Task collection is invalid' do
       Maintenance::TestTask.any_instance.stubs(collection: 'not a collection')
 
