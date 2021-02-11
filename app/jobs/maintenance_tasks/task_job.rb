@@ -49,9 +49,16 @@ module MaintenanceTasks
     # @param _run [Run] the current Run, passed as an argument by Job Iteration.
     def each_iteration(input, _run)
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
-      @task.process(input)
+      task_iteration(input)
       @ticker.tick
       @run.reload_status
+    end
+
+    def task_iteration(input)
+      @task.process(input)
+    rescue => error
+      @errored_element = input
+      raise error
     end
 
     def before_perform
@@ -97,7 +104,14 @@ module MaintenanceTasks
     def on_error(error)
       @ticker.persist if defined?(@ticker)
       @run.persist_error(error)
-      MaintenanceTasks.error_handler.call(error)
+
+      task_context = {
+        task_name: @run.task_name,
+        started_at: @run.started_at,
+        ended_at: @run.ended_at,
+      }
+      errored_element = @errored_element if defined?(@errored_element)
+      MaintenanceTasks.error_handler.call(error, task_context, errored_element)
     end
   end
 end

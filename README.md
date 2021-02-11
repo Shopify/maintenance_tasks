@@ -313,8 +313,30 @@ you can define an error handler:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
-MaintenanceTasks.error_handler = ->(error) { Bugsnag.notify(error) }
+MaintenanceTasks.error_handler = ->(error, task_context, _errored_element) do
+  Bugsnag.notify(error) do |notification|
+    notification.add_tab(:task, task_context)
+  end
+end
 ```
+
+The error handler should be a lambda that accepts three arguments:
+
+* `error`: The object containing the exception that was raised.
+* `task_context`: A hash with additional information about the Task and the
+  error:
+  * `task_name`: The name of the Task that errored
+  * `started_at`: The time the Task started
+  * `ended_at`: The time the Task errored
+* `errored_element`: The element, if any, that was being processed when the
+  Task raised an exception. If you would like to pass this object to your
+  exception monitoring service, make sure you **sanitize the object** to avoid
+  leaking sensitive data and **convert it to a format** that is compatible with
+  your bug tracker. For example, Bugsnag only sends the id and class name of
+  ActiveRecord objects in order to protect sensitive data. CSV rows, on the
+  other hand, are converted to strings and passed raw to Bugsnag, so make sure
+  to filter any personal data from these objects before adding them to a
+  report.
 
 #### Customizing the maintenance tasks module
 
