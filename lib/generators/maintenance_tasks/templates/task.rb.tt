@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# Add CSV and custom task stuff
+
 module <%= tasks_module %>
 <% module_namespacing do -%>
   class <%= class_name %>Task < MaintenanceTasks::Task
