@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+# TODO: Can we just merge this with the standard task template?
+
 module <%= tasks_module %>
 <% module_namespacing do -%>
   class <%= class_name %>Task < MaintenanceTasks::Task
