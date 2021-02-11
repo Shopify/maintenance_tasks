@@ -33,6 +33,8 @@ module MaintenanceTasks
     validates :task_name, on: :create, inclusion: { in: ->(_) {
       Task.available_tasks.map(&:to_s)
     } }
+    validate :csv_attachment_presence, on: :create
+
     attr_readonly :task_name
 
     serialize :backtrace
@@ -176,6 +178,21 @@ module MaintenanceTasks
     # @return [Boolean] whether the Run is stuck.
     def stuck?
       cancelling? && updated_at <= 5.minutes.ago
+    end
+
+    # Performs validation on the presence of a :csv_file attachment.
+    # A Run for a Task that uses CsvCollection must have an attached :csv_file
+    # to be valid. Conversely, a Run for a Task that doesn't use CsvCollection
+    # should not have an attachment to be valid. The appropriate error is added
+    # if the Run does not meet the above criteria.
+    def csv_attachment_presence
+      if Task.named(task_name) < CsvCollection && !csv_file.attached?
+        errors.add(:csv_file, 'must be attached to CSV Task.')
+      elsif !(Task.named(task_name) < CsvCollection) && csv_file.attached?
+        errors.add(:csv_file, 'should not be attached to non-CSV Task.')
+      end
+    rescue Task::NotFoundError
+      nil
     end
   end
   private_constant :Run

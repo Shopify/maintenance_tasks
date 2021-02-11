@@ -86,7 +86,7 @@ module MaintenanceTasks
     end
 
     test '#csv_file_download_path generates a download link to the CSV attachment for a Run' do
-      run = Run.create!(task_name: 'Maintenance::ImportPostsTask')
+      run = Run.new(task_name: 'Maintenance::ImportPostsTask')
       csv = Rack::Test::UploadedFile.new(file_fixture('sample.csv'), 'text/csv')
       run.csv_file.attach(csv)
 

@@ -223,10 +223,26 @@ Alternatively, you can run your Task in the command line:
 $ bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
 ```
 
+To run a Task that processes CSVs from the command line, use the --csv option:
+
+```bash
+$ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv 'path/to/my_csv.csv'
+```
+
 You can also run a Task in Ruby by sending `run` with a Task name to Runner:
 
 ```ruby
 MaintenanceTasks::Runner.run(name: 'Maintenance::UpdatePostsTask')
+```
+
+To run a Task that processes CSVs using the Runner, provide a Hash containing an
+open IO object and a filename to `run`:
+
+```ruby
+MaintenanceTasks::Runner.run(
+  name: 'Maintenance::ImportPostsTask'
+  csv_file: { io: File.open('path/to/my_csv.csv'), filename: 'my_csv.csv' }
+)
 ```
 
 ### Monitoring your Task's status

@@ -8,6 +8,18 @@ module MaintenanceTasks
       refute run.valid?
     end
 
+    test 'invalid if associated with CSV Task and no attachment' do
+      run = Run.new(task_name: 'Maintenance::ImportPostsTask')
+      refute run.valid?
+    end
+
+    test 'invalid if unassociated with CSV Task and attachment' do
+      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+      csv = Rack::Test::UploadedFile.new(file_fixture('sample.csv'), 'text/csv')
+      run.csv_file.attach(csv)
+      refute run.valid?
+    end
+
     test '#persist_progress persists increments to tick count and time_running' do
       run = Run.create!(
         task_name: 'Maintenance::UpdatePostsTask',

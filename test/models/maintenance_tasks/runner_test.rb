@@ -10,6 +10,7 @@ module MaintenanceTasks
       @name = 'Maintenance::UpdatePostsTask'
       @runner = Runner
       @job = MaintenanceTasks.job.constantize
+      @csv = file_fixture('sample.csv')
     end
 
     test '#run creates and performs a Run for the given Task when there is no active Run' do
@@ -31,8 +32,8 @@ module MaintenanceTasks
       end
     end
 
-    test '#run raises validation errors' do
-      assert_no_difference -> { Run.where(task_name: @name).count } do
+    test '#run raises validation error if no Task for given name' do
+      assert_no_difference -> { Run.where(task_name: 'Invalid').count } do
         assert_no_enqueued_jobs do
           error = assert_raises(ActiveRecord::RecordInvalid) do
             @runner.run(name: 'Invalid')
@@ -83,13 +84,46 @@ module MaintenanceTasks
     end
 
     test '#run attaches CSV file to Run if one is provided' do
-      csv_file = file_fixture('sample.csv')
-      uploaded_csv = Rack::Test::UploadedFile.new(csv_file, 'text/csv')
-      @runner.run(name: @name, csv_file: uploaded_csv)
+      @runner.run(name: 'Maintenance::ImportPostsTask', csv_file: csv_io)
 
       run = Run.last
       assert_predicate run.csv_file, :attached?
-      assert_equal File.read(csv_file), run.csv_file.download
+      assert_equal File.read(@csv), run.csv_file.download
+    end
+
+    test '#run raises if CSV file is provided but Task does not process CSVs' do
+      assert_no_difference -> { Run.where(task_name: @name).count } do
+        error = assert_raises(ActiveRecord::RecordInvalid) do
+          @runner.run(name: @name, csv_file: csv_io)
+        end
+
+        assert_equal(
+          'Validation failed: Csv file should not be attached to non-CSV Task.',
+          error.message
+        )
+      end
+    end
+
+    test '#run raises if no CSV file is provided and Task processes CSVs' do
+      task_name = 'Maintenance::ImportPostsTask'
+      assert_no_difference -> { Run.where(task_name: task_name).count } do
+        assert_no_enqueued_jobs do
+          error = assert_raises(ActiveRecord::RecordInvalid) do
+            @runner.run(name: task_name, csv_file: nil)
+          end
+
+          assert_equal(
+            'Validation failed: Csv file must be attached to CSV Task.',
+            error.message
+          )
+        end
+      end
+    end
+
+    private
+
+    def csv_io
+      { io: File.open(@csv), filename: 'sample.csv' }
     end
 
     test '#new raises deprecation warning and returns self' do
