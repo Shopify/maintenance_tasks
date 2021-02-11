@@ -47,7 +47,7 @@ module MaintenanceTasks
         new.process(item)
       end
 
-      # Returns the enumerator builder for this Task.
+      # Returns the Enumerator builder for this Task.
       #
       # Especially useful for tests.
       #
@@ -105,6 +105,13 @@ module MaintenanceTasks
     end
     private_constant :ArrayEnumeratorBuilder
 
+    # Returns an Enumerator builder wrapping the collection. Supported collection types are
+    # ActiveRecord::Relations, or Arrays.
+    #
+    # Tasks may override this to return a custom Enumerator builder, when requiring enumeration over an unsupported
+    # collection type. The object returned must respond to .enumerator(context:), and return an Enumerator yielding
+    # pairs of items and their cursor. The context object provided to .enumerator will respond to .cursor, returning the
+    # previous item's cursor, or nil (if this is the first iteration), to support resuming enumeration.
     def enumerator_builder
       collection = self.collection
 
@@ -115,14 +122,14 @@ module MaintenanceTasks
         ArrayEnumeratorBuilder.new(collection)
       else
         raise ArgumentError, "#{self.class.name}#collection must be either "\
-          'an Active Record Relation, or Array.' # TODO: update
-        # If you want CSVs, do this
-        # If you want custom enum, do this
+          'an Active Record Relation, or Array.'
       end
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
+    #
+    # Tasks with a custom #enumerator_builder are not required to implement this method.
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
