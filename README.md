@@ -421,8 +421,6 @@ pull requests. You can find the contribution guidelines on
 
 ## Releasing new versions
 
-This gem is published to packagecloud. The procedure to publish a new version:
-
 * Update `spec.version` in `maintenance_tasks.gemspec`.
 * Run `bundle install` to bump the `Gemfile.lock` version of the gem.
 * Open a PR and merge on approval.
