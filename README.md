@@ -152,9 +152,14 @@ My Title,Hello World!
 
 TODO: Add generation instructions
 
-If you have a special use case requiring iteration over an unsupported collection type, such as external resources fetched from some API, you can implement the `enumerator_builder` method instead.
+If you have a special use case requiring iteration over an unsupported
+collection type, such as external resources fetched from some API, you can
+implement the `enumerator_builder` method instead.
 
-This method should return an object responding to `enumerator(context:)` with an Enumerator, yielding pairs of `[item, item_cursor]`. In order for your enumerator to support resuming iteration part way through, you may use the `context.cursor`.
+This method should return an object responding to `enumerator(context:)` with
+an Enumerator, yielding pairs of `[item, item_cursor]` to the `process` method
+your Task defines. In order for your enumerator to support resuming iteration
+part way through, you may use the `context.cursor`.
 
 You may optionally provide an implementation for `count`, if appropriate.
 
@@ -208,7 +213,9 @@ module Maintenance
 end
 ```
 
-In some cases, you may have no use for a cursor (e.g. iterating over some collection until it is empty), in which case your Enumerator may yield `nil` cursors (i.e. pairs of `[item, nil]`).
+In some cases, you may have no use for a cursor (e.g. iterating over some
+collection until it is empty), in which case your Enumerator may yield `nil`
+cursors (i.e. pairs of `[item, nil]`).
 
 ```ruby
 # app/tasks/maintenance/ingredient_purge_task.rb
@@ -316,9 +323,14 @@ end
 
 ### Writing test for a custom Task
 
-As with other tasks, you should write tests for your `#process` method. It will receive the first item in each pair your custom Enumerator yields (`[item, item_cursor]`).
+As with other tasks, you should write tests for your `#process` method. It will
+receive the first item in each pair your custom Enumerator yields (`[item,
+item_cursor]`).
 
-You should also ensure your Enumerator is tested, by unit testing it in isolation, testing your `#enumerator_builder` method, or both. Make sure you test how your Enumerator handles the absence or presence of a `context.cursor`, if applicable.
+You should also ensure your Enumerator is tested, by unit testing it in
+isolation, testing your `#enumerator_builder` method, or both. Make sure you
+test how your Enumerator handles the absence or presence of a `context.cursor`,
+if applicable.
 
 ```ruby
 # test/tasks/maintenance/shopping_list_task_test.rb
