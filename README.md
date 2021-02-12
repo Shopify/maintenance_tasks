@@ -152,7 +152,7 @@ My Title,Hello World!
 
 TODO: Add generation instructions
 
-If you have a special use case requiring iteration over an unsupported resource, you can implement the `enumerator_builder` method instead. For example, you may need to iterate over external resources fetch from some API.
+If you have a special use case requiring iteration over an unsupported collection type, such as external resources fetched from some API, you can implement the `enumerator_builder` method instead.
 
 This method should return an object responding to `enumerator(context:)` with an Enumerator, yielding pairs of `[item, item_cursor]`. In order for your enumerator to support resuming iteration part way through, you may use the `context.cursor`.
 
