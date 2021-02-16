@@ -31,15 +31,14 @@ module MaintenanceTasks
       context = EnumerationContext.new(
         cursor: cursor || @run.cursor,
       )
+      enumerator = @task.enumerator_builder.enumerator(context: context)
 
-      if @task.throttle_condition
+      @task.throttle_specs.reduce(enumerator) do |enum, throttle_spec|
         JobIteration::EnumeratorBuilder.new(self).build_throttle_enumerator(
-          @task.enumerator_builder.enumerator(context: context),
-          throttle_on: @task.throttle_condition,
-          backoff: @task.throttle_backoff
+          enum,
+          throttle_on: throttle_spec[:condition],
+          backoff: throttle_spec[:backoff],
         )
-      else
-        @task.enumerator_builder.enumerator(context: context)
       end
     end
 

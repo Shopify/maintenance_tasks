@@ -7,9 +7,9 @@ module MaintenanceTasks
 
     class NotFoundError < NameError; end
 
-    class << self
-      attr_reader :throttle_condition, :throttle_backoff
+    @throttle_specs = []
 
+    class << self
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -76,7 +76,17 @@ module MaintenanceTasks
         new.count
       end
 
-      # Define throttling for this Task.
+      # Returns the list of the throttle specs for a given Task. This is
+      # provided as an array of hashes, with each hash specifying two keys:
+      # throttle_condition and backoff. Note that Tasks inherit throttle specs
+      # from their superclasses.
+
+      # @return [Array<Hash{Symbol => Proc, ActiveSupport::Duration}>]
+      def throttle_specs
+        @throttle_specs ||= superclass.throttle_specs.dup
+      end
+
+      # Add a throttle spec for this Task.
       #
       # @param condition [Proc] defines the condition under which the Task
       #   should be throttled.
@@ -84,8 +94,7 @@ module MaintenanceTasks
       #   can be specified. This is the time to wait before retrying the Task.
       #   If no value is specified, it defaults to 30 seconds.
       def throttle_on(condition, backoff: 30.seconds)
-        @throttle_condition = condition
-        @throttle_backoff = backoff
+        throttle_specs << { condition: condition, backoff: backoff }
       end
 
       private
@@ -175,18 +184,11 @@ module MaintenanceTasks
     def count
     end
 
-    # Return condition under which the Task should throttle.
+    # Returns the list of the throttle specs for a Task instance.
     #
-    # @return [Proc, nil]
-    def throttle_condition
-      self.class.throttle_condition
-    end
-
-    # Return throttle backoff defined for the Task.
-    #
-    # @return [ActiveSupport::Duration, nil]
-    def throttle_backoff
-      self.class.throttle_backoff
+    # @return [Array<Hash{Symbol => Proc, ActiveSupport::Duration}>]
+    def throttle_specs
+      self.class.throttle_specs
     end
   end
 end

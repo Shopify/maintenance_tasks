@@ -68,5 +68,24 @@ module MaintenanceTasks
       message = 'MaintenanceTasks::Task must implement `process`.'
       assert_equal message, error.message
     end
+
+    test '.throttle_specs inherits specs from superclass' do
+      assert_equal [], Maintenance::TestTask.throttle_specs
+    end
+
+    test '.throttle_on registers throttle condition for Task' do
+      throttle_condition = -> { true }
+      Maintenance::TestTask.throttle_on(throttle_condition)
+
+      expected = [{ condition: throttle_condition, backoff: 30.seconds }]
+      assert_equal(expected, Maintenance::TestTask.throttle_specs)
+    ensure
+      Maintenance::TestTask.instance_variable_set(:@throttle_specs, [])
+    end
+
+    test '#throttle_specs calls .throttle_specs' do
+      Maintenance::TestTask.expects(:throttle_specs)
+      Maintenance::TestTask.new.throttle_specs
+    end
   end
 end
