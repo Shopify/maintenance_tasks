@@ -6,7 +6,7 @@ module MaintenanceTasks
   # Helpers for formatting data in the maintenance_tasks views.
   #
   # @api private
-  module TaskHelper
+  module TasksHelper
     STATUS_COLOURS = {
       'new' => ['is-primary'],
       'enqueued' => ['is-primary is-light'],
@@ -114,5 +114,5 @@ module MaintenanceTasks
       )
     end
   end
-  private_constant :TaskHelper
+  private_constant :TasksHelper
 end
