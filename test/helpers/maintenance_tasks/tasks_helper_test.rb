@@ -3,7 +3,7 @@
 require 'test_helper'
 
 module MaintenanceTasks
-  class TaskHelperTest < ActionView::TestCase
+  class TasksHelperTest < ActionView::TestCase
     setup do
       @run = Run.new
     end
