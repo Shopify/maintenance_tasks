@@ -7,6 +7,9 @@ module MaintenanceTasks
   class ApplicationController < ActionController::Base
     include Pagy::Backend
 
+    helper ApplicationHelper
+    helper TaskHelper
+
     BULMA_CDN = 'https://cdn.jsdelivr.net'
 
     content_security_policy do |policy|
