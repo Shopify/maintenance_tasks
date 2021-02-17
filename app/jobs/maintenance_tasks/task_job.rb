@@ -12,20 +12,9 @@ module MaintenanceTasks
     on_shutdown(:on_shutdown)
 
     after_perform(:after_perform)
+    after_perform(:reenqueue, prepend: true, if: -> { @run.interrupted? } )
 
     rescue_from StandardError, with: :on_error
-
-    def interruptible_perform(*arguments)
-      puts "INTERRUPTIBLE PERFORM!"
-      puts @run.inspect
-      # Ensure callbacks have finished appropriately
-      unless @run.previous_changes[:status]
-        self.class.set(wait: 1.second).perform_later(@run)
-        return
-      end
-
-      super(*arguments)
-    end
 
     class << self
       # Overrides ActiveJob::Exceptions.retry_on to declare it unsupported.
@@ -113,9 +102,22 @@ module MaintenanceTasks
       @ticker.persist
     end
 
+    def reenqueue_iteration_job
+      puts 'reenqueue_iteration_job called'
+      if defined?(@callbacks_complete) && @callbacks_complete
+        super
+      end
+    end
+
     def after_perform
       puts "after_perform called"
       @run.save!
+    end
+
+    def reenqueue
+      puts 're-enqueue'
+      @callbacks_complete = true
+      reenqueue_iteration_job
     end
 
     def on_error(error)
