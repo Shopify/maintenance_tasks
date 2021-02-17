@@ -15,6 +15,18 @@ module MaintenanceTasks
 
     rescue_from StandardError, with: :on_error
 
+    def interruptible_perform(*arguments)
+      puts "INTERRUPTIBLE PERFORM!"
+      puts @run.inspect
+      # Ensure callbacks have finished appropriately
+      unless @run.previous_changes[:status]
+        self.class.set(wait: 1.second).perform_later(@run)
+        return
+      end
+
+      super(*arguments)
+    end
+
     class << self
       # Overrides ActiveJob::Exceptions.retry_on to declare it unsupported.
       # The use of rescue_from prevents retry_on from being usable.
@@ -81,6 +93,7 @@ module MaintenanceTasks
     end
 
     def on_complete
+      puts "on_complete called"
       @run.status = :succeeded
       @run.ended_at = Time.now
     end
@@ -90,14 +103,18 @@ module MaintenanceTasks
         @run.status = :cancelled
         @run.ended_at = Time.now
       else
+        puts 'on_shutdown before sleep'
+        sleep(3)
         @run.status = @run.pausing? ? :paused : :interrupted
         @run.cursor = cursor_position
+        puts 'on_shutdown after sleep'
       end
 
       @ticker.persist
     end
 
     def after_perform
+      puts "after_perform called"
       @run.save!
     end
 

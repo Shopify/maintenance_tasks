@@ -14,3 +14,5 @@ gem 'selenium-webdriver'
 gem 'sqlite3'
 gem 'webdrivers', require: false
 gem 'yard'
+
+gem "sidekiq", "~> 6.1"
