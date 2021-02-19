@@ -5,7 +5,7 @@ module Maintenance
       def enumerator(context:)
         drop = context.cursor.nil? ? 0 : context.cursor + 1
 
-        Array.new(3) { |index| [index, index] }.lazy.drop(drop)
+        %i(a b c).lazy.with_index.drop(drop)
       end
     end
 
