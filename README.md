@@ -207,8 +207,8 @@ module Maintenance
 end
 ```
 
-In some cases, you may have no use for a cursor (e.g. iterating over some
-collection until it is empty), in which case your Enumerator may yield `nil`
+In some cases, you may have no use for a cursor (e.g. taking items off a queue
+until it is empty), in which case your Enumerator may yield `nil`
 cursors (i.e. pairs of `[item, nil]`).
 
 ```ruby
@@ -338,7 +338,7 @@ module Maintenance
     end
 
     test '#enumerator_builder.enumerator enumerates ingredients for a random recipe' do
-      FancyRecipeApi.fake_it_till_you_make_it do
+      FancyRecipeAPI.fake_it_till_you_make_it do
         recipe = recipes(:tacos)
         FancyRecipeAPI.expects(:random_recipe).returns(recipe)
 
@@ -353,7 +353,7 @@ module Maintenance
     end
 
     test '#enumerator_builder.enumerator enumerates remaining ingredients for the cursor recipe' do
-      FancyRecipeApi.fake_it_till_you_make_it do
+      FancyRecipeAPI.fake_it_till_you_make_it do
         expected_ingredient_pairs = ingredient_pairs(recipes(:vegan_tacos))
         ingredients_so_far = expected_ingredient_pairs.shift(3)
         cursor = ingredients_so_far.last.last
@@ -382,7 +382,7 @@ module Maintenance
 end
 ```
 
-Dependaing on its complexity, you may choose to test your Enumerator builder in
+Depending on its complexity, you may choose to test your Enumerator builder in
 isolation, in which case you can simplify the tests for your Task.
 
 ```ruby
