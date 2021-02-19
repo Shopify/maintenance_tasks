@@ -221,11 +221,87 @@ module MaintenanceTasks
     end
 
     test '.perform_now accepts custom enumerated tasks' do
-      skip 'TODO: custom enumeration test to be implemented!'
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+    end
+
+    test '.perform_now handles cursors provided by custom enumerated tasks' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      TaskJob.perform_now(run)
+
+      assert_equal 2, run.reload.cursor
+    end
+
+    test '.perform_now handles custom enumerated tasks with nil cursors' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
+        .stubs(:enumerator).returns(%i(a b c).to_enum(:each_with_object, nil))
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_nil run.reload.cursor
+      assert_predicate run, :succeeded?
+    end
+
+    test '.perform_now rejects accepts enumerated tasks yielding item instead of [item, cursor] pair' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
+        .stubs(:enumerator).returns(%i(a b c).to_enum(:each))
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_nil run.reload.cursor
+      assert_predicate run, :succeeded?
+    end
+
+    test '.perform_now rejects accepts enumerated tasks yielding [item] instead of [item, cursor] pair' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
+        .stubs(:enumerator).returns([[:a], [:b], [:c]].to_enum(:each))
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_nil run.reload.cursor
+      assert_predicate run, :succeeded?
     end
 
     test '.perform_now can resume custom enumerated tasks' do
-      skip 'TODO: custom enumeration resumption test to be implemented!'
+      run = Run.create!(
+        task_name: 'Maintenance::CustomEnumeratingTask',
+        cursor: 0,
+      )
+
+      %i(b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
     end
 
     test '.perform_now sets the Run as errored when the Task collection is invalid' do
