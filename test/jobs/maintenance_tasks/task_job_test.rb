@@ -244,6 +244,7 @@ module MaintenanceTasks
 
       Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
         .stubs(:enumerator).returns(%i(a b c).to_enum(:each_with_object, nil))
+      # TODO: just be explicit
 
       %i(a b c).each do |item|
         Maintenance::CustomEnumeratingTask.any_instance
@@ -271,6 +272,7 @@ module MaintenanceTasks
 
       assert_nil run.reload.cursor
       assert_predicate run, :succeeded?
+      flunk 'this should break'
     end
 
     test '.perform_now rejects accepts enumerated tasks yielding [item] instead of [item, cursor] pair' do
@@ -288,6 +290,7 @@ module MaintenanceTasks
 
       assert_nil run.reload.cursor
       assert_predicate run, :succeeded?
+      flunk 'this should break'
     end
 
     test '.perform_now can resume custom enumerated tasks' do
