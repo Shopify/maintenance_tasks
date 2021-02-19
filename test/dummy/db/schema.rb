@@ -47,7 +47,7 @@ ActiveRecord::Schema.define(version: 2022_07_13_131925) do
     t.bigint "tick_count", default: 0, null: false
     t.bigint "tick_total"
     t.string "job_id"
-    t.bigint "cursor"
+    t.string "cursor"
     t.string "status", default: "enqueued", null: false
     t.string "error_class"
     t.string "error_message"
