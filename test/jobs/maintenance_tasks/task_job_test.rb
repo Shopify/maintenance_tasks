@@ -198,6 +198,15 @@ module MaintenanceTasks
       TaskJob.perform_now(@run)
     end
 
+    # Remove this once string cursors are shipped (#339)
+    test '.perform_now handles string cursor when Array task resumes' do
+      @run.expects(:cursor).returns('0')
+
+      TaskJob.perform_now(@run)
+
+      assert_predicate @run, :succeeded?
+    end
+
     test '.perform_now accepts Active Record Relations as collection' do
       Maintenance::TestTask.any_instance.stubs(collection: Post.all)
       Maintenance::TestTask.any_instance.expects(:process).times(Post.count)
@@ -205,6 +214,16 @@ module MaintenanceTasks
       TaskJob.perform_now(@run)
 
       assert_predicate @run.reload, :succeeded?
+    end
+
+    # Remove this once string cursors are shipped (#339)
+    test '.perform_now handles string cursor when Active Record Relation task resumes' do
+      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+      run.expects(:cursor).returns(Post.pick(:id)&.to_s)
+
+      TaskJob.perform_now(run)
+
+      assert_predicate run, :succeeded?
     end
 
     test '.perform_now accepts CSVs as collection' do
@@ -218,6 +237,20 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
 
       assert_predicate run.reload, :succeeded?
+    end
+
+    # Remove this once string cursors are shipped (#339)
+    test '.perform_now handles string cursor when CSV task resumes' do
+      run = Run.new(task_name: 'Maintenance::ImportPostsTask')
+      run.csv_file.attach(
+        { io: File.open(file_fixture('sample.csv')), filename: 'sample.csv' }
+      )
+      run.save
+      run.expects(:cursor).returns('0')
+
+      TaskJob.perform_now(run)
+
+      assert_predicate run, :succeeded?
     end
 
     test '.perform_now sets the Run as errored when the Task collection is invalid' do
