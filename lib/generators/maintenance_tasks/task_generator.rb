@@ -9,23 +9,29 @@ module MaintenanceTasks
     desc 'This generator creates a task file at app/tasks and a corresponding '\
       'test.'
 
-    class_option :csv, type: :boolean, default: false,
-      desc: 'Generate a CSV Task.'
+    TASK_TYPES = %w(collection csv).freeze
+    private_constant :TASK_TYPES
+    class_option :type, type: :string, default: 'collection',
+      desc: "Specify the type of Task to generate (#{TASK_TYPES.join(', ')})"
 
     check_class_collision suffix: 'Task'
 
+    # Ensure a valid task type has been provided
+    def validate_task_type
+      return if TASK_TYPES.include?(task_type)
+
+      raise(Thor::Error, "Unknown task type #{task_type.inspect}. " \
+            "Must be one of: #{TASK_TYPES.join(', ')}")
+    end
+
     # Creates the Task file.
     def create_task_file
-      template_file = File.join(
+      task_file = File.join(
         "app/tasks/#{tasks_module_file_path}",
         class_path,
         "#{file_name}_task.rb"
       )
-      if options[:csv]
-        template('csv_task.rb', template_file)
-      else
-        template('task.rb', template_file)
-      end
+      template(task_template_file, task_file)
     end
 
     # Creates the Task test file, according to the app's test framework.
@@ -44,25 +50,52 @@ module MaintenanceTasks
     private
 
     def create_task_test_file
-      template_file = File.join(
+      test_file = File.join(
         "test/tasks/#{tasks_module_file_path}",
         class_path,
         "#{file_name}_task_test.rb"
       )
-      template('task_test.rb', template_file)
+      template(test_template_file, test_file)
     end
 
     def create_task_spec_file
-      template_file = File.join(
+      spec_file = File.join(
         "spec/tasks/#{tasks_module_file_path}",
         class_path,
         "#{file_name}_task_spec.rb"
       )
-      template('task_spec.rb', template_file)
+      template(spec_template_file, spec_file)
+    end
+
+    def task_template_file
+      case task_type
+      when 'collection'
+        'task.rb'
+      when 'csv'
+        'csv_task.rb'
+      end
+    end
+
+    def test_template_file
+      case task_type
+      when 'collection', 'csv'
+        'task_test.rb'
+      end
+    end
+
+    def spec_template_file
+      case task_type
+      when 'collection', 'csv'
+        'task_spec.rb'
+      end
     end
 
     def file_name
       super.sub(/_task\z/i, '')
+    end
+
+    def task_type
+      options[:type]
     end
 
     def tasks_module

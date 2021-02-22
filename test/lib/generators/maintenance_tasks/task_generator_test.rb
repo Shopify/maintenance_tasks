@@ -72,13 +72,29 @@ module MaintenanceTasks
       assert_file 'app/tasks/maintenance/sleepy_task.rb'
     end
 
-    test 'generator creates a CSV Task if the --csv option is supplied' do
-      run_generator ['sleepy', '--csv']
+    test 'generator creates a CSV Task if the --type=csv option is supplied' do
+      run_generator ['sleepy', '--type=csv']
       assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
         assert_match(/class SleepyTask < MaintenanceTasks::Task/, task)
         assert_match(/csv_collection/, task)
         assert_match(/def process\(row\)/, task)
       end
+    end
+
+    test 'generator creates a generic collection task if the --type=collection option is supplied' do
+      run_generator ['sleepy', '--type=collection']
+      assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
+        assert_match(/def collection/, task)
+        assert_match(/def process\(element\)/, task)
+      end
+    end
+
+    test 'generator aborts if the --type option is supplied with an unknown value' do
+      stderr = capture(:stderr) do
+        run_generator ['sleepy', '--type=unknown']
+      end
+      assert_no_file 'app/tasks/maintenance/sleepy_task.rb'
+      assert_match(/Unknown task type "unknown"\. Must be one of:/, stderr)
     end
   end
 end
