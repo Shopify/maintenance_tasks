@@ -12,8 +12,6 @@ module MaintenanceTasks
     class_option :csv, type: :boolean, default: false,
       desc: 'Generate a CSV Task.'
 
-    # TODO: Add generator option for custom task
-
     check_class_collision suffix: 'Task'
 
     # Creates the Task file.

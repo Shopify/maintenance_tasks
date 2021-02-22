@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 require 'rails_helper'
 
-# TODO Add CSV and custom task stuff
-
 module <%= tasks_module %>
 <% module_namespacing do -%>
   RSpec.describe <%= class_name %>Task do
