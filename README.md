@@ -114,7 +114,7 @@ is specified in your application's Gemfile, and that you've followed the
 Generate a CSV Task by running:
 
 ```bash
-$ rails generate maintenance_tasks:task import_posts --csv
+$ rails generate maintenance_tasks:task import_posts --type=csv
 ```
 
 The generated task is a subclass of `MaintenanceTasks::Task` that implements:
