@@ -93,6 +93,36 @@ module MaintenanceTasks
       assert_match(/Unknown task type "unknown"\. Must be one of:/, stderr)
     end
 
+    test 'generator creates a custom Task if the --type=custom option is supplied' do
+      run_generator ['sleepy', '--type=custom']
+      assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
+        assert_match(/class SleepyTask < MaintenanceTasks::Task/, task)
+        assert_match(/enumerator_builder/, task)
+        assert_match(/def process\(element\)/, task)
+        assert_match(/def count/, task)
+      end
+      assert_file 'test/tasks/maintenance/sleepy_task_test.rb' do |task_test|
+        assert_match(/module Maintenance/, task_test)
+        assert_match(
+          /class SleepyTaskTest < ActiveSupport::TestCase/,
+          task_test
+        )
+        assert_match(/test "#enumerator_builder/, task_test)
+      end
+    end
+
+    test 'generator creates a custom Task spec if the --type=custom option is supplied and the application is using RSpec' do
+      with_rspec do
+        run_generator ['sleepy', '--type=custom']
+
+        assert_file('spec/tasks/maintenance/sleepy_task_spec.rb') do |task_spec|
+          assert_match(/module Maintenance/, task_spec)
+          assert_match(/RSpec.describe SleepyTask/, task_spec)
+          assert_match(/describe '#enumerator_builder'/, task_spec)
+        end
+      end
+    end
+
     private
 
     def with_rspec

@@ -9,7 +9,7 @@ module MaintenanceTasks
     desc 'This generator creates a task file at app/tasks and a corresponding '\
       'test.'
 
-    TASK_TYPES = %w(collection csv).freeze
+    TASK_TYPES = %w(collection csv custom).freeze
     private_constant :TASK_TYPES
     class_option :type, type: :string, default: 'collection',
       desc: "Specify the type of Task to generate (#{TASK_TYPES.join(', ')})"
@@ -73,6 +73,8 @@ module MaintenanceTasks
         'task.rb'
       when 'csv'
         'csv_task.rb'
+      when 'custom'
+        'custom_task.rb'
       end
     end
 
@@ -80,6 +82,8 @@ module MaintenanceTasks
       case task_type
       when 'collection', 'csv'
         'task_test.rb'
+      when 'custom'
+        'custom_task_test.rb'
       end
     end
 
@@ -87,6 +91,8 @@ module MaintenanceTasks
       case task_type
       when 'collection', 'csv'
         'task_spec.rb'
+      when 'custom'
+        'custom_task_spec.rb'
       end
     end
 
