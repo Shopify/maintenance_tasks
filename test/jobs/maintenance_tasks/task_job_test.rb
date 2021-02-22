@@ -187,11 +187,11 @@ module MaintenanceTasks
 
       TaskJob.perform_now(@run)
 
-      assert_equal 0, @run.reload.cursor
+      assert_equal '0', @run.reload.cursor
     end
 
     test '.perform_now starts job from cursor position when job resumes' do
-      @run.update!(cursor: 0)
+      @run.update!(cursor: '0')
 
       Maintenance::TestTask.any_instance.expects(:process).once.with(2)
 

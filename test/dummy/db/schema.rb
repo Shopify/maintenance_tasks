@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_12_141723) do
+ActiveRecord::Schema.define(version: 2021_02_19_212931) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -48,7 +48,7 @@ ActiveRecord::Schema.define(version: 2021_01_12_141723) do
     t.integer "tick_count", default: 0, null: false
     t.integer "tick_total"
     t.string "job_id"
-    t.bigint "cursor"
+    t.string "cursor"
     t.string "status", default: "enqueued", null: false
     t.string "error_class"
     t.string "error_message"

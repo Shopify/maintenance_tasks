@@ -33,9 +33,12 @@ module MaintenanceTasks
       when ActiveRecord::Relation
         enumerator_builder.active_record_on_records(collection, cursor: cursor)
       when Array
-        enumerator_builder.build_array_enumerator(collection, cursor: cursor)
+        enumerator_builder.build_array_enumerator(
+          collection,
+          cursor: cursor&.to_i,
+        )
       when CSV
-        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
+        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor&.to_i)
       else
         raise ArgumentError, "#{@task.class.name}#collection must be either "\
           'an Active Record Relation, Array, or CSV.'
