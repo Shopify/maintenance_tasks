@@ -3,7 +3,7 @@
 module MaintenanceTasks
   # Base class for all controllers used by this engine.
   #
-  # @api private
+  # Can be extended to add different authentication and authorization code.
   class ApplicationController < ActionController::Base
     include Pagy::Backend
 
