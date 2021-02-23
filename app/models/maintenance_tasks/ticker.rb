@@ -54,5 +54,4 @@ module MaintenanceTasks
       Time.now - @last_persisted >= @throttle_duration
     end
   end
-  private_constant :Ticker
 end

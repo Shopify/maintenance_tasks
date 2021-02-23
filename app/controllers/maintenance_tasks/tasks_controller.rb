@@ -42,5 +42,4 @@ module MaintenanceTasks
       @refresh = 3
     end
   end
-  private_constant :TasksController
 end

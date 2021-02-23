@@ -70,5 +70,4 @@ module MaintenanceTasks
       total? && @run.tick_total > @run.tick_count
     end
   end
-  private_constant :Progress
 end

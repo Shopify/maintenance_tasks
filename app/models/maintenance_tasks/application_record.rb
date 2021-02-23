@@ -6,5 +6,4 @@ module MaintenanceTasks
   class ApplicationRecord < ActiveRecord::Base
     self.abstract_class = true
   end
-  private_constant :ApplicationRecord
 end

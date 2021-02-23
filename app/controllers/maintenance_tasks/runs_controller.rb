@@ -30,5 +30,4 @@ module MaintenanceTasks
       @run = Run.find(params.fetch(:id))
     end
   end
-  private_constant :RunsController
 end

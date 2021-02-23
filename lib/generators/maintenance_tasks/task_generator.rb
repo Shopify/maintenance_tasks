@@ -77,5 +77,4 @@ module MaintenanceTasks
       Rails.application.config.generators.options[:rails][:test_framework]
     end
   end
-  private_constant :TaskGenerator
 end

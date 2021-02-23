@@ -22,5 +22,4 @@ module MaintenanceTasks
 
     protect_from_forgery with: :exception
   end
-  private_constant :ApplicationController
 end

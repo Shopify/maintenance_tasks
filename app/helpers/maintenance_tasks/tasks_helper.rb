@@ -114,5 +114,4 @@ module MaintenanceTasks
       )
     end
   end
-  private_constant :TasksHelper
 end

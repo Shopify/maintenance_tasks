@@ -85,5 +85,4 @@ module MaintenanceTasks
       )
     end
   end
-  private_constant :RunStatusValidator
 end
