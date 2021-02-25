@@ -97,8 +97,16 @@ module MaintenanceTasks
       @ticker.persist
     end
 
+    def reenqueue_iteration_job(should_ignore: true)
+      super() unless should_ignore
+      @reenqueue_iteration_job = true
+    end
+
     def after_perform
       @run.save!
+      if defined?(@reenqueue_iteration_job) && @reenqueue_iteration_job
+        reenqueue_iteration_job(should_ignore: false)
+      end
     end
 
     def on_error(error)
