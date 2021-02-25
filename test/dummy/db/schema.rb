@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2021_01_12_141723) do
+ActiveRecord::Schema.define(version: 2021_02_25_152418) do
 
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
@@ -56,7 +56,6 @@ ActiveRecord::Schema.define(version: 2021_01_12_141723) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.index ["task_name", "created_at"], name: "index_maintenance_tasks_runs_on_task_name_and_created_at", order: { created_at: :desc }
-    t.index ["task_name"], name: "index_maintenance_tasks_runs_on_task_name"
   end
 
   create_table "posts", force: :cascade do |t|
