@@ -29,6 +29,14 @@ module MaintenanceTasks
       assert_equal 'Maintenance::DoesNotExist', error.name
     end
 
+    test ".named raises Not Found Error if the name doesn't refer to a Task" do
+      error = assert_raises(Task::NotFoundError) do
+        Task.named('Array')
+      end
+      assert_equal 'Array is not a Task.', error.message
+      assert_equal 'Array', error.name
+    end
+
     test '.process calls #process' do
       item = mock
       Maintenance::TestTask.any_instance.expects(:process).with(item)
