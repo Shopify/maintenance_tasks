@@ -16,9 +16,12 @@ module MaintenanceTasks
       #
       # @raise [NotFoundError] if a Task with the given name does not exist.
       def named(name)
-        name.constantize
-      rescue NameError
-        raise NotFoundError.new("Task #{name} not found.", name)
+        task = name.safe_constantize
+        raise NotFoundError.new("Task #{name} not found.", name) unless task
+        unless task.is_a?(Class) && task < Task
+          raise NotFoundError.new("#{name} is not a Task.", name)
+        end
+        task
       end
 
       # Returns a list of concrete classes that inherit from the Task
