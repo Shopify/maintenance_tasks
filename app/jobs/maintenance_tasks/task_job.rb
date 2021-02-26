@@ -97,6 +97,17 @@ module MaintenanceTasks
       @ticker.persist
     end
 
+    # We are reopening a private part of Job Iteration's API here, so we should
+    # ensure the method is still defined upstream. This way, in the case where
+    # the method changes upstream, we catch it at load time instead of at
+    # runtime while calling `super`.
+    unless private_method_defined?(:reenqueue_iteration_job)
+      error_message = <<~HEREDOC
+        JobIteration::Iteration#reenqueue_iteration_job is expected to be
+        defined. Upgrading the maintenance_tasks gem should solve this problem.
+      HEREDOC
+      raise error_message
+    end
     def reenqueue_iteration_job(should_ignore: true)
       super() unless should_ignore
       @reenqueue_iteration_job = true
