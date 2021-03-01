@@ -25,9 +25,11 @@ module MaintenanceTasks
       assert_equal 4, @progress.value
     end
 
-    test '#value is nil if the Run tick count is greater than its tick total' do
-      @run.tick_count = 8
+    test '#value is nil if the Run tick count is strictly greater than its tick total' do
+      @run.tick_count = 7
+      refute_nil @progress.value
 
+      @run.tick_count = 8
       assert_nil @progress.value
     end
 
