@@ -49,7 +49,7 @@ module MaintenanceTasks
     def title
       if !total?
         "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)}."
-      elsif @run.tick_count > @run.tick_total
+      elsif over_total?
         "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)} " \
           "(expected #{@run.tick_total})."
       else
@@ -67,7 +67,11 @@ module MaintenanceTasks
     end
 
     def estimatable?
-      total? && @run.tick_total > @run.tick_count
+      total? && !over_total?
+    end
+
+    def over_total?
+      @run.tick_count > @run.tick_total
     end
   end
   private_constant :Progress
