@@ -164,6 +164,24 @@ module MaintenanceTasks
       assert_equal 'Task Maintenance::DeletedTask not found.', run.error_message
     end
 
+    test '.perform_now delays reenqueuing the job after interruption until all callbacks are finished' do
+      JobIteration.stubs(interruption_adapter: -> { true })
+
+      AnotherTaskJob = Class.new(TaskJob) do
+        after_perform { self.class.times_interrupted = times_interrupted }
+
+        class << self
+          attr_accessor :times_interrupted
+        end
+      end
+      AnotherTaskJob.perform_now(@run)
+
+      # The job should not yet have been reenqueued, so times_interrupted should
+      # be 0
+      assert_equal 0, AnotherTaskJob.times_interrupted
+      assert_enqueued_jobs 1
+    end
+
     test '.perform_now does not enqueue another job if Run errors' do
       run = Run.create!(task_name: 'Maintenance::ErrorTask')
 
