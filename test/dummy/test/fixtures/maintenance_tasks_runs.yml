@@ -9,6 +9,7 @@ update_posts_task:
   created_at: '01 Jan 2020 01:00:00'
   started_at: '01 Jan 2020 01:00:25'
   ended_at: '01 Jan 2020 01:00:36'
+  updated_at: '01 Jan 2020 01:00:36'
 
 deleted_task:
   task_name: Maintenance::DeletedTask
@@ -19,6 +20,7 @@ deleted_task:
   created_at: '01 Jan 2020 01:00:00'
   started_at: '01 Jan 2020 01:00:25'
   ended_at: '01 Jan 2020 01:00:36'
+  updated_at: '01 Jan 2020 01:00:36'
 
 paused_deleted_task:
   task_name: Maintenance::PausedDeletedTask
@@ -28,3 +30,4 @@ paused_deleted_task:
   status: 'paused'
   created_at: '09 Jan 2020 09:30:00'
   started_at: '09 Jan 2020 09:30:25'
+  updated_at: '09 Jan 2020 09:30:25'
