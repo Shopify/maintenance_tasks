@@ -195,5 +195,4 @@ module MaintenanceTasks
       nil
     end
   end
-  private_constant :Run
 end

@@ -138,5 +138,4 @@ module MaintenanceTasks
       Run.where(task_name: name).with_attached_csv_file.order(created_at: :desc)
     end
   end
-  private_constant :TaskData
 end

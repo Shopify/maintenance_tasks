@@ -30,5 +30,4 @@ module MaintenanceTasks
       csv_content.count("\n") - 1
     end
   end
-  private_constant :CsvCollection
 end

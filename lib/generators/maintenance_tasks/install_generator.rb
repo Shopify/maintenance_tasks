@@ -18,5 +18,4 @@ module MaintenanceTasks
       rake('db:migrate')
     end
   end
-  private_constant :InstallGenerator
 end

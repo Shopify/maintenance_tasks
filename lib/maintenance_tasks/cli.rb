@@ -51,5 +51,4 @@ module MaintenanceTasks
       end
     end
   end
-  private_constant :CLI
 end
