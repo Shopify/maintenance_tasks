@@ -7,6 +7,10 @@ module MaintenanceTasks
   class Engine < ::Rails::Engine
     isolate_namespace MaintenanceTasks
 
+    initializer 'eager_load_for_classic_autoloader' do
+      eager_load! unless Rails.autoloaders.zeitwerk_enabled?
+    end
+
     config.to_prepare do
       unless Rails.autoloaders.zeitwerk_enabled?
         tasks_module = MaintenanceTasks.tasks_module.underscore
@@ -17,7 +21,6 @@ module MaintenanceTasks
     end
 
     config.after_initialize do
-      eager_load! unless Rails.autoloaders.zeitwerk_enabled?
       JobIteration.max_job_runtime ||= 5.minutes
     end
 
