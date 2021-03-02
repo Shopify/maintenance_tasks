@@ -43,7 +43,11 @@ module MaintenanceTasks
 
     # Ensure ActiveStorage is in use before preloading the attachments
     scope :with_attached_csv, -> do
-      with_attached_csv_file if ActiveStorage::Attachment.table_exists?
+      if ActiveStorage::Attachment.table_exists?
+        with_attached_csv_file
+      else
+        none
+      end
     end
 
     validates_with RunStatusValidator, on: :update
