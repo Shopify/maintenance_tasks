@@ -41,6 +41,11 @@ module MaintenanceTasks
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
 
+    # Ensure ActiveStorage is in use before preloading the attachments
+    scope :with_attached_csv, -> do
+      with_attached_csv_file if ActiveStorage::Attachment.table_exists?
+    end
+
     validates_with RunStatusValidator, on: :update
 
     has_one_attached :csv_file
@@ -188,11 +193,21 @@ module MaintenanceTasks
     def csv_attachment_presence
       if Task.named(task_name) < CsvCollection && !csv_file.attached?
         errors.add(:csv_file, 'must be attached to CSV Task.')
-      elsif !(Task.named(task_name) < CsvCollection) && csv_file.attached?
+      elsif !(Task.named(task_name) < CsvCollection) && csv_file.present?
         errors.add(:csv_file, 'should not be attached to non-CSV Task.')
       end
     rescue Task::NotFoundError
       nil
+    end
+
+    # Fetches the attached ActiveStorage CSV file for the run. Checks first
+    # whether the ActiveStorage::Attachment table exists so that we are
+    # compatible with apps that are not using ActiveStorage.
+    #
+    # @return [ActiveStorage::Attached::One] the attached CSV file
+    def csv_file
+      return unless ActiveStorage::Attachment.table_exists?
+      super
     end
   end
 end
