@@ -135,7 +135,7 @@ module MaintenanceTasks
     private
 
     def runs
-      Run.where(task_name: name).with_attached_csv_file.order(created_at: :desc)
+      Run.where(task_name: name).with_attached_csv.order(created_at: :desc)
     end
   end
 end
