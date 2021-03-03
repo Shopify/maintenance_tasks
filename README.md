@@ -421,13 +421,20 @@ pull requests. You can find the contribution guidelines on
 
 ## Releasing new versions
 
+Updates should be added to the latest draft release on GitHub as Pull Requests
+are merged.
+
+Once a release is ready, follow these steps:
+
 * Update `spec.version` in `maintenance_tasks.gemspec`.
 * Run `bundle install` to bump the `Gemfile.lock` version of the gem.
 * Open a PR and merge on approval.
-* Create a [release on GitHub][release] with a version number that matches the
-  version defined in the gemspec.
 * Deploy via [Shipit][shipit] and see the new version on
   <https://rubygems.org/gems/maintenance_tasks>.
+* Ensure the release has documented all changes and publish it.
+* Create a new [draft release on GitHub][release] with the title 
+  'Upcoming Release'. The tag version can be left blank. This will be the
+  starting point for documenting changes related to the next release.
 
 [release]: https://help.github.com/articles/creating-releases/
 [shipit]: https://shipit.shopify.io/shopify/maintenance_tasks/rubygems
