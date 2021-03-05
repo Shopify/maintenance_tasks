@@ -6,8 +6,6 @@ require 'active_record'
 
 require 'job-iteration'
 require 'maintenance_tasks/engine'
-require 'pagy'
-require 'pagy/extras/bulma'
 
 # Force the TaskJob class to load so we can verify upstream compatibility with
 # the JobIteration gem
