@@ -80,8 +80,8 @@ module MaintenanceTasks
       task_data = TaskData.find('Maintenance::UpdatePostsTask')
 
       assert_equal 2, task_data.previous_runs.count
-      assert_equal run_2, task_data.previous_runs.first
-      assert_equal run_1, task_data.previous_runs.last
+      assert_equal run_1, task_data.previous_runs.first
+      assert_equal run_2, task_data.previous_runs.last
     end
 
     test '#previous_runs is empty when there are no Runs for the Task' do

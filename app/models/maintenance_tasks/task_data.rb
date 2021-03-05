@@ -83,7 +83,7 @@ module MaintenanceTasks
     # @return [nil] if there are no Runs associated with the Task.
     def last_run
       return @last_run if defined?(@last_run)
-      @last_run = runs.first
+      @last_run = runs.last
     end
 
     # Returns the set of Run records associated with the Task previous to the
@@ -135,7 +135,7 @@ module MaintenanceTasks
     private
 
     def runs
-      Run.where(task_name: name).with_attached_csv.order(created_at: :desc)
+      Run.where(task_name: name).with_attached_csv
     end
   end
 end

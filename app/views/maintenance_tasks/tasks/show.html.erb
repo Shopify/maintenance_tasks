@@ -41,12 +41,11 @@
   <pre><code><%= highlight_code(code) %></code></pre>
 <% end %>
 
-<% if @previous_runs.present? %>
+<% if @task.previous_runs.any? %>
   <hr/>
 
   <h4 class="title is-4">Previous Runs</h4>
-
-  <%= render @previous_runs %>
-
-  <%= pagination(@pagy) %>
+  <%= render @page.records %>
+  <%= pagination_text(@page, 'run')%>
+  <%= link_to "Next page", task_path(@task, page: @page.next_param) unless @page.last? %>
 <% end %>

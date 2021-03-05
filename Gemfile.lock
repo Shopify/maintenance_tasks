@@ -89,6 +89,9 @@ GEM
     concurrent-ruby (1.1.8)
     crass (1.0.6)
     erubi (1.10.0)
+    geared_pagination (1.1.0)
+      activesupport (>= 5.0)
+      addressable (>= 2.5.0)
     globalid (0.4.2)
       activesupport (>= 4.2.0)
     i18n (1.8.9)
@@ -206,6 +209,7 @@ PLATFORMS
 
 DEPENDENCIES
   capybara
+  geared_pagination (~> 1.1)
   maintenance_tasks!
   mocha
   pry-byebug

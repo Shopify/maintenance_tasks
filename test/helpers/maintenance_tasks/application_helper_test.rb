@@ -3,7 +3,10 @@ require 'test_helper'
 
 module MaintenanceTasks
   class ApplicationHelperTest < ActionView::TestCase
-    setup { @pagy = mock }
+    setup do
+      @pagy = mock
+      @page = mock
+    end
 
     test '#pagination returns nil if pages is less than or equal to 1' do
       @pagy.expects(pages: 1)
@@ -15,6 +18,23 @@ module MaintenanceTasks
       @pagy.expects(pages: 2)
       expects(:pagy_bulma_nav).with(@pagy).returns('pagination')
       assert_equal 'pagination', pagination(@pagy)
+    end
+
+    test '#pagination_text returns nil if pages is less than or equal to 1' do
+      @page.stubs(recordset: mock(page_count: 1))
+      assert_nil pagination_text(@page, 'run')
+    end
+
+    test '#pagination_text returns text with pagination info if pages is greater than 1' do
+      page_number = 1
+      total_pages = 2
+      records_count = 12
+      @page.stubs(
+        number: page_number,
+        recordset: mock(page_count: total_pages, records_count: records_count)
+      )
+      assert_equal '<span>Showing page 1 of 2 (12 total runs)</span>',
+        pagination_text(@page, 'run')
     end
 
     test '#time_ago returns a time element with the given datetime worded as relative to now and ISO 8601 UTC time in title attribute' do

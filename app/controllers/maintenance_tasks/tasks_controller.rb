@@ -20,7 +20,9 @@ module MaintenanceTasks
     def show
       @task = TaskData.find(params.fetch(:id))
       set_refresh if @task.last_run&.active?
-      @pagy, @previous_runs = pagy(@task.previous_runs)
+      set_page_and_extract_portion_from(@task.previous_runs,
+        ordered_by: { created_at: :desc })
+      set_paginated_headers
     end
 
     # Runs a given Task and redirects to the Task page.
