@@ -3,22 +3,7 @@ require 'test_helper'
 
 module MaintenanceTasks
   class ApplicationHelperTest < ActionView::TestCase
-    setup do
-      @pagy = mock
-      @page = mock
-    end
-
-    test '#pagination returns nil if pages is less than or equal to 1' do
-      @pagy.expects(pages: 1)
-      expects(:pagy_bulma_nav).never
-      assert_nil pagination(@pagy)
-    end
-
-    test '#pagination returns pagination element if pages is greater than 1' do
-      @pagy.expects(pages: 2)
-      expects(:pagy_bulma_nav).with(@pagy).returns('pagination')
-      assert_equal 'pagination', pagination(@pagy)
-    end
+    setup { @page = mock }
 
     test '#pagination_text returns nil if pages is less than or equal to 1' do
       @page.stubs(recordset: mock(page_count: 1))
