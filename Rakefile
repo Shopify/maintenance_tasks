@@ -26,4 +26,4 @@ RuboCop::RakeTask.new
 
 task(test: 'app:test')
 task('test:system' => 'app:test:system')
-task(default: ['db:setup', 'test', 'test:system', 'rubocop'])
+task(default: ['db:test:prepare', 'test', 'test:system', 'rubocop'])
