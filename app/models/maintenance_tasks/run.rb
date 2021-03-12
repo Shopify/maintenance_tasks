@@ -48,7 +48,7 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
-    has_one_attached :csv_file
+    has_one_attached :csv_file, service: MaintenanceTasks.active_storage_service
 
     # Sets the run status to enqueued, making sure the transition is validated
     # in case it's already enqueued.
