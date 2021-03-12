@@ -22,6 +22,7 @@ A Rails engine for queuing and managing maintenance tasks.
     * [Customizing the maintenance tasks module](#customizing-the-maintenance-tasks-module)
     * [Customizing the underlying job class](#customizing-the-underlying-job-class)
     * [Customizing the rate at which task progress gets updated](#customizing-the-rate-at-which-task-progress-gets-updated)
+    * [Customizing which Active Storage service to use](#customizing-which-active-storage-service-to-use)
 * [Upgrading](#upgrading)
 * [Contributing](#contributing)
 * [Releasing new versions](#releasing-new-versions)
@@ -400,6 +401,36 @@ MaintenanceTasks.ticker_delay = 2.seconds
 
 If no value is specified, it will default to 1 second.
 
+#### Customizing which Active Storage service to use
+
+The Active Storage framework in Rails 6.1 and up supports multiple storage
+services per environment. To specify which service to use,
+`MaintenanceTasks.active_storage_service` can be configured with the service's
+key, as specified in your application's `config/storage.yml`:
+
+```yaml
+# config/storage.yml
+user_data:
+  service: GCS
+  credentials: <%= Rails.root.join("path/to/user/data/keyfile.json") %>
+  project: "my-project"
+  bucket: "user-data-bucket"
+
+internal:
+  service: GCS
+  credentials: <%= Rails.root.join("path/to/internal/keyfile.json") %>
+  project: "my-project"
+  bucket: "internal-bucket"
+```
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+MaintenanceTasks.active_storage_service = :internal
+```
+
+There is no need to configure this option if your application uses only one
+storage service per environment.
+
 ## Upgrading
 
 Use bundler to check for and upgrade to newer versions. After installing a new
@@ -432,7 +463,7 @@ Once a release is ready, follow these steps:
 * Deploy via [Shipit][shipit] and see the new version on
   <https://rubygems.org/gems/maintenance_tasks>.
 * Ensure the release has documented all changes and publish it.
-* Create a new [draft release on GitHub][release] with the title 
+* Create a new [draft release on GitHub][release] with the title
   'Upcoming Release'. The tag version can be left blank. This will be the
   starting point for documenting changes related to the next release.
 

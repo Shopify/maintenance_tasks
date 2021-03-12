@@ -36,6 +36,12 @@ module MaintenanceTasks
   #   the ticker during Task iterations.
   mattr_accessor :ticker_delay, default: 1.second
 
+  # Specifies which Active Storage service to use for uploading CSV file blobs.
+  #
+  # @param [Symbol] the key for the storage service, as specified in the app's
+  #   config/storage.yml.
+  mattr_accessor :active_storage_service
+
   # Retrieves the callback to be performed when an error occurs in the task.
   def self.error_handler
     return @error_handler if defined?(@error_handler)
