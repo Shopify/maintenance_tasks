@@ -10,9 +10,11 @@ A Rails engine for queuing and managing maintenance tasks.
 * [Usage](#usage)
   * [Creating a Task](#creating-a-task)
   * [Creating a CSV Task](#creating-a-csv-task)
+  * [Creating a custom Task](#creating-a-custom-task)
   * [Considerations when writing Tasks](#considerations-when-writing-tasks)
   * [Writing tests for a Task](#writing-tests-for-a-task)
   * [Writing tests for a CSV Task](#writing-tests-for-a-csv-task)
+  * [Writing tests for a custom Task](#writing-tests-for-a-custom-task)
   * [Running a Task](#running-a-task)
   * [Monitoring your Task's status](#monitoring-your-tasks-status)
   * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
@@ -141,6 +143,106 @@ title,content
 My Title,Hello World!
 ```
 
+### Creating a custom Task
+
+TODO: Add generation instructions
+
+If you have a special use case requiring iteration over an unsupported
+collection type, such as external resources fetched from some API, you can
+implement the `enumerator_builder` method instead.
+
+This method should return an object responding to `enumerator(context:)` with
+an Enumerator, yielding pairs of `[item, item_cursor]` to the `process` method
+your Task defines. In order for your enumerator to support resuming iteration
+part way through, you may use the `context.cursor`.
+
+You may optionally provide an implementation for `count`, if appropriate.
+
+```ruby
+# app/tasks/maintenance/shopping_list_task.rb
+module Maintenance
+  class ShoppingListTask < MaintenanceTasks::Task
+    def enumerator_builder
+      IngredientsEnumerator.new
+    end
+
+    def process(ingredient)
+      ShoppingList.add(ingredient)
+    end
+
+    class IngredientEnumerator
+      def enumerator(context:)
+        Enumerator.new do |yielder|
+          cursor = context.cursor
+
+          if cursor.nil?
+            recipe = FancyRecipeAPI.random_recipe
+            ingredient_id = nil
+          else
+            recipe_id, ingredient_id = cursor.split(':', 2)
+            recipe = FancyRecipeAPI.recipe(recipe_id)
+          end
+
+          loop do
+            page = if ingredient_id.nil?
+              FancyRecipeAPI
+                .paginated_ingredients(recipe.id, max: 5)
+            else
+              FancyRecipeAPI
+                .paginated_ingredients(recipe.id, max: 5, after: ingredient_id)
+            end
+
+            page.entries.each do |ingredient|
+              ingredient_id = ingredient.id
+              cursor = "#{recipe.id}:#{ingredient.id}"
+
+              yielder.yield([ingredient, cursor])
+            end
+
+            break unless page.has_next?
+          end
+        end
+      end
+    end
+  end
+end
+```
+
+In some cases, you may have no use for a cursor (e.g. taking items off a queue
+until it is empty), in which case your Enumerator may yield `nil`
+cursors (i.e. pairs of `[item, nil]`).
+
+```ruby
+# app/tasks/maintenance/ingredient_purge_task.rb
+module Maintenance
+  class IngredientPurgeTask < MaintenanceTasks::Task
+    def enumerator_builder
+      ExpiredIngredientsEnumerator.new
+    end
+
+    def count
+      PantryAPI.ingredients(expired: true).count +
+        FridgeAPI.ingredients(expired: true).count +
+        FreezerAPI.ingredients(expired: true).count
+    end
+
+    def process(ingredient)
+      ingredient.compost!
+    end
+
+    class ExpiredIngredientsEnumerator
+      def enumerator(*)
+        Enumerator.chain(
+          PantryAPI.ingredients(expired: true).auto_paginate,
+          FridgeAPI.ingredients(expired: true).auto_paginate,
+          FreezerAPI.ingredients(expired: true).auto_paginate,
+        ).lazy.map { |ingredient| [ingredient, nil] }
+      end
+    end
+  end
+end
+```
+
 ### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to
@@ -213,6 +315,163 @@ module Maintenance
   end
 end
 ```
+
+### Writing test for a custom Task
+
+As with other tasks, you should write tests for your `#process` method. It will
+receive the first item in each pair your custom Enumerator yields (`[item,
+item_cursor]`).
+
+You should also ensure your Enumerator is tested, by unit testing it in
+isolation, testing your `#enumerator_builder` method, or both. Make sure you
+test how your Enumerator handles the absence or presence of a `context.cursor`,
+if applicable.
+
+```ruby
+# test/tasks/maintenance/shopping_list_task_test.rb
+module Maintenance
+  class ShoppingListTaskTest < ActiveSupport::TestCase
+    test '#process adds ingredients to the shopping list' do
+      ingredient = recipes(:tacos).first
+      ShoppingList.expects(:add).with(ingredient)
+
+      ShoppingListTask.process(ingredient)
+    end
+
+    test '#enumerator_builder.enumerator enumerates ingredients for a random recipe' do
+      FancyRecipeAPI.fake_it_till_you_make_it do
+        recipe = recipes(:tacos)
+        FancyRecipeAPI.expects(:random_recipe).returns(recipe)
+
+        expected_ingredient_pairs = ingredient_pairs(recipe)
+
+        context = stub('context', cursor: nil)
+        actual_ingredient_pairs = ShoppingListTask.enumerator_builder
+          .enumerator(context: context).to_a
+
+        assert_equal expected_ingredient_pairs, actual_ingredient_pairs
+      end
+    end
+
+    test '#enumerator_builder.enumerator enumerates remaining ingredients for the cursor recipe' do
+      FancyRecipeAPI.fake_it_till_you_make_it do
+        expected_ingredient_pairs = ingredient_pairs(recipes(:vegan_tacos))
+        ingredients_so_far = expected_ingredient_pairs.shift(3)
+        cursor = ingredients_so_far.last.last
+
+        context = stub('context', cursor: cursor)
+        actual_ingredient_pairs = ShoppingListTask.enumerator_builder
+          .enumerator(context: context).to_a
+
+        assert_equal expected_ingredient_pairs, actual_ingredient_pairs
+      end
+    end
+
+    test '#count returns nil, as we cannot guess the recipe choice' do
+      assert_nil ShoppingListTask.count
+    end
+
+    private
+
+    def ingredient_pairs(recipe)
+      recipe.ingredients.map do |ingredient|
+        cursor = "#{recipe.id}:#{ingredient.id}"
+        [ingredient, cursor]
+      end
+    end
+  end
+end
+```
+
+Depending on its complexity, you may choose to test your Enumerator builder in
+isolation, in which case you can simplify the tests for your Task.
+
+```ruby
+# test/tasks/maintenance/ingredient_purge_task_test.rb
+module Maintenance
+  class IngredientPurgeTaskTest < ActiveSupport::TestCase
+    test '#process composts ingredients' do
+      ingredient = ingredients(:tomato)
+      ingredient.expects(:compost!)
+
+      IngredientPurgeTask.process(ingredient)
+    end
+
+    test '#enumerator_builder returns an ExpiredIngredientsEnumerator' do
+      assert_instance_of(
+        ExpiredIngredientsEnumerator,
+        IngredientPurgeTask.enumerator_builder,
+      )
+    end
+  end
+end
+```
+
+```ruby
+# test/models/expired_ingredients_enumerator_test.rb
+class ExpiredIngredientsEnumeratorTest < ActiveSupport::TestCase
+  setup do
+    [PantryAPI, FridgeAPI, FreezerAPI].each(&:enable_test_mode!)
+  end
+
+  teardown do
+    [PantryAPI, FridgeAPI, FreezerAPI].each(&:disable_test_mode!)
+  end
+
+  test '#enumerator enumerates expired ingredients, ignoring cursor' do
+    expirees = []
+
+    PantryAPI.stock(ingredients(:fresh_tomatoes))
+
+    ingredients(:green_potatoes).tap do |ingredient|
+      PantryAPI.stock(ingredient)
+      expirees << ingredient
+    end
+
+    ingredients(:curdled_milk).tap do |ingredient|
+      FridgeAPI.stock(ingredient)
+      expirees << ingredient
+    end
+
+    FridgeAPI.stock(ingredients(:leftover_pizza))
+
+    ingredients(
+      :entire_pack_of_strawberries_ruined_by_that_single_one_that_had_mold,
+    ).tap do |ingredient|
+      FridgeAPI.stock(ingredient)
+      expirees << ingredient
+    end
+
+    ingredients(:mysterious_container).tap do |ingredient|
+      FreezerAPI.stock(ingredient)
+      expirees << ingredient
+    end
+
+    FreezerAPI.stock(ingredients(:ice_cubes))
+
+    expected_pairs = expirees.map do |ingredient|
+      cursor = nil
+      [ingredient, cursor]
+    end
+
+    context = stub('context')
+    context.expects(:cursor).never
+
+    actual_pairs =
+      ExpiredIngredientsEnumerator.enumerator(context: context).to_a
+
+    assert_equal expected_pairs, actual_pairs
+  end
+
+  test '#enumerator is empty if no expired ingredients' do
+    PantryAPI.stock(ingredients(:tortillas))
+
+    assert_empty ExpiredIngredientsEnumerator.enumerator(context: context).to_a
+  end
+end
+```
+
+</details>
 
 ### Running a Task
 

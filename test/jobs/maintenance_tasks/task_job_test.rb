@@ -238,6 +238,93 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test '.perform_now accepts custom enumerated tasks' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+    end
+
+    test '.perform_now handles cursors provided by custom enumerated tasks' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      TaskJob.perform_now(run)
+
+      assert_equal 2, run.reload.cursor
+    end
+
+    test '.perform_now handles custom enumerated tasks with nil cursors' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
+        .stubs(:enumerator).returns(%i(a b c).to_enum(:each_with_object, nil))
+      # TODO: just be explicit
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_nil run.reload.cursor
+      assert_predicate run, :succeeded?
+    end
+
+    test '.perform_now rejects accepts enumerated tasks yielding item instead of [item, cursor] pair' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
+        .stubs(:enumerator).returns(%i(a b c).to_enum(:each))
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_nil run.reload.cursor
+      assert_predicate run, :succeeded?
+      flunk 'this should break'
+    end
+
+    test '.perform_now rejects accepts enumerated tasks yielding [item] instead of [item, cursor] pair' do
+      run = Run.create!(task_name: 'Maintenance::CustomEnumeratingTask')
+
+      Maintenance::CustomEnumeratingTask::CustomEnumeratorBuilder.any_instance
+        .stubs(:enumerator).returns([[:a], [:b], [:c]].to_enum(:each))
+
+      %i(a b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_nil run.reload.cursor
+      assert_predicate run, :succeeded?
+      flunk 'this should break'
+    end
+
+    test '.perform_now can resume custom enumerated tasks' do
+      run = Run.create!(
+        task_name: 'Maintenance::CustomEnumeratingTask',
+        cursor: 0,
+      )
+
+      %i(b c).each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+    end
+
     test '.perform_now sets the Run as errored when the Task collection is invalid' do
       Maintenance::TestTask.any_instance.stubs(collection: 'not a collection')
 
@@ -248,7 +335,7 @@ module MaintenanceTasks
       assert_equal 'ArgumentError', @run.error_class
       assert_empty @run.backtrace
       expected_message = 'Maintenance::TestTask#collection '\
-        'must be either an Active Record Relation, Array, or CSV.'
+        'must be either an Active Record Relation, or Array.'
       assert_equal expected_message, @run.error_message
     end
 

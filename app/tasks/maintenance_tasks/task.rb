@@ -50,6 +50,15 @@ module MaintenanceTasks
         new.process(item)
       end
 
+      # Returns the Enumerator builder for this Task.
+      #
+      # Especially useful for tests.
+      #
+      # @return the enumerator builder.
+      def enumerator_builder
+        new.enumerator_builder
+      end
+
       # Returns the collection for this Task.
       #
       # Especially useful for tests.
@@ -77,8 +86,56 @@ module MaintenanceTasks
       end
     end
 
+    # @api private
+    ActiveRecordEnumeratorBuilder = Struct.new(:relation) do
+      def enumerator(context:)
+        JobIteration::EnumeratorBuilder.new(nil).active_record_on_records(
+          relation,
+          cursor: context.cursor,
+        )
+      end
+    end
+    private_constant :ActiveRecordEnumeratorBuilder
+
+    # @api private
+    ArrayEnumeratorBuilder = Struct.new(:array) do
+      def enumerator(context:)
+        JobIteration::EnumeratorBuilder.new(nil).build_array_enumerator(
+          array,
+          cursor: context.cursor,
+        )
+      end
+    end
+    private_constant :ArrayEnumeratorBuilder
+
+    # Returns an Enumerator builder wrapping the collection. Supported
+    # collection types are ActiveRecord::Relations, or Arrays.
+    #
+    # Tasks may override this to return a custom Enumerator builder, when
+    # requiring enumeration over an unsupported collection type. The object
+    # returned must respond to .enumerator(context:), and return an Enumerator
+    # yielding pairs of items and their cursor. The context object provided to
+    # .enumerator will respond to .cursor, returning the previous item's cursor,
+    # or nil (if this is the first iteration), to support resuming enumeration.
+    def enumerator_builder
+      collection = self.collection
+
+      case collection
+      when ActiveRecord::Relation
+        ActiveRecordEnumeratorBuilder.new(collection)
+      when Array
+        ArrayEnumeratorBuilder.new(collection)
+      else
+        raise ArgumentError, "#{self.class.name}#collection must be either "\
+          'an Active Record Relation, or Array.'
+      end
+    end
+
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
+    #
+    # Tasks with a custom #enumerator_builder are not required to implement this
+    # method.
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.

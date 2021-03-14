@@ -32,18 +32,14 @@ module MaintenanceTasks
     end
 
     test 'generator creates a task spec if the application is using RSpec' do
-      generators_config = Rails.application.config.generators
-      old_test_framework = generators_config.options[:rails][:test_framework]
-      generators_config.options[:rails][:test_framework] = :rspec
+      with_rspec do
+        run_generator(['sleepy'])
 
-      run_generator(['sleepy'])
-
-      assert_file('spec/tasks/maintenance/sleepy_task_spec.rb') do |task_spec|
-        assert_match(/module Maintenance/, task_spec)
-        assert_match(/RSpec.describe SleepyTask/, task_spec)
+        assert_file('spec/tasks/maintenance/sleepy_task_spec.rb') do |task_spec|
+          assert_match(/module Maintenance/, task_spec)
+          assert_match(/RSpec.describe SleepyTask/, task_spec)
+        end
       end
-    ensure
-      generators_config.options[:rails][:test_framework] = old_test_framework
     end
 
     test 'generator uses configured tasks module' do
@@ -72,13 +68,71 @@ module MaintenanceTasks
       assert_file 'app/tasks/maintenance/sleepy_task.rb'
     end
 
-    test 'generator creates a CSV Task if the --csv option is supplied' do
-      run_generator ['sleepy', '--csv']
+    test 'generator creates a CSV Task if the --type=csv option is supplied' do
+      run_generator ['sleepy', '--type=csv']
       assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
         assert_match(/class SleepyTask < MaintenanceTasks::Task/, task)
         assert_match(/csv_collection/, task)
         assert_match(/def process\(row\)/, task)
       end
+    end
+
+    test 'generator creates a generic collection task if the --type=collection option is supplied' do
+      run_generator ['sleepy', '--type=collection']
+      assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
+        assert_match(/def collection/, task)
+        assert_match(/def process\(element\)/, task)
+      end
+    end
+
+    test 'generator aborts if the --type option is supplied with an unknown value' do
+      stderr = capture(:stderr) do
+        run_generator ['sleepy', '--type=unknown']
+      end
+      assert_no_file 'app/tasks/maintenance/sleepy_task.rb'
+      assert_match(/Unknown task type "unknown"\. Must be one of:/, stderr)
+    end
+
+    test 'generator creates a custom Task if the --type=custom option is supplied' do
+      run_generator ['sleepy', '--type=custom']
+      assert_file 'app/tasks/maintenance/sleepy_task.rb' do |task|
+        assert_match(/class SleepyTask < MaintenanceTasks::Task/, task)
+        assert_match(/enumerator_builder/, task)
+        assert_match(/def process\(element\)/, task)
+        assert_match(/def count/, task)
+      end
+      assert_file 'test/tasks/maintenance/sleepy_task_test.rb' do |task_test|
+        assert_match(/module Maintenance/, task_test)
+        assert_match(
+          /class SleepyTaskTest < ActiveSupport::TestCase/,
+          task_test
+        )
+        assert_match(/test "#enumerator_builder/, task_test)
+      end
+    end
+
+    test 'generator creates a custom Task spec if the --type=custom option is supplied and the application is using RSpec' do
+      with_rspec do
+        run_generator ['sleepy', '--type=custom']
+
+        assert_file('spec/tasks/maintenance/sleepy_task_spec.rb') do |task_spec|
+          assert_match(/module Maintenance/, task_spec)
+          assert_match(/RSpec.describe SleepyTask/, task_spec)
+          assert_match(/describe '#enumerator_builder'/, task_spec)
+        end
+      end
+    end
+
+    private
+
+    def with_rspec
+      generators_config = Rails.application.config.generators
+      old_test_framework = generators_config.options[:rails][:test_framework]
+      generators_config.options[:rails][:test_framework] = :rspec
+
+      yield
+    ensure
+      generators_config.options[:rails][:test_framework] = old_test_framework
     end
   end
 end

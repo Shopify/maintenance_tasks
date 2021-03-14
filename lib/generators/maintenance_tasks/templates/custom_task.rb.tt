@@ -1,0 +1,22 @@
+# frozen_string_literal: true
+
+module <%= tasks_module %>
+<% module_namespacing do -%>
+  class <%= class_name %>Task < MaintenanceTasks::Task
+    def enumerator_builder
+      # Return an object which responds to .enumerator(context:),
+      # and yields pairs of [element, element_cursor]
+      # for each element the Task should iterate over
+    end
+
+    def process(element)
+      # The work to be done in a single iteration of the task
+    end
+
+    def count
+      # Optionally, define the number of rows that will be iterated over
+      # This is used to track the task's progress
+    end
+  end
+<% end -%>
+end

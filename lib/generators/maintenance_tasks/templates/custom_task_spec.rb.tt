@@ -9,6 +9,12 @@ module <%= tasks_module %>
     #     <%= tasks_module %>::<%= class_name %>Task.process(element)
     #   end
     # end
+
+    # describe '#enumerator_builder' do
+    #   it 'knows how to enumerate the custom collection' do
+    #     <%= tasks_module %>::<%= class_name %>Task.enumerator_builder(element)
+    #   end
+    # end
   end
 <% end -%>
 end
