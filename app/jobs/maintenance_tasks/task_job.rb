@@ -122,13 +122,18 @@ module MaintenanceTasks
 
     def on_error(error)
       @ticker.persist if defined?(@ticker)
-      @run.persist_error(error)
 
-      task_context = {
-        task_name: @run.task_name,
-        started_at: @run.started_at,
-        ended_at: @run.ended_at,
-      }
+      if defined?(@run)
+        @run.persist_error(error)
+
+        task_context = {
+          task_name: @run.task_name,
+          started_at: @run.started_at,
+          ended_at: @run.ended_at,
+        }
+      else
+        task_context = {}
+      end
       errored_element = @errored_element if defined?(@errored_element)
       MaintenanceTasks.error_handler.call(error, task_context, errored_element)
     end

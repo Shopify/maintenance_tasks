@@ -316,5 +316,26 @@ module MaintenanceTasks
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
+
+    test '.perform_now handles case where run is not set and calls error handler' do
+      error_handler_before = MaintenanceTasks.error_handler
+      handled_error = nil
+      handled_task_context = nil
+      MaintenanceTasks.error_handler = ->(error, task_context, _errored_el) do
+        handled_error = error
+        handled_task_context = task_context
+      end
+
+      RaisingTaskJob = Class.new(TaskJob) do
+        before_perform(prepend: true) { raise 'Uh oh!' }
+      end
+
+      RaisingTaskJob.perform_now(@run)
+
+      assert_equal('Uh oh!', handled_error.message)
+      assert_empty(handled_task_context)
+    ensure
+      MaintenanceTasks.error_handler = error_handler_before
+    end
   end
 end
