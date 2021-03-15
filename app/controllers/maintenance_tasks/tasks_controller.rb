@@ -27,7 +27,8 @@ module MaintenanceTasks
     def run
       task = Runner.run(
         name: params.fetch(:id),
-        csv_file: params[:csv_file]
+        csv_file: params[:csv_file],
+        params: params[:task_params],
       )
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error

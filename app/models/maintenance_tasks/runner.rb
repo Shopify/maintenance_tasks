@@ -43,19 +43,19 @@ module MaintenanceTasks
     # @raise [EnqueuingError] if an error occurs while enqueuing the Run.
     # @raise [ActiveRecord::RecordInvalid] if validation errors occur while
     #   creating the Run.
-    def run(name:, csv_file: nil)
+    def run(name:, csv_file: nil, params:)
       run = Run.active.find_by(task_name: name) || Run.new(task_name: name)
       run.csv_file.attach(csv_file) if csv_file
 
       run.enqueued!
-      enqueue(run)
+      enqueue(run, params)
       Task.named(name)
     end
 
     private
 
-    def enqueue(run)
-      unless MaintenanceTasks.job.constantize.perform_later(run)
+    def enqueue(run, params)
+      unless MaintenanceTasks.job.constantize.perform_later(run, params)
         raise "The job to perform #{run.task_name} could not be enqueued. "\
           'Enqueuing has been prevented by a callback.'
       end

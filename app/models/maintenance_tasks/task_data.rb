@@ -132,6 +132,15 @@ module MaintenanceTasks
       !deleted? && Task.named(name) < CsvCollection
     end
 
+    def has_params?
+      !deleted? && Task.named(name).params.any?
+    end
+
+    def params
+      return unless has_params?
+      Task.named(name).params.keys
+    end
+
     private
 
     def runs

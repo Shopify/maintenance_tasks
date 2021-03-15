@@ -41,6 +41,18 @@ module MaintenanceTasks
         include(CsvCollection)
       end
 
+      # The list of available parameters on the Task
+      def params
+        @params ||= {}
+      end
+
+      # Define a parameter for this Task.
+      def param(name, type)
+        puts name, type
+        params[name] = type
+        # attr_accessor name
+      end
+
       # Processes one item.
       #
       # Especially useful for tests.
@@ -106,5 +118,19 @@ module MaintenanceTasks
     # @return [Integer, nil]
     def count
     end
+
+    # Set params on the Task so it's accessible from Task code
+    def set_params(params)
+      params.each do |param_name, param_value|
+        attr_accessor param_name
+        param = param_value # need to coerce into what we expect
+      end
+    end
+
+    private
+
+    # def coerce_param(value, type)
+    #   raise unless type in [Integer, Float, String, Boolean, Array, Hash]
+    # end
   end
 end
