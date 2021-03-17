@@ -5,8 +5,6 @@ module MaintenanceTasks
   #
   # Can be extended to add different authentication and authorization code.
   class ApplicationController < ActionController::Base
-    include Pagy::Backend
-
     BULMA_CDN = 'https://cdn.jsdelivr.net'
 
     content_security_policy do |policy|

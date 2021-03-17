@@ -40,6 +40,38 @@ module MaintenanceTasks
       assert_text 'Ran for less than 5 seconds, finished 8 days ago.'
     end
 
+    test 'view a Task with multiple pages of Runs' do
+      Run.create!(
+        task_name: 'Maintenance::TestTask',
+        created_at: 1.hour.ago,
+        started_at: 1.hour.ago,
+        tick_count: 2,
+        tick_total: 10,
+        status: :errored,
+        ended_at: 1.hour.ago
+      )
+      21.times do |i|
+        Run.create!(
+          task_name: 'Maintenance::TestTask',
+          created_at: i.minutes.ago,
+          started_at: i.minutes.ago,
+          tick_count: 10,
+          tick_total: 10,
+          status: :succeeded,
+          ended_at: i.minutes.ago
+        )
+      end
+
+      visit maintenance_tasks_path
+
+      click_on('Maintenance::TestTask')
+      assert_no_text 'Errored'
+
+      click_on('Next page')
+      assert_text 'Errored'
+      assert_no_link 'Next page'
+    end
+
     test 'show a deleted Task' do
       visit maintenance_tasks_path + '/tasks/Maintenance::DeletedTask'
 
