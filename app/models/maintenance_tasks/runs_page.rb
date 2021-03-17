@@ -26,12 +26,14 @@ module MaintenanceTasks
     # @return [ActiveRecord::Relation<MaintenanceTasks::Run>] a limited amount
     #  of Run records.
     def records
-      runs_after_cursor = if @cursor.present?
-        @runs.where('id < ?', @cursor)
-      else
-        @runs
+      @records ||= begin
+        runs_after_cursor = if @cursor.present?
+          @runs.where('id < ?', @cursor)
+        else
+          @runs
+        end
+        runs_after_cursor.limit(RUNS_PER_PAGE)
       end
-      runs_after_cursor.limit(RUNS_PER_PAGE)
     end
 
     # Returns the cursor to use for the next Page of Runs. It is the id of the
@@ -47,7 +49,7 @@ module MaintenanceTasks
     # @return [Boolean] whether this Page contains the last Run record in the
     #   Runs dataset that is being paginated.
     def last?
-      @runs.last == records.last
+      @runs.unscope(:includes).pluck(:id).last == next_cursor
     end
   end
 end

@@ -41,7 +41,7 @@
   <pre><code><%= highlight_code(code) %></code></pre>
 <% end %>
 
-<% if @runs_page.records.any? %>
+<% if @runs_page.records.present? %>
   <hr/>
 
   <h4 class="title is-4">Previous Runs</h4>
