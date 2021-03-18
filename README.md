@@ -339,12 +339,15 @@ end
 
 The error handler should be a lambda that accepts three arguments:
 
-* `error`: The object containing the exception that was raised.
+* `error`: The exception that was raised.
 * `task_context`: A hash with additional information about the Task and the
   error:
   * `task_name`: The name of the Task that errored
   * `started_at`: The time the Task started
   * `ended_at`: The time the Task errored
+  Note that `task_context` may be empty if the Task produced an error before any
+  context could be gathered (for example, if deserializing the job to process
+  your Task failed).
 * `errored_element`: The element, if any, that was being processed when the
   Task raised an exception. If you would like to pass this object to your
   exception monitoring service, make sure you **sanitize the object** to avoid
