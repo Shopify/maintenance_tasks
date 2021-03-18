@@ -25,21 +25,17 @@ module MaintenanceTasks
 
     private
 
-    def build_enumerator(_run, cursor:)
-      cursor ||= @run.cursor
-      collection = @task.collection
+    EnumeratorContext = Struct.new(
+      :cursor,
+      :enumerator_builder,
+      keyword_init: true,
+    )
 
-      case collection
-      when ActiveRecord::Relation
-        enumerator_builder.active_record_on_records(collection, cursor: cursor)
-      when Array
-        enumerator_builder.build_array_enumerator(collection, cursor: cursor)
-      when CSV
-        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
-      else
-        raise ArgumentError, "#{@task.class.name}#collection must be either "\
-          'an Active Record Relation, Array, or CSV.'
-      end
+    def build_enumerator(_run, cursor:)
+      @task.enumerator(context: EnumeratorContext.new(
+        cursor: cursor || @run.cursor,
+        enumerator_builder: enumerator_builder,
+      ))
     end
 
     # Performs task iteration logic for the current input returned by the

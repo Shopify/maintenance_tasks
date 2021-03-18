@@ -216,6 +216,16 @@ module MaintenanceTasks
       TaskJob.perform_now(@run)
     end
 
+    test '.perform_now start job from cursor position when job resumes for custom enumerator task' do
+      @run = Run.create!(task_name: 'Maintenance::DynamicTask')
+
+      @run.update!(cursor: 1)
+
+      Maintenance::DynamicTask.any_instance.expects(:process).twice
+
+      TaskJob.perform_now(@run)
+    end
+
     test '.perform_now accepts Active Record Relations as collection' do
       Maintenance::TestTask.any_instance.stubs(collection: Post.all)
       Maintenance::TestTask.any_instance.expects(:process).times(Post.count)
@@ -238,6 +248,16 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test '.perform_now accepts callable collection' do
+      @run = Run.create!(task_name: 'Maintenance::DynamicTask')
+
+      Maintenance::DynamicTask.any_instance.expects(:process).times(3)
+
+      TaskJob.perform_now(@run)
+
+      assert_predicate @run.reload, :succeeded?
+    end
+
     test '.perform_now sets the Run as errored when the Task collection is invalid' do
       Maintenance::TestTask.any_instance.stubs(collection: 'not a collection')
 
@@ -248,7 +268,7 @@ module MaintenanceTasks
       assert_equal 'ArgumentError', @run.error_class
       assert_empty @run.backtrace
       expected_message = 'Maintenance::TestTask#collection '\
-        'must be either an Active Record Relation, Array, or CSV.'
+        'must be either an Active Record Relation, an Array, or a CSV.'
       assert_equal expected_message, @run.error_message
     end
 
