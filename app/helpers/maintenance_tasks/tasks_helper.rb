@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'ripper'
+require "ripper"
 
 module MaintenanceTasks
   # Helpers for formatting data in the maintenance_tasks views.
@@ -8,16 +8,16 @@ module MaintenanceTasks
   # @api private
   module TasksHelper
     STATUS_COLOURS = {
-      'new' => ['is-primary'],
-      'enqueued' => ['is-primary is-light'],
-      'running' => ['is-info'],
-      'interrupted' => ['is-info', 'is-light'],
-      'pausing' => ['is-warning', 'is-light'],
-      'paused' => ['is-warning'],
-      'succeeded' => ['is-success'],
-      'cancelling' => ['is-light'],
-      'cancelled' => ['is-dark'],
-      'errored' => ['is-danger'],
+      "new" => ["is-primary"],
+      "enqueued" => ["is-primary is-light"],
+      "running" => ["is-info"],
+      "interrupted" => ["is-info", "is-light"],
+      "pausing" => ["is-warning", "is-light"],
+      "paused" => ["is-warning"],
+      "succeeded" => ["is-success"],
+      "cancelling" => ["is-light"],
+      "cancelled" => ["is-dark"],
+      "errored" => ["is-danger"],
     }
 
     # Formats a run backtrace.
@@ -48,7 +48,7 @@ module MaintenanceTasks
         value: progress.value,
         max: progress.max,
         title: progress.title,
-        class: ['progress'] + STATUS_COLOURS.fetch(run.status)
+        class: ["progress"] + STATUS_COLOURS.fetch(run.status)
       )
     end
 
@@ -59,7 +59,7 @@ module MaintenanceTasks
     # @return [String] the span element containing the status, with the
     #   appropriate tag class attached.
     def status_tag(status)
-      tag.span(status.capitalize, class: ['tag'] + STATUS_COLOURS.fetch(status))
+      tag.span(status.capitalize, class: ["tag"] + STATUS_COLOURS.fetch(status))
     end
 
     # Returns the distance between now and the Run's expected completion time,
@@ -100,7 +100,7 @@ module MaintenanceTasks
         when :on_nl, :on_sp, :on_ignored_nl
           content
         else
-          tag.span(content, class: type.to_s.sub('on_', 'ruby-').dasherize)
+          tag.span(content, class: type.to_s.sub("on_", "ruby-").dasherize)
         end
       end
       safe_join(tokens)

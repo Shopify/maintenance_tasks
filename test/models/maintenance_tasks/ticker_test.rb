@@ -1,12 +1,12 @@
 # frozen_string_literal: true
 
-require 'test_helper'
+require "test_helper"
 
 module MaintenanceTasks
   class TickerTest < ActiveSupport::TestCase
     setup { freeze_time }
 
-    test '#ticks persists if enough time has passed' do
+    test "#ticks persists if enough time has passed" do
       ticker = Ticker.new(0) do |ticks, duration|
         @ticks = ticks
         @duration = duration
@@ -24,7 +24,7 @@ module MaintenanceTasks
       refute @called
     end
 
-    test '#tick persists if the tick happens after the duration has passed' do
+    test "#tick persists if the tick happens after the duration has passed" do
       ticker = Ticker.new(1.second) do |ticks, duration|
         @ticks = ticks
         @duration = duration
@@ -35,7 +35,7 @@ module MaintenanceTasks
       assert_equal 2, @duration
     end
 
-    test '#tick persists multiple ticks after the duration has passed' do
+    test "#tick persists multiple ticks after the duration has passed" do
       ticker = Ticker.new(1.second) do |ticks, duration|
         @ticks = ticks
         @duration = duration

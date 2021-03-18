@@ -13,8 +13,8 @@ module MaintenanceTasks
     # @param datetime [ActiveSupport::TimeWithZone] the time to be presented.
     # @return [String] the HTML to render with the relative datetime in words.
     def time_ago(datetime)
-      time_tag(datetime, title: datetime.utc.iso8601, class: 'is-clickable') do
-        time_ago_in_words(datetime) + ' ago'
+      time_tag(datetime, title: datetime.utc.iso8601, class: "is-clickable") do
+        time_ago_in_words(datetime) + " ago"
       end
     end
   end

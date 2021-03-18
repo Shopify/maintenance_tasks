@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'thor'
+require "thor"
 
 module MaintenanceTasks
   # Defines the command line interface commands exposed by Maintenance Tasks in
@@ -13,7 +13,7 @@ module MaintenanceTasks
       end
     end
 
-    desc 'perform [TASK NAME]', 'Runs the given Maintenance Task'
+    desc "perform [TASK NAME]", "Runs the given Maintenance Task"
 
     long_desc <<-LONGDESC
       `maintenance_tasks perform` will run the Maintenance Task specified by the
@@ -25,7 +25,7 @@ module MaintenanceTasks
     LONGDESC
 
     # Specify the CSV file to process for CSV Tasks
-    option :csv, desc: 'Supply a CSV file to be processed by a CSV Task, '\
+    option :csv, desc: "Supply a CSV file to be processed by a CSV Task, "\
       '--csv "path/to/csv/file.csv"'
 
     # Command to run a Task.

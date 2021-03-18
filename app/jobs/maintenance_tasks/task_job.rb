@@ -19,7 +19,7 @@ module MaintenanceTasks
       # Overrides ActiveJob::Exceptions.retry_on to declare it unsupported.
       # The use of rescue_from prevents retry_on from being usable.
       def retry_on(*, **)
-        raise NotImplementedError, 'retry_on is not supported'
+        raise NotImplementedError, "retry_on is not supported"
       end
     end
 
@@ -38,7 +38,7 @@ module MaintenanceTasks
         JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
       else
         raise ArgumentError, "#{@task.class.name}#collection must be either "\
-          'an Active Record Relation, Array, or CSV.'
+          "an Active Record Relation, Array, or CSV."
       end
     end
 

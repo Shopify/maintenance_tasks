@@ -5,14 +5,14 @@ module MaintenanceTasks
   #
   # @api private
   class TaskGenerator < Rails::Generators::NamedBase
-    source_root File.expand_path('templates', __dir__)
-    desc 'This generator creates a task file at app/tasks and a corresponding '\
-      'test.'
+    source_root File.expand_path("templates", __dir__)
+    desc "This generator creates a task file at app/tasks and a corresponding "\
+      "test."
 
     class_option :csv, type: :boolean, default: false,
-      desc: 'Generate a CSV Task.'
+      desc: "Generate a CSV Task."
 
-    check_class_collision suffix: 'Task'
+    check_class_collision suffix: "Task"
 
     # Creates the Task file.
     def create_task_file
@@ -22,9 +22,9 @@ module MaintenanceTasks
         "#{file_name}_task.rb"
       )
       if options[:csv]
-        template('csv_task.rb', template_file)
+        template("csv_task.rb", template_file)
       else
-        template('task.rb', template_file)
+        template("task.rb", template_file)
       end
     end
 
@@ -49,7 +49,7 @@ module MaintenanceTasks
         class_path,
         "#{file_name}_task_test.rb"
       )
-      template('task_test.rb', template_file)
+      template("task_test.rb", template_file)
     end
 
     def create_task_spec_file
@@ -58,11 +58,11 @@ module MaintenanceTasks
         class_path,
         "#{file_name}_task_spec.rb"
       )
-      template('task_spec.rb', template_file)
+      template("task_spec.rb", template_file)
     end
 
     def file_name
-      super.sub(/_task\z/i, '')
+      super.sub(/_task\z/i, "")
     end
 
     def tasks_module

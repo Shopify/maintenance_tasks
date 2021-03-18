@@ -2,16 +2,16 @@
 MaintenanceTasks::Engine.routes.draw do
   resources :tasks, only: [:index, :show], format: false do
     member do
-      put 'run'
+      put "run"
     end
 
     resources :runs, only: [], format: false do
       member do
-        put 'pause'
-        put 'cancel'
+        put "pause"
+        put "cancel"
       end
     end
   end
 
-  root to: 'tasks#index'
+  root to: "tasks#index"
 end

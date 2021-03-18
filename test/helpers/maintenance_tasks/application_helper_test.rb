@@ -1,9 +1,9 @@
 # frozen_string_literal: true
-require 'test_helper'
+require "test_helper"
 
 module MaintenanceTasks
   class ApplicationHelperTest < ActionView::TestCase
-    test '#time_ago returns a time element with the given datetime worded as relative to now and ISO 8601 UTC time in title attribute' do
+    test "#time_ago returns a time element with the given datetime worded as relative to now and ISO 8601 UTC time in title attribute" do
       travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
       time = Time.zone.local(2020, 01, 01, 01, 00, 00)
 
