@@ -41,7 +41,7 @@ module MaintenanceTasks
         task_names = Task.available_tasks.map(&:name)
         available_task_runs = Run.where(task_name: task_names)
         last_runs = Run.where(
-          id: available_task_runs.select('MAX(id) as id').group(:task_name)
+          id: available_task_runs.select("MAX(id) as id").group(:task_name)
         )
 
         task_names.map do |task_name|
@@ -111,7 +111,7 @@ module MaintenanceTasks
     #
     # @return [String] the Task status.
     def status
-      last_run&.status || 'new'
+      last_run&.status || "new"
     end
 
     # Retrieves the Task's category, which is one of active, new, or completed.

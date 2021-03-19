@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require 'csv'
+require "csv"
 
 module MaintenanceTasks
   # Module that is included into Task classes by Task.csv_collection for

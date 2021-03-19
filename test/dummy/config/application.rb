@@ -1,28 +1,28 @@
 # frozen_string_literal: true
-require_relative 'boot'
+require_relative "boot"
 
 verbose = $VERBOSE
 $VERBOSE = false
-require 'action_mailbox/engine'
+require "action_mailbox/engine"
 $VERBOSE = verbose
 
-require 'rails/all'
+require "rails/all"
 
 Bundler.require(*Rails.groups)
-require 'maintenance_tasks'
+require "maintenance_tasks"
 
 module Dummy
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults(6.1)
 
-    if ENV['CLASSIC_AUTOLOADER'].present?
-      puts '=> Using classic autoloader'
+    if ENV["CLASSIC_AUTOLOADER"].present?
+      puts "=> Using classic autoloader"
       config.autoloader = :classic
     end
 
     config.to_prepare do
-      MaintenanceTasks.job = 'CustomTaskJob'
+      MaintenanceTasks.job = "CustomTaskJob"
     end
 
     # Only include the helper module which match the name of the controller.

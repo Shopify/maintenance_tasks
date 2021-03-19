@@ -8,7 +8,7 @@ module MaintenanceTasks
     # @deprecated Use {Runner} directly instead.
     def new
       ActiveSupport::Deprecation.warn(
-        'Use Runner.run instead of Runner.new.run'
+        "Use Runner.run instead of Runner.new.run"
       )
       self
     end
@@ -57,7 +57,7 @@ module MaintenanceTasks
     def enqueue(run)
       unless MaintenanceTasks.job.constantize.perform_later(run)
         raise "The job to perform #{run.task_name} could not be enqueued. "\
-          'Enqueuing has been prevented by a callback.'
+          "Enqueuing has been prevented by a callback."
       end
     rescue => error
       run.persist_error(error)

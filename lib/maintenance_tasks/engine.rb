@@ -1,5 +1,5 @@
 # frozen_string_literal: true
-require 'active_record/railtie'
+require "active_record/railtie"
 
 module MaintenanceTasks
   # The engine's main class, which defines its namespace. The engine is mounted
@@ -7,7 +7,7 @@ module MaintenanceTasks
   class Engine < ::Rails::Engine
     isolate_namespace MaintenanceTasks
 
-    initializer 'eager_load_for_classic_autoloader' do
+    initializer "eager_load_for_classic_autoloader" do
       eager_load! unless Rails.autoloaders.zeitwerk_enabled?
     end
 
@@ -25,7 +25,7 @@ module MaintenanceTasks
     end
 
     config.action_dispatch.rescue_responses.merge!(
-      'MaintenanceTasks::Task::NotFoundError' => :not_found,
+      "MaintenanceTasks::Task::NotFoundError" => :not_found,
     )
   end
 end

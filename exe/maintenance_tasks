@@ -2,11 +2,11 @@
 
 # frozen_string_literal: true
 
-require File.expand_path('config/application', Dir.pwd)
+require File.expand_path("config/application", Dir.pwd)
 
 Rails.application.require_environment!
 
-require 'maintenance_tasks/cli'
+require "maintenance_tasks/cli"
 
 module MaintenanceTasks
   CLI.start(ARGV)

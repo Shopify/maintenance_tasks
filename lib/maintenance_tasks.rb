@@ -1,15 +1,15 @@
 # frozen_string_literal: true
-require 'action_controller'
-require 'action_view'
-require 'active_job'
-require 'active_record'
+require "action_controller"
+require "action_view"
+require "active_job"
+require "active_record"
 
-require 'job-iteration'
-require 'maintenance_tasks/engine'
+require "job-iteration"
+require "maintenance_tasks/engine"
 
 # Force the TaskJob class to load so we can verify upstream compatibility with
 # the JobIteration gem
-require_relative '../app/jobs/maintenance_tasks/task_job'
+require_relative "../app/jobs/maintenance_tasks/task_job"
 
 # The engine's namespace module. It provides isolation between the host
 # application's code and the engine-specific code. Top-level engine constants
@@ -17,13 +17,13 @@ require_relative '../app/jobs/maintenance_tasks/task_job'
 module MaintenanceTasks
   # The module to namespace Tasks in, as a String. Defaults to 'Maintenance'.
   # @param [String] the tasks_module value.
-  mattr_accessor :tasks_module, default: 'Maintenance'
+  mattr_accessor :tasks_module, default: "Maintenance"
 
   # Defines the job to be used to perform Tasks. This job must be either
   # `MaintenanceTasks::TaskJob` or a class that inherits from it.
   #
   # @param [String] the name of the job class.
-  mattr_accessor :job, default: 'MaintenanceTasks::TaskJob'
+  mattr_accessor :job, default: "MaintenanceTasks::TaskJob"
 
   # After each iteration, the progress of the task may be updated. This duration
   # in seconds limits these updates, skipping if the duration since the last
@@ -50,8 +50,8 @@ module MaintenanceTasks
   def self.error_handler=(error_handler)
     unless error_handler.arity == 3
       ActiveSupport::Deprecation.warn(
-        'MaintenanceTasks.error_handler should be a lambda that takes three '\
-         'arguments: error, task_context, and errored_element.'
+        "MaintenanceTasks.error_handler should be a lambda that takes three "\
+         "arguments: error, task_context, and errored_element."
       )
       @error_handler = ->(error, _task_context, _errored_element) do
         error_handler.call(error)

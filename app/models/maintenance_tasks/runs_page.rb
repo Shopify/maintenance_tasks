@@ -28,7 +28,7 @@ module MaintenanceTasks
     def records
       @records ||= begin
         runs_after_cursor = if @cursor.present?
-          @runs.where('id < ?', @cursor)
+          @runs.where("id < ?", @cursor)
         else
           @runs
         end

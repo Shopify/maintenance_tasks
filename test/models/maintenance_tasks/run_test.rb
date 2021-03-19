@@ -1,28 +1,28 @@
 # frozen_string_literal: true
-require 'test_helper'
+require "test_helper"
 
 module MaintenanceTasks
   class RunTest < ActiveSupport::TestCase
     test "invalid if the task doesn't exist" do
-      run = Run.new(task_name: 'Maintenance::DoesNotExist')
+      run = Run.new(task_name: "Maintenance::DoesNotExist")
       refute run.valid?
     end
 
-    test 'invalid if associated with CSV Task and no attachment' do
-      run = Run.new(task_name: 'Maintenance::ImportPostsTask')
+    test "invalid if associated with CSV Task and no attachment" do
+      run = Run.new(task_name: "Maintenance::ImportPostsTask")
       refute run.valid?
     end
 
-    test 'invalid if unassociated with CSV Task and attachment' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
-      csv = Rack::Test::UploadedFile.new(file_fixture('sample.csv'), 'text/csv')
+    test "invalid if unassociated with CSV Task and attachment" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
+      csv = Rack::Test::UploadedFile.new(file_fixture("sample.csv"), "text/csv")
       run.csv_file.attach(csv)
       refute run.valid?
     end
 
-    test '#persist_progress persists increments to tick count and time_running' do
+    test "#persist_progress persists increments to tick count and time_running" do
       run = Run.create!(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         tick_count: 40,
         time_running: 10.2,
       )
@@ -34,23 +34,23 @@ module MaintenanceTasks
       assert_equal 12.2, run.time_running
     end
 
-    test '#persist_error updates Run to errored and sets ended_at' do
+    test "#persist_error updates Run to errored and sets ended_at" do
       freeze_time
-      run = Run.create!(task_name: 'Maintenance::ErrorTask')
+      run = Run.create!(task_name: "Maintenance::ErrorTask")
 
-      error = ArgumentError.new('Something went wrong')
+      error = ArgumentError.new("Something went wrong")
       error.set_backtrace(["lib/foo.rb:42:in `bar'"])
       run.persist_error(error)
 
       assert_predicate run, :errored?
-      assert_equal 'ArgumentError', run.error_class
-      assert_equal 'Something went wrong', run.error_message
+      assert_equal "ArgumentError", run.error_class
+      assert_equal "Something went wrong", run.error_message
       assert_equal ["lib/foo.rb:42:in `bar'"], run.backtrace
       assert_equal Time.now, run.ended_at
     end
 
-    test '#reload_status reloads status and clears dirty tracking' do
-      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+    test "#reload_status reloads status and clears dirty tracking" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
       Run.find(run.id).running!
 
       run.reload_status
@@ -58,8 +58,8 @@ module MaintenanceTasks
       refute run.changed?
     end
 
-    test '#reload_status does not use query cache' do
-      run = Run.create!(task_name: 'Maintenance::UpdatePostsTask')
+    test "#reload_status does not use query cache" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
       query_count = count_uncached_queries do
         ActiveRecord::Base.connection.cache do
           run.reload_status
@@ -69,10 +69,10 @@ module MaintenanceTasks
       assert_equal 2, query_count
     end
 
-    test '#stopping? returns true if status is pausing or cancelling' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#stopping? returns true if status is pausing or cancelling" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
-      (Run.statuses.keys - ['pausing', 'cancelling']).each do |status|
+      (Run.statuses.keys - ["pausing", "cancelling"]).each do |status|
         run.status = status
         refute_predicate run, :stopping?
       end
@@ -84,15 +84,15 @@ module MaintenanceTasks
       assert_predicate run, :stopping?
     end
 
-    test '#stopped? is true if Run is paused' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#stopped? is true if Run is paused" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
       run.status = :paused
       assert_predicate run, :stopped?
     end
 
-    test '#stopped? is true if Run is completed' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#stopped? is true if Run is completed" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
       Run::COMPLETED_STATUSES.each do |status|
         run.status = status
@@ -100,8 +100,8 @@ module MaintenanceTasks
       end
     end
 
-    test '#stopped? is false if Run is not paused nor completed' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#stopped? is false if Run is not paused nor completed" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
       Run::STATUSES.excluding(Run::COMPLETED_STATUSES, :paused).each do |status|
         run.status = status
@@ -109,21 +109,21 @@ module MaintenanceTasks
       end
     end
 
-    test '#started? returns false if the Run has no started_at timestamp' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#started? returns false if the Run has no started_at timestamp" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
       refute_predicate run, :started?
     end
 
-    test '#started? returns true if the Run has a started_at timestamp' do
+    test "#started? returns true if the Run has a started_at timestamp" do
       run = Run.new(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         started_at: Time.now
       )
       assert_predicate run, :started?
     end
 
-    test '#completed? returns true if status is succeeded, errored, or cancelled' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#completed? returns true if status is succeeded, errored, or cancelled" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
       (Run::STATUSES - Run::COMPLETED_STATUSES).each do |status|
         run.status = status
@@ -136,8 +136,8 @@ module MaintenanceTasks
       end
     end
 
-    test '#active? returns true if status is among Run::ACTIVE_STATUSES' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#active? returns true if status is among Run::ACTIVE_STATUSES" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
       (Run::STATUSES - Run::ACTIVE_STATUSES).each do |status|
         run.status = status
@@ -150,18 +150,18 @@ module MaintenanceTasks
       end
     end
 
-    test '#estimated_completion_time returns nil if the run is completed' do
+    test "#estimated_completion_time returns nil if the run is completed" do
       run = Run.new(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         status: :succeeded
       )
 
       assert_nil run.estimated_completion_time
     end
 
-    test '#estimated_completion_time returns nil if tick_count is 0' do
+    test "#estimated_completion_time returns nil if tick_count is 0" do
       run = Run.new(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         status: :running,
         tick_count: 0,
         tick_total: 10
@@ -170,9 +170,9 @@ module MaintenanceTasks
       assert_nil run.estimated_completion_time
     end
 
-    test '#estimated_completion_time returns nil if no tick_total' do
+    test "#estimated_completion_time returns nil if no tick_total" do
       run = Run.new(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         status: :running,
         tick_count: 1
       )
@@ -180,12 +180,12 @@ module MaintenanceTasks
       assert_nil run.estimated_completion_time
     end
 
-    test '#estimated_completion_time returns estimated completion time based on average time elapsed per tick' do
+    test "#estimated_completion_time returns estimated completion time based on average time elapsed per tick" do
       started_at = Time.utc(2020, 1, 9, 9, 41, 44)
       travel_to started_at + 9.seconds
 
       run = Run.new(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         started_at: started_at,
         status: :running,
         tick_count: 9,
@@ -197,10 +197,10 @@ module MaintenanceTasks
       assert_equal expected_completion_time, run.estimated_completion_time
     end
 
-    test '#cancel transitions the Run to cancelling if not paused' do
+    test "#cancel transitions the Run to cancelling if not paused" do
       [:enqueued, :running, :pausing, :interrupted].each do |status|
         run = Run.create!(
-          task_name: 'Maintenance::UpdatePostsTask',
+          task_name: "Maintenance::UpdatePostsTask",
           status: status,
         )
         run.cancel
@@ -209,10 +209,10 @@ module MaintenanceTasks
       end
     end
 
-    test '#cancel transitions the Run to cancelled if paused and updates ended_at' do
+    test "#cancel transitions the Run to cancelled if paused and updates ended_at" do
       freeze_time
       run = Run.create!(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         status: :paused,
       )
       run.cancel
@@ -221,10 +221,10 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
-    test '#stuck? returns true if the Run is cancelling and has not been updated in more than 5 minutes' do
+    test "#stuck? returns true if the Run is cancelling and has not been updated in more than 5 minutes" do
       freeze_time
       run = Run.create!(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         status: :cancelling,
       )
       refute_predicate run, :stuck?
@@ -233,11 +233,11 @@ module MaintenanceTasks
       assert_predicate run, :stuck?
     end
 
-    test '#stuck? does not return true for other statuses' do
+    test "#stuck? does not return true for other statuses" do
       freeze_time
-      Run.statuses.except('cancelling').each_key do |status|
+      Run.statuses.except("cancelling").each_key do |status|
         run = Run.create!(
-          task_name: 'Maintenance::UpdatePostsTask',
+          task_name: "Maintenance::UpdatePostsTask",
           status: status,
         )
         travel 5.minutes
@@ -245,10 +245,10 @@ module MaintenanceTasks
       end
     end
 
-    test '#cancel transitions from cancelling to cancelled if it has not been updated in more than 5 minutes' do
+    test "#cancel transitions from cancelling to cancelled if it has not been updated in more than 5 minutes" do
       freeze_time
       run = Run.create!(
-        task_name: 'Maintenance::UpdatePostsTask',
+        task_name: "Maintenance::UpdatePostsTask",
         status: :cancelling,
       )
 
@@ -262,14 +262,14 @@ module MaintenanceTasks
       assert_equal Time.now, run.ended_at
     end
 
-    test '#enqueued! ensures the status is marked as changed' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#enqueued! ensures the status is marked as changed" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
       run.enqueued!
-      assert_equal ['enqueued', 'enqueued'], run.status_previous_change
+      assert_equal ["enqueued", "enqueued"], run.status_previous_change
     end
 
-    test '#enqueued! prevents already enqueued Run to be enqueued' do
-      run = Run.new(task_name: 'Maintenance::UpdatePostsTask')
+    test "#enqueued! prevents already enqueued Run to be enqueued" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
       run.enqueued!
       assert_raises(ActiveRecord::RecordInvalid) do
         run.enqueued!
@@ -283,7 +283,7 @@ module MaintenanceTasks
 
       query_cb = ->(*, payload) { count += 1 unless payload[:cached] }
       ActiveSupport::Notifications.subscribed(query_cb,
-        'sql.active_record',
+        "sql.active_record",
         &block)
 
       count

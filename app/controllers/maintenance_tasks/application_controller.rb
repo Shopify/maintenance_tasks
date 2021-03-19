@@ -5,7 +5,7 @@ module MaintenanceTasks
   #
   # Can be extended to add different authentication and authorization code.
   class ApplicationController < ActionController::Base
-    BULMA_CDN = 'https://cdn.jsdelivr.net'
+    BULMA_CDN = "https://cdn.jsdelivr.net"
 
     content_security_policy do |policy|
       policy.style_src(BULMA_CDN)
@@ -15,7 +15,7 @@ module MaintenanceTasks
     before_action do
       request.content_security_policy_nonce_generator ||=
         ->(_request) { SecureRandom.base64(16) }
-      request.content_security_policy_nonce_directives = ['style-src']
+      request.content_security_policy_nonce_directives = ["style-src"]
     end
 
     protect_from_forgery with: :exception

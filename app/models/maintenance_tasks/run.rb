@@ -192,9 +192,9 @@ module MaintenanceTasks
     # if the Run does not meet the above criteria.
     def csv_attachment_presence
       if Task.named(task_name) < CsvCollection && !csv_file.attached?
-        errors.add(:csv_file, 'must be attached to CSV Task.')
+        errors.add(:csv_file, "must be attached to CSV Task.")
       elsif !(Task.named(task_name) < CsvCollection) && csv_file.present?
-        errors.add(:csv_file, 'should not be attached to non-CSV Task.')
+        errors.add(:csv_file, "should not be attached to non-CSV Task.")
       end
     rescue Task::NotFoundError
       nil
