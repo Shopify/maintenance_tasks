@@ -27,8 +27,9 @@ module MaintenanceTasks
         mock(value: 42, max: 84, text: "Almost there!")
       )
 
-      expected = '<div class="block"><progress value="42" max="84" class='\
-        '"progress is-primary is-light"></progress><i>Almost there!</i></div>'
+      expected = '<div class="block"><progress value="42" max="84" '\
+        'class="progress is-primary is-light"></progress>'\
+        "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
 
@@ -42,8 +43,9 @@ module MaintenanceTasks
         mock(value: nil, max: 84, text: "Almost there!")
       )
 
-      expected = '<div class="block"><progress max="84" class='\
-        '"progress is-primary is-light"></progress><i>Almost there!</i></div>'
+      expected = '<div class="block"><progress max="84" '\
+        'class="progress is-primary is-light"></progress>'\
+        "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
 

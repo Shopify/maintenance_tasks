@@ -4,6 +4,7 @@ module MaintenanceTasks
   # This class generates progress information about a Run.
   class Progress
     include ActiveSupport::NumberHelper
+    include ActionView::Helpers::TextHelper
 
     # Sets the Progress initial state with a Run.
     #
@@ -50,13 +51,13 @@ module MaintenanceTasks
       count = @run.tick_count
       total = @run.tick_total
       if !total?
-        "Processed #{ticks_in_words(count)}."
+        "Processed #{pluralize(count, 'item')}."
       elsif over_total?
-        "Processed #{ticks_in_words(count)} (expected #{total})."
+        "Processed #{pluralize(count, 'item')} (expected #{total})."
       else
         percentage = 100.0 * count / total
 
-        "Processed #{count} out of #{ticks_in_words(total)} "\
+        "Processed #{count} out of #{pluralize(total, 'item')} "\
           "(#{number_to_percentage(percentage, precision: 0)})."
       end
     end
@@ -73,10 +74,6 @@ module MaintenanceTasks
 
     def over_total?
       @run.tick_count > @run.tick_total
-    end
-
-    def ticks_in_words(amount, unit = 'item')
-      "#{amount} #{unit.pluralize(amount)}"
     end
   end
 end
