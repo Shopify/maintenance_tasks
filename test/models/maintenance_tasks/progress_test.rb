@@ -47,24 +47,24 @@ module MaintenanceTasks
       assert_equal 8, @progress.max
     end
 
-    test "#title returns a description with tick count, tick total, and percentage" do
-      assert_equal "Processed 4 out of 7 (57%)", @progress.title
+    test "#text returns a description with tick count, tick total, and percentage" do
+      assert_equal "Processed 4 out of 7 items (57%).", @progress.text
     end
 
-    test "#title returns a description with tick count when tick total is not present" do
+    test "#text returns a description with tick count when tick total is not present" do
       @run.tick_total = nil
-      assert_equal "Processed 4 items.", @progress.title
+      assert_equal "Processed 4 items.", @progress.text
     end
 
-    test "#title returns a description with tick count and tick total when tick count is greater than its tick total" do
+    test "#text returns a description with tick count and tick total when tick count is greater than its tick total" do
       @run.tick_count = 8
-      assert_equal "Processed 8 items (expected 7).", @progress.title
+      assert_equal "Processed 8 items (expected 7).", @progress.text
     end
 
-    test "#title pluralizes the description according to the tick count" do
+    test "#text pluralizes the description according to the tick count" do
       @run.tick_count = 1
       @run.tick_total = nil
-      assert_equal "Processed 1 item.", @progress.title
+      assert_equal "Processed 1 item.", @progress.text
     end
   end
 end
