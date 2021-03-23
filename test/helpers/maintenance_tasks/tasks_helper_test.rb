@@ -20,15 +20,16 @@ module MaintenanceTasks
       assert_equal expected_trace, format_backtrace(backtrace)
     end
 
-    test "#progress renders a <progress> when Run has started" do
+    test "#progress returns a <div> with a <progress> and progress text when Run has started" do
       @run.started_at = Time.now
 
       Progress.expects(:new).with(@run).returns(
-        mock(value: 42, max: 84, title: "Almost there!")
+        mock(value: 42, max: 84, text: "Almost there!")
       )
 
-      expected = '<progress value="42" max="84" title="Almost there!" '\
-        'class="progress is-primary is-light"></progress>'
+      expected = '<div class="block"><progress value="42" max="84" '\
+        'class="progress is-primary is-light"></progress>'\
+        "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
 
@@ -36,13 +37,15 @@ module MaintenanceTasks
       assert_nil progress(@run)
     end
 
-    test "#progress returns a <progress> with no value when the Progress value is nil" do
+    test "#progress returns a a <div> with a <progress> with no value when the Progress value is nil" do
       @run.started_at = Time.now
       Progress.expects(:new).with(@run).returns(
-        mock(value: nil, max: 84, title: "Almost there!")
+        mock(value: nil, max: 84, text: "Almost there!")
       )
-      expected = '<progress max="84" title="Almost there!" '\
-        'class="progress is-primary is-light"></progress>'
+
+      expected = '<div class="block"><progress max="84" '\
+        'class="progress is-primary is-light"></progress>'\
+        "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
 

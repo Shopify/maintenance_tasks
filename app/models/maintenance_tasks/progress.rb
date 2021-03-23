@@ -4,6 +4,7 @@ module MaintenanceTasks
   # This class generates progress information about a Run.
   class Progress
     include ActiveSupport::NumberHelper
+    include ActionView::Helpers::TextHelper
 
     # Sets the Progress initial state with a Run.
     #
@@ -41,22 +42,23 @@ module MaintenanceTasks
       estimatable? ? @run.tick_total : @run.tick_count
     end
 
-    # The title for the progress information. This is a text that describes the
-    # progress of the Run so far. It includes the percentage that is done out of
-    # the maximum, if an estimate is possible.
+    # The text containing progress information. This describes the progress of
+    # the Run so far. It includes the percentage done out of the maximum, if an
+    # estimate is possible.
     #
-    # @return [String] the title for the Run progress.
-    def title
+    # @return [String] the text for the Run progress.
+    def text
+      count = @run.tick_count
+      total = @run.tick_total
       if !total?
-        "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)}."
+        "Processed #{pluralize(count, 'item')}."
       elsif over_total?
-        "Processed #{@run.tick_count} #{'item'.pluralize(@run.tick_count)} " \
-          "(expected #{@run.tick_total})."
+        "Processed #{pluralize(count, 'item')} (expected #{total})."
       else
-        percentage = 100.0 * @run.tick_count / @run.tick_total
+        percentage = 100.0 * count / total
 
-        "Processed #{@run.tick_count} out of #{@run.tick_total} "\
-          "(#{number_to_percentage(percentage, precision: 0)})"
+        "Processed #{count} out of #{pluralize(total, 'item')} "\
+          "(#{number_to_percentage(percentage, precision: 0)})."
       end
     end
 

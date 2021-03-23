@@ -44,12 +44,13 @@ module MaintenanceTasks
 
       progress = Progress.new(run)
 
-      tag.progress(
+      progress_bar = tag.progress(
         value: progress.value,
         max: progress.max,
-        title: progress.title,
         class: ["progress"] + STATUS_COLOURS.fetch(run.status)
       )
+      progress_text = tag.p(tag.i(progress.text))
+      tag.div(progress_bar + progress_text, class: "block")
     end
 
     # Renders a span with a Run's status, with the corresponding tag class
