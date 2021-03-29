@@ -2,35 +2,6 @@
 
 A Rails engine for queuing and managing maintenance tasks.
 
-## Table of Contents
-
-* [Demo](#demo)
-* [Installation](#installation)
-  * [Active Job Dependency](#active-job-dependency)
-* [Usage](#usage)
-  * [Creating a Task](#creating-a-task)
-  * [Creating a CSV Task](#creating-a-csv-task)
-  * [Considerations when writing Tasks](#considerations-when-writing-tasks)
-  * [Writing tests for a Task](#writing-tests-for-a-task)
-  * [Writing tests for a CSV Task](#writing-tests-for-a-csv-task)
-  * [Running a Task](#running-a-task)
-  * [Monitoring your Task's status](#monitoring-your-tasks-status)
-  * [How Maintenance Tasks runs a Task](#how-maintenance-tasks-runs-a-task)
-    * [Help! My Task is stuck](#help-my-task-is-stuck)
-  * [Configuring the gem](#configuring-the-gem)
-    * [Customizing the error handler](#customizing-the-error-handler)
-    * [Customizing the maintenance tasks module](#customizing-the-maintenance-tasks-module)
-    * [Customizing the underlying job class](#customizing-the-underlying-job-class)
-    * [Customizing the rate at which task progress gets updated](#customizing-the-rate-at-which-task-progress-gets-updated)
-    * [Customizing which Active Storage service to use](#customizing-which-active-storage-service-to-use)
-* [Upgrading](#upgrading)
-* [Contributing](#contributing)
-* [Releasing new versions](#releasing-new-versions)
-
-## Demo
-
-Watch this demo video to see the gem in action:
-
 [![Link to demo video](static/demo.png)](https://www.youtube.com/watch?v=BTuvTQxlFzs)
 
 ## Installation
