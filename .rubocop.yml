@@ -23,9 +23,6 @@ Style/DocumentationMethod:
     - app/**/*.rb
     - lib/**/*.rb
 
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
-
 Style/SymbolArray:
   EnforcedStyle: brackets
 
