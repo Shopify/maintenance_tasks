@@ -6,6 +6,7 @@ AllCops:
   Exclude:
     - test/dummy/db/schema.rb
     - vendor/**/*
+  SuggestExtensions: false
 
 Bundler/OrderedGems:
   Enabled: true
@@ -22,9 +23,6 @@ Style/DocumentationMethod:
   Include:
     - app/**/*.rb
     - lib/**/*.rb
-
-Style/StringLiterals:
-  EnforcedStyle: double_quotes
 
 Style/SymbolArray:
   EnforcedStyle: brackets
