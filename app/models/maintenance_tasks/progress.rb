@@ -51,13 +51,13 @@ module MaintenanceTasks
       count = @run.tick_count
       total = @run.tick_total
       if !total?
-        "Processed #{pluralize(count, 'item')}."
+        "Processed #{pluralize(count, "item")}."
       elsif over_total?
-        "Processed #{pluralize(count, 'item')} (expected #{total})."
+        "Processed #{pluralize(count, "item")} (expected #{total})."
       else
         percentage = 100.0 * count / total
 
-        "Processed #{count} out of #{pluralize(total, 'item')} "\
+        "Processed #{count} out of #{pluralize(total, "item")} "\
           "(#{number_to_percentage(percentage, precision: 0)})."
       end
     end
