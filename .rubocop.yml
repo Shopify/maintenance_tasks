@@ -6,6 +6,7 @@ AllCops:
   Exclude:
     - test/dummy/db/schema.rb
     - vendor/**/*
+  SuggestExtensions: false
 
 Bundler/OrderedGems:
   Enabled: true
