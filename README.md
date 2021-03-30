@@ -424,6 +424,12 @@ pull requests. You can find the contribution guidelines on
 
 [contributing]: https://github.com/Shopify/maintenance_tasks/blob/main/.github/CONTRIBUTING.md
 
+### Dependabot updates
+
+Whenever Dependabot creates a PR for a gem bump, check out the branch locally
+and run `bin/update-gemfile <gem>` to ensure all the gemfiles have the gem
+updated consistently.
+
 ## Releasing new versions
 
 Updates should be added to the latest draft release on GitHub as Pull Requests
@@ -432,14 +438,14 @@ are merged.
 Once a release is ready, follow these steps:
 
 * Update `spec.version` in `maintenance_tasks.gemspec`.
-* Run `bundle install` to bump the `Gemfile.lock` version of the gem.
+* Run `bin/gemfile-update install` to bump the version in all the lockfiles.
 * Open a PR and merge on approval.
 * Deploy via [Shipit][shipit] and see the new version on
   <https://rubygems.org/gems/maintenance_tasks>.
 * Ensure the release has documented all changes and publish it.
-* Create a new [draft release on GitHub][release] with the title
-  'Upcoming Release'. The tag version can be left blank. This will be the
-  starting point for documenting changes related to the next release.
+* Create a new [draft release on GitHub][release] with the title 'Upcoming
+  Release'. The tag version can be left blank. This will be the starting point
+  for documenting changes related to the next release.
 
 [release]: https://help.github.com/articles/creating-releases/
 [shipit]: https://shipit.shopify.io/shopify/maintenance_tasks/rubygems

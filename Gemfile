@@ -8,7 +8,7 @@ gem "capybara"
 gem "mocha"
 gem "pry-byebug"
 gem "puma"
-gem "rails"
+gem "rails", $rails_gem_requirement
 gem "rubocop-shopify"
 gem "selenium-webdriver"
 gem "sqlite3"
