@@ -14,7 +14,7 @@ require "maintenance_tasks"
 module Dummy
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults(6.1)
+    config.load_defaults("#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}")
 
     if ENV["CLASSIC_AUTOLOADER"].present?
       puts "=> Using classic autoloader"

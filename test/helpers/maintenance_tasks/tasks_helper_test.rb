@@ -93,7 +93,7 @@ module MaintenanceTasks
       csv = Rack::Test::UploadedFile.new(file_fixture("sample.csv"), "text/csv")
       run.csv_file.attach(csv)
 
-      assert_match %r{rails\/active_storage\/blobs\/redirect\/\S+\/sample.csv},
+      assert_match %r{rails/active_storage/blobs/\S+/sample.csv},
         csv_file_download_path(run)
     end
   end

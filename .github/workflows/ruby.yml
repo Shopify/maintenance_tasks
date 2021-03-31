@@ -6,13 +6,20 @@ jobs:
   build:
 
     runs-on: ubuntu-latest
-
+    name: Ruby ${{ matrix.ruby }}
+    strategy:
+      matrix:
+        gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_edge.gemfile]
+        ruby: [2.7, 3.0]
+    env:
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
     - name: Check out code
       uses: actions/checkout@v2
-    - name: Set up Ruby
+    - name: Set up Ruby ${{ matrix.ruby }}
       uses: ruby/setup-ruby@v1
       with:
+        ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
     - name: Set up database
       run: RAILS_ENV=test bundle exec rails db:setup
