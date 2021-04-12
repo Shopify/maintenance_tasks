@@ -43,6 +43,7 @@ module MaintenanceTasks
 
     # Ensure ActiveStorage is in use before preloading the attachments
     scope :with_attached_csv, -> do
+      return unless defined?(ActiveStorage)
       with_attached_csv_file if ActiveStorage::Attachment.table_exists?
     end
 
@@ -51,7 +52,7 @@ module MaintenanceTasks
     if MaintenanceTasks.active_storage_service.present?
       has_one_attached :csv_file,
         service: MaintenanceTasks.active_storage_service
-    else
+    elsif respond_to?(:has_one_attached)
       has_one_attached :csv_file
     end
 
@@ -211,6 +212,7 @@ module MaintenanceTasks
     #
     # @return [ActiveStorage::Attached::One] the attached CSV file
     def csv_file
+      return unless defined?(ActiveStorage)
       return unless ActiveStorage::Attachment.table_exists?
       super
     end
