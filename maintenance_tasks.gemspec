@@ -7,6 +7,7 @@ Gem::Specification.new do |spec|
   spec.email = "gems@shopify.com"
   spec.homepage = "https://github.com/Shopify/maintenance_tasks"
   spec.summary = "A Rails engine for queuing and managing maintenance tasks"
+  spec.license = "MIT"
 
   spec.metadata = {
     "source_code_uri" =>
@@ -14,7 +15,7 @@ Gem::Specification.new do |spec|
     "allowed_push_host" => "https://rubygems.org",
   }
 
-  spec.files = Dir["{app,config,db,lib}/**/*", "Rakefile", "README.md"]
+  spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE.md", "README.md"]
   spec.bindir = "exe"
   spec.executables = ["maintenance_tasks"]
 
