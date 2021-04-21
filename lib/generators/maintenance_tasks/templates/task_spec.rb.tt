@@ -4,11 +4,13 @@ require 'rails_helper'
 module <%= tasks_module %>
 <% module_namespacing do -%>
   RSpec.describe <%= class_name %>Task do
-    # describe '#process' do
-      # it 'performs a task iteration' do
-        # <%= tasks_module %>::<%= class_name %>Task.process(element)
-      # end
-    # end
+    describe "#process" do
+      subject(:process) { described_class.process(element) }
+      let(:element) { 
+        # Object to be processed in a single iteration of this task
+      }
+      pending "add some examples to (or delete) #{__FILE__}"
+    end
   end
 <% end -%>
 end
