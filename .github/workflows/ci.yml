@@ -3,10 +3,9 @@ name: CI
 on: [push, pull_request]
 
 jobs:
-  build:
-
+  test:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}
+    name: Test Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}
     strategy:
       matrix:
         gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_edge.gemfile]
@@ -27,11 +26,34 @@ jobs:
       run: bundle exec rails test
     - name: System Tests
       run: bundle exec rails test:system
-    - name: RuboCop
-      run: bundle exec rubocop
     - name: Archive system test artifacts
       uses: actions/upload-artifact@v2
       if: failure()
       with:
         name: screenshots
         path: test/dummy/tmp/screenshots
+  lint:
+    runs-on: ubuntu-latest
+    name: Rubocop
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+    - name: RuboCop
+      run: bundle exec rubocop
+
+  docs:
+    runs-on: ubuntu-latest
+    name: Documentation
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        bundler-cache: true
+    - name: Documentation written correctly
+      run: bundle exec yardoc --no-output --no-save --no-stats --fail-on-warning
