@@ -23,9 +23,3 @@ Style/DocumentationMethod:
   Include:
     - app/**/*.rb
     - lib/**/*.rb
-
-Style/SymbolArray:
-  EnforcedStyle: brackets
-
-Style/WordArray:
-  EnforcedStyle: brackets
