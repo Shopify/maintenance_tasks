@@ -7,10 +7,6 @@ require "active_record"
 require "job-iteration"
 require "maintenance_tasks/engine"
 
-# Force the TaskJob class to load so we can verify upstream compatibility with
-# the JobIteration gem
-require_relative "../app/jobs/maintenance_tasks/task_job"
-
 # The engine's namespace module. It provides isolation between the host
 # application's code and the engine-specific code. Top-level engine constants
 # and variables are defined under this module.
