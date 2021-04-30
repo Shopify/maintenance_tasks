@@ -15,11 +15,13 @@ Layout/LineLength:
   Max: 80
 
 Style/Documentation:
+  Enabled: true
   Include:
     - app/**/*.rb
     - lib/**/*.rb
 
 Style/DocumentationMethod:
+  Enabled: true
   Include:
     - app/**/*.rb
     - lib/**/*.rb
