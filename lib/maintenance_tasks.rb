@@ -15,8 +15,9 @@ module MaintenanceTasks
   # @param [String] the tasks_module value.
   mattr_accessor :tasks_module, default: "Maintenance"
 
-  # Defines the job to be used to perform Tasks. This job must be either
-  # `MaintenanceTasks::TaskJob` or a class that inherits from it.
+  # The name of the job to be used to perform Tasks. Defaults to
+  # `"MaintenanceTasks::TaskJob"`. This job must be either a class that inherits
+  # from {TaskJob} or a class that includes {TaskJobConcern}.
   #
   # @param [String] the name of the job class.
   mattr_accessor :job, default: "MaintenanceTasks::TaskJob"
