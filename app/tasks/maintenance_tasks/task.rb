@@ -1,11 +1,18 @@
 # frozen_string_literal: true
-
+puts "LOADING TASK CLASS"
 module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
     extend ActiveSupport::DescendantsTracker
 
     class NotFoundError < NameError; end
+
+    # The throttle conditions for a given Task. This is provided as an array of
+    # hashes, with each hash specifying two keys: throttle_condition and
+    # backoff. Note that Tasks inherit conditions from their superclasses.
+    #
+    # @api private
+    class_attribute :throttle_conditions, default: []
 
     class << self
       # Finds a Task with the given name.
@@ -70,6 +77,19 @@ module MaintenanceTasks
       # @return the count of items.
       def count
         new.count
+      end
+
+      # Add a condition under which this Task will be throttled.
+      #
+      # @param backoff [ActiveSupport::Duration] optionally, a custom backoff
+      #   can be specified. This is the time to wait before retrying the Task.
+      #   If no value is specified, it defaults to 30 seconds.
+      # @yieldreturn [Boolean] where the throttle condition is being met,
+      #   indicating that the Task should throttle.
+      def throttle_on(backoff: 30.seconds, &condition)
+        self.throttle_conditions += [
+          { throttle_on: condition, backoff: backoff },
+        ]
       end
 
       private
