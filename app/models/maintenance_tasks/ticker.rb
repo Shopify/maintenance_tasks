@@ -28,11 +28,11 @@ module MaintenanceTasks
       @ticks_recorded = 0
     end
 
-    # Increments the tick count by one, and may persist the new value if the
-    # threshold duration has passed since initialization or the tick count was
-    # last persisted.
-    def tick
-      @ticks_recorded += 1
+    # Increments the tick count, which defaults to one. It may persist the new
+    # value if the threshold duration has passed since initialization or the
+    # tick count was last persisted.
+    def tick(increment = 1)
+      @ticks_recorded += increment
       persist if persist?
     end
 

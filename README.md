@@ -111,6 +111,41 @@ end
 title,content
 My Title,Hello World!
 ```
+### Processing Batch Collections
+
+The Maintenance Tasks gem supports processing Active Records in batches. This
+can reduce the number of calls your Task makes to the database. Use `in_batches`
+to specify that your Task should process records in batches. The default batch
+size is 100, but a custom size can be specified.
+
+```ruby
+# app/tasks/maintenance/update_posts_in_batches_task.rb
+module Maintenance
+  class UpdatePostsInBatchesTask < MaintenanceTasks::Task
+    in_batches 50
+
+    def collection
+      Post.all
+    end
+
+    def count
+      collection.count
+    end
+
+    def process(batch_of_posts)
+      Post.where(id: batch_of_posts.map(&:id)).update_all(
+        content: "New content added on #{Time.now.utc}"
+      )    
+    end
+  end
+end
+```
+
+Ensure that you've implemented the following methods:
+* `collection`: return an Active Record Relation to be iterated over.
+* `process`: do the work of your Task on a _batch_ of records.
+* `count`: return the number of rows that will be iterated over (this should
+still be the number of records to be processed, not the number of batches).
 
 ### Considerations when writing Tasks
 

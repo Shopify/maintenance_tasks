@@ -31,7 +31,18 @@ module MaintenanceTasks
 
       case collection
       when ActiveRecord::Relation
-        enumerator_builder.active_record_on_records(collection, cursor: cursor)
+        if @task.in_batches?
+          enumerator_builder.active_record_on_batches(
+            collection,
+            cursor: cursor,
+            batch_size: @task.batch_size
+          )
+        else
+          enumerator_builder.active_record_on_records(
+            collection,
+            cursor: cursor
+          )
+        end
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor)
       when CSV
@@ -50,7 +61,8 @@ module MaintenanceTasks
     def each_iteration(input, _run)
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
       task_iteration(input)
-      @ticker.tick
+      batch_size = @task.in_batches? ? input.size : 1
+      @ticker.tick(batch_size)
       @run.reload_status
     end
 

@@ -337,5 +337,18 @@ module MaintenanceTasks
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
+
+    test ".perform_now handles batched tasks" do
+      5.times do |i|
+        Post.create!(title: "Another Post ##{i}", content: "Content ##{i}")
+      end
+      # We expect 2 batches (7 posts => 5 + 2)
+      Maintenance::UpdatePostsInBatchesTask.any_instance.expects(:process).twice
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsInBatchesTask")
+      TaskJob.perform_now(run)
+
+      assert_equal Post.count, run.reload.tick_count
+    end
   end
 end

@@ -26,6 +26,7 @@ module MaintenanceTasks
         "Maintenance::ErrorTask",
         "Maintenance::ImportPostsTask",
         "Maintenance::TestTask",
+        "Maintenance::UpdatePostsInBatchesTask",
         "Maintenance::UpdatePostsTask",
       ]
       assert_equal expected, TaskData.available_tasks.map(&:name)

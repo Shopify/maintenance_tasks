@@ -8,6 +8,8 @@ module MaintenanceTasks
     class NotFoundError < NameError; end
 
     class << self
+      attr_reader :batch_size
+
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -72,6 +74,14 @@ module MaintenanceTasks
         new.count
       end
 
+      # Make this a Task that processes batches.
+      #
+      # @param batch_size [Integer] optionally, a custom batch size can be
+      #   specified. Defaults to 100 if one is not provided.
+      def in_batches(batch_size = 100)
+        @batch_size = batch_size
+      end
+
       private
 
       def load_constants
@@ -109,6 +119,21 @@ module MaintenanceTasks
     #
     # @return [Integer, nil]
     def count
+    end
+
+    # The batch size for this Task instance, if any.
+    #
+    # @return [Integer, nil] the batch size for this Task instance, or nil if
+    #   the Task does not process batches.
+    def batch_size
+      self.class.batch_size
+    end
+
+    # Whether this Task instance processes batches.
+    #
+    # @return [Boolean] whether this Task instance processes batches.
+    def in_batches?
+      batch_size.present?
     end
   end
 end
