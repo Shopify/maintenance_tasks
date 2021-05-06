@@ -33,7 +33,7 @@ module MaintenanceTasks
       cursor ||= @run.cursor
       collection = @task.collection
 
-      case collection
+      collection_enum = case collection
       when ActiveRecord::Relation
         enumerator_builder.active_record_on_records(collection, cursor: cursor)
       when Array
@@ -43,6 +43,10 @@ module MaintenanceTasks
       else
         raise ArgumentError, "#{@task.class.name}#collection must be either "\
           "an Active Record Relation, Array, or CSV."
+      end
+
+      @task.throttle_conditions.reduce(collection_enum) do |enum, condition|
+        enumerator_builder.build_throttle_enumerator(enum, **condition)
       end
     end
 

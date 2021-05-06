@@ -112,6 +112,46 @@ title,content
 My Title,Hello World!
 ```
 
+### Throttling
+
+Maintenance Tasks often modify a lot of data and can be taxing on your database.
+The gem provides a throttling mechanism that can be used to throttle a Task when
+a given condition is met. If a Task is throttled, it will be interrupted and
+retried after a backoff period has passed. The default backoff is 30 seconds.
+Specify the throttle condition as a block:
+
+```ruby
+# app/tasks/maintenance/update_posts_throttled_task.rb
+module Maintenance
+  class UpdatePostsThrottledTask < MaintenanceTasks::Task
+    throttle_on(backoff: 1.minute) do
+      DatabaseStatus.unhealthy?
+    end
+
+    def collection
+      Post.all
+    end
+
+    def count
+      collection.count
+    end
+
+    def process(post)
+      post.update!(content: "New content added on #{Time.now.utc}")
+    end
+  end
+end
+```
+
+Note that it's up to you to define a throttling condition that makes sense for
+your app. Shopify implements `DatabaseStatus.healthy?` to check various MySQL
+metrics such as replication lag, DB threads, whether DB writes are available, 
+etc.
+
+Tasks can define multiple throttle conditions. Throttle conditions are inherited
+by descendants, and new conditions will be appended without impacting existing
+conditions.
+
 ### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to

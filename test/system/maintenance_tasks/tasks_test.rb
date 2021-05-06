@@ -23,6 +23,7 @@ module MaintenanceTasks
         "Maintenance::ErrorTask\nNew",
         "Maintenance::ImportPostsTask\nNew",
         "Maintenance::TestTask\nNew",
+        "Maintenance::UpdatePostsThrottledTask\nNew",
         "Completed Tasks",
         "Maintenance::UpdatePostsTask\nSucceeded",
       ]

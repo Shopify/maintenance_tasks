@@ -11,6 +11,7 @@ module MaintenanceTasks
         "Maintenance::ImportPostsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsTask",
+        "Maintenance::UpdatePostsThrottledTask",
       ]
       assert_equal expected,
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
@@ -66,6 +67,21 @@ module MaintenanceTasks
       error = assert_raises(NoMethodError) { Task.new.process("an item") }
       message = "MaintenanceTasks::Task must implement `process`."
       assert_equal message, error.message
+    end
+
+    test ".throttle_conditions inherits conditions from superclass" do
+      assert_equal [], Maintenance::TestTask.throttle_conditions
+    end
+
+    test ".throttle_on registers throttle condition for Task" do
+      throttle_condition = -> { true }
+
+      Maintenance::TestTask.throttle_on(&throttle_condition)
+
+      expected = [{ throttle_on: throttle_condition, backoff: 30.seconds }]
+      assert_equal(expected, Maintenance::TestTask.throttle_conditions)
+    ensure
+      Maintenance::TestTask.throttle_conditions = []
     end
   end
 end
