@@ -1,5 +1,4 @@
 # frozen_string_literal: true
-puts "LOADING TASK CLASS"
 module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
