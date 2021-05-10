@@ -11,39 +11,52 @@ require "maintenance_tasks/engine"
 # application's code and the engine-specific code. Top-level engine constants
 # and variables are defined under this module.
 module MaintenanceTasks
-  # The module to namespace Tasks in, as a String. Defaults to 'Maintenance'.
-  # @param [String] the tasks_module value.
+  # @!attribute tasks_module
+  #   @scope class
+  #
+  #   The module to namespace Tasks in, as a String. Defaults to 'Maintenance'.
+  #   @return [String] the name of the module.
   mattr_accessor :tasks_module, default: "Maintenance"
 
-  # The name of the job to be used to perform Tasks. Defaults to
-  # `"MaintenanceTasks::TaskJob"`. This job must be either a class that inherits
-  # from {TaskJob} or a class that includes {TaskJobConcern}.
+  # @!attribute job
+  #   @scope class
   #
-  # @param [String] the name of the job class.
+  #   The name of the job to be used to perform Tasks. Defaults to
+  #   `"MaintenanceTasks::TaskJob"`. This job must be either a class that
+  #   inherits from {TaskJob} or a class that includes {TaskJobConcern}.
+  #
+  #   @return [String] the name of the job class.
   mattr_accessor :job, default: "MaintenanceTasks::TaskJob"
 
-  # After each iteration, the progress of the task may be updated. This duration
-  # in seconds limits these updates, skipping if the duration since the last
-  # update is lower than this value, except if the job is interrupted, in which
-  # case the progress will always be recorded.
+  # @!attribute ticker_delay
+  #   @scope class
   #
-  # @param [ActiveSupport::Duration, Numeric] Duration of the delay to update
-  #   the ticker during Task iterations.
+  #   The delay between updates to the tick count. After each iteration, the
+  #   progress of the Task may be updated. This duration in seconds limits
+  #   these updates, skipping if the duration since the last update is lower
+  #   than this value, except if the job is interrupted, in which case the
+  #   progress will always be recorded.
+  #
+  #   @return [ActiveSupport::Duration, Numeric] duration of the delay between
+  #     updates to the tick count during Task iterations.
   mattr_accessor :ticker_delay, default: 1.second
 
-  # Specifies which Active Storage service to use for uploading CSV file blobs.
+  # @!attribute active_storage_service
+  #   @scope class
   #
-  # @param [Symbol] the key for the storage service, as specified in the app's
-  #   config/storage.yml.
+  #   The Active Storage service to use for uploading CSV file blobs.
+  #
+  #   @return [Symbol] the key for the storage service, as specified in the
+  #     app's config/storage.yml.
   mattr_accessor :active_storage_service
 
-  # Retrieves the callback to be performed when an error occurs in the task.
+  # @private
   def self.error_handler
     return @error_handler if defined?(@error_handler)
     @error_handler = ->(_error, _task_context, _errored_element) {}
   end
 
-  # Defines a callback to be performed when an error occurs in the task.
+  # @private
   def self.error_handler=(error_handler)
     unless error_handler.arity == 3
       ActiveSupport::Deprecation.warn(
@@ -56,4 +69,12 @@ module MaintenanceTasks
     end
     @error_handler = error_handler
   end
+
+  # @!attribute error_handler
+  #   @scope class
+  #
+  #   The callback to perform when an error occurs in the Task.  See the
+  #   {file:README#label-Customizing+the+error+handler} for details.
+  #
+  #   @return [Proc] the callback to perform when an error occurs in the Task.
 end
