@@ -247,8 +247,11 @@ module MaintenanceTasks
       assert_predicate @run, :errored?
       assert_equal "ArgumentError", @run.error_class
       assert_empty @run.backtrace
-      expected_message = "Maintenance::TestTask#collection "\
-        "must be either an Active Record Relation, Array, or CSV."
+      expected_message = <<~MSG.squish
+        Maintenance::TestTask#collection must be either an
+        Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
+        Array, or CSV.
+      MSG
       assert_equal expected_message, @run.error_message
     end
 
@@ -367,6 +370,21 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
 
       assert_predicate run.reload, :succeeded?
+    end
+
+    test ".perform_now handles batch relation tasks" do
+      5.times do |i|
+        Post.create!(title: "Another Post ##{i}", content: "Content ##{i}")
+      end
+      # We expect 2 batches (7 posts => 5 + 2)
+      Maintenance::UpdatePostsInBatchesTask.any_instance.expects(:process).twice
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsInBatchesTask")
+      TaskJob.perform_now(run)
+
+      run.reload
+      assert_equal 2, run.tick_total
+      assert_equal 2, run.tick_count
     end
   end
 end

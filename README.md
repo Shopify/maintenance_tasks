@@ -112,6 +112,46 @@ title,content
 My Title,Hello World!
 ```
 
+### Processing Batch Collections
+
+The Maintenance Tasks gem supports processing Active Records in batches. This
+can reduce the number of calls your Task makes to the database. Use
+`ActiveRecord::Batches#in_batches` on the relation returned by your collection to specify that your Task should process
+batches instead of records. Active Record defaults to 1000 records by batch, but a custom size can be
+specified.
+
+```ruby
+# app/tasks/maintenance/update_posts_in_batches_task.rb
+module Maintenance
+  class UpdatePostsInBatchesTask < MaintenanceTasks::Task
+    def collection
+      Post.in_batches
+    end
+
+    def process(batch_of_posts)
+      batch_of_posts.update_all(content: "New content added on #{Time.now.utc}")
+    end
+  end
+end
+```
+
+Ensure that you've implemented the following methods:
+
+* `collection`: return an `ActiveRecord::Batches::BatchEnumerator`.
+* `process`: do the work of your Task on a batch (`ActiveRecord::Relation`).
+
+Note that `#count` is calculated automatically based on the number of batches in
+your collection, and your Task's progress will be displayed in terms of batches
+(not the number of records in the relation).
+
+**Important!** Batches should only be used if `#process` is performing a batch
+operation such as `#update_all` or `#delete_all`. If you need to iterate over
+individual records, you should define a collection that [returns an
+`ActiveRecord::Relation`](#creating-a-task). This uses batching
+internally, but loads the records with one SQL query. Conversely, batch
+collections load the primary keys of the records of the batch first, and then perform an additional query to load the
+records when calling `each` (or any `Enumerable` method) inside `#process`.
+
 ### Throttling
 
 Maintenance Tasks often modify a lot of data and can be taxing on your database.

@@ -36,13 +36,27 @@ module MaintenanceTasks
       collection_enum = case collection
       when ActiveRecord::Relation
         enumerator_builder.active_record_on_records(collection, cursor: cursor)
+      when ActiveRecord::Batches::BatchEnumerator
+        relation = collection.instance_variable_get(:@relation)
+        batch_size = collection.instance_variable_get(:@of)
+        enumerator_builder.active_record_on_batch_relations(
+          relation,
+          cursor: cursor,
+          batch_size: batch_size,
+          as_relation: true
+        )
+        @run.update!(tick_total: enumerator.size)
+        enumerator
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor)
       when CSV
         JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
       else
-        raise ArgumentError, "#{@task.class.name}#collection must be either "\
-          "an Active Record Relation, Array, or CSV."
+        raise ArgumentError, <<~MSG.squish
+          #{@task.class.name}#collection must be either an
+          Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
+          Array, or CSV.
+        MSG
       end
 
       @task.throttle_conditions.reduce(collection_enum) do |enum, condition|
@@ -85,7 +99,8 @@ module MaintenanceTasks
     end
 
     def on_start
-      @run.update!(started_at: Time.now, tick_total: @task.count)
+      @run.tick_total = @task.count unless @run.tick_total
+      @run.update!(started_at: Time.now)
     end
 
     def on_complete
