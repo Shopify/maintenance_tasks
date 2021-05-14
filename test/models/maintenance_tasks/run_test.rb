@@ -23,7 +23,7 @@ module MaintenanceTasks
     test "invalid if associated Task has parameters and they are invalid" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",
-        arguments: { post_ids: "xyz" }
+        arguments: { post_ids: "" }
       )
       refute_predicate run, :valid?
     end
@@ -312,7 +312,17 @@ module MaintenanceTasks
       run.validate_task_arguments
 
       assert_predicate run, :valid?
-      assert_equal "1,2,3", run.task.post_ids
+      assert_equal [1, 2, 3], run.task.post_ids
+    end
+
+    test "#validate_task_arguments raises if casting arguments to custom parameter value type fails" do
+      run = Run.new(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: "xyz" }
+      )
+      assert_raises MaintenanceTasks::Parameters::TypeError do
+        run.validate_task_arguments
+      end
     end
 
     private
