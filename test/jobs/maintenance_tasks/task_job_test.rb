@@ -386,5 +386,24 @@ module MaintenanceTasks
       assert_equal 2, run.tick_total
       assert_equal 2, run.tick_count
     end
+
+    test ".perform_now raises if +start+ or +finish+ options are used on batch enumerator" do
+      batch_enumerator = Post.in_batches(of: 5, start: 1, finish: 10)
+
+      Maintenance::UpdatePostsInBatchesTask.any_instance
+        .expects(:collection).returns(batch_enumerator)
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsInBatchesTask")
+      TaskJob.perform_now(run)
+
+      assert_predicate run.reload, :errored?
+      assert_equal "ArgumentError", run.error_class
+      assert_empty run.backtrace
+      expected_message = <<~MSG.squish
+        Maintenance::UpdatePostsInBatchesTask#collection cannot support a batch
+        enumerator with the "start" or "finish" options.
+      MSG
+      assert_equal expected_message, run.error_message
+    end
   end
 end
