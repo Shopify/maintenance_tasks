@@ -38,6 +38,7 @@ module MaintenanceTasks
     attr_readonly :task_name
 
     serialize :backtrace
+    serialize :arguments, JSON
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
 
