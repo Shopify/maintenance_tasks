@@ -152,6 +152,41 @@ Tasks can define multiple throttle conditions. Throttle conditions are inherited
 by descendants, and new conditions will be appended without impacting existing
 conditions.
 
+### Custom Task Parameters
+
+Tasks may need additional information, supplied via parameters, to run.
+Parameters can be defined as Active Model Attributes in a Task, and then
+become accessible to any of Task's methods: `#collection`, `#count`, or
+`#process`.
+
+```ruby
+# app/tasks/maintenance/update_posts_via_params_task.rb
+module Maintenance
+  class UpdatePostsViaParamsTask < MaintenanceTasks::Task
+    attribute :updated_content, :string
+    validates :updated_content, presence: true
+
+    def collection
+      Post.all
+    end
+
+    def count
+      collection.count
+    end
+
+    def process(post)
+      post.update!(content: updated_content)
+    end
+  end
+end
+```
+
+Tasks can leverage Active Model Validations when defining parameters. Arguments
+supplied to a Task accepting parameters will be validated before the Task starts
+to run. Since arguments are specified in the user interface via text area
+inputs, it's important to check that they conform to the format your Task
+expects, and to sanitize any inputs if necessary.
+
 ### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to
