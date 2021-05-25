@@ -20,11 +20,13 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   setup do
     travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
     Maintenance::UpdatePostsTask.fast_task = false
+    Maintenance::ParamsTask.fast_task = false
   end
 
   teardown do
     assert_empty page.driver.browser.manage.logs.get(:browser)
     Maintenance::UpdatePostsTask.fast_task = true
+    Maintenance::ParamsTask.fast_task = true
     FileUtils.rm_rf("test/dummy/tmp/downloads")
   end
 end

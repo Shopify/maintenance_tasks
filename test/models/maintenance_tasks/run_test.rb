@@ -5,19 +5,27 @@ module MaintenanceTasks
   class RunTest < ActiveSupport::TestCase
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: "Maintenance::DoesNotExist")
-      refute run.valid?
+      refute_predicate run, :valid?
     end
 
     test "invalid if associated with CSV Task and no attachment" do
       run = Run.new(task_name: "Maintenance::ImportPostsTask")
-      refute run.valid?
+      refute_predicate run, :valid?
     end
 
     test "invalid if unassociated with CSV Task and attachment" do
       run = Run.new(task_name: "Maintenance::UpdatePostsTask")
       csv = Rack::Test::UploadedFile.new(file_fixture("sample.csv"), "text/csv")
       run.csv_file.attach(csv)
-      refute run.valid?
+      refute_predicate run, :valid?
+    end
+
+    test "invalid if associated Task has parameters and they are invalid" do
+      run = Run.new(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: "xyz" }
+      )
+      refute_predicate run, :valid?
     end
 
     test "#persist_progress persists increments to tick count and time_running" do
@@ -274,6 +282,22 @@ module MaintenanceTasks
       assert_raises(ActiveRecord::RecordInvalid) do
         run.enqueued!
       end
+    end
+
+    test "#task returns Task instance for Run" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
+      assert_kind_of Maintenance::UpdatePostsTask, run.task
+    end
+
+    test "#validate_task_arguments instantiates Task and assigns arguments if Task has parameters" do
+      run = Run.new(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: "1,2,3" }
+      )
+      run.validate_task_arguments
+
+      assert_predicate run, :valid?
+      assert_equal "1,2,3", run.task.post_ids
     end
 
     private

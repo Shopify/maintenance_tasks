@@ -71,7 +71,7 @@ module MaintenanceTasks
 
     def before_perform
       @run = arguments.first
-      @task = Task.named(@run.task_name).new
+      @task = @run.task
       if @task.respond_to?(:csv_content=)
         @task.csv_content = @run.csv_file.download
       end

@@ -34,6 +34,7 @@ module MaintenanceTasks
       Task.available_tasks.map(&:to_s)
     } }
     validate :csv_attachment_presence, on: :create
+    validate :validate_task_arguments, on: :create
 
     attr_readonly :task_name
 
@@ -207,6 +208,40 @@ module MaintenanceTasks
       nil
     end
 
+    # Support iterating over ActiveModel::Errors in Rails 6.0 and Rails 6.1+.
+    # To be removed when Rails 6.0 is no longer supported.
+    if Rails::VERSION::STRING.match?(/^6.0/)
+      # Performs validation on the arguments to use for the Task. If the Task is
+      # invalid, the errors are added to the Run.
+      def validate_task_arguments
+        if task.invalid?
+          error_messages = task.errors
+            .map { |attribute, message| "#{attribute.inspect} #{message}" }
+          errors.add(
+            :arguments,
+            "are invalid: #{error_messages.join("; ")}"
+          )
+        end
+      rescue Task::NotFoundError
+        nil
+      end
+    else
+      # Performs validation on the arguments to use for the Task. If the Task is
+      # invalid, the errors are added to the Run.
+      def validate_task_arguments
+        if task.invalid?
+          error_messages = task.errors
+            .map { |error| "#{error.attribute.inspect} #{error.message}" }
+          errors.add(
+            :arguments,
+            "are invalid: #{error_messages.join("; ")}"
+          )
+        end
+      rescue Task::NotFoundError
+        nil
+      end
+    end
+
     # Fetches the attached ActiveStorage CSV file for the run. Checks first
     # whether the ActiveStorage::Attachment table exists so that we are
     # compatible with apps that are not using ActiveStorage.
@@ -216,6 +251,22 @@ module MaintenanceTasks
       return unless defined?(ActiveStorage)
       return unless ActiveStorage::Attachment.table_exists?
       super
+    end
+
+    # Returns a Task instance for this Run. Assigns any attributes to the Task
+    # based on the Run's parameters. Note that the Task instance is not supplied
+    # with :csv_content yet if it's a CSV Task. This is done in the job, since
+    # downloading the CSV file can take some time.
+    #
+    # @return [Task] a Task instance.
+    def task
+      @task ||= begin
+        task = Task.named(task_name).new
+        if task.attribute_names.any? && arguments.present?
+          task.assign_attributes(arguments)
+        end
+        task
+      end
     end
   end
 end
