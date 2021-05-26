@@ -23,12 +23,12 @@ handler](#customizing-the-error-handler) for more information.
 
 ### Active Job Dependency
 
-The Maintenance Tasks framework relies on ActiveJob behind the scenes to run
-Tasks. The default queuing backend for ActiveJob is
+The Maintenance Tasks framework relies on Active Job behind the scenes to run
+Tasks. The default queuing backend for Active Job is
 [asynchronous][async-adapter]. It is **strongly recommended** to change this to
 a persistent backend so that Task progress is not lost during code or
 infrastructure changes. For more information on configuring a queuing backend,
-take a look at the [ActiveJob documentation][active-job-docs].
+take a look at the [Active Job documentation][active-job-docs].
 
 [async-adapter]: https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/AsyncAdapter.html
 [active-job-docs]: https://guides.rubyonrails.org/active_job_basics.html#setting-the-backend
@@ -77,7 +77,7 @@ end
 ### Creating a CSV Task
 
 You can also write a Task that iterates on a CSV file. Note that writing CSV
-Tasks **requires ActiveStorage to be configured**. Ensure that the dependency
+Tasks **requires Active Storage to be configured**. Ensure that the dependency
 is specified in your application's Gemfile, and that you've followed the
 [setup instuctions][setup].
 
@@ -364,7 +364,7 @@ The error handler should be a lambda that accepts three arguments:
   exception monitoring service, make sure you **sanitize the object** to avoid
   leaking sensitive data and **convert it to a format** that is compatible with
   your bug tracker. For example, Bugsnag only sends the id and class name of
-  ActiveRecord objects in order to protect sensitive data. CSV rows, on the
+  Active Record objects in order to protect sensitive data. CSV rows, on the
   other hand, are converted to strings and passed raw to Bugsnag, so make sure
   to filter any personal data from these objects before adding them to a
   report.
