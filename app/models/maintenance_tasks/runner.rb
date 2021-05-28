@@ -45,6 +45,8 @@ module MaintenanceTasks
     # @raise [EnqueuingError] if an error occurs while enqueuing the Run.
     # @raise [ActiveRecord::RecordInvalid] if validation errors occur while
     #   creating the Run.
+    # @raise [ActiveRecord::ValueTooLong] if the creation of the Run fails due
+    #   to a value being too long for the column type.
     def run(name:, csv_file: nil, arguments: {})
       run = Run.active.find_by(task_name: name) ||
         Run.new(task_name: name, arguments: arguments)

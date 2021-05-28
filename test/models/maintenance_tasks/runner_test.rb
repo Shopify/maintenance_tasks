@@ -83,6 +83,16 @@ module MaintenanceTasks
       end
     end
 
+    test "#run raises ActiveRecord::ValueTooLong error if arguments input is too long" do
+      Run.any_instance.expects(:enqueued!).raises(ActiveRecord::ValueTooLong)
+      assert_raises(ActiveRecord::ValueTooLong) do
+        @runner.run(
+          name: "Maintenance::ParamsTask",
+          arguments: { post_ids: "123" }
+        )
+      end
+    end
+
     test "#run attaches CSV file to Run if one is provided" do
       @runner.run(name: "Maintenance::ImportPostsTask", csv_file: csv_io)
 
