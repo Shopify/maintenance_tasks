@@ -25,6 +25,7 @@ module MaintenanceTasks
         "Maintenance::EnqueueErrorTask",
         "Maintenance::ErrorTask",
         "Maintenance::ImportPostsTask",
+        "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsTask",
         "Maintenance::UpdatePostsThrottledTask",
@@ -142,6 +143,15 @@ module MaintenanceTasks
 
     test "#csv_task? returns false if the Task is deleted" do
       refute_predicate TaskData.new("Maintenance::DoesNotExist"), :csv_task?
+    end
+
+    test "#parameter_names returns list of parameter names for Tasks supporting parameters" do
+      assert_equal ["post_ids"],
+        TaskData.new("Maintenance::ParamsTask").parameter_names
+    end
+
+    test "#parameter_names returns empty list for deleted Tasks" do
+      assert_empty TaskData.new("Maintenance::DoesNotExist").parameter_names
     end
   end
 end

@@ -355,5 +355,18 @@ module MaintenanceTasks
 
       assert_predicate run.reload, :succeeded?
     end
+
+    test ".perform_now makes arguments supplied for Task parameters available" do
+      post = Post.last
+      Maintenance::ParamsTask.any_instance.expects(:process).once.with(post)
+
+      run = Run.create!(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: post.id.to_s }
+      )
+      TaskJob.perform_now(run)
+
+      assert_predicate run.reload, :succeeded?
+    end
   end
 end

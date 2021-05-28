@@ -27,16 +27,26 @@ module MaintenanceTasks
     def run
       task = Runner.run(
         name: params.fetch(:id),
-        csv_file: params[:csv_file]
+        csv_file: params[:csv_file],
+        arguments: task_arguments,
       )
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(error.record.task_name), alert: error.message)
+    rescue ActiveRecord::ValueTooLong => error
+      task_name = params.fetch(:id)
+      redirect_to(task_path(task_name), alert: error.message)
     rescue Runner::EnqueuingError => error
       redirect_to(task_path(error.run.task_name), alert: error.message)
     end
 
     private
+
+    def task_arguments
+      return {} unless params[:task_arguments].present?
+      task_attributes = Task.named(params[:id]).attribute_names
+      params.require(:task_arguments).permit(*task_attributes).to_h
+    end
 
     def set_refresh
       @refresh = 3

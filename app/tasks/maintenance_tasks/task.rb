@@ -3,6 +3,9 @@ module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
     extend ActiveSupport::DescendantsTracker
+    include ActiveModel::Attributes
+    include ActiveModel::AttributeAssignment
+    include ActiveModel::Validations
 
     class NotFoundError < NameError; end
 

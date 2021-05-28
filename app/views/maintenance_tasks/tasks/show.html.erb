@@ -16,6 +16,16 @@
           <%= form.file_field :csv_file %>
         </div>
       <% end %>
+      <% if @task.parameter_names.any? %>
+        <div class="block">
+          <%= form.fields_for :task_arguments do |ff| %>
+            <% @task.parameter_names.each do |parameter| %>
+              <%= ff.label parameter, "#{parameter}: ", class: "label" %>
+              <%= ff.text_area parameter, class: "textarea" %>
+            <% end %>
+          <% end %>
+        </div>
+      <% end %>
       <div class="block">
         <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
       </div>

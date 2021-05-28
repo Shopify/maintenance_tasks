@@ -132,6 +132,15 @@ module MaintenanceTasks
       !deleted? && Task.named(name) < CsvCollection
     end
 
+    # @return [Array<String>] the names of parameters the Task accepts.
+    def parameter_names
+      if deleted?
+        []
+      else
+        Task.named(name).attribute_names
+      end
+    end
+
     private
 
     def runs
