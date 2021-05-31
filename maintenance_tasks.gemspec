@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.executables = ["maintenance_tasks"]
 
   spec.post_install_message = "Thank you for installing Maintenance Tasks "\
-    "#{spec.version}. To complete, please run:\n\nrails generate "\
+    "#{spec.version}. To complete, please run:\n\nbin/rails generate "\
     "maintenance_tasks:install"
 
   spec.add_dependency("actionpack", ">= 6.0")
