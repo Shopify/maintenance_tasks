@@ -37,19 +37,16 @@ module MaintenanceTasks
       when ActiveRecord::Relation
         enumerator_builder.active_record_on_records(collection, cursor: cursor)
       when ActiveRecord::Batches::BatchEnumerator
-        if collection.instance_variable_get(:@start) ||
-          collection.instance_variable_get(:@finish)
+        if collection.start || collection.finish
           raise ArgumentError, <<~MSG.squish
             #{@task.class.name}#collection cannot support
             a batch enumerator with the "start" or "finish" options.
           MSG
         end
-        relation = collection.instance_variable_get(:@relation)
-        batch_size = collection.instance_variable_get(:@of)
         enumerator_builder.active_record_on_batch_relations(
-          relation,
+          collection.relation,
           cursor: cursor,
-          batch_size: batch_size,
+          batch_size: collection.batch_size,
         )
         @run.update!(tick_total: enumerator.size)
         enumerator
