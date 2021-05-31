@@ -32,6 +32,20 @@ module MaintenanceTasks
       end
     end
 
+    # Yielding the run is undocumented and not supported in the Runner's API
+    test "#run yields the newly created Run when there is no active Run" do
+      run = Run.create!(task_name: @name, status: :paused)
+
+      @runner.run(name: @name) { |yielded| @run = yielded }
+      assert_equal run, @run
+    end
+
+    # Yielding the run is undocumented and not supported in the Runner's API
+    test "#run yields the existing active Run" do
+      @runner.run(name: @name) { |run| @run = run }
+      assert_equal Run.last, @run
+    end
+
     test "#run raises validation error if no Task for given name" do
       assert_no_difference -> { Run.where(task_name: "Invalid").count } do
         assert_no_enqueued_jobs do

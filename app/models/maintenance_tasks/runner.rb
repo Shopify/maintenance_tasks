@@ -54,6 +54,7 @@ module MaintenanceTasks
 
       run.enqueued!
       enqueue(run)
+      yield run if block_given?
       Task.named(name)
     end
 
