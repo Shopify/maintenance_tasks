@@ -10,7 +10,7 @@ To install the gem and run the install generator, execute:
 
 ```bash
 $ bundle add maintenance_tasks
-$ rails generate maintenance_tasks:install
+$ bin/rails generate maintenance_tasks:install
 ```
 
 The generator creates and runs a migration to add the necessary table to your
@@ -40,7 +40,7 @@ take a look at the [Active Job documentation][active-job-docs].
 A generator is provided to create tasks. Generate a new task by running:
 
 ```bash
-$ rails generate maintenance_tasks:task update_posts
+$ bin/rails generate maintenance_tasks:task update_posts
 ```
 
 This creates the task file `app/tasks/maintenance/update_posts_task.rb`.
@@ -86,7 +86,7 @@ is specified in your application's Gemfile, and that you've followed the
 Generate a CSV Task by running:
 
 ```bash
-$ rails generate maintenance_tasks:task import_posts --csv
+$ bin/rails generate maintenance_tasks:task import_posts --csv
 ```
 
 The generated task is a subclass of `MaintenanceTasks::Task` that implements:
@@ -145,7 +145,7 @@ end
 
 Note that it's up to you to define a throttling condition that makes sense for
 your app. Shopify implements `DatabaseStatus.healthy?` to check various MySQL
-metrics such as replication lag, DB threads, whether DB writes are available, 
+metrics such as replication lag, DB threads, whether DB writes are available,
 etc.
 
 Tasks can define multiple throttle conditions. Throttle conditions are inherited
@@ -486,7 +486,7 @@ Use bundler to check for and upgrade to newer versions. After installing a new
 version, re-run the install command:
 
 ```bash
-$ rails generate maintenance_tasks:install
+$ bin/rails generate maintenance_tasks:install
 ```
 
 This ensures that new migrations are installed and run as well.
