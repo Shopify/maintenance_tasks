@@ -4,7 +4,6 @@ on: [push, pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}
     strategy:
@@ -21,6 +20,9 @@ jobs:
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
+    - name: Rails version
+      if: ${{ matrix.gemfile == 'gemfiles/rails_edge.gemfile' }}
+      run: bundle info rails | head -1
     - name: Set up database
       run: RAILS_ENV=test bundle exec rails db:setup
     - name: Ruby Tests
