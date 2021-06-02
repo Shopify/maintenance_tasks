@@ -1,7 +1,7 @@
 <p>
   Ran for <%= time_running_in_words run  %> until paused,
-  <% if run.estimated_completion_time %>
-    <%= estimated_time_to_completion(run) %> remaining.
+  <% if (time_to_completion = run.time_to_completion) %>
+    <%= distance_of_time_in_words(time_to_completion) %> remaining.
   <% else %>
     processed <%= pluralize run.tick_count, 'item' %> so far.
   <% end %>

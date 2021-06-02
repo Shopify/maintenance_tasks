@@ -151,19 +151,19 @@ module MaintenanceTasks
       ACTIVE_STATUSES.include?(status.to_sym)
     end
 
-    # Returns the estimated time the task will finish based on the the number of
-    # ticks left and the average time needed to process a tick.
-    # Returns nil if the Run is completed, or if the tick_count or tick_total is
-    # zero.
+    # Returns the duration left for the Run to finish based on the number of
+    # ticks left and the average time needed to process a tick. Returns nil if
+    # the Run is completed, or if tick_count or tick_total is zero.
     #
-    # @return [Time] the estimated time the Run will finish.
-    def estimated_completion_time
+    # @return [ActiveSupport::Duration] the estimated duration left for the Run
+    #   to finish.
+    def time_to_completion
       return if completed? || tick_count == 0 || tick_total.to_i == 0
 
       processed_per_second = (tick_count.to_f / time_running)
       ticks_left = (tick_total - tick_count)
       seconds_to_finished = ticks_left / processed_per_second
-      Time.now + seconds_to_finished
+      seconds_to_finished.seconds
     end
 
     # Cancels a Run.
