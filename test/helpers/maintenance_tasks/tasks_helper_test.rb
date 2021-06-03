@@ -54,15 +54,6 @@ module MaintenanceTasks
       assert_equal expected, status_tag("pausing")
     end
 
-    test "#estimated_time_to_completion returns the Run's estimated_completion_time in words" do
-      @run.expects(estimated_completion_time: Time.now + 2.minutes)
-      assert_equal "2 minutes", estimated_time_to_completion(@run)
-    end
-
-    test "#estimated_time_to_completion returns nil if the Run has no estimated_completion_time" do
-      assert_nil estimated_time_to_completion(@run)
-    end
-
     test "#time_running_in_words reports the approximate time running of the given Run" do
       @run.time_running = 182.5
       assert_equal "3 minutes", time_running_in_words(@run)

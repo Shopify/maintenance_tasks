@@ -63,20 +63,6 @@ module MaintenanceTasks
       tag.span(status.capitalize, class: ["tag"] + STATUS_COLOURS.fetch(status))
     end
 
-    # Returns the distance between now and the Run's expected completion time,
-    # if the Run has an estimated_completion_time.
-    #
-    # @param run [MaintenanceTasks::Run] the Run for which the estimated time to
-    #   completion is being calculated.
-    # return [String, nil] the distance in words, or nil if the Run has no
-    #   estimated completion time.
-    def estimated_time_to_completion(run)
-      estimated_completion_time = run.estimated_completion_time
-      if estimated_completion_time.present?
-        time_ago_in_words(estimated_completion_time)
-      end
-    end
-
     # Reports the approximate elapsed time a Run has been processed so far based
     # on the Run's time running attribute.
     #

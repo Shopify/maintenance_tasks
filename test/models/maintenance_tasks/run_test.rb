@@ -158,16 +158,16 @@ module MaintenanceTasks
       end
     end
 
-    test "#estimated_completion_time returns nil if the run is completed" do
+    test "#time_to_completion returns nil if the run is completed" do
       run = Run.new(
         task_name: "Maintenance::UpdatePostsTask",
         status: :succeeded
       )
 
-      assert_nil run.estimated_completion_time
+      assert_nil run.time_to_completion
     end
 
-    test "#estimated_completion_time returns nil if tick_count is 0" do
+    test "#time_to_completion returns nil if tick_count is 0" do
       run = Run.new(
         task_name: "Maintenance::UpdatePostsTask",
         status: :running,
@@ -175,34 +175,29 @@ module MaintenanceTasks
         tick_total: 10
       )
 
-      assert_nil run.estimated_completion_time
+      assert_nil run.time_to_completion
     end
 
-    test "#estimated_completion_time returns nil if no tick_total" do
+    test "#time_to_completion returns nil if no tick_total" do
       run = Run.new(
         task_name: "Maintenance::UpdatePostsTask",
         status: :running,
         tick_count: 1
       )
 
-      assert_nil run.estimated_completion_time
+      assert_nil run.time_to_completion
     end
 
-    test "#estimated_completion_time returns estimated completion time based on average time elapsed per tick" do
-      started_at = Time.utc(2020, 1, 9, 9, 41, 44)
-      travel_to started_at + 9.seconds
-
+    test "#time_to_completion returns estimated duration until completion based on average time elapsed per tick" do
       run = Run.new(
         task_name: "Maintenance::UpdatePostsTask",
-        started_at: started_at,
         status: :running,
         tick_count: 9,
         tick_total: 10,
         time_running: 9,
       )
 
-      expected_completion_time = Time.utc(2020, 1, 9, 9, 41, 54)
-      assert_equal expected_completion_time, run.estimated_completion_time
+      assert_equal 1.second, run.time_to_completion
     end
 
     test "#cancel transitions the Run to cancelling if not paused" do
