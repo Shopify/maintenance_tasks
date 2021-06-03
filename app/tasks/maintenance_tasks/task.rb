@@ -131,6 +131,7 @@ module MaintenanceTasks
     #
     # @return [Integer, nil]
     def count
+      :no_count
     end
   end
 end

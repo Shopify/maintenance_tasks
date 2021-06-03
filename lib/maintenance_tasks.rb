@@ -7,6 +7,8 @@ require "active_record"
 require "job-iteration"
 require "maintenance_tasks/engine"
 
+require "patches/active_record_batch_enumerator"
+
 # The engine's namespace module. It provides isolation between the host
 # application's code and the engine-specific code. Top-level engine constants
 # and variables are defined under this module.
