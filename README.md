@@ -316,6 +316,13 @@ To run a Task that processes CSVs from the command line, use the --csv option:
 $ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv 'path/to/my_csv.csv'
 ```
 
+To run a Task that takes arguments from the command line, use the --arguments
+option, passing arguments as a set of <key>:<value> pairs:
+
+```bash
+$ bundle exec maintenance_tasks perform Maintenance::ParamsTask --arguments post_ids:1,2,3 content:"Hello, World!"
+```
+
 You can also run a Task in Ruby by sending `run` with a Task name to Runner:
 
 ```ruby
@@ -329,6 +336,16 @@ open IO object and a filename to `run`:
 MaintenanceTasks::Runner.run(
   name: 'Maintenance::ImportPostsTask'
   csv_file: { io: File.open('path/to/my_csv.csv'), filename: 'my_csv.csv' }
+)
+```
+
+To run a Task that takes arguments using the Runner, provide a Hash containing
+the set of arguments (`{ parameter_name: argument_value }`) to `run`:
+
+```ruby
+MaintenanceTasks::Runner.run(
+  name: "Maintenance::ParamsTask",
+  arguments: { post_ids: "1,2,3" }
 )
 ```
 

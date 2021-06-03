@@ -28,6 +28,26 @@ module MaintenanceTasks
       refute_predicate run, :valid?
     end
 
+    test "invalid if arguments used do not match parameters on Task" do
+      run = Run.new(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: "1,2,3", bad_argument: "1,2,3" }
+      )
+      refute_predicate run, :valid?
+      assert_equal run.errors.full_messages.first,
+        "Unknown parameters: bad_argument"
+    end
+
+    test "invalid if arguments are supplied but Task does not support parameters" do
+      run = Run.new(
+        task_name: "Maintenance::UpdatePostsTask",
+        arguments: { post_ids: "1,2,3" }
+      )
+      refute_predicate run, :valid?
+      assert_equal run.errors.full_messages.first,
+        "Unknown parameters: post_ids"
+    end
+
     test "#persist_progress persists increments to tick count and time_running" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
