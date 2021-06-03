@@ -32,6 +32,7 @@ module MaintenanceTasks
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
       collection = @task.collection
+      @enumerator = nil
 
       collection_enum = case collection
       when ActiveRecord::Relation
@@ -43,13 +44,13 @@ module MaintenanceTasks
             a batch enumerator with the "start" or "finish" options.
           MSG
         end
-        enumerator_builder.active_record_on_batch_relations(
+        # For now, only support automatic count based on the enumerator for
+        # batches
+        @enumerator = enumerator_builder.active_record_on_batch_relations(
           collection.relation,
           cursor: cursor,
           batch_size: collection.batch_size,
         )
-        @run.update!(tick_total: enumerator.size)
-        enumerator
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor)
       when CSV
@@ -102,8 +103,9 @@ module MaintenanceTasks
     end
 
     def on_start
-      @run.tick_total = @task.count unless @run.tick_total
-      @run.update!(started_at: Time.now)
+      count = @task.count
+      count = @enumerator&.size if count == :no_count
+      @run.update!(started_at: Time.now, tick_total: count)
     end
 
     def on_complete

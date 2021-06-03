@@ -54,9 +54,9 @@ module MaintenanceTasks
       assert_equal 2, Maintenance::TestTask.count
     end
 
-    test "#count is nil by default" do
+    test "#count is :no_count by default" do
       task = Task.new
-      assert_nil task.count
+      assert_equal(:no_count, task.count)
     end
 
     test "#collection raises NoMethodError" do
