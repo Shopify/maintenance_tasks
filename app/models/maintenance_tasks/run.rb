@@ -214,6 +214,7 @@ module MaintenanceTasks
       # Performs validation on the arguments to use for the Task. If the Task is
       # invalid, the errors are added to the Run.
       def validate_task_arguments
+        arguments_match_task_attributes if arguments.present?
         if task.invalid?
           error_messages = task.errors
             .map { |attribute, message| "#{attribute.inspect} #{message}" }
@@ -229,6 +230,7 @@ module MaintenanceTasks
       # Performs validation on the arguments to use for the Task. If the Task is
       # invalid, the errors are added to the Run.
       def validate_task_arguments
+        arguments_match_task_attributes if arguments.present?
         if task.invalid?
           error_messages = task.errors
             .map { |error| "#{error.attribute.inspect} #{error.message}" }
@@ -266,6 +268,20 @@ module MaintenanceTasks
           task.assign_attributes(arguments)
         end
         task
+      rescue ActiveModel::UnknownAttributeError
+        task
+      end
+    end
+
+    private
+
+    def arguments_match_task_attributes
+      invalid_argument_keys = arguments.keys - task.attribute_names
+      if invalid_argument_keys.any?
+        error_message = <<~MSG.squish
+          Unknown parameters: #{invalid_argument_keys.map(&:to_sym).join(", ")}
+        MSG
+        errors.add(:base, error_message)
       end
     end
   end

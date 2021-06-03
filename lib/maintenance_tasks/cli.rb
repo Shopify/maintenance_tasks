@@ -28,15 +28,21 @@ module MaintenanceTasks
     option :csv, desc: "Supply a CSV file to be processed by a CSV Task, "\
       '--csv "path/to/csv/file.csv"'
 
+    # Specify arguments to supply to a Task supporting parameters
+    option :arguments, type: :hash, desc: "Supply arguments for a Task that "\
+      "accepts parameters as a set of <key>:<value> pairs."
+
     # Command to run a Task.
     #
     # It instantiates a Runner and sends a run message with the given Task name.
     # If a CSV file is supplied using the --csv option, an attachable with the
-    # File IO object is sent along with the Task name to run.
+    # File IO object is sent along with the Task name to run. If arguments are
+    # supplied using the --arguments option, these are also passed to run.
     #
     # @param name [String] the name of the Task to be run.
     def perform(name)
-      task = Runner.run(name: name, csv_file: csv_file)
+      arguments = options[:arguments] || {}
+      task = Runner.run(name: name, csv_file: csv_file, arguments: arguments)
       say_status(:success, "#{task.name} was enqueued.", :green)
     rescue => error
       say_status(:error, error.message, :red)

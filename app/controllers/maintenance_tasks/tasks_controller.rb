@@ -28,7 +28,7 @@ module MaintenanceTasks
       task = Runner.run(
         name: params.fetch(:id),
         csv_file: params[:csv_file],
-        arguments: task_arguments,
+        arguments: params.fetch(:task_arguments, {}).permit!.to_h,
       )
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error
@@ -41,12 +41,6 @@ module MaintenanceTasks
     end
 
     private
-
-    def task_arguments
-      return {} unless params[:task_arguments].present?
-      task_attributes = Task.named(params[:id]).attribute_names
-      params.require(:task_arguments).permit(*task_attributes).to_h
-    end
 
     def set_refresh
       @refresh = 3
