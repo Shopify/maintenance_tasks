@@ -227,22 +227,24 @@ to run. Since arguments are specified in the user interface via text area
 inputs, it's important to check that they conform to the format your Task
 expects, and to sanitize any inputs if necessary.
 
-The gem provides custom ActiveModel::Type::Value objects for complex parameter
+The gem provides custom `ActiveModel::Type::Value` objects for complex parameter
 types:
 
-- `MaintenanceTasks::Parameters::IntegerArrayType`: Accepts a comma-delimited
-string of integers and turns it into an array of integers.
-- `MaintenanceTasks::Parameters::StringArrayType`: Accepts an alphanumeric,
-comma-delimited string and turns it into an array of strings.
+- `IntegerArrayType`: Accepts a comma-delimited string of integers and turns it
+into an array of integers.
+- `StringArrayType`: Accepts an alphanumeric, comma-delimited string and turns
+it into an array of strings.
 
-If you use one of these types for a parameter in your Task, the input will be
-validated automatically and typecast appropriately.
+If you use one of these types for a parameter in your Task, your input will be
+coerced appropriately. **You may still want write validations for your input,
+as type coercion is fairly lax. For example, if you input "xyz" for an
+`IntegerArrayType` parameter, it will be cast to `[0]`.**
 
 ```ruby
 # app/tasks/maintenance/update_posts_via_params_task.rb
 module Maintenance
   class UpdatePostsViaParamsTask < MaintenanceTasks::Task
-    attribute :post_ids, MaintenanceTasks::Parameters::IntegerArrayType.new
+    attribute :post_ids, IntegerArrayType.new
     validates :post_ids, presence: true
 
     def collection

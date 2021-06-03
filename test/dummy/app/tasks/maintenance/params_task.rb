@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 module Maintenance
   class ParamsTask < MaintenanceTasks::Task
-    attribute :post_ids, MaintenanceTasks::Parameters::IntegerArrayType.new
+    attribute :post_ids, IntegerArrayType.new
     validates :post_ids, presence: true
 
     class << self

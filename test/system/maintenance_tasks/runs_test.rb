@@ -57,20 +57,6 @@ module MaintenanceTasks
       assert_text alert_text
     end
 
-    test "errors for Task with arguments using custom parameter types shown" do
-      visit maintenance_tasks_path
-
-      click_on("Maintenance::ParamsTask")
-      fill_in("_task_arguments_post_ids", with: "xyz")
-      click_on "Run"
-
-      alert_text = <<~MSG.squish
-        MaintenanceTasks::Parameters::IntegerArrayType expects
-        a comma-delimited string of integers. Input received: xyz
-      MSG
-      assert_text alert_text
-    end
-
     test "download the CSV attached to a run for a CSV Task" do
       visit(maintenance_tasks_path)
 

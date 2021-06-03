@@ -315,16 +315,6 @@ module MaintenanceTasks
       assert_equal [1, 2, 3], run.task.post_ids
     end
 
-    test "#validate_task_arguments raises if casting arguments to custom parameter value type fails" do
-      run = Run.new(
-        task_name: "Maintenance::ParamsTask",
-        arguments: { post_ids: "xyz" }
-      )
-      assert_raises MaintenanceTasks::Parameters::TypeError do
-        run.validate_task_arguments
-      end
-    end
-
     private
 
     def count_uncached_queries(&block)
