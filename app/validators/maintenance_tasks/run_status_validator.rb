@@ -48,9 +48,8 @@ module MaintenanceTasks
         "errored",
       ],
       # paused -> enqueued occurs when the task is resumed after being paused.
-      # paused -> cancelling when the user cancels the task after it is paused.
       # paused -> cancelled when the user cancels the task after it is paused.
-      "paused" => ["enqueued", "cancelling", "cancelled"],
+      "paused" => ["enqueued", "cancelled"],
       # interrupted -> running occurs when the task is resumed after being
       #   interrupted by the job infrastructure.
       # interrupted -> pausing occurs when the task is paused by the user while
