@@ -213,6 +213,7 @@ DEPENDENCIES
   pry-byebug
   puma
   rails
+  rubocop (= 1.14.0)
   rubocop-shopify
   selenium-webdriver
   sqlite3
