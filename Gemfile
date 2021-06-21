@@ -9,7 +9,7 @@ gem "mocha"
 gem "pry-byebug"
 gem "puma"
 gem "rails", defined?(@rails_gem_requirement) && @rails_gem_requirement
-gem "rubocop", "1.14.0" # https://github.com/rubocop/rubocop/issues/9861
+gem "rubocop", "1.17.0" # https://github.com/rubocop/rubocop/issues/9861
 gem "rubocop-shopify"
 gem "selenium-webdriver"
 gem "sqlite3"
