@@ -213,7 +213,7 @@ DEPENDENCIES
   pry-byebug
   puma
   rails
-  rubocop (= 1.17.0)
+  rubocop
   rubocop-shopify
   selenium-webdriver
   sqlite3
@@ -221,4 +221,4 @@ DEPENDENCIES
   yard
 
 BUNDLED WITH
-   2.2.17
+   2.2.20
