@@ -7,6 +7,7 @@ AllCops:
     - test/dummy/db/schema.rb
     - vendor/**/*
   SuggestExtensions: false
+  NewCops: disable
 
 Bundler/OrderedGems:
   Enabled: true
