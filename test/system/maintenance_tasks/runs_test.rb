@@ -49,11 +49,11 @@ module MaintenanceTasks
       visit maintenance_tasks_path
 
       click_on("Maintenance::ParamsTask")
-      fill_in("_task_arguments_post_ids", with: "xyz")
+      fill_in("_task_arguments_post_ids", with: "")
       click_on "Run"
 
-      alert_text = "Validation failed: Arguments are invalid: :post_ids is "\
-        "invalid"
+      alert_text = "Validation failed: Arguments are invalid: "\
+        ":post_ids can't be blank"
       assert_text alert_text
     end
 
