@@ -8,6 +8,12 @@ module MaintenanceTasks
       @run = Run.create!(task_name: "Maintenance::TestTask")
     end
 
+    test "persists job_id to run before enqueue" do
+      job = TaskJob.perform_later(@run)
+
+      assert_equal job.job_id, @run.job_id
+    end
+
     test ".perform_now exits job when Run is paused, and updates Run status from pausing to paused" do
       Maintenance::TestTask.any_instance.expects(:process).once.with do
         @run.pausing!
@@ -92,15 +98,12 @@ module MaintenanceTasks
       assert_equal 2, @run.tick_total
     end
 
-    test ".perform_now updates Run to running and persists job_id when job starts performing" do
+    test ".perform_now updates Run to running when job starts performing" do
       Maintenance::TestTask.any_instance.expects(:process).twice.with do
         assert_predicate @run.reload, :running?
       end
 
-      job = TaskJob.new(@run)
-      job.perform_now
-
-      assert_equal job.job_id, @run.reload.job_id
+      TaskJob.new(@run).perform_now
     end
 
     test ".perform_now updates Run to succeeded and persists ended_at when job finishes successfully" do
