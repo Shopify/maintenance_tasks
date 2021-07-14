@@ -252,7 +252,7 @@ module MaintenanceTasks
       )
       refute_predicate run, :stuck?
 
-      travel 5.minutes
+      travel Run::STUCK_TASK_TIMEOUT
       assert_predicate run, :stuck?
     end
 
@@ -263,7 +263,7 @@ module MaintenanceTasks
           task_name: "Maintenance::UpdatePostsTask",
           status: status,
         )
-        travel 5.minutes
+        travel Run::STUCK_TASK_TIMEOUT
         refute_predicate run, :stuck?
       end
     end
@@ -279,7 +279,7 @@ module MaintenanceTasks
       assert_predicate run, :cancelling?
       assert_nil run.ended_at
 
-      travel 5.minutes
+      travel Run::STUCK_TASK_TIMEOUT
       run.cancel
       assert_predicate run, :cancelled?
       assert_equal Time.now, run.ended_at

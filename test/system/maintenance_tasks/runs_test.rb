@@ -135,7 +135,7 @@ module MaintenanceTasks
       assert_text "Cancelling…"
       refute_button "Cancel"
 
-      travel 5.minutes
+      travel Run::STUCK_TASK_TIMEOUT
 
       refresh
       click_on "Cancel"
