@@ -91,7 +91,7 @@ module MaintenanceTasks
         status: :errored,
         error_class: error.class.to_s,
         error_message: error.message,
-        backtrace: Rails.backtrace_cleaner.clean(error.backtrace),
+        backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
         ended_at: Time.now,
       )
     end
