@@ -537,6 +537,23 @@ MaintenanceTasks.active_storage_service = :internal
 There is no need to configure this option if your application uses only one
 storage service per environment.
 
+#### Customizing the backtrace cleaner
+
+`MaintenanceTasks.backtrace_cleaner` can be configured to specify a backtrace
+cleaner to use when a Task errors and the backtrace is cleaned and persisted.
+An `ActiveSupport::BacktraceCleaner` should be used.
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+cleaner = ActiveSupport::BacktraceCleaner.new
+cleaner.add_silencer { |line| line =~ /ignore_this_dir/ }
+
+MaintenanceTasks.backtrace_cleaner = cleaner
+```
+
+If none is specified, the default `Rails.backtrace_cleaner` will be used to
+clean backtraces.
+
 ## Upgrading
 
 Use bundler to check for and upgrade to newer versions. After installing a new

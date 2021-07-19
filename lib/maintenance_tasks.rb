@@ -52,6 +52,16 @@ module MaintenanceTasks
   #     app's config/storage.yml.
   mattr_accessor :active_storage_service
 
+  # @!attribute backtrace_cleaner
+  #   @scope class
+  #
+  #   The Active Support backtrace cleaner that will be used to clean the
+  #   backtrace of a Task that errors.
+  #
+  #   @return [ActiveSupport::BacktraceCleaner, nil] the backtrace cleaner to
+  #     use when cleaning a Run's backtrace.
+  mattr_accessor :backtrace_cleaner
+
   # @private
   def self.error_handler
     return @error_handler if defined?(@error_handler)

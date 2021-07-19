@@ -11,6 +11,10 @@ module MaintenanceTasks
       eager_load! unless Rails.autoloaders.zeitwerk_enabled?
     end
 
+    initializer "maintenance_tasks.configs" do
+      MaintenanceTasks.backtrace_cleaner = Rails.backtrace_cleaner
+    end
+
     config.to_prepare do
       _ = TaskJobConcern # load this for JobIteration compatibility check
       unless Rails.autoloaders.zeitwerk_enabled?
