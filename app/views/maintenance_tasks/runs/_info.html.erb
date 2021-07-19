@@ -11,6 +11,16 @@
 
 <% if run.csv_file.present? %>
   <div class="block">
-    <%= link_to('Download CSV', csv_file_download_path(run)) %>
+    <%= link_to("Download CSV", csv_file_download_path(run)) %>
+  </div>
+<% end %>
+<% if run.arguments.present? %>
+  <div class="block">
+    <h5>Arguments:</h5>
+    <pre>
+      <% run.arguments.each do |key, value| %>
+        <%= "#{key}: #{value}" %>
+      <% end %>
+    </pre>
   </div>
 <% end %>

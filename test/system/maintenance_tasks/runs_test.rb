@@ -43,6 +43,8 @@ module MaintenanceTasks
       assert_title "Maintenance::ParamsTask"
       assert_text "Succeeded"
       assert_text "Processed 1 out of 1 item (100%)."
+      assert_text "Arguments"
+      assert_text "post_ids: #{post_id}"
     end
 
     test "errors for Task with invalid arguments shown" do
