@@ -51,10 +51,10 @@ module MaintenanceTasks
       run = Run.active.find_by(task_name: name) ||
         Run.new(task_name: name, arguments: arguments)
       run.csv_file.attach(csv_file) if csv_file
+      yield run if block_given?
 
       run.enqueued!
       enqueue(run)
-      yield run if block_given?
       Task.named(name)
     end
 
