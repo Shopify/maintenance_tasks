@@ -591,6 +591,7 @@ are merged.
 Once a release is ready, follow these steps:
 
 * Update `spec.version` in `maintenance_tasks.gemspec`.
+* Run `bundle install` to bump the `Gemfile.lock` version of the gem.
 * Open a PR and merge on approval.
 * Deploy via [Shipit][shipit] and see the new version on
   <https://rubygems.org/gems/maintenance_tasks>.
