@@ -241,6 +241,15 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test ".perform_now accepts enumerable objects as collection" do
+      Maintenance::ImportPostsTask.any_instance.expects(:process).times(3)
+
+      run = Run.new(task_name: "Maintenance::ToEnumTask")
+      TaskJob.perform_now(run)
+
+      assert_predicate(run, :succeeded?)
+    end
+
     test ".perform_now sets the Run as errored when the Task collection is invalid" do
       Maintenance::TestTask.any_instance.stubs(collection: "not a collection")
 
@@ -253,7 +262,7 @@ module MaintenanceTasks
       expected_message = <<~MSG.squish
         Maintenance::TestTask#collection must be either an
         Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
-        Array, or CSV.
+        Array, CSV, or object that responds to #to_enumerable.
       MSG
       assert_equal expected_message, @run.error_message
     end

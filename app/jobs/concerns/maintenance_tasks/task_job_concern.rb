@@ -57,11 +57,15 @@ module MaintenanceTasks
       when CSV
         JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
       else
-        raise ArgumentError, <<~MSG.squish
-          #{@task.class.name}#collection must be either an
-          Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
-          Array, or CSV.
-        MSG
+        if collection.respond_to?(:to_enumerable)
+          collection.to_enumerable(cursor: cursor)
+        else
+          raise ArgumentError, <<~MSG.squish
+            #{@task.class.name}#collection must be either an
+            Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
+            Array, CSV, or object that responds to #to_enumerable.
+          MSG
+        end
       end
 
       @task.throttle_conditions.reduce(collection_enum) do |enum, condition|

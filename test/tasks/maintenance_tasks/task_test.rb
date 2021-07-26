@@ -11,6 +11,7 @@ module MaintenanceTasks
         "Maintenance::ImportPostsTask",
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
+        "Maintenance::ToEnumTask",
         "Maintenance::UpdatePostsInBatchesTask",
         "Maintenance::UpdatePostsTask",
         "Maintenance::UpdatePostsThrottledTask",
