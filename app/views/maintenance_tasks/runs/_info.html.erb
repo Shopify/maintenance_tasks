@@ -16,13 +16,24 @@
   <hr/>
 <% end %>
 <% if run.arguments.present? %>
-  <div class="block">
-    <h5>Arguments:</h5>
-    <pre>
-      <% run.arguments.each do |key, value| %>
-        <%= "#{key}: #{value}" %>
-      <% end %>
-    </pre>
+<div class="table-container">
+  <h6 class="title is-6">Arguments:</h6>
+    <table class="table">
+      <tbody>
+        <% run.arguments.each do |key, value| %>
+          <tr>
+            <td><var><%= key %></var></td>
+            <td>
+              <% if value.include?("\n") %>
+                <pre><%= value %><pre>
+              <% else %>
+                <code><%= value %><code>
+              <% end %>
+            </td>
+          </tr>
+          <% end %>
+      </tbody>
+    </table>
   </div>
   <hr/>
 <% end %>
