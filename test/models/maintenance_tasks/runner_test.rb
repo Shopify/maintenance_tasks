@@ -32,6 +32,14 @@ module MaintenanceTasks
       end
     end
 
+    test "#run sets the job_id" do
+      assert_enqueued_with(job: @job) do
+        assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
+      end
+      run = Run.last
+      assert_not_nil run.job_id
+    end
+
     # Yielding the run is undocumented and not supported in the Runner's API
     test "#run yields the newly created Run when there is no active Run" do
       run = Run.create!(task_name: @name, status: :paused)
@@ -62,35 +70,36 @@ module MaintenanceTasks
     end
 
     test "#run raises enqueuing errors if enqueuing raises" do
-      @job.expects(:perform_later).raises(RuntimeError, "error")
       assert_no_enqueued_jobs do
         error = assert_raises(Runner::EnqueuingError) do
-          @runner.run(name: @name)
+          @runner.run(name: "Maintenance::EnqueueErrorTask")
         end
 
         assert_equal(
-          "The job to perform #{@name} could not be enqueued",
+          "The job to perform Maintenance::EnqueueErrorTask "\
+          "could not be enqueued",
           error.message
         )
         assert_kind_of RuntimeError, error.cause
-        assert_equal "error", error.cause.message
+        assert_equal "Error enqueuing", error.cause.message
       end
     end
 
     test "#run raises enqueuing errors if enqueuing is unsuccessful" do
-      @job.expects(:perform_later).returns(false)
       assert_no_enqueued_jobs do
         error = assert_raises(Runner::EnqueuingError) do
-          @runner.run(name: @name)
+          @runner.run(name: "Maintenance::CancelledEnqueueTask")
         end
 
         assert_equal(
-          "The job to perform #{@name} could not be enqueued",
+          "The job to perform Maintenance::CancelledEnqueueTask "\
+          "could not be enqueued",
           error.message
         )
         assert_kind_of RuntimeError, error.cause
         assert_equal(
-          "The job to perform #{@name} could not be enqueued. "\
+          "The job to perform Maintenance::CancelledEnqueueTask "\
+          "could not be enqueued. "\
           "Enqueuing has been prevented by a callback.",
           error.cause.message
         )

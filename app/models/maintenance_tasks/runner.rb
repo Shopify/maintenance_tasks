@@ -51,17 +51,18 @@ module MaintenanceTasks
       run = Run.active.find_by(task_name: name) ||
         Run.new(task_name: name, arguments: arguments)
       run.csv_file.attach(csv_file) if csv_file
+      job = MaintenanceTasks.job.constantize.new(run)
+      run.job_id = job.job_id
       yield run if block_given?
-
       run.enqueued!
-      enqueue(run)
+      enqueue(run, job)
       Task.named(name)
     end
 
     private
 
-    def enqueue(run)
-      unless MaintenanceTasks.job.constantize.perform_later(run)
+    def enqueue(run, job)
+      unless job.enqueue
         raise "The job to perform #{run.task_name} could not be enqueued. "\
           "Enqueuing has been prevented by a callback."
       end

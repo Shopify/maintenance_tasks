@@ -8,7 +8,6 @@ module MaintenanceTasks
     include JobIteration::Iteration
 
     included do
-      before_enqueue(:before_enqueue)
       before_perform(:before_perform)
 
       on_start(:on_start)
@@ -86,11 +85,6 @@ module MaintenanceTasks
     rescue => error
       @errored_element = input
       raise error
-    end
-
-    def before_enqueue
-      @run = arguments.first
-      @run.update!(job_id: job_id)
     end
 
     def before_perform
