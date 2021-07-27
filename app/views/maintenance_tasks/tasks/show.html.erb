@@ -20,8 +20,12 @@
         <div class="block">
           <%= form.fields_for :task_arguments do |ff| %>
             <% @task.parameter_names.each do |parameter| %>
-              <%= ff.label parameter, "#{parameter}: ", class: "label" %>
-              <%= ff.text_area parameter, class: "textarea" %>
+              <div class="field">
+                <%= ff.label parameter, tag.var(parameter), class: "label" %>
+                <div class="control">
+                  <%= ff.text_area parameter, class: "textarea" %>
+                </div>
+              </div>
             <% end %>
           <% end %>
         </div>
