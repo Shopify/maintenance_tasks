@@ -13,6 +13,7 @@
   <div class="block">
     <%= link_to("Download CSV", csv_file_download_path(run)) %>
   </div>
+  <hr/>
 <% end %>
 <% if run.arguments.present? %>
   <div class="block">
@@ -23,4 +24,5 @@
       <% end %>
     </pre>
   </div>
+  <hr/>
 <% end %>
