@@ -32,6 +32,14 @@ module MaintenanceTasks
       end
     end
 
+    test "#run sets the job_id" do
+      assert_enqueued_with(job: @job) do
+        assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
+      end
+      run = Run.last
+      assert_not_nil run.job_id
+    end
+
     # Yielding the run is undocumented and not supported in the Runner's API
     test "#run yields the newly created Run when there is no active Run" do
       run = Run.create!(task_name: @name, status: :paused)

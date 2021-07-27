@@ -8,12 +8,6 @@ module MaintenanceTasks
       @run = Run.create!(task_name: "Maintenance::TestTask")
     end
 
-    test "persists job_id to run before enqueue" do
-      job = TaskJob.perform_later(@run)
-
-      assert_equal job.job_id, @run.job_id
-    end
-
     test ".perform_now exits job when Run is paused, and updates Run status from pausing to paused" do
       Maintenance::TestTask.any_instance.expects(:process).once.with do
         @run.pausing!
