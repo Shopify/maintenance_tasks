@@ -40,7 +40,7 @@ module MaintenanceTasks
       def available_tasks
         task_names = Task.available_tasks.map(&:name)
         available_task_runs = Run.where(task_name: task_names)
-        last_runs = Run.where(
+        last_runs = Run.with_attached_csv.where(
           id: available_task_runs.select("MAX(id) as id").group(:task_name)
         )
 
