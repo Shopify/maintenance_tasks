@@ -1,0 +1,5 @@
+<% if run.csv_file.present? %>
+  <div class="block">
+    <%= link_to("Download CSV", csv_file_download_path(run)) %>
+  </div>
+<% end %>

@@ -4,10 +4,25 @@
   <%= @task %> <%= status_tag(@task.status) %>
 </h1>
 
-<%= render 'maintenance_tasks/runs/info', run: @task.last_run, with_status: false if @task.last_run %>
+<% last_run = @task.last_run %>
+<% if last_run %>
+  <h5 class="title is-5">
+    <%= time_tag last_run.created_at, title: last_run.created_at %>
+  </h5>
+
+  <%= progress last_run %>
+
+  <div class="content">
+    <%= render "maintenance_tasks/runs/info/#{last_run.status}", run: last_run %>
+  </div>
+
+  <%= render "maintenance_tasks/runs/csv", run: last_run %>
+  <%= tag.hr if last_run.csv_file.present? %>
+  <%= render "maintenance_tasks/runs/arguments", run: last_run %>
+  <%= tag.hr if last_run.arguments.present? %>
+<% end %>
 
 <div class="buttons">
-  <% last_run = @task.last_run %>
   <% if last_run.nil? || last_run.completed? %>
     <%= form_with url: run_task_path(@task), method: :put do |form| %>
       <% if @task.csv_task? %>

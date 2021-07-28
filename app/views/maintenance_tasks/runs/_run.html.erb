@@ -1,3 +1,16 @@
 <div class="box">
-  <%= render 'maintenance_tasks/runs/info', run: run, with_status: true %>
+  <h5 class="title is-5">
+    <%= time_tag run.created_at, title: run.created_at %>
+    <%= status_tag run.status %>
+  </h5>
+
+  <%= progress run %>
+
+  <div class="content">
+    <%= render "maintenance_tasks/runs/info/#{run.status}", run: run %>
+  </div>
+
+  <%= render "maintenance_tasks/runs/csv", run: run %>
+  <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
+  <%= render "maintenance_tasks/runs/arguments", run: run %>
 </div>
