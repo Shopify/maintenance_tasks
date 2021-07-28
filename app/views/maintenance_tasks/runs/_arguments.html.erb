@@ -1,0 +1,22 @@
+<% if run.arguments.present? %>
+  <div class="table-container">
+    <h6 class="title is-6">Arguments:</h6>
+    <table class="table">
+      <tbody>
+        <% run.arguments.each do |key, value| %>
+          <tr>
+            <td class="is-family-monospace"><%= key %></td>
+            <td>
+              <% next if value.nil? || value.empty? %>
+              <% if value.include?("\n") %>
+                <pre><%= value %><pre>
+              <% else %>
+                <code><%= value %><code>
+              <% end %>
+            </td>
+          </tr>
+          <% end %>
+      </tbody>
+    </table>
+  </div>
+<% end %>

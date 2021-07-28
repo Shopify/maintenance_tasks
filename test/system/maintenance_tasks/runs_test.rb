@@ -44,7 +44,10 @@ module MaintenanceTasks
       assert_text "Succeeded"
       assert_text "Processed 1 out of 1 item (100%)."
       assert_text "Arguments"
-      assert_text "post_ids: #{post_id}"
+      assert_table do |table|
+        table.assert_text("post_ids")
+        table.assert_text(post_id.to_s)
+      end
     end
 
     test "errors for Task with invalid arguments shown" do
