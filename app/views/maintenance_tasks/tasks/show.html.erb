@@ -21,7 +21,7 @@
           <%= form.fields_for :task_arguments do |ff| %>
             <% @task.parameter_names.each do |parameter| %>
               <div class="field">
-                <%= ff.label parameter, tag.var(parameter), class: "label" %>
+                <%= ff.label parameter, parameter, class: "label is-family-monospace" %>
                 <div class="control">
                   <%= ff.text_area parameter, class: "textarea" %>
                 </div>

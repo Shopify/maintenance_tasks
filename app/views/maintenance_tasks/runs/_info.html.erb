@@ -22,7 +22,7 @@
       <tbody>
         <% run.arguments.each do |key, value| %>
           <tr>
-            <td><var><%= key %></var></td>
+            <td class="is-family-monospace"><%= key %></td>
             <td>
               <% if value.include?("\n") %>
                 <pre><%= value %><pre>
