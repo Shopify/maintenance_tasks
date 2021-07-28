@@ -24,6 +24,7 @@
           <tr>
             <td class="is-family-monospace"><%= key %></td>
             <td>
+              <% next if value.nil? || value.empty? %>
               <% if value.include?("\n") %>
                 <pre><%= value %><pre>
               <% else %>
