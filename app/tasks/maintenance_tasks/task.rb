@@ -7,6 +7,20 @@ module MaintenanceTasks
     include ActiveModel::AttributeAssignment
     include ActiveModel::Validations
 
+    class NullCollectionBuilder
+      def collection(task)
+        raise NoMethodError, "#{task.class.name} must implement `collection`."
+      end
+
+      def count(task)
+        :no_count
+      end
+
+      def has_csv_content?
+        false
+      end
+    end
+
     class NotFoundError < NameError; end
 
     # The throttle conditions for a given Task. This is provided as an array of
@@ -15,6 +29,8 @@ module MaintenanceTasks
     #
     # @api private
     class_attribute :throttle_conditions, default: []
+
+    class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
     class << self
       # Finds a Task with the given name.
@@ -51,7 +67,11 @@ module MaintenanceTasks
           raise NotImplementedError, "Active Storage needs to be installed\n"\
             "To resolve this issue run: bin/rails active_storage:install"
         end
-        include(CsvCollection)
+        self.collection_builder_strategy = CsvCollectionBuilder.new
+      end
+
+      def has_csv_content?
+        self.collection_builder_strategy.has_csv_content?
       end
 
       # Processes one item.
@@ -103,13 +123,35 @@ module MaintenanceTasks
       end
     end
 
+    # The contents of a CSV file to be processed by a Task.
+    #
+    # @return [String] the content of the CSV file to process.
+    def csv_content
+      raise NoMethodError unless has_csv_content?
+
+      @csv_content
+    end
+
+    # Set the contents of a CSV file to be processed by a Task.
+    #
+    # @param csv_content [String] the content of the CSV file to process.
+    def csv_content=(csv_content)
+      raise NoMethodError unless has_csv_content?
+
+      @csv_content = csv_content
+    end
+
+    def has_csv_content?
+      self.class.has_csv_content?
+    end
+
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
     #
     # @raise [NotImplementedError] with a message advising subclasses to
     #   implement an override for this method.
     def collection
-      raise NoMethodError, "#{self.class.name} must implement `collection`."
+      self.class.collection_builder_strategy.collection(self)
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
@@ -131,7 +173,7 @@ module MaintenanceTasks
     #
     # @return [Integer, nil]
     def count
-      :no_count
+      self.class.collection_builder_strategy.count(self)
     end
   end
 end
