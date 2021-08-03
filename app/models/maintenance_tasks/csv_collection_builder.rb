@@ -3,8 +3,7 @@
 require "csv"
 
 module MaintenanceTasks
-  # Module that is included into Task classes by Task.csv_collection for
-  # processing CSV files.
+  # Strategy for building a Task that processes CSV files.
   #
   # @api private
   class CsvCollectionBuilder
@@ -25,6 +24,7 @@ module MaintenanceTasks
       task.csv_content.count("\n") - 1
     end
 
+    # Return that the Task processes CSV content.
     def has_csv_content?
       true
     end

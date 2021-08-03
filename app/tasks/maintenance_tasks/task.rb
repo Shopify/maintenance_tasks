@@ -7,15 +7,29 @@ module MaintenanceTasks
     include ActiveModel::AttributeAssignment
     include ActiveModel::Validations
 
+    # Base strategy for building a collection-based Task to be performed.
     class NullCollectionBuilder
+      # Placeholder method to raise in case a subclass fails to implement the
+      # expected instance method.
+      #
+      # @raise [NotImplementedError] with a message advising subclasses to
+      #   implement an override for this method.
       def collection(task)
         raise NoMethodError, "#{task.class.name} must implement `collection`."
       end
 
+      # Total count of iterations to be performed.
+      #
+      # Tasks override this method to define the total amount of iterations
+      # expected at the start of the run. Return +nil+ if the amount is
+      # undefined, or counting would be prohibitive for your database.
+      #
+      # @return [Integer, nil]
       def count(task)
         :no_count
       end
 
+      # Return that the Task does not process CSV content.
       def has_csv_content?
         false
       end
@@ -30,7 +44,8 @@ module MaintenanceTasks
     # @api private
     class_attribute :throttle_conditions, default: []
 
-    class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
+    class_attribute :collection_builder_strategy,
+      default: NullCollectionBuilder.new
 
     class << self
       # Finds a Task with the given name.
@@ -70,8 +85,11 @@ module MaintenanceTasks
         self.collection_builder_strategy = CsvCollectionBuilder.new
       end
 
+      # Returns whether the Task handles CSV.
+      #
+      # @return [Boolean] whether the Task handles CSV.
       def has_csv_content?
-        self.collection_builder_strategy.has_csv_content?
+        collection_builder_strategy.has_csv_content?
       end
 
       # Processes one item.
@@ -141,15 +159,16 @@ module MaintenanceTasks
       @csv_content = csv_content
     end
 
+    # Returns whether the Task handles CSV.
+    #
+    # @return [Boolean] whether the Task handles CSV.
     def has_csv_content?
       self.class.has_csv_content?
     end
 
-    # Placeholder method to raise in case a subclass fails to implement the
-    # expected instance method.
+    # The collection to be processed, delegated to the strategy.
     #
-    # @raise [NotImplementedError] with a message advising subclasses to
-    #   implement an override for this method.
+    # @return the collection.
     def collection
       self.class.collection_builder_strategy.collection(self)
     end
@@ -165,11 +184,7 @@ module MaintenanceTasks
       raise NoMethodError, "#{self.class.name} must implement `process`."
     end
 
-    # Total count of iterations to be performed.
-    #
-    # Tasks override this method to define the total amount of iterations
-    # expected at the start of the run. Return +nil+ if the amount is
-    # undefined, or counting would be prohibitive for your database.
+    # Total count of iterations to be performed, delegated to the strategy.
     #
     # @return [Integer, nil]
     def count
