@@ -75,7 +75,8 @@ module MaintenanceTasks
     end
 
     def filename(task_name)
-      "#{Time.now.utc.strftime("%Y%m%dT%H%M%SZ")} #{task_name}.csv"
+      formatted_task_name = task_name.underscore.gsub("/", "_")
+      "#{Time.now.utc.strftime("%Y%m%dT%H%M%SZ")}_#{formatted_task_name}.csv"
     end
   end
 end

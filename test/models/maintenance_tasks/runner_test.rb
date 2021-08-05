@@ -158,7 +158,7 @@ module MaintenanceTasks
       @runner.run(name: "Maintenance::ImportPostsTask", csv_file: csv_io)
 
       run = Run.last
-      assert_equal "20210805T120542Z Maintenance--ImportPostsTask.csv",
+      assert_equal "20210805T120542Z_maintenance_import_posts_task.csv",
         run.csv_file.filename.to_s
     end
 

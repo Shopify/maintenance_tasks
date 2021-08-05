@@ -113,8 +113,7 @@ My Title,Hello World!
 ```
 
 The files uploaded to your Active Storage service provider will be renamed first
-to include a timestamp (ISO8601 without dashes or colons) and the Task name
-(with colons changed into dashes).
+to include an ISO8601 timestamp and the Task name in snake case format.
 
 ### Processing Batch Collections
 
