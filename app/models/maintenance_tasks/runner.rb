@@ -50,7 +50,10 @@ module MaintenanceTasks
     def run(name:, csv_file: nil, arguments: {})
       run = Run.active.find_by(task_name: name) ||
         Run.new(task_name: name, arguments: arguments)
-      run.csv_file.attach(csv_file) if csv_file
+      if csv_file
+        run.csv_file.attach(csv_file)
+        run.csv_file.filename = filename(name)
+      end
       job = MaintenanceTasks.job.constantize.new(run)
       run.job_id = job.job_id
       yield run if block_given?
@@ -69,6 +72,10 @@ module MaintenanceTasks
     rescue => error
       run.persist_error(error)
       raise EnqueuingError, run
+    end
+
+    def filename(task_name)
+      "#{Time.now.utc.strftime("%Y%m%dT%H%M%SZ")} #{task_name}.csv"
     end
   end
 end

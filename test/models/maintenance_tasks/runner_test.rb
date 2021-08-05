@@ -153,6 +153,15 @@ module MaintenanceTasks
       end
     end
 
+    test "#run overrides the file name" do
+      travel_to "2021-08-05T12:05:42Z"
+      @runner.run(name: "Maintenance::ImportPostsTask", csv_file: csv_io)
+
+      run = Run.last
+      assert_equal "20210805T120542Z Maintenance--ImportPostsTask.csv",
+        run.csv_file.filename.to_s
+    end
+
     private
 
     def csv_io

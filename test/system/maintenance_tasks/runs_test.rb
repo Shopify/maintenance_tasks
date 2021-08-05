@@ -74,7 +74,8 @@ module MaintenanceTasks
 
       click_on("Download CSV")
 
-      downloaded_csv = "test/dummy/tmp/downloads/sample.csv"
+      downloaded_csv = "test/dummy/tmp/downloads/"\
+        "20200109T094144Z Maintenance--ImportPostsTask.csv"
 
       Timeout.timeout(1) do
         sleep(0.1) until File.exist?(downloaded_csv)
