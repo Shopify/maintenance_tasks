@@ -129,7 +129,7 @@ module MaintenanceTasks
 
     # @return [Boolean] whether the Task inherits from CsvTask.
     def csv_task?
-      !deleted? && Task.named(name) < CsvCollection
+      !deleted? && Task.named(name).has_csv_content?
     end
 
     # @return [Array<String>] the names of parameters the Task accepts.

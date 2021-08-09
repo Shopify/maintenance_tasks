@@ -16,6 +16,9 @@ module MaintenanceTasks
     # @api private
     class_attribute :throttle_conditions, default: []
 
+    class_attribute :collection_builder_strategy,
+      default: NullCollectionBuilder.new
+
     class << self
       # Finds a Task with the given name.
       #
@@ -51,7 +54,14 @@ module MaintenanceTasks
           raise NotImplementedError, "Active Storage needs to be installed\n"\
             "To resolve this issue run: bin/rails active_storage:install"
         end
-        include(CsvCollection)
+        self.collection_builder_strategy = CsvCollectionBuilder.new
+      end
+
+      # Returns whether the Task handles CSV.
+      #
+      # @return [Boolean] whether the Task handles CSV.
+      def has_csv_content?
+        collection_builder_strategy.has_csv_content?
       end
 
       # Processes one item.
@@ -103,13 +113,36 @@ module MaintenanceTasks
       end
     end
 
-    # Placeholder method to raise in case a subclass fails to implement the
-    # expected instance method.
+    # The contents of a CSV file to be processed by a Task.
     #
-    # @raise [NotImplementedError] with a message advising subclasses to
-    #   implement an override for this method.
+    # @return [String] the content of the CSV file to process.
+    def csv_content
+      raise NoMethodError unless has_csv_content?
+
+      @csv_content
+    end
+
+    # Set the contents of a CSV file to be processed by a Task.
+    #
+    # @param csv_content [String] the content of the CSV file to process.
+    def csv_content=(csv_content)
+      raise NoMethodError unless has_csv_content?
+
+      @csv_content = csv_content
+    end
+
+    # Returns whether the Task handles CSV.
+    #
+    # @return [Boolean] whether the Task handles CSV.
+    def has_csv_content?
+      self.class.has_csv_content?
+    end
+
+    # The collection to be processed, delegated to the strategy.
+    #
+    # @return the collection.
     def collection
-      raise NoMethodError, "#{self.class.name} must implement `collection`."
+      self.class.collection_builder_strategy.collection(self)
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
@@ -123,15 +156,11 @@ module MaintenanceTasks
       raise NoMethodError, "#{self.class.name} must implement `process`."
     end
 
-    # Total count of iterations to be performed.
-    #
-    # Tasks override this method to define the total amount of iterations
-    # expected at the start of the run. Return +nil+ if the amount is
-    # undefined, or counting would be prohibitive for your database.
+    # Total count of iterations to be performed, delegated to the strategy.
     #
     # @return [Integer, nil]
     def count
-      :no_count
+      self.class.collection_builder_strategy.count(self)
     end
   end
 end
