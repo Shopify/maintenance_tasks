@@ -112,6 +112,9 @@ title,content
 My Title,Hello World!
 ```
 
+The files uploaded to your Active Storage service provider will be renamed first
+to include an ISO8601 timestamp and the Task name in snake case format.
+
 ### Processing Batch Collections
 
 The Maintenance Tasks gem supports processing Active Records in batches. This
