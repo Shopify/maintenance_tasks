@@ -321,7 +321,9 @@ module MaintenanceTasks
     def count_uncached_queries(&block)
       count = 0
 
-      query_cb = ->(*, payload) { count += 1 unless payload[:cached] }
+      query_cb = ->(*, payload) do
+        count += 1 if !payload[:cached] && payload[:sql] != "SHOW search_path"
+      end
       ActiveSupport::Notifications.subscribed(query_cb,
         "sql.active_record",
         &block)
