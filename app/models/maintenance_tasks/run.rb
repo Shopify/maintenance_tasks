@@ -87,6 +87,7 @@ module MaintenanceTasks
     #
     # @param error [StandardError] the Error being persisted.
     def persist_error(error)
+      self.started_at ||= Time.now
       update!(
         status: :errored,
         error_class: error.class.to_s,

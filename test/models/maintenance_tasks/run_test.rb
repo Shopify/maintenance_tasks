@@ -62,7 +62,7 @@ module MaintenanceTasks
       assert_equal 12.2, run.time_running
     end
 
-    test "#persist_error updates Run to errored and sets ended_at" do
+    test "#persist_error updates Run to errored, sets ended_at, and sets started_at if not yet set" do
       freeze_time
       run = Run.create!(task_name: "Maintenance::ErrorTask")
 
@@ -74,6 +74,7 @@ module MaintenanceTasks
       assert_equal "ArgumentError", run.error_class
       assert_equal "Something went wrong", run.error_message
       assert_equal ["lib/foo.rb:42:in `bar'"], run.backtrace
+      assert_equal Time.now, run.started_at
       assert_equal Time.now, run.ended_at
     end
 
