@@ -236,6 +236,7 @@ module MaintenanceTasks
     end
 
     test ".perform_now sets the Run as errored when the Task collection is invalid" do
+      freeze_time
       Maintenance::TestTask.any_instance.stubs(collection: "not a collection")
 
       TaskJob.perform_now(@run)
@@ -250,6 +251,7 @@ module MaintenanceTasks
         Array, or CSV.
       MSG
       assert_equal expected_message, @run.error_message
+      assert_equal Time.now, @run.started_at
     end
 
     test ".perform_now sets the Run as errored when the Task collection is not defined" do
