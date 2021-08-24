@@ -57,6 +57,7 @@ Example:
 
 ```ruby
 # app/tasks/maintenance/update_posts_task.rb
+
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
     def collection
@@ -95,6 +96,7 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 
 ```ruby
 # app/tasks/maintenance/import_posts_task.rb
+
 module Maintenance
   class ImportPostsTask < MaintenanceTasks::Task
     csv_collection
@@ -125,6 +127,7 @@ specified.
 
 ```ruby
 # app/tasks/maintenance/update_posts_in_batches_task.rb
+
 module Maintenance
   class UpdatePostsInBatchesTask < MaintenanceTasks::Task
     def collection
@@ -165,6 +168,7 @@ Specify the throttle condition as a block:
 
 ```ruby
 # app/tasks/maintenance/update_posts_throttled_task.rb
+
 module Maintenance
   class UpdatePostsThrottledTask < MaintenanceTasks::Task
     throttle_on(backoff: 1.minute) do
@@ -204,6 +208,7 @@ become accessible to any of Task's methods: `#collection`, `#count`, or
 
 ```ruby
 # app/tasks/maintenance/update_posts_via_params_task.rb
+
 module Maintenance
   class UpdatePostsViaParamsTask < MaintenanceTasks::Task
     attribute :updated_content, :string
@@ -466,6 +471,7 @@ you can define an error handler:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.error_handler = ->(error, task_context, _errored_element) do
   Bugsnag.notify(error) do |notification|
     notification.add_tab(:task, task_context)
@@ -501,6 +507,7 @@ tasks will be placed.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.tasks_module = 'TaskModule'
 ```
 
@@ -514,9 +521,11 @@ maintenance tasks in your application.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.job = 'CustomTaskJob'
 
 # app/jobs/custom_task_job.rb
+
 class CustomTaskJob < MaintenanceTasks::TaskJob
   queue_as :low_priority
 end
@@ -535,6 +544,7 @@ task progress gets persisted to the database. It can be a `Numeric` value or an
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.ticker_delay = 2.seconds
 ```
 
@@ -549,6 +559,7 @@ key, as specified in your application's `config/storage.yml`:
 
 ```yaml
 # config/storage.yml
+
 user_data:
   service: GCS
   credentials: <%= Rails.root.join("path/to/user/data/keyfile.json") %>
@@ -564,6 +575,7 @@ internal:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.active_storage_service = :internal
 ```
 
@@ -578,6 +590,7 @@ An `ActiveSupport::BacktraceCleaner` should be used.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 cleaner = ActiveSupport::BacktraceCleaner.new
 cleaner.add_silencer { |line| line =~ /ignore_this_dir/ }
 
