@@ -57,6 +57,7 @@ Example:
 
 ```ruby
 # app/tasks/maintenance/update_posts_task.rb
+
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
     def collection
@@ -68,7 +69,7 @@ module Maintenance
     end
 
     def process(post)
-      post.update!(content: 'New content!')
+      post.update!(content: "New content!")
     end
   end
 end
@@ -95,6 +96,7 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 
 ```ruby
 # app/tasks/maintenance/import_posts_task.rb
+
 module Maintenance
   class ImportPostsTask < MaintenanceTasks::Task
     csv_collection
@@ -125,6 +127,7 @@ specified.
 
 ```ruby
 # app/tasks/maintenance/update_posts_in_batches_task.rb
+
 module Maintenance
   class UpdatePostsInBatchesTask < MaintenanceTasks::Task
     def collection
@@ -165,6 +168,7 @@ Specify the throttle condition as a block:
 
 ```ruby
 # app/tasks/maintenance/update_posts_throttled_task.rb
+
 module Maintenance
   class UpdatePostsThrottledTask < MaintenanceTasks::Task
     throttle_on(backoff: 1.minute) do
@@ -204,6 +208,7 @@ become accessible to any of Task's methods: `#collection`, `#count`, or
 
 ```ruby
 # app/tasks/maintenance/update_posts_via_params_task.rb
+
 module Maintenance
   class UpdatePostsViaParamsTask < MaintenanceTasks::Task
     attribute :updated_content, :string
@@ -262,7 +267,7 @@ Example:
 ```ruby
 # test/tasks/maintenance/update_posts_task_test.rb
 
-require 'test_helper'
+require "test_helper"
 
 module Maintenance
   class UpdatePostsTaskTest < ActiveSupport::TestCase
@@ -271,7 +276,7 @@ module Maintenance
 
       Maintenance::UpdatePostsTask.process(post)
 
-      assert_equal 'New content!', post.content
+      assert_equal "New content!", post.content
     end
   end
 end
@@ -284,20 +289,50 @@ takes a `CSV::Row` as an argument. You can pass a row, or a hash with string
 keys to `#process` from your test.
 
 ```ruby
-# app/tasks/maintenance/import_posts_task_test.rb
+# test/tasks/maintenance/import_posts_task_test.rb
+
+require "test_helper"
+
 module Maintenance
   class ImportPostsTaskTest < ActiveSupport::TestCase
     test "#process performs a task iteration" do
       assert_difference -> { Post.count } do
         Maintenance::UpdatePostsTask.process({
-          'title' => 'My Title',
-          'content' => 'Hello World!',
+          "title" => "My Title",
+          "content" => "Hello World!",
         })
       end
 
       post = Post.last
-      assert_equal 'My Title', post.title
-      assert_equal 'Hello World!', post.content
+      assert_equal "My Title", post.title
+      assert_equal "Hello World!", post.content
+    end
+  end
+end
+```
+
+### Writing tests for a Task with parameters
+
+Tests for tasks with parameters need to instatiate the task class
+in order to assign attributes. Once the task instance it setup,
+you may test `#process` normally.
+
+```ruby
+# test/tasks/maintenance/update_posts_via_params_task_test.rb
+
+require "test_helper"
+
+module Maintenance
+  class UpdatePostsViaParamsTaskTest < ActiveSupport::TestCase
+    setup do
+      @task = UpdatePostsViaParamsTask.new
+      @task.updated_content = "Testing"
+    end
+
+    test "#process performs a task iteration" do
+      assert_difference -> { Post.first.content } do
+        task.process(Post.first)
+      end
     end
   end
 end
@@ -316,7 +351,7 @@ $ bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
 To run a Task that processes CSVs from the command line, use the --csv option:
 
 ```bash
-$ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv 'path/to/my_csv.csv'
+$ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path/to/my_csv.csv"
 ```
 
 To run a Task that takes arguments from the command line, use the --arguments
@@ -329,7 +364,7 @@ $ bundle exec maintenance_tasks perform Maintenance::ParamsTask --arguments post
 You can also run a Task in Ruby by sending `run` with a Task name to Runner:
 
 ```ruby
-MaintenanceTasks::Runner.run(name: 'Maintenance::UpdatePostsTask')
+MaintenanceTasks::Runner.run(name: "Maintenance::UpdatePostsTask")
 ```
 
 To run a Task that processes CSVs using the Runner, provide a Hash containing an
@@ -337,8 +372,8 @@ open IO object and a filename to `run`:
 
 ```ruby
 MaintenanceTasks::Runner.run(
-  name: 'Maintenance::ImportPostsTask'
-  csv_file: { io: File.open('path/to/my_csv.csv'), filename: 'my_csv.csv' }
+  name: "Maintenance::ImportPostsTask",
+  csv_file: { io: File.open("path/to/my_csv.csv"), filename: "my_csv.csv" }
 )
 ```
 
@@ -436,6 +471,7 @@ you can define an error handler:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.error_handler = ->(error, task_context, _errored_element) do
   Bugsnag.notify(error) do |notification|
     notification.add_tab(:task, task_context)
@@ -471,7 +507,8 @@ tasks will be placed.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
-MaintenanceTasks.tasks_module = 'TaskModule'
+
+MaintenanceTasks.tasks_module = "TaskModule"
 ```
 
 If no value is specified, it will default to `Maintenance`.
@@ -484,9 +521,11 @@ maintenance tasks in your application.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.job = 'CustomTaskJob'
 
 # app/jobs/custom_task_job.rb
+
 class CustomTaskJob < MaintenanceTasks::TaskJob
   queue_as :low_priority
 end
@@ -505,6 +544,7 @@ task progress gets persisted to the database. It can be a `Numeric` value or an
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.ticker_delay = 2.seconds
 ```
 
@@ -519,6 +559,7 @@ key, as specified in your application's `config/storage.yml`:
 
 ```yaml
 # config/storage.yml
+
 user_data:
   service: GCS
   credentials: <%= Rails.root.join("path/to/user/data/keyfile.json") %>
@@ -534,6 +575,7 @@ internal:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 MaintenanceTasks.active_storage_service = :internal
 ```
 
@@ -548,6 +590,7 @@ An `ActiveSupport::BacktraceCleaner` should be used.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+
 cleaner = ActiveSupport::BacktraceCleaner.new
 cleaner.add_silencer { |line| line =~ /ignore_this_dir/ }
 
