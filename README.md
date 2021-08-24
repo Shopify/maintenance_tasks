@@ -69,7 +69,7 @@ module Maintenance
     end
 
     def process(post)
-      post.update!(content: 'New content!')
+      post.update!(content: "New content!")
     end
   end
 end
@@ -267,7 +267,7 @@ Example:
 ```ruby
 # test/tasks/maintenance/update_posts_task_test.rb
 
-require 'test_helper'
+require "test_helper"
 
 module Maintenance
   class UpdatePostsTaskTest < ActiveSupport::TestCase
@@ -276,7 +276,7 @@ module Maintenance
 
       Maintenance::UpdatePostsTask.process(post)
 
-      assert_equal 'New content!', post.content
+      assert_equal "New content!", post.content
     end
   end
 end
@@ -298,14 +298,14 @@ module Maintenance
     test "#process performs a task iteration" do
       assert_difference -> { Post.count } do
         Maintenance::UpdatePostsTask.process({
-          'title' => 'My Title',
-          'content' => 'Hello World!',
+          "title" => "My Title",
+          "content" => "Hello World!",
         })
       end
 
       post = Post.last
-      assert_equal 'My Title', post.title
-      assert_equal 'Hello World!', post.content
+      assert_equal "My Title", post.title
+      assert_equal "Hello World!", post.content
     end
   end
 end
@@ -351,7 +351,7 @@ $ bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
 To run a Task that processes CSVs from the command line, use the --csv option:
 
 ```bash
-$ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv 'path/to/my_csv.csv'
+$ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path/to/my_csv.csv"
 ```
 
 To run a Task that takes arguments from the command line, use the --arguments
@@ -364,7 +364,7 @@ $ bundle exec maintenance_tasks perform Maintenance::ParamsTask --arguments post
 You can also run a Task in Ruby by sending `run` with a Task name to Runner:
 
 ```ruby
-MaintenanceTasks::Runner.run(name: 'Maintenance::UpdatePostsTask')
+MaintenanceTasks::Runner.run(name: "Maintenance::UpdatePostsTask")
 ```
 
 To run a Task that processes CSVs using the Runner, provide a Hash containing an
@@ -372,8 +372,8 @@ open IO object and a filename to `run`:
 
 ```ruby
 MaintenanceTasks::Runner.run(
-  name: 'Maintenance::ImportPostsTask'
-  csv_file: { io: File.open('path/to/my_csv.csv'), filename: 'my_csv.csv' }
+  name: "Maintenance::ImportPostsTask",
+  csv_file: { io: File.open("path/to/my_csv.csv"), filename: "my_csv.csv" }
 )
 ```
 
@@ -508,7 +508,7 @@ tasks will be placed.
 ```ruby
 # config/initializers/maintenance_tasks.rb
 
-MaintenanceTasks.tasks_module = 'TaskModule'
+MaintenanceTasks.tasks_module = "TaskModule"
 ```
 
 If no value is specified, it will default to `Maintenance`.
