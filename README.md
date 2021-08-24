@@ -303,6 +303,33 @@ module Maintenance
 end
 ```
 
+### Writing tests for a Task with parameters
+
+Tests for tasks with parameters need to instatiate the task class
+in order to assign attributes. Once the task instance it setup,
+you may test `#process` normally.
+
+```ruby
+# test/tasks/maintenance/update_posts_via_params_task_test.rb
+
+require "test_helper"
+
+module Maintenance
+  class UpdatePostsViaParamsTaskTest < ActiveSupport::TestCase
+    setup do
+      @task = UpdatePostsViaParamsTask.new
+      @task.updated_content = "Testing"
+    end
+
+    test "#process performs a task iteration" do
+      assert_difference -> { Post.first.content } do
+        task.process(Post.first)
+      end
+    end
+  end
+end
+```
+
 ### Running a Task
 
 You can run your new Task by accessing the Web UI and clicking on "Run".
