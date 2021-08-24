@@ -284,7 +284,10 @@ takes a `CSV::Row` as an argument. You can pass a row, or a hash with string
 keys to `#process` from your test.
 
 ```ruby
-# app/tasks/maintenance/import_posts_task_test.rb
+# test/tasks/maintenance/import_posts_task_test.rb
+
+require "test_helper"
+
 module Maintenance
   class ImportPostsTaskTest < ActiveSupport::TestCase
     test "#process performs a task iteration" do
