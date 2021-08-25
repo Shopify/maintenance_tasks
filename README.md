@@ -79,8 +79,8 @@ end
 
 You can also write a Task that iterates on a CSV file. Note that writing CSV
 Tasks **requires Active Storage to be configured**. Ensure that the dependency
-is specified in your application's Gemfile, and that you've followed the
-[setup instuctions][setup].
+is specified in your application's Gemfile, and that you've followed the [setup
+instuctions][setup].
 
 [setup]: https://edgeguides.rubyonrails.org/active_storage_overview.html#setup
 
@@ -121,9 +121,9 @@ to include an ISO8601 timestamp and the Task name in snake case format.
 
 The Maintenance Tasks gem supports processing Active Records in batches. This
 can reduce the number of calls your Task makes to the database. Use
-`ActiveRecord::Batches#in_batches` on the relation returned by your collection to specify that your Task should process
-batches instead of records. Active Record defaults to 1000 records by batch, but a custom size can be
-specified.
+`ActiveRecord::Batches#in_batches` on the relation returned by your collection
+to specify that your Task should process batches instead of records. Active
+Record defaults to 1000 records by batch, but a custom size can be specified.
 
 ```ruby
 # app/tasks/maintenance/update_posts_in_batches_task.rb
@@ -153,10 +153,11 @@ your collection, and your Task's progress will be displayed in terms of batches
 **Important!** Batches should only be used if `#process` is performing a batch
 operation such as `#update_all` or `#delete_all`. If you need to iterate over
 individual records, you should define a collection that [returns an
-`ActiveRecord::Relation`](#creating-a-task). This uses batching
-internally, but loads the records with one SQL query. Conversely, batch
-collections load the primary keys of the records of the batch first, and then perform an additional query to load the
-records when calling `each` (or any `Enumerable` method) inside `#process`.
+`ActiveRecord::Relation`](#creating-a-task). This uses batching internally, but
+loads the records with one SQL query. Conversely, batch collections load the
+primary keys of the records of the batch first, and then perform an additional
+query to load the records when calling `each` (or any `Enumerable` method)
+inside `#process`.
 
 ### Throttling
 
@@ -202,9 +203,8 @@ conditions.
 ### Custom Task Parameters
 
 Tasks may need additional information, supplied via parameters, to run.
-Parameters can be defined as Active Model Attributes in a Task, and then
-become accessible to any of Task's methods: `#collection`, `#count`, or
-`#process`.
+Parameters can be defined as Active Model Attributes in a Task, and then become
+accessible to any of Task's methods: `#collection`, `#count`, or `#process`.
 
 ```ruby
 # app/tasks/maintenance/update_posts_via_params_task.rb
@@ -358,7 +358,8 @@ To run a Task that takes arguments from the command line, use the --arguments
 option, passing arguments as a set of \<key>:\<value> pairs:
 
 ```bash
-$ bundle exec maintenance_tasks perform Maintenance::ParamsTask --arguments post_ids:1,2,3 content:"Hello, World!"
+$ bundle exec maintenance_tasks perform Maintenance::ParamsTask \
+  --arguments post_ids:1,2,3 content:"Hello, World!"
 ```
 
 You can also run a Task in Ruby by sending `run` with a Task name to Runner:
@@ -396,8 +397,8 @@ a Task can be in:
 * **enqueued**: A Task that is waiting to be performed after a user has
   instructed it to run.
 * **running**: A Task that is currently being performed by a job worker.
-* **pausing**: A Task that was paused by a user, but needs to finish work
-  before stopping.
+* **pausing**: A Task that was paused by a user, but needs to finish work before
+  stopping.
 * **paused**: A Task that was paused by a user and is not performing. It can be
   resumed.
 * **interrupted**: A Task that has been momentarily interrupted by the job
@@ -491,15 +492,14 @@ The error handler should be a lambda that accepts three arguments:
   Note that `task_context` may be empty if the Task produced an error before any
   context could be gathered (for example, if deserializing the job to process
   your Task failed).
-* `errored_element`: The element, if any, that was being processed when the
-  Task raised an exception. If you would like to pass this object to your
-  exception monitoring service, make sure you **sanitize the object** to avoid
-  leaking sensitive data and **convert it to a format** that is compatible with
-  your bug tracker. For example, Bugsnag only sends the id and class name of
-  Active Record objects in order to protect sensitive data. CSV rows, on the
-  other hand, are converted to strings and passed raw to Bugsnag, so make sure
-  to filter any personal data from these objects before adding them to a
-  report.
+* `errored_element`: The element, if any, that was being processed when the Task
+  raised an exception. If you would like to pass this object to your exception
+  monitoring service, make sure you **sanitize the object** to avoid leaking
+  sensitive data and **convert it to a format** that is compatible with your bug
+  tracker. For example, Bugsnag only sends the id and class name of Active
+  Record objects in order to protect sensitive data. CSV rows, on the other
+  hand, are converted to strings and passed raw to Bugsnag, so make sure to
+  filter any personal data from these objects before adding them to a report.
 
 #### Customizing the maintenance tasks module
 
@@ -534,8 +534,8 @@ end
 
 The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
 
-Note that `retry_on` is not supported for custom Job
-classes, so failed jobs cannot be retried.
+Note that `retry_on` is not supported for custom Job classes, so failed jobs
+cannot be retried.
 
 #### Customizing the rate at which task progress gets updated
 
@@ -615,10 +615,11 @@ This ensures that new migrations are installed and run as well.
 **What if I've deleted my previous Maintenance Task migrations?**
 
 The install command will attempt to reinstall these old migrations and migrating
-the database will cause problems. Use `bin/rails generate maintenance_tasks:install:migrations`
-to copy the gem's migrations to your `db/migrate` folder. Check the release
-notes to see if any new migrations were added since your last gem upgrade.
-Ensure that these are kept, but remove any migrations that already ran.
+the database will cause problems. Use `bin/rails generate
+maintenance_tasks:install:migrations` to copy the gem's migrations to your
+`db/migrate` folder. Check the release notes to see if any new migrations were
+added since your last gem upgrade.  Ensure that these are kept, but remove any
+migrations that already ran.
 
 Run the migrations using `bin/rails db:migrate`.
 
