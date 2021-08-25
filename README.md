@@ -313,9 +313,9 @@ end
 
 ### Writing tests for a Task with parameters
 
-Tests for tasks with parameters need to instatiate the task class
-in order to assign attributes. Once the task instance it setup,
-you may test `#process` normally.
+Tests for tasks with parameters need to instatiate the task class in order to
+assign attributes. Once the task instance is setup, you may test `#process`
+normally.
 
 ```ruby
 # test/tasks/maintenance/update_posts_via_params_task_test.rb
@@ -355,7 +355,7 @@ $ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path
 ```
 
 To run a Task that takes arguments from the command line, use the --arguments
-option, passing arguments as a set of <key>:<value> pairs:
+option, passing arguments as a set of \<key>:\<value> pairs:
 
 ```bash
 $ bundle exec maintenance_tasks perform Maintenance::ParamsTask --arguments post_ids:1,2,3 content:"Hello, World!"
@@ -487,6 +487,7 @@ The error handler should be a lambda that accepts three arguments:
   * `task_name`: The name of the Task that errored
   * `started_at`: The time the Task started
   * `ended_at`: The time the Task errored
+
   Note that `task_context` may be empty if the Task produced an error before any
   context could be gathered (for example, if deserializing the job to process
   your Task failed).
