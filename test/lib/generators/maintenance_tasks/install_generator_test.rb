@@ -12,10 +12,12 @@ module MaintenanceTasks
     setup do
       skip "This test is too slow" if ENV["SKIP_SLOW"].present?
       setup_sample_app
+      setup_database_url
     end
 
     teardown do
       FileUtils.rm_rf(SAMPLE_APP_PATH)
+      teardown_database_url
     end
 
     test "generator mounts engine and runs migrations" do
@@ -44,6 +46,21 @@ module MaintenanceTasks
 
       Dir.chdir(SAMPLE_APP_PATH) do
         FileUtils.rm_r("db")
+      end
+    end
+
+    def setup_database_url
+      if ENV["DATABASE_URL"]
+        @previous_database_url = ENV["DATABASE_URL"]
+        ENV["DATABASE_URL"] += "_#{Process.pid}"
+        %x(bin/rails db:create)
+      end
+    end
+
+    def teardown_database_url
+      if defined?(@previous_database_url)
+        %x(bin/rails db:drop)
+        ENV["DATABASE_URL"] = @previous_database_url
       end
     end
   end

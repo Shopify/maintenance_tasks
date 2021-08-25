@@ -6,6 +6,7 @@ gemspec
 
 gem "capybara"
 gem "mocha"
+gem "pg"
 gem "pry-byebug"
 gem "puma"
 gem "rails", defined?(@rails_gem_requirement) && @rails_gem_requirement

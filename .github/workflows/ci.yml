@@ -5,13 +5,15 @@ on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }}
+    name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }} / ${{ matrix.database }}
     strategy:
       matrix:
         gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_edge.gemfile]
         ruby: [2.7, 3.0]
+        database: [sqlite, postgres]
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
+      DB: ${{ matrix.database }}
     steps:
     - name: Check out code
       uses: actions/checkout@v2.3.4
@@ -23,6 +25,12 @@ jobs:
     - name: Rails version
       if: ${{ matrix.gemfile == 'gemfiles/rails_edge.gemfile' }}
       run: bundle info rails | head -1
+    - name: Start Postgres
+      if: ${{ matrix.database == 'postgres' }}
+      run: |
+        sudo sed -i s/md5/trust/g /etc/postgresql/*/main/pg_hba.conf
+        sudo systemctl start postgresql.service
+        echo "DATABASE_URL=postgresql://postgres:@localhost:5432/maintenance_tasks_test" >> $GITHUB_ENV
     - name: Set up database
       run: RAILS_ENV=test bundle exec rails db:setup
     - name: Ruby Tests
