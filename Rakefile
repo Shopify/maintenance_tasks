@@ -22,7 +22,9 @@ load("rails/tasks/statistics.rake")
 require "bundler/gem_tasks"
 
 require "rubocop/rake_task"
-RuboCop::RakeTask.new
+RuboCop::RakeTask.new.tap do |rubocop|
+  rubocop.options += ["--no-parallel"]
+end
 
 task(test: "app:test")
 task("test:system" => "app:test:system")
