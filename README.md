@@ -615,7 +615,7 @@ This ensures that new migrations are installed and run as well.
 **What if I've deleted my previous Maintenance Task migrations?**
 
 The install command will attempt to reinstall these old migrations and migrating
-the database will cause problems. Use `bin/rake
+the database will cause problems. Use `bin/rails
 maintenance_tasks:install:migrations` to copy the gem's migrations to your
 `db/migrate` folder. Check the release notes to see if any new migrations were
 added since your last gem upgrade.  Ensure that these are kept, but remove any
