@@ -12,17 +12,21 @@
 
 ActiveRecord::Schema.define(version: 2021_05_17_131953) do
 
-  create_table "active_storage_attachments", force: :cascade do |t|
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
+  enable_extension "plpgsql"
+
+  create_table "active_storage_attachments", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
-    t.integer "record_id", null: false
-    t.bigint "blob_id", null: false
+    t.bigint "record_id", null: false
+    t.uuid "blob_id", null: false
     t.datetime "created_at", null: false
     t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
     t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
   end
 
-  create_table "active_storage_blobs", force: :cascade do |t|
+  create_table "active_storage_blobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "key", null: false
     t.string "filename", null: false
     t.string "content_type"
@@ -34,13 +38,13 @@ ActiveRecord::Schema.define(version: 2021_05_17_131953) do
     t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
   end
 
-  create_table "active_storage_variant_records", force: :cascade do |t|
-    t.bigint "blob_id", null: false
+  create_table "active_storage_variant_records", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "maintenance_tasks_runs", force: :cascade do |t|
+  create_table "maintenance_tasks_runs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "task_name", null: false
     t.datetime "started_at"
     t.datetime "ended_at"
@@ -56,7 +60,7 @@ ActiveRecord::Schema.define(version: 2021_05_17_131953) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "arguments"
-    t.index ["task_name", "created_at"], name: "index_maintenance_tasks_runs_on_task_name_and_created_at"
+    t.index ["task_name", "created_at"], name: "index_maintenance_tasks_runs_on_task_name_and_created_at", order: { created_at: :desc }
   end
 
   create_table "posts", force: :cascade do |t|
