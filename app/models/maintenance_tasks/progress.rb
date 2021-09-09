@@ -51,10 +51,10 @@ module MaintenanceTasks
       count = @run.tick_count
       total = @run.tick_total
 
-      count_delim = number_with_delimiter(count)
+      count_delim = number_to_delimited(count)
       return "Processed #{count_delim} #{"item".pluralize(count)}." unless total?
 
-      total_delim = number_with_delimiter(total)
+      total_delim = number_to_delimited(total)
       if over_total?
         "Processed #{count_delim} #{"item".pluralize(count)} (expected #{total_delim})."
       else
