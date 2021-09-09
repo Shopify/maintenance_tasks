@@ -50,14 +50,17 @@ module MaintenanceTasks
     def text
       count = @run.tick_count
       total = @run.tick_total
-      if !total?
-        "Processed #{pluralize(count, "item")}."
-      elsif over_total?
-        "Processed #{pluralize(count, "item")} (expected #{total})."
+
+      count_delim = number_with_delimiter(count)
+      return "Processed #{count_delim} #{"item".pluralize(count)}." unless total?
+
+      total_delim = number_with_delimiter(total)
+      if over_total?
+        "Processed #{count_delim} #{"item".pluralize(count)} (expected #{total_delim})."
       else
         percentage = 100.0 * count / total
 
-        "Processed #{count} out of #{pluralize(total, "item")} "\
+        "Processed #{count_delim} out of #{total_delim} #{"item".pluralize(total)} "\
           "(#{number_to_percentage(percentage, precision: 0)})."
       end
     end
