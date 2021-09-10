@@ -51,20 +51,18 @@ module MaintenanceTasks
       count = @run.tick_count
       total = @run.tick_total
 
-      count_delim = number_to_delimited(count)
-      unless total?
-        return "Processed #{count_delim} #{"item".pluralize(count)}."
-      end
-
-      total_delim = number_to_delimited(total)
-      if over_total?
-        "Processed #{count_delim} #{"item".pluralize(count)} "\
-          "(expected #{total_delim})."
+      if !total?
+        "Processed #{number_to_delimited(count)} "\
+          "#{"item".pluralize(count)}."
+      elsif over_total?
+        "Processed #{number_to_delimited(count)} "\
+          "#{"item".pluralize(count)} "\
+          "(expected #{number_to_delimited(total)})."
       else
         percentage = 100.0 * count / total
 
-        "Processed #{count_delim} out of "\
-          "#{total_delim} #{"item".pluralize(total)} "\
+        "Processed #{number_to_delimited(count)} out of "\
+          "#{number_to_delimited(total)} #{"item".pluralize(total)} "\
           "(#{number_to_percentage(percentage, precision: 0)})."
       end
     end
