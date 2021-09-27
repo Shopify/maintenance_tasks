@@ -470,5 +470,30 @@ module MaintenanceTasks
       Maintenance::CallbackTestTask.any_instance.expects(:after_error_callback)
       TaskJob.perform_now(run)
     end
+
+    test ".perform_now calls the error handler even if a task's on_error callback raises an exception" do
+      process_error = StandardError.new("Task process failed!")
+      callback_error = StandardError.new("Error callback failed!")
+
+      Maintenance::CallbackTestTask.any_instance.expects(:process)
+        .raises(process_error)
+      Maintenance::CallbackTestTask.any_instance.expects(:after_error_callback)
+        .raises(callback_error)
+
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+
+      error_handler_before = MaintenanceTasks.error_handler
+      handled_error = nil
+
+      MaintenanceTasks.error_handler = ->(error, _task_context, _errored_el) do
+        handled_error = error
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_equal("Task process failed!", handled_error.message)
+    ensure
+      MaintenanceTasks.error_handler = error_handler_before
+    end
   end
 end

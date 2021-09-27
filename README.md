@@ -262,6 +262,31 @@ module Maintenance
 end
 ```
 
+Note: The `after_error` callback is guaranteed to complete,
+so any exceptions raised in your callback code are ignored.
+If your `after_error` callback code can raise an exception,
+you'll need to rescue it and handle it appropriately
+within the callback.
+
+```ruby
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    after_error :dangerous_notify
+
+    def dangerous_notify
+      # This error is rescued in favour of the original error causing the error flow.
+      raise NotDeliveredError
+    end
+
+    # ...
+  end
+end
+```
+
+If any of the other callbacks cause an exception,
+it will be handled by the error handler,
+and will cause the task to stop running.
+
 Callback behaviour can be shared across all tasks using an initializer.
 
 ```ruby

@@ -170,7 +170,15 @@ module MaintenanceTasks
         task_context = {}
       end
       errored_element = @errored_element if defined?(@errored_element)
+      run_error_callback
+    ensure
       MaintenanceTasks.error_handler.call(error, task_context, errored_element)
+    end
+
+    def run_error_callback
+      @task.run_callbacks(:error) if defined?(@task)
+    rescue
+      nil
     end
   end
 end
