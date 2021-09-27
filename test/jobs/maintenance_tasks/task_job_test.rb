@@ -404,5 +404,71 @@ module MaintenanceTasks
       MSG
       assert_equal expected_message, run.error_message
     end
+    test ".perform_now runs task's start callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+
+      Maintenance::CallbackTestTask.any_instance.expects(:after_start_callback)
+      TaskJob.perform_now(run)
+    end
+
+    test ".perform_now runs task's complete callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+
+      # Interrupt task, don't expect complete callback
+      JobIteration.stubs(interruption_adapter: -> { true })
+      Maintenance::CallbackTestTask
+        .any_instance
+        .expects(:after_complete_callback)
+        .never
+      TaskJob.perform_now(run)
+
+      # Let task complete, expect complete callback
+      JobIteration.stubs(interruption_adapter: -> { false })
+      Maintenance::CallbackTestTask
+        .any_instance
+        .expects(:after_complete_callback)
+      TaskJob.perform_now(run)
+    end
+
+    test ".perform_now runs task's pause callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+
+      Maintenance::CallbackTestTask.any_instance.expects(:process).once.with do
+        run.pausing!
+      end
+
+      Maintenance::CallbackTestTask.any_instance.expects(:after_pause_callback)
+      TaskJob.perform_now(run)
+    end
+
+    test ".perform_now runs task's interrupt callback" do
+      JobIteration.stubs(interruption_adapter: -> { true })
+
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+
+      Maintenance::CallbackTestTask
+        .any_instance
+        .expects(:after_interrupt_callback)
+      TaskJob.perform_now(run)
+    end
+
+    test ".perform_now runs task's cancel callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      Maintenance::CallbackTestTask.any_instance.expects(:process).once.with do
+        run.cancelling!
+      end
+
+      Maintenance::CallbackTestTask.any_instance.expects(:after_cancel_callback)
+      TaskJob.perform_now(run)
+    end
+
+    test ".perform_now runs task's error callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      Maintenance::CallbackTestTask.any_instance.expects(:process)
+        .raises(ArgumentError)
+
+      Maintenance::CallbackTestTask.any_instance.expects(:after_error_callback)
+      TaskJob.perform_now(run)
+    end
   end
 end

@@ -3,6 +3,7 @@ module MaintenanceTasks
   # Base class that is inherited by the host application's task classes.
   class Task
     extend ActiveSupport::DescendantsTracker
+    include ActiveSupport::Callbacks
     include ActiveModel::Attributes
     include ActiveModel::AttributeAssignment
     include ActiveModel::Validations
@@ -18,6 +19,8 @@ module MaintenanceTasks
 
     class_attribute :collection_builder_strategy,
       default: NullCollectionBuilder.new
+
+    define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
       # Finds a Task with the given name.
@@ -102,6 +105,54 @@ module MaintenanceTasks
         self.throttle_conditions += [
           { throttle_on: condition, backoff: backoff },
         ]
+      end
+
+      # Initialize a callback to run after the task starts.
+      #
+      # @param filter_list apply filters to the callback
+      #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
+      def after_start(*filter_list, &block)
+        set_callback(:start, :after, *filter_list, &block)
+      end
+
+      # Initialize a callback to run after the task completes.
+      #
+      # @param filter_list apply filters to the callback
+      #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
+      def after_complete(*filter_list, &block)
+        set_callback(:complete, :after, *filter_list, &block)
+      end
+
+      # Initialize a callback to run after the task pauses.
+      #
+      # @param filter_list apply filters to the callback
+      #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
+      def after_pause(*filter_list, &block)
+        set_callback(:pause, :after, *filter_list, &block)
+      end
+
+      # Initialize a callback to run after the task is interrupted.
+      #
+      # @param filter_list apply filters to the callback
+      #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
+      def after_interrupt(*filter_list, &block)
+        set_callback(:interrupt, :after, *filter_list, &block)
+      end
+
+      # Initialize a callback to run after the task is cancelled.
+      #
+      # @param filter_list apply filters to the callback
+      #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
+      def after_cancel(*filter_list, &block)
+        set_callback(:cancel, :after, *filter_list, &block)
+      end
+
+      # Initialize a callback to run after the task produces an error.
+      #
+      # @param filter_list apply filters to the callback
+      #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
+      def after_error(*filter_list, &block)
+        set_callback(:error, :after, *filter_list, &block)
       end
 
       private
