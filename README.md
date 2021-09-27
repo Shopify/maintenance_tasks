@@ -235,6 +235,73 @@ to run. Since arguments are specified in the user interface via text area
 inputs, it's important to check that they conform to the format your Task
 expects, and to sanitize any inputs if necessary.
 
+### Using Task Callbacks
+
+The Task provides callbacks that hook into its life cycle.
+
+Available callbacks are:
+
+`after_start`
+`after_pause`
+`after_interrupt`
+`after_cancel`
+`after_complete`
+`after_error`
+
+```ruby
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    after_start :notify
+
+    def notify
+      NotifyJob.perform_later(self.class.name)
+    end
+
+    # ...
+  end
+end
+```
+
+Note: The `after_error` callback is guaranteed to complete,
+so any exceptions raised in your callback code are ignored.
+If your `after_error` callback code can raise an exception,
+you'll need to rescue it and handle it appropriately
+within the callback.
+
+```ruby
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    after_error :dangerous_notify
+
+    def dangerous_notify
+      # This error is rescued in favour of the original error causing the error flow.
+      raise NotDeliveredError
+    end
+
+    # ...
+  end
+end
+```
+
+If any of the other callbacks cause an exception,
+it will be handled by the error handler,
+and will cause the task to stop running.
+
+Callback behaviour can be shared across all tasks using an initializer.
+
+```ruby
+# config/initializer/maintenance_tasks.rb
+Rails.autoloaders.main.on_load("MaintenanceTasks::Task") do
+  MaintenanceTasks::Task.class_eval do
+    after_start(:notify)
+
+    private
+
+    def notify; end
+  end
+end
+```
+
 ### Considerations when writing Tasks
 
 MaintenanceTasks relies on the queue adapter configured for your application to

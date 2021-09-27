@@ -105,22 +105,29 @@ module MaintenanceTasks
       count = @task.count
       count = @enumerator&.size if count == :no_count
       @run.update!(started_at: Time.now, tick_total: count)
+      @task.run_callbacks(:start)
     end
 
     def on_complete
       @run.status = :succeeded
       @run.ended_at = Time.now
+      @task.run_callbacks(:complete)
     end
 
     def on_shutdown
       if @run.cancelling?
         @run.status = :cancelled
+        @task.run_callbacks(:cancel)
         @run.ended_at = Time.now
+      elsif @run.pausing?
+        @run.status = :paused
+        @task.run_callbacks(:pause)
       else
-        @run.status = @run.pausing? ? :paused : :interrupted
-        @run.cursor = cursor_position
+        @run.status = :interrupted
+        @task.run_callbacks(:interrupt)
       end
 
+      @run.cursor = cursor_position
       @ticker.persist
     end
 
@@ -163,7 +170,15 @@ module MaintenanceTasks
         task_context = {}
       end
       errored_element = @errored_element if defined?(@errored_element)
+      run_error_callback
+    ensure
       MaintenanceTasks.error_handler.call(error, task_context, errored_element)
+    end
+
+    def run_error_callback
+      @task.run_callbacks(:error) if defined?(@task)
+    rescue
+      nil
     end
   end
 end
