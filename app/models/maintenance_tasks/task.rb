@@ -53,10 +53,11 @@ module MaintenanceTasks
       # An input to upload a CSV will be added in the form to start a Run. The
       # collection and count method are implemented.
       def csv_collection
-        if !defined?(ActiveStorage) || !ActiveStorage::Attachment.table_exists?
+        unless defined?(ActiveStorage)
           raise NotImplementedError, "Active Storage needs to be installed\n"\
             "To resolve this issue run: bin/rails active_storage:install"
         end
+
         self.collection_builder_strategy = CsvCollectionBuilder.new
       end
 
