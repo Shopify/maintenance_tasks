@@ -164,6 +164,33 @@ module MaintenanceTasks
       run.persist_error(error)
     end
 
+    test "#persist_error does not raise on longer error class names" do
+      run = Run.create!(task_name: "Maintenance::ErrorTask")
+      error = ArgumentError.new("Something went wrong")
+      class_name = "SomeVeryLongErrorClassName #{"." * 20000}"
+      error.class.stubs(name: class_name)
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+
+      assert_nothing_raised do
+        run.persist_error(error)
+      end
+      limit = MaintenanceTasks::Run.column_for_attribute(:error_message).limit
+      assert_equal class_name.first(255), run.error_class if limit
+    end
+
+    test "#persist_error does not raise on longer errors messages" do
+      run = Run.create!(task_name: "Maintenance::ErrorTask")
+      error_name = "SomeVeryLongErrorMessage #{"." * 20000}"
+      error = ArgumentError.new(error_name)
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+
+      assert_nothing_raised do
+        run.persist_error(error)
+      end
+      limit = MaintenanceTasks::Run.column_for_attribute(:error_class).limit
+      assert_equal error_name.first(limit), run.error_message if limit
+    end
+
     test "#reload_status reloads status and lock version, and clears dirty tracking" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
       original_lock_version = run.lock_version
