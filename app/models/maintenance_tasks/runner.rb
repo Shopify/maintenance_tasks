@@ -39,8 +39,6 @@ module MaintenanceTasks
     #   Value is nil if the Task does not use CSV iteration.
     # @param arguments [Hash] the arguments to persist to the Run and to make
     #   accessible to the Task.
-    # @param run_model [ActiveRecord] the Active Record Run class to use for
-    #   persisting information related to the Task.
     #
     # @return [Task] the Task that was run.
     #

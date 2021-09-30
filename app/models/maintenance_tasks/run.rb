@@ -105,8 +105,8 @@ module MaintenanceTasks
     #
     # @return [MaintenanceTasks::Run] the Run record with its updated status.
     def reload_status
-      updated_status = Run.uncached do
-        Run.where(id: id).pluck(:status).first
+      updated_status = self.class.uncached do
+        self.class.where(id: id).pluck(:status).first
       end
       self.status = updated_status
       clear_attribute_changes([:status])
