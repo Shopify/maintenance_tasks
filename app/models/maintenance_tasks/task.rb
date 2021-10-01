@@ -23,6 +23,8 @@ module MaintenanceTasks
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
+      attr_reader :job_class
+
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -106,6 +108,13 @@ module MaintenanceTasks
         self.throttle_conditions += [
           { throttle_on: condition, backoff: backoff },
         ]
+      end
+
+      # Specify the Job class to use for this Task.
+      #
+      # @param job_class [String] the Job class to be used.
+      def with_job_class(job_class)
+        @job_class = job_class
       end
 
       # Initialize a callback to run after the task starts.
