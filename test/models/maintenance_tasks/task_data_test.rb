@@ -23,6 +23,7 @@ module MaintenanceTasks
       expected = [
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
+        "Maintenance::CustomJobTask",
         "Maintenance::EnqueueErrorTask",
         "Maintenance::ErrorTask",
         "Maintenance::ImportPostsTask",

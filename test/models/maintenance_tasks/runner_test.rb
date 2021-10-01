@@ -162,6 +162,14 @@ module MaintenanceTasks
         run.csv_file.filename.to_s
     end
 
+    test "#run instantiates custom job if one is set on the task" do
+      expected_job_class = Maintenance::CustomJobTask.job_class.constantize
+
+      assert_enqueued_with(job: expected_job_class) do
+        @runner.run(name: "Maintenance::CustomJobTask")
+      end
+    end
+
     private
 
     def csv_io
