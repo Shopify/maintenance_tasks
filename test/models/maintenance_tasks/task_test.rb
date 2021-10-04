@@ -7,6 +7,7 @@ module MaintenanceTasks
       expected = [
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
+        "Maintenance::CustomJobTask",
         "Maintenance::EnqueueErrorTask",
         "Maintenance::ErrorTask",
         "Maintenance::ImportPostsTask",
@@ -85,6 +86,11 @@ module MaintenanceTasks
       assert_equal(expected, Maintenance::TestTask.throttle_conditions)
     ensure
       Maintenance::TestTask.throttle_conditions = []
+    end
+
+    test ".with_job_class sets job class on Task" do
+      Maintenance::TestTask.with_job_class("AnotherCustomTaskJob")
+      assert_equal("AnotherCustomTaskJob", Maintenance::TestTask.job_class)
     end
   end
 end
