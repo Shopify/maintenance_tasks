@@ -20,11 +20,11 @@ module MaintenanceTasks
     class_attribute :collection_builder_strategy,
       default: NullCollectionBuilder.new
 
+    class_attribute :job_class, default: -> { MaintenanceTasks.job.constantize }
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
-      attr_reader :job_class
-
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -114,7 +114,7 @@ module MaintenanceTasks
       #
       # @param job_class [String] the Job class to be used.
       def with_job_class(job_class)
-        @job_class = job_class
+        self.job_class = job_class
       end
 
       # Initialize a callback to run after the task starts.

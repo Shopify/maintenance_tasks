@@ -80,13 +80,18 @@ module MaintenanceTasks
     end
 
     def instantiate_job(run)
-      job_class = begin
-        Task.named(run.task_name).job_class&.constantize ||
-          MaintenanceTasks.job.constantize
+      klass = begin
+        Task.named(run.task_name).job_class
       rescue Task::NotFoundError
-        MaintenanceTasks.job.constantize
+        MaintenanceTasks.job
       end
-      job_class.new(run)
+
+      case klass
+      when Proc
+        klass.call
+      when String
+        klass.constantize
+      end.new(run)
     end
   end
 end
