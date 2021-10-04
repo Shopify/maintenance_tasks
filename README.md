@@ -604,6 +604,29 @@ The Job class **must inherit** from `MaintenanceTasks::TaskJob`.
 Note that `retry_on` is not supported for custom Job classes, so failed jobs
 cannot be retried.
 
+#### Customizing the Job for a single Task
+
+A Job class can also be specified on an individual Task, overriding the global
+configuration, using `with_job_class`:
+
+```ruby
+# app/jobs/high_priority_job.rb
+
+class HighPriorityJob < MaintenanceTasks::TaskJob
+  queue_as :high_priority
+end
+
+# app/tasks/maintenance/really_important_task.rb
+
+module Maintenance
+  class ReallyImportantTask < MaintenanceTasks::Task
+    with_job_class "HighPriorityJob"
+    ...
+  end
+end
+```
+
+Again, the Job class must inherit from `MaintenanceTasks::TaskJob`.
 #### Customizing the rate at which task progress gets updated
 
 `MaintenanceTasks.ticker_delay` can be configured to customize how frequently
