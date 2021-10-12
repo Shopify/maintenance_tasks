@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MaintenanceTasks
   # Custom validator class responsible for ensuring that transitions between
   # Run statuses are valid.

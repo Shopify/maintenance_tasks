@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Maintenance
   class CallbackTestTask < MaintenanceTasks::Task
     after_start :after_start_callback

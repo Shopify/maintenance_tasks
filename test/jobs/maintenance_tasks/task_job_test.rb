@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 require "job-iteration"
 
@@ -132,7 +133,7 @@ module MaintenanceTasks
       run.expects(:persist_error).with do |exception|
         assert_kind_of ArgumentError, exception
         assert_equal "Something went wrong", exception.message
-        expected = "app/tasks/maintenance/error_task.rb:9:in `process'"
+        expected = "app/tasks/maintenance/error_task.rb:10:in `process'"
         assert_match expected, exception.backtrace.first
       end
 

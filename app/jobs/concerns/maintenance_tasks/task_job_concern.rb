@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MaintenanceTasks
   # Concern that holds the behaviour of the job that runs the tasks. It is
   # included in {TaskJob} and if MaintenanceTasks.job is overridden, it must be

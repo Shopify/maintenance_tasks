@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "test_helper"
 
 class MaintenanceTasksTest < ActiveSupport::TestCase
@@ -6,7 +7,7 @@ class MaintenanceTasksTest < ActiveSupport::TestCase
     error_handler_before = MaintenanceTasks.error_handler
 
     dep_msg = "MaintenanceTasks.error_handler should be a lambda that takes "\
-    "three arguments: error, task_context, and errored_element."
+      "three arguments: error, task_context, and errored_element."
     assert_deprecated(dep_msg) { MaintenanceTasks.error_handler = ->(error) {} }
   ensure
     MaintenanceTasks.error_handler = error_handler_before

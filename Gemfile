@@ -17,7 +17,7 @@ else
   gem "rails"
 end
 gem "rubocop"
-gem "rubocop-shopify", "2.2.0"
+gem "rubocop-shopify", "2.3.0"
 gem "selenium-webdriver"
 gem "sqlite3"
 gem "webdrivers", require: false

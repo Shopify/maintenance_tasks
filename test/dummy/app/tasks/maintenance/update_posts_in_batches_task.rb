@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Maintenance
   class UpdatePostsInBatchesTask < MaintenanceTasks::Task
     def collection

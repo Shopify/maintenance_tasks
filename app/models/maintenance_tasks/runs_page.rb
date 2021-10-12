@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MaintenanceTasks
   # This class is responsible for handling cursor-based pagination for Run
   # records.

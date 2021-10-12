@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MaintenanceTasks
   # Generator used to set up the engine in the host application. It handles
   # mounting the engine and installing migrations.

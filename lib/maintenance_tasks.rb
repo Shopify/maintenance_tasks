@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require "action_controller"
 require "action_view"
 require "active_job"
@@ -73,7 +74,7 @@ module MaintenanceTasks
     unless error_handler.arity == 3
       ActiveSupport::Deprecation.warn(
         "MaintenanceTasks.error_handler should be a lambda that takes three "\
-         "arguments: error, task_context, and errored_element."
+          "arguments: error, task_context, and errored_element."
       )
       @error_handler = ->(error, _task_context, _errored_element) do
         error_handler.call(error)
