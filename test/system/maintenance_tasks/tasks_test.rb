@@ -20,7 +20,6 @@ module MaintenanceTasks
         "New Tasks",
         "Maintenance::CallbackTestTask\nNew",
         "Maintenance::CancelledEnqueueTask\nNew",
-        "Maintenance::CustomJobTask\nNew",
         "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
         "Maintenance::ImportPostsTask\nNew",
