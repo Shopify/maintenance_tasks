@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MaintenanceTasks
   # Module for common view helpers.
   #

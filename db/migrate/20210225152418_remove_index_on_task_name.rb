@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class RemoveIndexOnTaskName < ActiveRecord::Migration[6.0]
   def up
     change_table(:maintenance_tasks_runs) do |t|

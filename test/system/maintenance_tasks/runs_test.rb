@@ -169,7 +169,7 @@ module MaintenanceTasks
         "less than a minute ago."
       assert_text "ArgumentError"
       assert_text "Something went wrong"
-      assert_text "app/tasks/maintenance/error_task.rb:9:in `process'"
+      assert_text "app/tasks/maintenance/error_task.rb:10:in `process'"
     end
 
     test "errors for double enqueue are shown" do

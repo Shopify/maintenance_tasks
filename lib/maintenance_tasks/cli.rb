@@ -25,12 +25,13 @@ module MaintenanceTasks
     LONGDESC
 
     # Specify the CSV file to process for CSV Tasks
-    option :csv, desc: "Supply a CSV file to be processed by a CSV Task, "\
-      '--csv "path/to/csv/file.csv"'
-
+    desc = "Supply a CSV file to be processed by a CSV Task, "\
+      "--csv path/to/csv/file.csv"
+    option :csv, desc: desc
     # Specify arguments to supply to a Task supporting parameters
-    option :arguments, type: :hash, desc: "Supply arguments for a Task that "\
-      "accepts parameters as a set of <key>:<value> pairs."
+    desc = "Supply arguments for a Task that accepts parameters as a set of "\
+      "<key>:<value> pairs."
+    option :arguments, type: :hash, desc: desc
 
     # Command to run a Task.
     #

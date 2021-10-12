@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Maintenance
   class ParamsTask < MaintenanceTasks::Task
     attribute :post_ids, :string

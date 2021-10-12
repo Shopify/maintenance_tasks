@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
     class << self

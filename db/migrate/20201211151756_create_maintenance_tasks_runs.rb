@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 class CreateMaintenanceTasksRuns < ActiveRecord::Migration[6.0]
   def change
     create_table(:maintenance_tasks_runs) do |t|

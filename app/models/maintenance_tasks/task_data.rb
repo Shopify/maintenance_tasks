@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module MaintenanceTasks
   # Class that represents the data related to a Task. Such information can be
   # sourced from a Task or from existing Run records for a Task that was since

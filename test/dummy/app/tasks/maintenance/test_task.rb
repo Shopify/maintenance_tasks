@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 module Maintenance
   class TestTask < MaintenanceTasks::Task
     def collection
