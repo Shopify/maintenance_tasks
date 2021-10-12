@@ -54,7 +54,7 @@ module MaintenanceTasks
         run.csv_file.attach(csv_file)
         run.csv_file.filename = filename(name)
       end
-      job = instantiate_job(run)
+      job = MaintenanceTasks.job.constantize.new(run)
       run.job_id = job.job_id
       yield run if block_given?
       run.enqueued!
@@ -77,21 +77,6 @@ module MaintenanceTasks
     def filename(task_name)
       formatted_task_name = task_name.underscore.gsub("/", "_")
       "#{Time.now.utc.strftime("%Y%m%dT%H%M%SZ")}_#{formatted_task_name}.csv"
-    end
-
-    def instantiate_job(run)
-      klass = begin
-        Task.named(run.task_name).job_class
-      rescue Task::NotFoundError
-        MaintenanceTasks.job
-      end
-
-      case klass
-      when Proc
-        klass.call
-      when String
-        klass.constantize
-      end.new(run)
     end
   end
 end

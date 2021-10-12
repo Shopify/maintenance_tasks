@@ -20,8 +20,6 @@ module MaintenanceTasks
     class_attribute :collection_builder_strategy,
       default: NullCollectionBuilder.new
 
-    class_attribute :job_class, default: -> { MaintenanceTasks.job.constantize }
-
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
@@ -108,13 +106,6 @@ module MaintenanceTasks
         self.throttle_conditions += [
           { throttle_on: condition, backoff: backoff },
         ]
-      end
-
-      # Specify the Job class to use for this Task.
-      #
-      # @param job_class [String] the Job class to be used.
-      def with_job_class(job_class)
-        self.job_class = job_class
       end
 
       # Initialize a callback to run after the task starts.
