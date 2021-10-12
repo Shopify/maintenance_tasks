@@ -28,7 +28,7 @@ jobs:
     - name: Start Postgres
       if: ${{ matrix.database == 'postgres' }}
       run: |
-        sudo sed -i s/md5/trust/g /etc/postgresql/*/main/pg_hba.conf
+        sudo sed -i s/scram-sha-256/trust/g /etc/postgresql/*/main/pg_hba.conf
         sudo systemctl start postgresql.service
         echo "DATABASE_URL=postgresql://postgres:@localhost:5432/maintenance_tasks_test" >> $GITHUB_ENV
     - name: Set up database
