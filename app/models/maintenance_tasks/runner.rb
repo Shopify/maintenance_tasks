@@ -54,7 +54,7 @@ module MaintenanceTasks
         run.csv_file.attach(csv_file)
         run.csv_file.filename = filename(name)
       end
-      job = MaintenanceTasks.job.constantize.new(run)
+      job = instantiate_job(run)
       run.job_id = job.job_id
       yield run if block_given?
       run.enqueued!
@@ -77,6 +77,10 @@ module MaintenanceTasks
     def filename(task_name)
       formatted_task_name = task_name.underscore.gsub("/", "_")
       "#{Time.now.utc.strftime("%Y%m%dT%H%M%SZ")}_#{formatted_task_name}.csv"
+    end
+
+    def instantiate_job(run)
+      MaintenanceTasks.job.constantize.new(run)
     end
   end
 end
