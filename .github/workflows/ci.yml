@@ -15,6 +15,9 @@ jobs:
           - gemfile: Gemfile
             ruby: 3.0
             database: postgres
+          - gemfile: Gemfile
+            ruby: 3.0
+            database: mysql
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
       DB: ${{ matrix.database }}
@@ -29,6 +32,11 @@ jobs:
     - name: Rails version
       if: ${{ matrix.gemfile == 'gemfiles/rails_edge.gemfile' }}
       run: bundle info rails | head -1
+    - name: Start MySQL
+      if: ${{ matrix.database == 'mysql' }}
+      run: |
+        sudo systemctl start mysql.service
+        echo "DATABASE_URL=mysql2://root:root@localhost/maintenance_tasks_test" >> $GITHUB_ENV
     - name: Start Postgres
       if: ${{ matrix.database == 'postgres' }}
       run: |
