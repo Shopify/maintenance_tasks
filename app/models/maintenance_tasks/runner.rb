@@ -47,9 +47,9 @@ module MaintenanceTasks
     #   creating the Run.
     # @raise [ActiveRecord::ValueTooLong] if the creation of the Run fails due
     #   to a value being too long for the column type.
-    def run(name:, csv_file: nil, arguments: {})
-      run = Run.active.find_by(task_name: name) ||
-        Run.new(task_name: name, arguments: arguments)
+    def run(name:, csv_file: nil, arguments: {}, run_model: Run)
+      run = run_model.active.find_by(task_name: name) ||
+        run_model.new(task_name: name, arguments: arguments)
       if csv_file
         run.csv_file.attach(csv_file)
         run.csv_file.filename = filename(name)
