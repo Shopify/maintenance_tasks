@@ -177,6 +177,7 @@ module MaintenanceTasks
     #
     # If the run is stopping already, it will not transition to running.
     def running
+      return if stopping?
       updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
         .update_all(status: :running, updated_at: Time.now) > 0
       if updated
