@@ -247,6 +247,18 @@ module MaintenanceTasks
       end
     end
 
+    test "#running doesn't set a stopping run to running and reloads the status" do
+      [:cancelling, :pausing].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+        )
+        Run.find(run.id).update(status: status) # race condition
+        run.running
+
+        assert_equal status.to_s, run.status
+      end
+    end
+
     test "#cancel transitions the Run to cancelling if not paused" do
       [:enqueued, :running, :pausing, :interrupted].each do |status|
         run = Run.create!(

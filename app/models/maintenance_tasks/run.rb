@@ -183,6 +183,8 @@ module MaintenanceTasks
       if updated
         self.status = :running
         clear_attribute_changes([:status])
+      else
+        reload_status
       end
     end
 
