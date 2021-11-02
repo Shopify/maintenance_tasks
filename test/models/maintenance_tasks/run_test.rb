@@ -231,6 +231,7 @@ module MaintenanceTasks
         run.running
 
         assert_predicate run, :running?
+        refute_predicate run, :changed?
       end
     end
 
