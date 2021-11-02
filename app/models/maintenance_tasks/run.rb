@@ -26,6 +26,10 @@ module MaintenanceTasks
       :cancelling,
       :interrupted,
     ]
+    STOPPING_STATUSES = [
+      :pausing,
+      :cancelling,
+    ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
     COMPLETED_RUNS_LIMIT = 10
     STUCK_TASK_TIMEOUT = 5.minutes
@@ -118,7 +122,7 @@ module MaintenanceTasks
     #
     # @return [Boolean] whether the Run is stopping.
     def stopping?
-      pausing? || cancelling?
+      STOPPING_STATUSES.include?(status.to_sym)
     end
 
     # Returns whether the Run is stopped, which is defined as having a status of
