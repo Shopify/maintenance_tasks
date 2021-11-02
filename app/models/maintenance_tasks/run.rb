@@ -26,6 +26,10 @@ module MaintenanceTasks
       :cancelling,
       :interrupted,
     ]
+    STOPPING_STATUSES = [
+      :pausing,
+      :cancelling,
+    ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
     COMPLETED_RUNS_LIMIT = 10
     STUCK_TASK_TIMEOUT = 5.minutes
@@ -118,7 +122,7 @@ module MaintenanceTasks
     #
     # @return [Boolean] whether the Run is stopping.
     def stopping?
-      pausing? || cancelling?
+      STOPPING_STATUSES.include?(status.to_sym)
     end
 
     # Returns whether the Run is stopped, which is defined as having a status of
@@ -167,6 +171,18 @@ module MaintenanceTasks
       ticks_left = (tick_total - tick_count)
       seconds_to_finished = ticks_left / processed_per_second
       seconds_to_finished.seconds
+    end
+
+    # Mark a Run as running.
+    #
+    # If the run is stopping already, it will not transition to running.
+    def running
+      updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
+        .update_all(status: :running, updated_at: Time.now) > 0
+      if updated
+        self.status = :running
+        clear_attribute_changes([:status])
+      end
     end
 
     # Cancels a Run.
