@@ -222,6 +222,30 @@ module MaintenanceTasks
       assert_equal 1.second, run.time_to_completion
     end
 
+    test "#running sets an enqueued or interrupted run to running" do
+      [:enqueued, :interrupted].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          status: status,
+        )
+        run.running
+
+        assert_predicate run, :running?
+      end
+    end
+
+    test "#running doesn't set a stopping run to running" do
+      [:cancelling, :pausing].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          status: status,
+        )
+        run.running
+
+        refute_predicate run, :running?
+      end
+    end
+
     test "#cancel transitions the Run to cancelling if not paused" do
       [:enqueued, :running, :pausing, :interrupted].each do |status|
         run = Run.create!(

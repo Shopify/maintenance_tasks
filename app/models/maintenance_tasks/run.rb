@@ -169,6 +169,13 @@ module MaintenanceTasks
       seconds_to_finished.seconds
     end
 
+    # Mark a Run as running.
+    #
+    # If the run is stopping already, it will not transition to running.
+    def running
+      running! unless stopping?
+    end
+
     # Cancels a Run.
     #
     # If the Run is paused, it will transition directly to cancelled, since the

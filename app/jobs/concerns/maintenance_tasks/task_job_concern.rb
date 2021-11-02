@@ -95,7 +95,7 @@ module MaintenanceTasks
         @task.csv_content = @run.csv_file.download
       end
 
-      @run.running! unless @run.stopping?
+      @run.running
 
       @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
         @run.persist_progress(ticks, duration)
