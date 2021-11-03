@@ -16,7 +16,7 @@ jobs:
       DB: ${{ matrix.database }}
     steps:
     - name: Check out code
-      uses: actions/checkout@v2.4.0
+      uses: actions/checkout@v2
     - name: Set up Ruby ${{ matrix.ruby }}
       uses: ruby/setup-ruby@v1
       with:
