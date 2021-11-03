@@ -22,7 +22,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   end
 
   teardown do
-    assert_empty page.driver.browser.manage.logs.get(:browser)
+    assert_empty page.driver.browser.logs.get(:browser)
     FileUtils.rm_rf("test/dummy/tmp/downloads")
   end
 end
