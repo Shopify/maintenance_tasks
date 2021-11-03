@@ -235,15 +235,27 @@ module MaintenanceTasks
       end
     end
 
-    test "#running doesn't set a stopping run to running" do
+    test "#running doesn't set a stopping run to running without a query" do
       [:cancelling, :pausing].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
           status: status,
         )
-        run.running
+        assert_equal 0, count_uncached_queries { run.running }
 
         refute_predicate run, :running?
+      end
+    end
+
+    test "#running doesn't set a stopping run to running and reloads the status" do
+      [:cancelling, :pausing].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+        )
+        Run.find(run.id).update(status: status) # race condition
+        run.running
+
+        assert_equal status.to_s, run.status
       end
     end
 

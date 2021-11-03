@@ -53,7 +53,7 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
-    test ".perform_now skips iterations when Run is cancelled" do
+    test ".perform_now avoids iterating when Run is cancelled" do
       @run.cancelling!
 
       Maintenance::TestTask.any_instance.expects(:process).never
@@ -62,6 +62,21 @@ module MaintenanceTasks
 
       assert_predicate @run.reload, :cancelled?
       assert_no_enqueued_jobs
+    end
+
+    test ".perform_now avoids iterating and cancels Run when a race occurs between starting and cancelling" do
+      CustomTaskJob.race_condition_hook = -> do
+        Run.find(@run.id).update(status: :cancelling)
+      end
+
+      Maintenance::TestTask.any_instance.expects(:process).never
+
+      CustomTaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :cancelled?)
+      assert_no_enqueued_jobs
+    ensure
+      CustomTaskJob.race_condition_hook = nil
     end
 
     test ".perform_now updates tick_count" do
