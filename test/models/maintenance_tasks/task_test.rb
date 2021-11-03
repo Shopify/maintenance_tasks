@@ -14,6 +14,7 @@ module MaintenanceTasks
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
+        "Maintenance::UpdatePostsModulePrependedTask",
         "Maintenance::UpdatePostsTask",
         "Maintenance::UpdatePostsThrottledTask",
       ]
