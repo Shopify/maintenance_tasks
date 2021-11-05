@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "maintenance_tasks"
-  spec.version = "1.5.0"
+  spec.version = "1.6.0"
   spec.author = "Shopify Engineering"
   spec.email = "gems@shopify.com"
   spec.homepage = "https://github.com/Shopify/maintenance_tasks"
