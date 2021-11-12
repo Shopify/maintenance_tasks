@@ -542,7 +542,7 @@ you can define an error handler:
 
 MaintenanceTasks.error_handler = ->(error, task_context, _errored_element) do
   Bugsnag.notify(error) do |notification|
-    notification.add_tab(:task, task_context)
+    notification.add_metadata(:task, task_context)
   end
 end
 ```
