@@ -17,11 +17,6 @@ module Dummy
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults("#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}")
 
-    if ENV["CLASSIC_AUTOLOADER"].present?
-      puts "=> Using classic autoloader"
-      config.autoloader = :classic
-    end
-
     config.to_prepare do
       MaintenanceTasks.job = "CustomTaskJob"
     end
