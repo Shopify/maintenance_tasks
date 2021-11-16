@@ -59,7 +59,8 @@ module MaintenanceTasks
             "To resolve this issue run: bin/rails active_storage:install"
         end
 
-        self.collection_builder_strategy = CsvCollectionBuilder.new
+        self.collection_builder_strategy =
+          MaintenanceTasks::CsvCollectionBuilder.new
       end
 
       # Returns whether the Task handles CSV.

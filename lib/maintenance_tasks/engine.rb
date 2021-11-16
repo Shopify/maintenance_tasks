@@ -8,7 +8,16 @@ module MaintenanceTasks
   class Engine < ::Rails::Engine
     isolate_namespace MaintenanceTasks
 
-    initializer "eager_load_for_classic_autoloader" do
+    initializer "maintenance_tasks.warn_classic_autoloader" do
+      unless Rails.autoloaders.zeitwerk_enabled?
+        ActiveSupport::Deprecation.warn(<<~MSG.squish)
+          Autoloading in classic mode is deprecated and support will be removed in the next
+          release of Maintenance Tasks. Please use Zeitwerk to autoload your application.
+        MSG
+      end
+    end
+
+    initializer "maintenance_tasks.eager_load_for_classic_autoloader" do
       eager_load! unless Rails.autoloaders.zeitwerk_enabled?
     end
 
