@@ -6,6 +6,15 @@ require "action_dispatch/system_testing/server"
 
 ActionDispatch::SystemTesting::Server.silence_puma = true
 
+if Rails::VERSION::MAJOR < 7
+  # Necessary so that Capybara::Selenium::DeprecationSuppressor is prepended in
+  # Selenium::WebDriver::Logger before it is instantiated in
+  # Selenium::WebDriver.logger to prevent an uninitialized instance variable
+  # warning.
+  Capybara::Selenium::Driver.load_selenium
+  Selenium::WebDriver.logger.ignore(:browser_options)
+end
+
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   include ActiveJob::TestHelper
 
