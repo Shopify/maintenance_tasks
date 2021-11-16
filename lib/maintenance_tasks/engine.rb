@@ -8,12 +8,22 @@ module MaintenanceTasks
   class Engine < ::Rails::Engine
     isolate_namespace MaintenanceTasks
 
+    initializer "eager_load_for_classic_autoloader" do
+      eager_load! unless Rails.autoloaders.zeitwerk_enabled?
+    end
+
     initializer "maintenance_tasks.configs" do
       MaintenanceTasks.backtrace_cleaner = Rails.backtrace_cleaner
     end
 
     config.to_prepare do
       _ = TaskJobConcern # load this for JobIteration compatibility check
+      unless Rails.autoloaders.zeitwerk_enabled?
+        tasks_module = MaintenanceTasks.tasks_module.underscore
+        Dir["#{Rails.root}/app/tasks/#{tasks_module}/*.rb"].each do |file|
+          require_dependency(file)
+        end
+      end
     end
 
     config.after_initialize do
