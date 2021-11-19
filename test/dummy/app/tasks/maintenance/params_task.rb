@@ -8,6 +8,9 @@ module Maintenance
       presence: true,
       format: { with: /\A(\s?\d+(,\s?\d+\s?)*)\z/, allow_blank: true }
 
+    attribute :content, :string, default: "default content"
+    attribute :integer_attr, :integer, default: 111_222_333
+
     class << self
       attr_accessor :fast_task
     end

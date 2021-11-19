@@ -31,14 +31,15 @@
           <%= form.file_field :csv_file %>
         </div>
       <% end %>
-      <% if @task.parameter_names.any? %>
+      <% parameter_names = @task.parameter_names %>
+      <% if parameter_names.any? %>
         <div class="block">
-          <%= form.fields_for :task_arguments do |ff| %>
-            <% @task.parameter_names.each do |parameter| %>
+          <%= form.fields_for :task_arguments, task_object_for(@task) do |ff| %>
+            <% parameter_names.each do |parameter_name| %>
               <div class="field">
-                <%= ff.label parameter, parameter, class: "label is-family-monospace" %>
+                <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
                 <div class="control">
-                  <%= ff.text_area parameter, class: "textarea" %>
+                  <%= ff.text_area parameter_name, class: "textarea" %>
                 </div>
               </div>
             <% end %>

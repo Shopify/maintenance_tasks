@@ -45,6 +45,17 @@ module MaintenanceTasks
       assert_text "Ran for less than 5 seconds, finished 8 days ago."
     end
 
+    test "task with attributes renders default values on the form" do
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ParamsTask")
+
+      content_text = page.find_field("[task_arguments][content]").text
+      assert_equal("default content", content_text)
+      integer_attr_text = page.find_field("[task_arguments][integer_attr]").text
+      assert_equal("111222333", integer_attr_text)
+    end
+
     test "view a Task with multiple pages of Runs" do
       Run.create!(
         task_name: "Maintenance::TestTask",
