@@ -100,5 +100,11 @@ module MaintenanceTasks
         only_path: true
       )
     end
+
+    # @param task_data [TaskData] an instance of the TaskData.
+    # @return [MaintenanceTasks::Task] an instance of a task class.
+    def task_object_for(task_data)
+      MaintenanceTasks::Task.named(task_data.name).new
+    end
   end
 end
