@@ -26,6 +26,7 @@ module MaintenanceTasks
         "Maintenance::ParamsTask\nNew",
         "Maintenance::TestTask\nNew",
         "Maintenance::UpdatePostsInBatchesTask\nNew",
+        "Maintenance::UpdatePostsModulePrependedTask\nNew",
         "Maintenance::UpdatePostsThrottledTask\nNew",
         "Completed Tasks",
         "Maintenance::UpdatePostsTask\nSucceeded",

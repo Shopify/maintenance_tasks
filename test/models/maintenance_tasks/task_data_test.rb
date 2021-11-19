@@ -30,6 +30,7 @@ module MaintenanceTasks
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
+        "Maintenance::UpdatePostsModulePrependedTask",
         "Maintenance::UpdatePostsTask",
         "Maintenance::UpdatePostsThrottledTask",
       ]
@@ -46,8 +47,15 @@ module MaintenanceTasks
     test "#code returns the code source of the Task" do
       task_data = TaskData.new("Maintenance::UpdatePostsTask")
 
-      assert_equal "class UpdatePostsTask < MaintenanceTasks::Task",
-        task_data.code.each_line.grep(/UpdatePostsTask/).first.squish
+      assert_includes task_data.code,
+        "class UpdatePostsTask < MaintenanceTasks::Task"
+    end
+
+    test "#code returns the code source of a Task with a prepended module" do
+      task_data = TaskData.new("Maintenance::UpdatePostsModulePrependedTask")
+
+      assert_includes task_data.code,
+        "class UpdatePostsModulePrependedTask < MaintenanceTasks::Task"
     end
 
     test "#code returns nil if the Task does not exist" do

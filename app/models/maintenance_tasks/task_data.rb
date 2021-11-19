@@ -74,7 +74,11 @@ module MaintenanceTasks
     def code
       return if deleted?
       task = Task.named(name)
-      file = task.instance_method(:process).source_location.first
+      file = if Object.respond_to?(:const_source_location)
+        Object.const_source_location(task.name).first
+      else
+        task.instance_method(:process).source_location.first
+      end
       File.read(file)
     end
 
