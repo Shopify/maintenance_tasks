@@ -34,7 +34,7 @@
       <% parameter_names = @task.parameter_names %>
       <% if parameter_names.any? %>
         <div class="block">
-          <%= form.fields_for :task_arguments, task_object_for(@task) do |ff| %>
+          <%= form.fields_for :task_arguments, @task.new do |ff| %>
             <% parameter_names.each do |parameter_name| %>
               <div class="field">
                 <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>

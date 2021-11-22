@@ -87,10 +87,5 @@ module MaintenanceTasks
       assert_match %r{rails/active_storage/blobs/\S+/sample.csv},
         csv_file_download_path(run)
     end
-
-    test "#task_object_for returns an instance of the task represented by a TaskData object" do
-      obj = task_object_for(TaskData.new("Maintenance::ParamsTask"))
-      assert_kind_of Maintenance::ParamsTask, obj
-    end
   end
 end

@@ -146,6 +146,11 @@ module MaintenanceTasks
       end
     end
 
+    # @return [MaintenanceTasks::Task] an instance of a task class.
+    def new
+      MaintenanceTasks::Task.named(name).new
+    end
+
     private
 
     def runs
