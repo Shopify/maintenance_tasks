@@ -165,5 +165,13 @@ module MaintenanceTasks
       names = TaskData.new("Maintenance::DoesNotExist").parameter_names
       assert_equal [], names
     end
+
+    test "#new returns a Task instance" do
+      assert_kind_of Task, TaskData.new("Maintenance::ParamsTask").new
+    end
+
+    test "#new returns nil for a deleted Task" do
+      assert_nil TaskData.new("Maintenance::DoesNotExist").new
+    end
   end
 end

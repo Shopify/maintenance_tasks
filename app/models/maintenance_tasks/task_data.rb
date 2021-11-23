@@ -146,6 +146,13 @@ module MaintenanceTasks
       end
     end
 
+    # @return [MaintenanceTasks::Task, nil] an instance of the Task class.
+    # @return [nil] if the Task file was deleted.
+    def new
+      return if deleted?
+      MaintenanceTasks::Task.named(name).new
+    end
+
     private
 
     def runs
