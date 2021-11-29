@@ -63,6 +63,10 @@ module MaintenanceTasks
   #     use when cleaning a Run's backtrace.
   mattr_accessor :backtrace_cleaner
 
+  mattr_accessor :approved_runs_only, default: false
+
+  mattr_accessor :current_user_identifier
+
   # @private
   def self.error_handler
     return @error_handler if defined?(@error_handler)

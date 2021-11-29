@@ -8,6 +8,8 @@ module MaintenanceTasks
   class RunStatusValidator < ActiveModel::Validator
     # Valid status transitions a Run can make.
     VALID_STATUS_TRANSITIONS = {
+      "pending_approval" => ["approved"],
+      "approved" => ["enqueued"],
       # enqueued -> running occurs when the task starts performing.
       # enqueued -> pausing occurs when the task is paused before starting.
       # enqueued -> cancelling occurs when the task is cancelled

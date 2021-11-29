@@ -3,6 +3,8 @@
 MaintenanceTasks::Engine.routes.draw do
   resources :tasks, only: [:index, :show], format: false do
     member do
+      put "request_run"
+      put "approve"
       put "run"
     end
 

@@ -21,6 +21,26 @@ module MaintenanceTasks
       @task = TaskData.find(params.fetch(:id))
       set_refresh if @task.last_run&.active?
       @runs_page = RunsPage.new(@task.previous_runs, params[:cursor])
+      @is_creator = @task.last_run&.creator.present? && @task.last_run&.creator == current_user_identifier
+    end
+
+    def request_run
+      task_name = params.fetch(:id)
+      run = Run.new(task_name: task_name, status: :pending_approval, creator: current_user_identifier)
+      if run.save
+        redirect_to(task_path(task_name), notice: 'Task run requested. Approval is needed.')
+      else
+        redirect_to(task_path(task_name), alert: pending_run.errors.full_messages.join(','))
+      end
+    end
+
+    def approve
+      task_name = params.fetch(:id)
+      run = Run.active.find_by(task_name: task_name)
+      redirect_to(task_path(task_name), alert: 'Task run not found') unless run
+
+      run.approved!
+      redirect_to(task_path(task_name), notice: 'Task run approved.')
     end
 
     # Runs a given Task and redirects to the Task page.

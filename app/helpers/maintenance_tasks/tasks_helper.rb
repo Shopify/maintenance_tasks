@@ -9,6 +9,8 @@ module MaintenanceTasks
   module TasksHelper
     STATUS_COLOURS = {
       "new" => ["is-primary"],
+      "pending_approval" => ["is-primary"],
+      "approved" => ["is-primary"],
       "enqueued" => ["is-primary is-light"],
       "running" => ["is-info"],
       "interrupted" => ["is-info", "is-light"],
