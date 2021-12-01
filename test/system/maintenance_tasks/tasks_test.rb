@@ -52,7 +52,7 @@ module MaintenanceTasks
 
       content_text = page.find_field("[task_arguments][content]").text
       assert_equal("default content", content_text)
-      integer_attr_text = page.find_field("[task_arguments][integer_attr]").text
+      integer_attr_text = page.find_field("[task_arguments][integer_attr]").value
       assert_equal("111222333", integer_attr_text)
     end
 
