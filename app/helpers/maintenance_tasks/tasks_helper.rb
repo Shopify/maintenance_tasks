@@ -100,5 +100,23 @@ module MaintenanceTasks
         only_path: true
       )
     end
+
+    # Return the appropriate field tag for the parameter
+    def parameter_field(form_builder, parameter_name)
+      case form_builder.object.class.attribute_types[parameter_name]
+      when ActiveModel::Type::Integer, ActiveModel::Type::Decimal, ActiveModel::Type::Float
+        form_builder.number_field(parameter_name)
+      when ActiveModel::Type::DateTime
+        form_builder.datetime_field(parameter_name)
+      when ActiveModel::Type::Date
+        form_builder.date_field(parameter_name)
+      when ActiveModel::Type::Time
+        form_builder.time_field(parameter_name)
+      when ActiveModel::Type::Boolean
+        form_builder.check_box(parameter_name)
+      else
+        form_builder.text_area(parameter_name, class: "textarea")
+      end
+    end
   end
 end
