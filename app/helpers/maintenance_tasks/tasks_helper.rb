@@ -103,6 +103,7 @@ module MaintenanceTasks
 
     # Return the appropriate field tag for the parameter
     def parameter_field(form_builder, parameter_name)
+      # rubocop:disable Layout/LineLength
       case form_builder.object.class.attribute_types[parameter_name]
       when ActiveModel::Type::Integer, ActiveModel::Type::Decimal, ActiveModel::Type::Float
         form_builder.number_field(parameter_name)
@@ -117,6 +118,7 @@ module MaintenanceTasks
       else
         form_builder.text_area(parameter_name, class: "textarea")
       end
+      # rubocop:enable Layout/LineLength
     end
   end
 end
