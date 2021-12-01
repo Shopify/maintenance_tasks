@@ -52,8 +52,8 @@ module MaintenanceTasks
 
       content_text = page.find_field("[task_arguments][content]").text
       assert_equal("default content", content_text)
-      integer_attr_text = page.find_field("[task_arguments][integer_attr]").value
-      assert_equal("111222333", integer_attr_text)
+      integer_attr_val = page.find_field("[task_arguments][integer_attr]").value
+      assert_equal("111222333", integer_attr_val)
     end
 
     test "view a Task with multiple pages of Runs" do
