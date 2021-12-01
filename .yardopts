@@ -1,4 +1,5 @@
 --no-cache
 --fail-on-warning
+--exclude lib/patches/.*
 app/**/*.rb
 lib/**/*.rb
