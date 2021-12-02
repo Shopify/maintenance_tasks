@@ -56,6 +56,39 @@ module MaintenanceTasks
       assert_equal("111222333", integer_attr_val)
     end
 
+    test "task with attributes renders correct field tags on the form" do
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ParamsTask")
+
+      content_field = page.find_field("[task_arguments][content]")
+      assert_equal("textarea", content_field.tag_name)
+      integer_field = page.find_field("[task_arguments][integer_attr]")
+      assert_equal("input", integer_field.tag_name)
+      assert_equal("number", integer_field[:type])
+      big_integer_field = page.find_field("[task_arguments][big_integer_attr]")
+      assert_equal("input", big_integer_field.tag_name)
+      assert_equal("number", big_integer_field[:type])
+      float_field = page.find_field("[task_arguments][float_attr]")
+      assert_equal("input", float_field.tag_name)
+      assert_equal("number", float_field[:type])
+      decimal_field = page.find_field("[task_arguments][decimal_attr]")
+      assert_equal("input", decimal_field.tag_name)
+      assert_equal("number", decimal_field[:type])
+      datetime_field = page.find_field("[task_arguments][datetime_attr]")
+      assert_equal("input", datetime_field.tag_name)
+      assert_equal("datetime-local", datetime_field[:type])
+      date_field = page.find_field("[task_arguments][date_attr]")
+      assert_equal("input", date_field.tag_name)
+      assert_equal("date", date_field[:type])
+      time_field = page.find_field("[task_arguments][time_attr]")
+      assert_equal("input", time_field.tag_name)
+      assert_equal("time", time_field[:type])
+      boolean_field = page.find_field("[task_arguments][boolean_attr]")
+      assert_equal("input", boolean_field.tag_name)
+      assert_equal("checkbox", boolean_field[:type])
+    end
+
     test "view a Task with multiple pages of Runs" do
       Run.create!(
         task_name: "Maintenance::TestTask",
