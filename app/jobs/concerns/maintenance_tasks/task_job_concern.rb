@@ -65,7 +65,13 @@ module MaintenanceTasks
       end
 
       @task.throttle_conditions.reduce(collection_enum) do |enum, condition|
-        enumerator_builder.build_throttle_enumerator(enum, **condition)
+        backoff = condition[:backoff]
+        backoff = backoff.call if backoff.respond_to?(:call)
+        enumerator_builder.build_throttle_enumerator(
+          enum,
+          throttle_on: condition[:throttle_on],
+          backoff: backoff
+        )
       end
     end
 

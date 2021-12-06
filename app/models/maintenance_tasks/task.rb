@@ -99,9 +99,11 @@ module MaintenanceTasks
 
       # Add a condition under which this Task will be throttled.
       #
-      # @param backoff [ActiveSupport::Duration] optionally, a custom backoff
+      # @param backoff [ActiveSupport::Duration, #call] a custom backoff
       #   can be specified. This is the time to wait before retrying the Task.
-      #   If no value is specified, it defaults to 30 seconds.
+      #   If no value is specified, it defaults to 30 seconds. Alternatively,
+      #   an object responding to call can be used. It must return an
+      #   ActiveSupport::Duration.
       # @yieldreturn [Boolean] where the throttle condition is being met,
       #   indicating that the Task should throttle.
       def throttle_on(backoff: 30.seconds, &condition)

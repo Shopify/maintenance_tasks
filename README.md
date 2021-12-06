@@ -200,6 +200,20 @@ Tasks can define multiple throttle conditions. Throttle conditions are inherited
 by descendants, and new conditions will be appended without impacting existing
 conditions.
 
+The backoff can also be specified as a proc:
+
+```ruby
+# app/tasks/maintenance/update_posts_throttled_task.rb
+
+module Maintenance
+  class UpdatePostsThrottledTask < MaintenanceTasks::Task
+    throttle_on(backoff: -> { RandomBackoffGenerator.generate_duration } ) do
+      DatabaseStatus.unhealthy?
+    end
+    ...
+  end
+end
+```
 ### Custom Task Parameters
 
 Tasks may need additional information, supplied via parameters, to run.
