@@ -22,6 +22,12 @@ module MaintenanceTasks
         MaintenanceTasks::Task.available_tasks.map(&:name).sort
     end
 
+    test ".available_tasks ignores tasks not defined in the module" do
+      _ = IgnoredTask
+      assert_not_includes MaintenanceTasks::Task.available_tasks.map(&:name),
+        "IgnoredTask"
+    end
+
     test ".named returns the task based on its name" do
       expected_task = Maintenance::UpdatePostsTask
       assert_equal expected_task, Task.named("Maintenance::UpdatePostsTask")
@@ -41,6 +47,15 @@ module MaintenanceTasks
       end
       assert_equal "Array is not a Task.", error.message
       assert_equal "Array", error.name
+    end
+
+    test ".named raises Not Found Error if the name refers to a Task outside of tasks_module" do
+      error = assert_raises(Task::NotFoundError) do
+        Task.named("IgnoredTask")
+      end
+      assert_equal "IgnoredTask is not defined in the Maintenance module.",
+        error.message
+      assert_equal "IgnoredTask", error.name
     end
 
     test ".process calls #process" do

@@ -37,6 +37,13 @@ module MaintenanceTasks
         unless task.is_a?(Class) && task < Task
           raise NotFoundError.new("#{name} is not a Task.", name)
         end
+        unless task.module_parent_name == MaintenanceTasks.tasks_module
+          raise NotFoundError.new(
+            "#{name} is not defined in "\
+              "the #{MaintenanceTasks.tasks_module} module.",
+            name
+          )
+        end
         task
       end
 
@@ -46,7 +53,9 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def available_tasks
         load_constants
-        descendants
+        descendants.select do |task|
+          task.module_parent_name == MaintenanceTasks.tasks_module
+        end
       end
 
       # Make this Task a task that handles CSV.
