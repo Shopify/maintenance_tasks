@@ -39,7 +39,7 @@
               <div class="field">
                 <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
                 <div class="control">
-                  <%= ff.text_area parameter_name, class: "textarea" %>
+                  <%= parameter_field(ff, parameter_name) %>
                 </div>
               </div>
             <% end %>

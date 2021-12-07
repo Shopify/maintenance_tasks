@@ -157,8 +157,14 @@ module MaintenanceTasks
     end
 
     test "#parameter_names returns list of parameter names for Tasks supporting parameters" do
-      assert_equal ["post_ids", "content", "integer_attr"],
+      assert_equal(
+        [
+          "post_ids", "content", "integer_attr", "big_integer_attr",
+          "float_attr", "decimal_attr", "datetime_attr", "date_attr",
+          "time_attr", "boolean_attr",
+        ],
         TaskData.new("Maintenance::ParamsTask").parameter_names
+      )
     end
 
     test "#parameter_names returns empty list for deleted Tasks" do
