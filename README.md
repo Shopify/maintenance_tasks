@@ -114,8 +114,9 @@ title,content
 My Title,Hello World!
 ```
 
-The files uploaded to your Active Storage service provider will be renamed first
+The files uploaded to your Active Storage service provider will be renamed
 to include an ISO8601 timestamp and the Task name in snake case format.
+The CSV is expected to have a trailing newline at the end of the file.
 
 ### Processing Batch Collections
 
