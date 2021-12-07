@@ -83,8 +83,12 @@ module MaintenanceTasks
 
       Maintenance::TestTask.throttle_on(&throttle_condition)
 
-      expected = [{ throttle_on: throttle_condition, backoff: 30.seconds }]
-      assert_equal(expected, Maintenance::TestTask.throttle_conditions)
+      task_throttle_conditions = Maintenance::TestTask.throttle_conditions
+      assert_equal(1, task_throttle_conditions.size)
+
+      condition = task_throttle_conditions.first
+      assert_equal(throttle_condition, condition[:throttle_on])
+      assert_equal(30.seconds, condition[:backoff].call)
     ensure
       Maintenance::TestTask.throttle_conditions = []
     end
