@@ -63,14 +63,15 @@ module MaintenanceTasks
           Array, or CSV.
         MSG
       end
+      throttle_enumerator(collection_enum)
+    end
 
+    def throttle_enumerator(collection_enum)
       @task.throttle_conditions.reduce(collection_enum) do |enum, condition|
-        backoff = condition[:backoff]
-        backoff = backoff.call if backoff.respond_to?(:call)
         enumerator_builder.build_throttle_enumerator(
           enum,
           throttle_on: condition[:throttle_on],
-          backoff: backoff
+          backoff: condition[:backoff].call
         )
       end
     end
