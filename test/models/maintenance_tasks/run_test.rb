@@ -127,12 +127,15 @@ module MaintenanceTasks
       run.persist_error(error)
     end
 
-    test "#reload_status reloads status and clears dirty tracking" do
+    test "#reload_status reloads status and lock version, and clears dirty tracking" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
-      Run.find(run.id).running!
+      original_lock_version = run.lock_version
+
+      Run.find(run.id).running! # race condition
 
       run.reload_status
       assert_predicate run, :running?
+      assert_equal original_lock_version + 1, run.lock_version
       refute run.changed?
     end
 

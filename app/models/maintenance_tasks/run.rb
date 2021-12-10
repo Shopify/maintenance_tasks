@@ -119,18 +119,28 @@ module MaintenanceTasks
       run_task_callbacks(:error)
     end
 
-    # Refreshes just the status attribute on the Active Record object, and
-    # ensures ActiveModel::Dirty does not mark the object as changed.
+    # Refreshes the status and lock version attributes on the Active Record
+    # object, and ensures ActiveModel::Dirty doesn't mark the object as changed.
+    #
     # This allows us to get the Run's most up-to-date status without needing
     # to reload the entire record.
     #
     # @return [MaintenanceTasks::Run] the Run record with its updated status.
     def reload_status
-      updated_status = self.class.uncached do
-        self.class.where(id: id).pluck(:status).first
+      columns_to_reload = if locking_enabled?
+        [:status, self.class.locking_column]
+      else
+        [:status]
       end
+      updated_status, updated_lock_version = self.class.uncached do
+        self.class.where(id: id).pluck(*columns_to_reload).first
+      end
+
       self.status = updated_status
-      clear_attribute_changes([:status])
+      if updated_lock_version
+        self[self.class.locking_column] = updated_lock_version
+      end
+      clear_attribute_changes(columns_to_reload)
       self
     end
 
