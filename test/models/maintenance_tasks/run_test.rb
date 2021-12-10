@@ -284,7 +284,7 @@ module MaintenanceTasks
       assert_equal 1.second, run.time_to_completion
     end
 
-    test "#running sets an enqueued or interrupted run to running" do
+    test "with optimistic locking enabled, #running sets an enqueued or interrupted run to running" do
       [:enqueued, :interrupted].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
@@ -297,7 +297,32 @@ module MaintenanceTasks
       end
     end
 
-    test "#running doesn't set a stopping run to running without a query" do
+    test "with optimistic locking disabled, #running sets an enqueued or interrupted run to running" do
+      Run.expects(:locking_enabled?).returns(false).at_least_once
+      [:enqueued, :interrupted].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          status: status,
+        )
+        run.running
+
+        assert_predicate run, :running?
+        refute_predicate run, :changed?
+      end
+    end
+
+    test "with optimistic locking enabled, #running doesn't set a stopping run to running" do
+      [:cancelling, :pausing].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          status: status,
+        )
+        refute_predicate run, :running?
+      end
+    end
+
+    test "with optimistic locking disabled, #running doesn't set a stopping run to running, and performs no queries" do
+      Run.expects(:locking_enabled?).returns(false).at_least_once
       [:cancelling, :pausing].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
@@ -309,7 +334,18 @@ module MaintenanceTasks
       end
     end
 
-    test "#running doesn't set a stopping run to running and reloads the status" do
+    test "with optimistic locking enabled, #running rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.running
+      end
+
+      assert_predicate run, :pausing?
+    end
+
+    test "with optimistic locking disabled, #running doesn't set a stopping run to running and reloads the status" do
       [:cancelling, :pausing].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",

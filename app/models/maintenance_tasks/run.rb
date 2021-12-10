@@ -205,18 +205,31 @@ module MaintenanceTasks
       seconds_to_finished.seconds
     end
 
-    # Mark a Run as running.
+    # Marks a Run as running.
     #
     # If the run is stopping already, it will not transition to running.
+    # Rescues and retries status transition if an ActiveRecord::StaleObjectError
+    # is encountered.
     def running
-      return if stopping?
-      updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
-        .update_all(status: :running, updated_at: Time.now) > 0
-      if updated
-        self.status = :running
-        clear_attribute_changes([:status])
+      if locking_enabled?
+        begin
+          running! unless stopping?
+        rescue ActiveRecord::StaleObjectError
+          reload_status
+          retry
+        end
       else
-        reload_status
+        # Preserve swap-and-replace solution for data races until users
+        # run migration to upgrade to optimistic locking solution
+        return if stopping?
+        updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
+          .update_all(status: :running, updated_at: Time.now) > 0
+        if updated
+          self.status = :running
+          clear_attribute_changes([:status])
+        else
+          reload_status
+        end
       end
     end
 
