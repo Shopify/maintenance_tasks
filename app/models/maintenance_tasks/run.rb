@@ -249,6 +249,9 @@ module MaintenanceTasks
     def start(count)
       update!(started_at: Time.now, tick_total: count)
       run_task_callbacks(:start)
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     def job_shutdown

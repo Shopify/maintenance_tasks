@@ -556,6 +556,20 @@ module MaintenanceTasks
       assert_predicate run, :errored?
     end
 
+    test "#start rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running
+      )
+      Run.find(run.id).cancelling!
+
+      assert_nothing_raised do
+        run.start(2)
+      end
+
+      assert_predicate run, :cancelling?
+    end
+
     private
 
     def count_uncached_queries(&block)
