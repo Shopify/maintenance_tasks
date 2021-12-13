@@ -66,9 +66,15 @@ module MaintenanceTasks
 
     # Sets the run status to enqueued, making sure the transition is validated
     # in case it's already enqueued.
+    #
+    # Rescues and retries status transition if an ActiveRecord::StaleObjectError
+    # is encountered.
     def enqueued!
       status_will_change!
       super
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     CALLBACKS_TRANSITION = {
@@ -122,6 +128,9 @@ module MaintenanceTasks
         ended_at: Time.now,
       )
       run_task_callbacks(:error)
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     # Refreshes the status and lock version attributes on the Active Record
@@ -272,6 +281,20 @@ module MaintenanceTasks
       else
         cancelling!
       end
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
+    # Marks a Run as pausing.
+    #
+    # Rescues and retries status transition if an ActiveRecord::StaleObjectError
+    # is encountered.
+    def pausing!
+      super
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     # Returns whether a Run is stuck, which is defined as having a status of

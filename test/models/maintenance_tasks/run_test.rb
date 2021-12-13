@@ -502,6 +502,60 @@ module MaintenanceTasks
       assert_equal "1,2,3", run.task.post_ids
     end
 
+    test "#enqueued! rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :paused,
+      )
+      Run.find(run.id).cancelled!
+
+      assert_raises(ActiveRecord::RecordInvalid) do
+        run.enqueued!
+      end
+
+      assert_predicate run.reload, :cancelled?
+    end
+
+    test "#cancel rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.cancel
+      end
+
+      assert_predicate run, :cancelling?
+    end
+
+    test "#pausing! rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      Run.find(run.id).running!
+
+      assert_nothing_raised do
+        run.pausing!
+      end
+
+      assert_predicate run, :pausing?
+    end
+
+    test "#persist_error rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(
+        task_name: "Maintenance::ErrorTask",
+        status: :running,
+      )
+
+      error = ArgumentError.new("Something went wrong")
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.persist_error(error)
+      end
+
+      assert_predicate run, :errored?
+    end
+
     private
 
     def count_uncached_queries(&block)
