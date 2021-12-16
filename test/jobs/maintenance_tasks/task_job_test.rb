@@ -461,9 +461,10 @@ module MaintenanceTasks
 
       # Let task complete, expect complete callback
       JobIteration.stubs(interruption_adapter: -> { false })
-      Maintenance::CallbackTestTask
+      task = Maintenance::CallbackTestTask
         .any_instance
-        .expects(:after_complete_callback)
+      task.expects(:after_interrupt_callback).never
+      task.expects(:after_complete_callback)
       TaskJob.perform_now(run)
     end
 

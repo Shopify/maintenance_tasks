@@ -71,6 +71,22 @@ module MaintenanceTasks
       super
     end
 
+    CALLBACKS_TRANSITION = {
+      cancelled: :cancel,
+      interrupted: :interrupt,
+      paused: :pause,
+      succeeded: :complete,
+    }.transform_keys(&:to_s)
+    private_constant :CALLBACKS_TRANSITION
+
+    # Saves the run, persisting the transition of its status, and all other
+    # changes to the object.
+    def persist_transition
+      save!
+      callback = CALLBACKS_TRANSITION[status]
+      run_task_callbacks(callback) if callback
+    end
+
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
     # +duration+, both directly in the DB.
     # The attribute values are not set in the current instance, you need
@@ -100,6 +116,7 @@ module MaintenanceTasks
         backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
         ended_at: Time.now,
       )
+      run_task_callbacks(:error)
     end
 
     # Refreshes just the status attribute on the Active Record object, and
@@ -188,6 +205,15 @@ module MaintenanceTasks
       end
     end
 
+    # Starts a Run, setting its started_at timestamp and tick_total.
+    #
+    # @param count [Integer] the total iterations to be performed, as
+    #   specified by the Task.
+    def start(count)
+      update!(started_at: Time.now, tick_total: count)
+      run_task_callbacks(:start)
+    end
+
     # Cancels a Run.
     #
     # If the Run is paused, it will transition directly to cancelled, since the
@@ -201,7 +227,9 @@ module MaintenanceTasks
     # will be updated.
     def cancel
       if paused? || stuck?
-        update!(status: :cancelled, ended_at: Time.now)
+        self.status = :cancelled
+        self.ended_at = Time.now
+        persist_transition
       else
         cancelling!
       end
@@ -296,6 +324,12 @@ module MaintenanceTasks
     end
 
     private
+
+    def run_task_callbacks(callback)
+      task.run_callbacks(callback)
+    rescue
+      nil
+    end
 
     def arguments_match_task_attributes
       invalid_argument_keys = arguments.keys - task.attribute_names
