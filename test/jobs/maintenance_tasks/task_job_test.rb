@@ -497,5 +497,37 @@ module MaintenanceTasks
     ensure
       CustomTaskJob.race_condition_after_hook = nil
     end
+
+    test ".perform_now raises validation error if run is cancelled right after being saved as succeeded" do
+      CustomTaskJob.race_condition_prepended_after_hook = -> do
+        assert_raises(ActiveRecord::RecordInvalid) do
+          Run.find(@run.id).cancel
+        end
+      end
+
+      Maintenance::TestTask.any_instance.expects(:process).twice
+
+      CustomTaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :succeeded?)
+    ensure
+      CustomTaskJob.race_condition_prepended_after_hook = nil
+    end
+
+    test ".perform_now marks raises validation error if run is paused right after being saved as succeeded" do
+      CustomTaskJob.race_condition_prepended_after_hook = -> do
+        assert_raises(ActiveRecord::RecordInvalid) do
+          Run.find(@run.id).pausing!
+        end
+      end
+
+      Maintenance::TestTask.any_instance.expects(:process).twice
+
+      CustomTaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :succeeded?)
+    ensure
+      CustomTaskJob.race_condition_prepended_after_hook = nil
+    end
   end
 end
