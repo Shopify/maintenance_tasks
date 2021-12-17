@@ -122,8 +122,7 @@ module MaintenanceTasks
     end
 
     def on_complete
-      @run.status = :succeeded
-      @run.ended_at = Time.now
+      @run.complete
     end
 
     # We are reopening a private part of Job Iteration's API here, so we should

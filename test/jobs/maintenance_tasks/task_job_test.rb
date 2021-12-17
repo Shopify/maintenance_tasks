@@ -443,5 +443,59 @@ module MaintenanceTasks
       MSG
       assert_equal expected_message, run.error_message
     end
+
+    test ".perform_now cancels run when race occurs between interrupting and cancelling run" do
+      JobIteration.stubs(interruption_adapter: -> { true })
+
+      # Simulate cancel happening after we've already checked @run.cancelling?
+      @run.expects(:cancelling?).twice.with do
+        Run.find(@run.id).cancel
+      end.returns(false).then.returns(true)
+
+      TaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :cancelled?)
+    end
+
+    test ".perform_now pauses run when race occurs between interrupting and pausing run" do
+      JobIteration.stubs(interruption_adapter: -> { true })
+
+      # Simulate pause happening after we've already checked @run.pausing?
+      @run.expects(:pausing?).twice.with do
+        Run.find(@run.id).pausing!
+      end.returns(false).then.returns(true)
+
+      TaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :paused?)
+    end
+
+    test ".perform_now marks run as succeeded when run is cancelled before success persists" do
+      CustomTaskJob.race_condition_after_hook = -> do
+        Run.find(@run.id).cancel
+      end
+
+      Maintenance::TestTask.any_instance.expects(:process).twice
+
+      CustomTaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :succeeded?)
+    ensure
+      CustomTaskJob.race_condition_after_hook = nil
+    end
+
+    test ".perform_now marks run as succeeded when run is paused before success persists" do
+      CustomTaskJob.race_condition_after_hook = -> do
+        Run.find(@run.id).pausing!
+      end
+
+      Maintenance::TestTask.any_instance.expects(:process).twice
+
+      CustomTaskJob.perform_now(@run)
+
+      assert_predicate(@run.reload, :succeeded?)
+    ensure
+      CustomTaskJob.race_condition_after_hook = nil
+    end
   end
 end

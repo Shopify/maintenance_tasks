@@ -89,6 +89,32 @@ module MaintenanceTasks
       run.persist_transition
     end
 
+    test "#persist_transition with a race condition moves the run to the proper status and calls the right callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "running")
+      Run.find(run.id).cancelling!
+
+      run.task.expects(:after_interrupt_callback).never
+      run.task.expects(:after_cancel_callback)
+
+      run.status = :interrupted
+      run.persist_transition
+      assert_predicate run.reload, :cancelled?
+    end
+
+    test "#persist_transition with a race condition for a successful run moves to the succeeded status and calls the right callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "running")
+      Run.find(run.id).cancelling!
+
+      run.task.expects(:after_interrupt_callback).never
+      run.task.expects(:after_complete_callback)
+
+      run.status = :succeeded
+      run.persist_transition
+      assert_predicate run.reload, :succeeded?
+    end
+
     test "#persist_progress persists increments to tick count and time_running" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
@@ -398,6 +424,16 @@ module MaintenanceTasks
       run = Run.new(status: :pausing)
       run.job_shutdown
       assert_predicate run, :paused?
+    end
+
+    test "#complete sets status to succeeded and sets ended_at" do
+      freeze_time
+      now = Time.now
+      run = Run.new(status: :running)
+      run.complete
+
+      assert_predicate run, :succeeded?
+      assert_equal now, run.ended_at
     end
 
     test "#cancel transitions the Run to cancelling if not paused" do

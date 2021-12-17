@@ -91,6 +91,15 @@ module MaintenanceTasks
       save!
       callback = CALLBACKS_TRANSITION[status]
       run_task_callbacks(callback) if callback
+    rescue ActiveRecord::StaleObjectError
+      success = succeeded?
+      reload_status
+      if success
+        self.status = :succeeded
+      else
+        job_shutdown
+      end
+      retry
     end
 
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
@@ -254,6 +263,7 @@ module MaintenanceTasks
       retry
     end
 
+    # Handles transitioning the status on a Run when the job shuts down.
     def job_shutdown
       if cancelling?
         self.status = :cancelled
@@ -263,6 +273,13 @@ module MaintenanceTasks
       else
         self.status = :interrupted
       end
+    end
+
+    # Handles the completion of a Run, setting a status of succeeded and the
+    # ended_at timestamp.
+    def complete
+      self.status = :succeeded
+      self.ended_at = Time.now
     end
 
     # Cancels a Run.
