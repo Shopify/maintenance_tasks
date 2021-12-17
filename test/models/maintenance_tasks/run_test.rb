@@ -103,6 +103,17 @@ module MaintenanceTasks
       assert_equal 12.2, run.time_running
     end
 
+    test "#persist_progress increments the lock version in memory" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running,
+      )
+      run.persist_progress(2, 2)
+      refute_predicate run, :changed?
+      lock_version = run.lock_version
+      assert_equal run.reload.lock_version, lock_version
+    end
+
     test "#persist_error updates Run to errored, sets ended_at, and sets started_at if not yet set" do
       freeze_time
       run = Run.create!(task_name: "Maintenance::ErrorTask")

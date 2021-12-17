@@ -102,6 +102,11 @@ module MaintenanceTasks
         time_running: duration,
         touch: true
       )
+      if locking_enabled?
+        locking_column = self.class.locking_column
+        self[locking_column] += 1
+        clear_attribute_change(locking_column)
+      end
     end
 
     # Marks the run as errored and persists the error data.
