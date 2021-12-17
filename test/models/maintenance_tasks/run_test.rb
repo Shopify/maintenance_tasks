@@ -49,6 +49,46 @@ module MaintenanceTasks
         "Unknown parameters: post_ids"
     end
 
+    test "#persist_transition saves the record" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      run.status = :running
+      run.persist_transition
+      refute_predicate run, :changed?
+      assert_equal run.reload, run
+    end
+
+    test "#persist_transition calls the interrupt callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "running")
+      run.status = :interrupted
+      run.task.expects(:after_interrupt_callback)
+      run.persist_transition
+    end
+
+    test "#persist_transition calls the complete callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "running")
+      run.status = :succeeded
+      run.task.expects(:after_complete_callback)
+      run.persist_transition
+    end
+
+    test "#persist_transition calls the cancel callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "cancelling")
+      run.status = :cancelled
+      run.task.expects(:after_cancel_callback)
+      run.persist_transition
+    end
+
+    test "#persist_transition calls the pause callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "pausing")
+      run.status = :paused
+      run.task.expects(:after_pause_callback)
+      run.persist_transition
+    end
+
     test "#persist_progress persists increments to tick count and time_running" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
@@ -77,6 +117,14 @@ module MaintenanceTasks
       assert_equal ["lib/foo.rb:42:in `bar'"], run.backtrace
       assert_equal Time.now, run.started_at
       assert_equal Time.now, run.ended_at
+    end
+
+    test "#persist_error runs the error callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      error = ArgumentError.new("Something went wrong")
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+      run.task.expects(:after_error_callback)
+      run.persist_error(error)
     end
 
     test "#reload_status reloads status and clears dirty tracking" do
@@ -259,6 +307,27 @@ module MaintenanceTasks
       end
     end
 
+    test "#start persists started_at and tick_total to the Run" do
+      freeze_time
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running
+      )
+      run.start(2)
+
+      assert_equal 2, run.tick_total
+      assert_equal Time.now, run.started_at
+    end
+
+    test "#start runs the start callback" do
+      run = Run.create!(
+        task_name: "Maintenance::CallbackTestTask",
+        status: :running
+      )
+      run.task.expects(:after_start_callback)
+      run.start(2)
+    end
+
     test "#cancel transitions the Run to cancelling if not paused" do
       [:enqueued, :running, :pausing, :interrupted].each do |status|
         run = Run.create!(
@@ -322,6 +391,13 @@ module MaintenanceTasks
       run.cancel
       assert_predicate run, :cancelled?
       assert_equal Time.now, run.ended_at
+    end
+
+    test "#cancel calls the cancel callback if the job was paused" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "paused")
+      run.task.expects(:after_cancel_callback)
+      run.cancel
     end
 
     test "#enqueued! ensures the status is marked as changed" do

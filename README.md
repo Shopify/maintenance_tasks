@@ -256,12 +256,12 @@ The Task provides callbacks that hook into its life cycle.
 
 Available callbacks are:
 
-`after_start`
-`after_pause`
-`after_interrupt`
-`after_cancel`
-`after_complete`
-`after_error`
+* `after_start`
+* `after_pause`
+* `after_interrupt`
+* `after_cancel`
+* `after_complete`
+* `after_error`
 
 ```ruby
 module Maintenance
