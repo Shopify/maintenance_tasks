@@ -12,8 +12,8 @@ module MaintenanceTasks
       before_perform(:before_perform)
 
       on_start(:on_start)
-      on_complete(:on_complete)
       on_shutdown(:on_shutdown)
+      on_complete(:on_complete)
 
       after_perform(:after_perform)
 
@@ -115,23 +115,15 @@ module MaintenanceTasks
       @run.start(count)
     end
 
+    def on_shutdown
+      @run.job_shutdown
+      @run.cursor = cursor_position
+      @ticker.persist
+    end
+
     def on_complete
       @run.status = :succeeded
       @run.ended_at = Time.now
-    end
-
-    def on_shutdown
-      if @run.cancelling?
-        @run.status = :cancelled
-        @run.ended_at = Time.now
-      elsif @run.pausing?
-        @run.status = :paused
-      else
-        @run.status = :interrupted
-      end
-
-      @run.cursor = cursor_position
-      @ticker.persist
     end
 
     # We are reopening a private part of Job Iteration's API here, so we should

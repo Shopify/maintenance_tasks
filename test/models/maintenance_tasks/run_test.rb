@@ -328,6 +328,28 @@ module MaintenanceTasks
       run.start(2)
     end
 
+    test "#job_shutdown sets running run to interrupted" do
+      run = Run.new(status: :running)
+      run.job_shutdown
+      assert_predicate run, :interrupted?
+    end
+
+    test "#job_shutdown sets cancelling run to cancelled, and sets ended_at" do
+      freeze_time
+      now = Time.now
+      run = Run.new(status: :cancelling)
+      run.job_shutdown
+
+      assert_predicate run, :cancelled?
+      assert_equal now, run.ended_at
+    end
+
+    test "#job_shutdown sets pausing run to paused" do
+      run = Run.new(status: :pausing)
+      run.job_shutdown
+      assert_predicate run, :paused?
+    end
+
     test "#cancel transitions the Run to cancelling if not paused" do
       [:enqueued, :running, :pausing, :interrupted].each do |status|
         run = Run.create!(

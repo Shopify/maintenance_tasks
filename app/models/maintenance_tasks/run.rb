@@ -214,6 +214,17 @@ module MaintenanceTasks
       run_task_callbacks(:start)
     end
 
+    def job_shutdown
+      if cancelling?
+        self.status = :cancelled
+        self.ended_at = Time.now
+      elsif pausing?
+        self.status = :paused
+      else
+        self.status = :interrupted
+      end
+    end
+
     # Cancels a Run.
     #
     # If the Run is paused, it will transition directly to cancelled, since the
