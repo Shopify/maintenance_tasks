@@ -9,8 +9,12 @@ jobs:
     strategy:
       matrix:
         gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_edge.gemfile]
-        ruby: ["2.7", "3.0"]
-        database: [sqlite, postgres]
+        ruby: ["2.7", "3.0", "3.1"]
+        database: [sqlite]
+        include:
+          - gemfile: Gemfile
+            ruby: 3.1
+            database: postgres
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
       DB: ${{ matrix.database }}
