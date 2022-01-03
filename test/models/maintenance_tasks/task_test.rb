@@ -31,7 +31,8 @@ module MaintenanceTasks
       error = assert_raises(Task::NotFoundError) do
         Task.named("Maintenance::DoesNotExist")
       end
-      assert_equal "Task Maintenance::DoesNotExist not found.", error.message
+      assert error.message
+        .start_with?("Task Maintenance::DoesNotExist not found.")
       assert_equal "Maintenance::DoesNotExist", error.name
     end
 
@@ -39,7 +40,7 @@ module MaintenanceTasks
       error = assert_raises(Task::NotFoundError) do
         Task.named("Array")
       end
-      assert_equal "Array is not a Task.", error.message
+      assert error.message.start_with?("Array is not a Task.")
       assert_equal "Array", error.name
     end
 
@@ -65,13 +66,13 @@ module MaintenanceTasks
     test "#collection raises NoMethodError" do
       error = assert_raises(NoMethodError) { Task.new.collection }
       message = "MaintenanceTasks::Task must implement `collection`."
-      assert_equal message, error.message
+      assert error.message.start_with?(message)
     end
 
     test "#process raises NoMethodError" do
       error = assert_raises(NoMethodError) { Task.new.process("an item") }
       message = "MaintenanceTasks::Task must implement `process`."
-      assert_equal message, error.message
+      assert error.message.start_with?(message)
     end
 
     test ".throttle_conditions inherits conditions from superclass" do
