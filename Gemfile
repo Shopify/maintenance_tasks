@@ -6,6 +6,7 @@ gemspec
 
 gem "capybara"
 gem "mocha"
+gem "net-smtp" # mail is missing a dependency on net-smtp https://github.com/mikel/mail/pull/1439
 gem "pg"
 gem "pry-byebug"
 gem "puma"

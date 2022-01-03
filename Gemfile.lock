@@ -88,11 +88,13 @@ GEM
     coderay (1.1.3)
     concurrent-ruby (1.1.9)
     crass (1.0.6)
+    digest (3.1.0)
     erubi (1.10.0)
     globalid (0.5.2)
       activesupport (>= 5.0)
     i18n (1.8.11)
       concurrent-ruby (~> 1.0)
+    io-wait (0.2.1)
     job-iteration (1.3.3)
       activejob (>= 5.2)
     loofah (2.12.0)
@@ -107,6 +109,13 @@ GEM
     mini_portile2 (2.6.1)
     minitest (5.14.4)
     mocha (1.13.0)
+    net-protocol (0.1.2)
+      io-wait
+      timeout
+    net-smtp (0.3.1)
+      digest
+      net-protocol
+      timeout
     nio4r (2.5.8)
     nokogiri (1.12.5)
       mini_portile2 (~> 2.6.1)
@@ -186,6 +195,7 @@ GEM
       sprockets (>= 3.0.0)
     sqlite3 (1.4.2)
     thor (1.1.0)
+    timeout (0.2.0)
     tzinfo (2.0.4)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.1.0)
@@ -212,6 +222,7 @@ DEPENDENCIES
   capybara
   maintenance_tasks!
   mocha
+  net-smtp
   pg
   pry-byebug
   puma
