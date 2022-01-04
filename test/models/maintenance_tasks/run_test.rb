@@ -89,6 +89,32 @@ module MaintenanceTasks
       run.persist_transition
     end
 
+    test "#persist_transition with a race condition moves the run to the proper status and calls the right callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "running")
+      Run.find(run.id).cancelling!
+
+      run.task.expects(:after_interrupt_callback).never
+      run.task.expects(:after_cancel_callback)
+
+      run.status = :interrupted
+      run.persist_transition
+      assert_predicate run.reload, :cancelled?
+    end
+
+    test "#persist_transition with a race condition for a successful run moves to the succeeded status and calls the right callback" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
+        status: "running")
+      Run.find(run.id).cancelling!
+
+      run.task.expects(:after_interrupt_callback).never
+      run.task.expects(:after_complete_callback)
+
+      run.status = :succeeded
+      run.persist_transition
+      assert_predicate run.reload, :succeeded?
+    end
+
     test "#persist_progress persists increments to tick count and time_running" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
@@ -101,6 +127,17 @@ module MaintenanceTasks
       assert_equal 21, run.tick_count # record is not used or updated
       assert_equal 42, run.reload.tick_count
       assert_equal 12.2, run.time_running
+    end
+
+    test "#persist_progress increments the lock version in memory" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running,
+      )
+      run.persist_progress(2, 2)
+      refute_predicate run, :changed?
+      lock_version = run.lock_version
+      assert_equal run.reload.lock_version, lock_version
     end
 
     test "#persist_error updates Run to errored, sets ended_at, and sets started_at if not yet set" do
@@ -127,12 +164,15 @@ module MaintenanceTasks
       run.persist_error(error)
     end
 
-    test "#reload_status reloads status and clears dirty tracking" do
+    test "#reload_status reloads status and lock version, and clears dirty tracking" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
-      Run.find(run.id).running!
+      original_lock_version = run.lock_version
+
+      Run.find(run.id).running! # race condition
 
       run.reload_status
       assert_predicate run, :running?
+      assert_equal original_lock_version + 1, run.lock_version
       refute run.changed?
     end
 
@@ -270,7 +310,7 @@ module MaintenanceTasks
       assert_equal 1.second, run.time_to_completion
     end
 
-    test "#running sets an enqueued or interrupted run to running" do
+    test "with optimistic locking enabled, #running sets an enqueued or interrupted run to running" do
       [:enqueued, :interrupted].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
@@ -283,7 +323,32 @@ module MaintenanceTasks
       end
     end
 
-    test "#running doesn't set a stopping run to running without a query" do
+    test "with optimistic locking disabled, #running sets an enqueued or interrupted run to running" do
+      Run.expects(:locking_enabled?).returns(false).at_least_once
+      [:enqueued, :interrupted].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          status: status,
+        )
+        run.running
+
+        assert_predicate run, :running?
+        refute_predicate run, :changed?
+      end
+    end
+
+    test "with optimistic locking enabled, #running doesn't set a stopping run to running" do
+      [:cancelling, :pausing].each do |status|
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          status: status,
+        )
+        refute_predicate run, :running?
+      end
+    end
+
+    test "with optimistic locking disabled, #running doesn't set a stopping run to running, and performs no queries" do
+      Run.expects(:locking_enabled?).returns(false).at_least_once
       [:cancelling, :pausing].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
@@ -295,7 +360,18 @@ module MaintenanceTasks
       end
     end
 
-    test "#running doesn't set a stopping run to running and reloads the status" do
+    test "with optimistic locking enabled, #running rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.running
+      end
+
+      assert_predicate run, :pausing?
+    end
+
+    test "with optimistic locking disabled, #running doesn't set a stopping run to running and reloads the status" do
       [:cancelling, :pausing].each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
@@ -326,6 +402,38 @@ module MaintenanceTasks
       )
       run.task.expects(:after_start_callback)
       run.start(2)
+    end
+
+    test "#job_shutdown sets running run to interrupted" do
+      run = Run.new(status: :running)
+      run.job_shutdown
+      assert_predicate run, :interrupted?
+    end
+
+    test "#job_shutdown sets cancelling run to cancelled, and sets ended_at" do
+      freeze_time
+      now = Time.now
+      run = Run.new(status: :cancelling)
+      run.job_shutdown
+
+      assert_predicate run, :cancelled?
+      assert_equal now, run.ended_at
+    end
+
+    test "#job_shutdown sets pausing run to paused" do
+      run = Run.new(status: :pausing)
+      run.job_shutdown
+      assert_predicate run, :paused?
+    end
+
+    test "#complete sets status to succeeded and sets ended_at" do
+      freeze_time
+      now = Time.now
+      run = Run.new(status: :running)
+      run.complete
+
+      assert_predicate run, :succeeded?
+      assert_equal now, run.ended_at
     end
 
     test "#cancel transitions the Run to cancelling if not paused" do
@@ -428,6 +536,74 @@ module MaintenanceTasks
 
       assert_predicate run, :valid?
       assert_equal "1,2,3", run.task.post_ids
+    end
+
+    test "#enqueued! rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :paused,
+      )
+      Run.find(run.id).cancelled!
+
+      assert_raises(ActiveRecord::RecordInvalid) do
+        run.enqueued!
+      end
+
+      assert_predicate run.reload, :cancelled?
+    end
+
+    test "#cancel rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.cancel
+      end
+
+      assert_predicate run, :cancelling?
+    end
+
+    test "#pausing! rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      Run.find(run.id).running!
+
+      assert_nothing_raised do
+        run.pausing!
+      end
+
+      assert_predicate run, :pausing?
+    end
+
+    test "#persist_error rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(
+        task_name: "Maintenance::ErrorTask",
+        status: :running,
+      )
+
+      error = ArgumentError.new("Something went wrong")
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+
+      Run.find(run.id).pausing!
+
+      assert_nothing_raised do
+        run.persist_error(error)
+      end
+
+      assert_predicate run, :errored?
+    end
+
+    test "#start rescues and retries ActiveRecord::StaleObjectError" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running
+      )
+      Run.find(run.id).cancelling!
+
+      assert_nothing_raised do
+        run.start(2)
+      end
+
+      assert_predicate run, :cancelling?
     end
 
     private

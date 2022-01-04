@@ -66,9 +66,15 @@ module MaintenanceTasks
 
     # Sets the run status to enqueued, making sure the transition is validated
     # in case it's already enqueued.
+    #
+    # Rescues and retries status transition if an ActiveRecord::StaleObjectError
+    # is encountered.
     def enqueued!
       status_will_change!
       super
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     CALLBACKS_TRANSITION = {
@@ -85,6 +91,15 @@ module MaintenanceTasks
       save!
       callback = CALLBACKS_TRANSITION[status]
       run_task_callbacks(callback) if callback
+    rescue ActiveRecord::StaleObjectError
+      success = succeeded?
+      reload_status
+      if success
+        self.status = :succeeded
+      else
+        job_shutdown
+      end
+      retry
     end
 
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
@@ -102,6 +117,11 @@ module MaintenanceTasks
         time_running: duration,
         touch: true
       )
+      if locking_enabled?
+        locking_column = self.class.locking_column
+        self[locking_column] += 1
+        clear_attribute_change(locking_column)
+      end
     end
 
     # Marks the run as errored and persists the error data.
@@ -117,20 +137,33 @@ module MaintenanceTasks
         ended_at: Time.now,
       )
       run_task_callbacks(:error)
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
-    # Refreshes just the status attribute on the Active Record object, and
-    # ensures ActiveModel::Dirty does not mark the object as changed.
+    # Refreshes the status and lock version attributes on the Active Record
+    # object, and ensures ActiveModel::Dirty doesn't mark the object as changed.
+    #
     # This allows us to get the Run's most up-to-date status without needing
     # to reload the entire record.
     #
     # @return [MaintenanceTasks::Run] the Run record with its updated status.
     def reload_status
-      updated_status = self.class.uncached do
-        self.class.where(id: id).pluck(:status).first
+      columns_to_reload = if locking_enabled?
+        [:status, self.class.locking_column]
+      else
+        [:status]
       end
+      updated_status, updated_lock_version = self.class.uncached do
+        self.class.where(id: id).pluck(*columns_to_reload).first
+      end
+
       self.status = updated_status
-      clear_attribute_changes([:status])
+      if updated_lock_version
+        self[self.class.locking_column] = updated_lock_version
+      end
+      clear_attribute_changes(columns_to_reload)
       self
     end
 
@@ -190,18 +223,31 @@ module MaintenanceTasks
       seconds_to_finished.seconds
     end
 
-    # Mark a Run as running.
+    # Marks a Run as running.
     #
     # If the run is stopping already, it will not transition to running.
+    # Rescues and retries status transition if an ActiveRecord::StaleObjectError
+    # is encountered.
     def running
-      return if stopping?
-      updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
-        .update_all(status: :running, updated_at: Time.now) > 0
-      if updated
-        self.status = :running
-        clear_attribute_changes([:status])
+      if locking_enabled?
+        begin
+          running! unless stopping?
+        rescue ActiveRecord::StaleObjectError
+          reload_status
+          retry
+        end
       else
-        reload_status
+        # Preserve swap-and-replace solution for data races until users
+        # run migration to upgrade to optimistic locking solution
+        return if stopping?
+        updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
+          .update_all(status: :running, updated_at: Time.now) > 0
+        if updated
+          self.status = :running
+          clear_attribute_changes([:status])
+        else
+          reload_status
+        end
       end
     end
 
@@ -212,6 +258,28 @@ module MaintenanceTasks
     def start(count)
       update!(started_at: Time.now, tick_total: count)
       run_task_callbacks(:start)
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
+    # Handles transitioning the status on a Run when the job shuts down.
+    def job_shutdown
+      if cancelling?
+        self.status = :cancelled
+        self.ended_at = Time.now
+      elsif pausing?
+        self.status = :paused
+      else
+        self.status = :interrupted
+      end
+    end
+
+    # Handles the completion of a Run, setting a status of succeeded and the
+    # ended_at timestamp.
+    def complete
+      self.status = :succeeded
+      self.ended_at = Time.now
     end
 
     # Cancels a Run.
@@ -233,6 +301,20 @@ module MaintenanceTasks
       else
         cancelling!
       end
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
+    end
+
+    # Marks a Run as pausing.
+    #
+    # Rescues and retries status transition if an ActiveRecord::StaleObjectError
+    # is encountered.
+    def pausing!
+      super
+    rescue ActiveRecord::StaleObjectError
+      reload_status
+      retry
     end
 
     # Returns whether a Run is stuck, which is defined as having a status of
