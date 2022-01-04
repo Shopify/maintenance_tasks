@@ -162,7 +162,8 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
 
       assert_equal "MaintenanceTasks::Task::NotFoundError", run.error_class
-      assert_equal "Task Maintenance::DeletedTask not found.", run.error_message
+      assert run.error_message
+        .start_with?("Task Maintenance::DeletedTask not found.")
     end
 
     test ".perform_now handles when the Task cannot be found when resuming after interruption" do
@@ -174,7 +175,8 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
 
       assert_equal "MaintenanceTasks::Task::NotFoundError", run.error_class
-      assert_equal "Task Maintenance::DeletedTask not found.", run.error_message
+      assert run.error_message
+        .start_with?("Task Maintenance::DeletedTask not found.")
     end
 
     test ".perform_now delays reenqueuing the job after interruption until all callbacks are finished" do
@@ -266,7 +268,7 @@ module MaintenanceTasks
         Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
         Array, or CSV.
       MSG
-      assert_equal expected_message, @run.error_message
+      assert @run.error_message.start_with?(expected_message)
       assert_equal Time.now, @run.started_at
     end
 
