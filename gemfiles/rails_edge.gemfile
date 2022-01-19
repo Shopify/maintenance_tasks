@@ -3,4 +3,3 @@
 @rails_gem_requirement = { github: "rails/rails" }
 
 eval_gemfile "../Gemfile"
-gem "sprockets-rails"
