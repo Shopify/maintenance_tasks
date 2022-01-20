@@ -20,6 +20,7 @@ end
 gem "rubocop"
 gem "rubocop-shopify", "2.4.0"
 gem "selenium-webdriver"
+gem "sprockets-rails"
 gem "sqlite3"
 gem "webdrivers", require: false
 gem "yard"
