@@ -8,7 +8,7 @@ jobs:
     name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }} / ${{ matrix.database }}
     strategy:
       matrix:
-        gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_edge.gemfile]
+        gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_6_1.gemfile, gemfiles/rails_edge.gemfile]
         ruby: ["2.7", "3.0", "3.1"]
         database: [sqlite]
         include:
