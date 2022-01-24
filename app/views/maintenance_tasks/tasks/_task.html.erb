@@ -15,6 +15,10 @@
       <%= render "maintenance_tasks/runs/info/#{run.status}", run: run %>
     </div>
 
+    <div class="content" id="custom-content">
+      <%= render "maintenance_tasks/runs/info/custom", run: run %>
+    </div>
+
     <%= render "maintenance_tasks/runs/csv", run: run %>
     <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
     <%= render "maintenance_tasks/runs/arguments", run: run %>

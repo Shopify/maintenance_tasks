@@ -16,6 +16,10 @@
     <%= render "maintenance_tasks/runs/info/#{last_run.status}", run: last_run %>
   </div>
 
+  <div class="content" id="custom-content">
+    <%= render "maintenance_tasks/runs/info/custom", run: last_run %>
+  </div>
+
   <%= render "maintenance_tasks/runs/csv", run: last_run %>
   <%= tag.hr if last_run.csv_file.present? %>
   <%= render "maintenance_tasks/runs/arguments", run: last_run %>
@@ -46,6 +50,7 @@
           <% end %>
         </div>
       <% end %>
+      <%= render "maintenance_tasks/tasks/custom", form: form %>
       <div class="block">
         <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
       </div>
