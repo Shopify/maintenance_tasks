@@ -2,7 +2,7 @@ inherit_gem:
   rubocop-shopify: rubocop.yml
 
 AllCops:
-  TargetRubyVersion: 2.7
+  TargetRubyVersion: 3.1
   Exclude:
     - test/dummy/db/schema.rb
     - vendor/**/*
@@ -26,3 +26,6 @@ Style/DocumentationMethod:
   Include:
     - app/**/*.rb
     - lib/**/*.rb
+
+Style/HashSyntax:
+  Enabled: false
