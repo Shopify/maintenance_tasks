@@ -63,6 +63,13 @@ module MaintenanceTasks
           MaintenanceTasks::CsvCollectionBuilder.new
       end
 
+      # Make this a Task that calls #process once, instead of iterating over
+      # a collection.
+      def no_collection
+        self.collection_builder_strategy =
+          MaintenanceTasks::NoCollectionBuilder.new
+      end
+
       # Returns whether the Task handles CSV.
       #
       # @return [Boolean] whether the Task handles CSV.

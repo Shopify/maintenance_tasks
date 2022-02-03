@@ -36,6 +36,8 @@ module MaintenanceTasks
       @enumerator = nil
 
       collection_enum = case collection
+      when :no_collection
+        enumerator_builder.build_once_enumerator(cursor: nil)
       when ActiveRecord::Relation
         enumerator_builder.active_record_on_records(collection, cursor: cursor)
       when ActiveRecord::Batches::BatchEnumerator

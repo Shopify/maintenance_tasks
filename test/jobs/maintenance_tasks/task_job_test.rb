@@ -253,6 +253,16 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test ".perform_now can run a Task that uses no collection" do
+      Maintenance::NoCollectionTask.any_instance.expects(:process).once
+
+      run = Run.new(task_name: "Maintenance::NoCollectionTask")
+
+      TaskJob.perform_now(run)
+
+      assert_predicate run.reload, :succeeded?
+    end
+
     test ".perform_now sets the Run as errored when the Task collection is invalid" do
       freeze_time
       Maintenance::TestTask.any_instance.stubs(collection: "not a collection")
