@@ -1,0 +1,13 @@
+# frozen_string_literal: true
+
+module <%= tasks_module %>
+<% module_namespacing do -%>
+  class <%= class_name %>Task < MaintenanceTasks::Task
+    no_collection
+
+    def process(_)
+      # The work to be done
+    end
+  end
+<% end -%>
+end

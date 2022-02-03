@@ -12,10 +12,17 @@ module MaintenanceTasks
     class_option :csv, type: :boolean, default: false,
       desc: "Generate a CSV Task."
 
+    class_option :no_collection, type: :boolean, default: false,
+      desc: "Generate a collection-less Task."
+
     check_class_collision suffix: "Task"
 
     # Creates the Task file.
     def create_task_file
+      if options[:csv] && options[:no_collection]
+        raise "Multiple Task type options provided. Please use either "\
+          "--csv or --no-collection."
+      end
       template_file = File.join(
         "app/tasks/#{tasks_module_file_path}",
         class_path,
@@ -23,6 +30,8 @@ module MaintenanceTasks
       )
       if options[:csv]
         template("csv_task.rb", template_file)
+      elsif options[:no_collection]
+        template("no_collection_task.rb", template_file)
       else
         template("task.rb", template_file)
       end

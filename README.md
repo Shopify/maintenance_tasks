@@ -160,6 +160,36 @@ primary keys of the records of the batch first, and then perform an additional
 query to load the records when calling `each` (or any `Enumerable` method)
 inside `#process`.
 
+### Tasks that don't need a Collection
+
+Sometimes, you might want to run a Task that performs a single operation, such
+as enqueuing another background job or hitting an external API. The gem supports
+collection-less tasks.
+
+Generate a collection-less Task by running:
+
+```bash
+$ bin/rails generate maintenance_tasks:task no_collection_task --no-collection
+```
+
+The generated task is a subclass of `MaintenanceTasks::Task` that implements:
+
+* `process`: do the work of your maintenance task
+
+```ruby
+# app/tasks/maintenance/no_collection_task.rb
+
+module Maintenance
+  class NoCollectionTask < MaintenanceTasks::Task
+    no_collection
+
+    def process(_)
+      SomeAsyncJob.perform_later
+    end
+  end
+end
+```
+
 ### Throttling
 
 Maintenance Tasks often modify a lot of data and can be taxing on your database.

@@ -81,5 +81,24 @@ module MaintenanceTasks
         assert_match(/def process\(row\)/, task)
       end
     end
+
+    test "generator creates a collection-less Task if the --no-collection option is supplied" do
+      run_generator ["sleepy", "--no-collection"]
+      assert_file "app/tasks/maintenance/sleepy_task.rb" do |task|
+        assert_match(/class SleepyTask < MaintenanceTasks::Task/, task)
+        assert_match(/no_collection/, task)
+        assert_match(/def process\(_\)/, task)
+      end
+    end
+
+    test "generator raises if multiple collection options provided" do
+      error = assert_raises do
+        run_generator(["sleepy", "--csv", "--no-collection"])
+      end
+
+      expected = "Multiple Task type options provided. "\
+        "Please use either --csv or --no-collection."
+      assert_equal(expected, error.message)
+    end
   end
 end
