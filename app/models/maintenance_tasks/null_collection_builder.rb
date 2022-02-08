@@ -2,6 +2,8 @@
 
 module MaintenanceTasks
   # Base strategy for building a collection-based Task to be performed.
+  #
+  # @api private
   class NullCollectionBuilder
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
@@ -25,6 +27,11 @@ module MaintenanceTasks
 
     # Return that the Task does not process CSV content.
     def has_csv_content?
+      false
+    end
+
+    # Returns that the Task processes a collection.
+    def no_collection?
       false
     end
   end

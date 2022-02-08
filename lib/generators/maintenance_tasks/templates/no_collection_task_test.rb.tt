@@ -5,11 +5,7 @@ module <%= tasks_module %>
 <% module_namespacing do -%>
   class <%= class_name %>TaskTest < ActiveSupport::TestCase
     # test "#process performs a task iteration" do
-    <%- if no_collection? -%>
     #   <%= tasks_module %>::<%= class_name %>Task.process
-    <%- else -%>
-    #   <%= tasks_module %>::<%= class_name %>Task.process(element)
-    <%- end -%>
     # end
   end
 <% end -%>

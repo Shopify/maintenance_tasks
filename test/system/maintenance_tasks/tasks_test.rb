@@ -23,6 +23,7 @@ module MaintenanceTasks
         "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
         "Maintenance::ImportPostsTask\nNew",
+        "Maintenance::NoCollectionTask\nNew",
         "Maintenance::ParamsTask\nNew",
         "Maintenance::TestTask\nNew",
         "Maintenance::UpdatePostsInBatchesTask\nNew",
