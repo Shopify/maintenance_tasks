@@ -5,7 +5,7 @@ module <%= tasks_module %>
   class <%= class_name %>Task < MaintenanceTasks::Task
     no_collection
 
-    def process(_)
+    def process
       # The work to be done
     end
   end

@@ -4,7 +4,7 @@ module Maintenance
   class NoCollectionTask < MaintenanceTasks::Task
     no_collection
 
-    def process(_)
+    def process
       Rails.logger.debug("#process method was called")
     end
   end

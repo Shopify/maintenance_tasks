@@ -183,7 +183,7 @@ module Maintenance
   class NoCollectionTask < MaintenanceTasks::Task
     no_collection
 
-    def process(_)
+    def process
       SomeAsyncJob.perform_later
     end
   end

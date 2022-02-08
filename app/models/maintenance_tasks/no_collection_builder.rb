@@ -20,5 +20,10 @@ module MaintenanceTasks
     def has_csv_content?
       false
     end
+
+    # Returns that the Task is collection-less.
+    def no_collection?
+      true
+    end
   end
 end

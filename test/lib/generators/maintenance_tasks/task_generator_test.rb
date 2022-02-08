@@ -87,7 +87,7 @@ module MaintenanceTasks
       assert_file "app/tasks/maintenance/sleepy_task.rb" do |task|
         assert_match(/class SleepyTask < MaintenanceTasks::Task/, task)
         assert_match(/no_collection/, task)
-        assert_match(/def process\(_\)/, task)
+        assert_match(/def process/, task)
       end
     end
 

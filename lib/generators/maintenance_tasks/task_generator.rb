@@ -30,7 +30,7 @@ module MaintenanceTasks
       )
       if options[:csv]
         template("csv_task.rb", template_file)
-      elsif options[:no_collection]
+      elsif no_collection?
         template("no_collection_task.rb", template_file)
       else
         template("task.rb", template_file)
@@ -84,6 +84,10 @@ module MaintenanceTasks
 
     def test_framework
       Rails.application.config.generators.options[:rails][:test_framework]
+    end
+
+    def no_collection?
+      options[:no_collection]
     end
   end
 end

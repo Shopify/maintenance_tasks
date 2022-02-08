@@ -91,7 +91,11 @@ module MaintenanceTasks
     end
 
     def task_iteration(input)
-      @task.process(input)
+      if @task.no_collection?
+        @task.process
+      else
+        @task.process(input)
+      end
     rescue => error
       @errored_element = input
       raise error

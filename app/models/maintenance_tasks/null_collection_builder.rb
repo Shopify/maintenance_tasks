@@ -29,5 +29,10 @@ module MaintenanceTasks
     def has_csv_content?
       false
     end
+
+    # Returns that the Task processes a collection.
+    def no_collection?
+      false
+    end
   end
 end

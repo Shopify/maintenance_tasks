@@ -78,13 +78,20 @@ module MaintenanceTasks
         collection_builder_strategy.has_csv_content?
       end
 
+      # Returns whether the Task is collection-less.
+      #
+      # @return [Boolean] whether the Task is collection-less.
+      def no_collection?
+        collection_builder_strategy.no_collection?
+      end
+
       # Processes one item.
       #
       # Especially useful for tests.
       #
-      # @param item the item to process.
-      def process(item)
-        new.process(item)
+      # @param args [Object, nil] the item to process
+      def process(*args)
+        new.process(*args)
       end
 
       # Returns the collection for this Task.
@@ -203,6 +210,13 @@ module MaintenanceTasks
     # @return [Boolean] whether the Task handles CSV.
     def has_csv_content?
       self.class.has_csv_content?
+    end
+
+    # Returns whether the Task is collection-less.
+    #
+    # @return [Boolean] whether the Task is collection-less.
+    def no_collection?
+      self.class.no_collection?
     end
 
     # The collection to be processed, delegated to the strategy.
