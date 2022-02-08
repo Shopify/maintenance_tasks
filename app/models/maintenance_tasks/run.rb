@@ -131,8 +131,8 @@ module MaintenanceTasks
       self.started_at ||= Time.now
       update!(
         status: :errored,
-        error_class: error.class.to_s,
-        error_message: error.message,
+        error_class: truncate(:error_class, error.class.name),
+        error_message: truncate(:error_message, error.message),
         backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
         ended_at: Time.now,
       )
@@ -421,6 +421,12 @@ module MaintenanceTasks
         MSG
         errors.add(:base, error_message)
       end
+    end
+
+    def truncate(attribute_name, value)
+      limit = MaintenanceTasks::Run.column_for_attribute(attribute_name).limit
+      return value unless limit
+      value&.first(limit)
     end
   end
 end
