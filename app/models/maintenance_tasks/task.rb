@@ -71,19 +71,8 @@ module MaintenanceTasks
           MaintenanceTasks::NoCollectionBuilder.new
       end
 
-      # Returns whether the Task handles CSV.
-      #
-      # @return [Boolean] whether the Task handles CSV.
-      def has_csv_content?
-        collection_builder_strategy.has_csv_content?
-      end
-
-      # Returns whether the Task is collection-less.
-      #
-      # @return [Boolean] whether the Task is collection-less.
-      def no_collection?
-        collection_builder_strategy.no_collection?
-      end
+      delegate :has_csv_content?, :no_collection?,
+        to: :collection_builder_strategy
 
       # Processes one item.
       #
