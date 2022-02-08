@@ -2,6 +2,8 @@
 
 module MaintenanceTasks
   # Base strategy for building a collection-based Task to be performed.
+  #
+  # @api private
   class NullCollectionBuilder
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.

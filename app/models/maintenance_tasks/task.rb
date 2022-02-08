@@ -18,6 +18,7 @@ module MaintenanceTasks
     # @api private
     class_attribute :throttle_conditions, default: []
 
+    # @api private
     class_attribute :collection_builder_strategy,
       default: NullCollectionBuilder.new
 
