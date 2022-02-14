@@ -8,14 +8,21 @@ module MaintenanceTasks
     JSDELIVR_CDN = "https://cdn.jsdelivr.net"
 
     content_security_policy do |policy|
-      policy.style_src(JSDELIVR_CDN)
+      policy.style_src(
+        JSDELIVR_CDN,
+        # https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es2017-umd.js
+        # line 1188
+        "'sha256-rql2tlBWA4Hb3HHbUfw797urk+ifBd6EAovoOUGt0oI='",
+        # https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es2017-umd.js
+        # line 334
+        "'sha256-y9V0na/WU44EUNI/HDP7kZ7mfEci4PAOIjYOOan6JMA='",
+        # https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es2017-umd.js
+        # line 334
+        "'sha256-VELoZazE4c2GJUpn8GbzkTIBqEEuvRmGtUwrKI578Ak='",
+      )
       policy.script_src(JSDELIVR_CDN)
       policy.frame_ancestors(:self)
     end
-
-    # cant get turbo to not output a csp error
-    # although turbo will work just fine even with this error
-    content_security_policy false if Rails.env == "test"
 
     before_action do
       request.content_security_policy_nonce_generator ||=
