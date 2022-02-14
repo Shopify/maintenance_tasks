@@ -1,87 +1,90 @@
 <% content_for :page_title, @task %>
 
-<h1 class="title is-1">
-  <%= @task %> <%= status_tag(@task.status) %>
-</h1>
+<turbo-frame id="task">
+  <h1 class="title is-1">
+    <%= @task %> <%= status_tag(@task.status) %>
+    <%= link_to "update", request.url, class: "button" %>
+  </h1>
 
-<% last_run = @task.last_run %>
-<% if last_run %>
-  <h5 class="title is-5">
-    <%= time_tag last_run.created_at, title: last_run.created_at %>
-  </h5>
+  <% last_run = @task.last_run %>
+  <% if last_run %>
+    <h5 class="title is-5">
+      <%= time_tag last_run.created_at, title: last_run.created_at %>
+    </h5>
 
-  <%= progress last_run %>
+    <%= progress last_run %>
 
-  <div class="content">
-    <%= render "maintenance_tasks/runs/info/#{last_run.status}", run: last_run %>
-  </div>
+    <div class="content">
+      <%= render "maintenance_tasks/runs/info/#{last_run.status}", run: last_run %>
+    </div>
 
-  <div class="content" id="custom-content">
-    <%= render "maintenance_tasks/runs/info/custom", run: last_run %>
-  </div>
+    <div class="content" id="custom-content">
+      <%= render "maintenance_tasks/runs/info/custom", run: last_run %>
+    </div>
 
-  <%= render "maintenance_tasks/runs/csv", run: last_run %>
-  <%= tag.hr if last_run.csv_file.present? %>
-  <%= render "maintenance_tasks/runs/arguments", run: last_run %>
-  <%= tag.hr if last_run.arguments.present? %>
-<% end %>
+    <%= render "maintenance_tasks/runs/csv", run: last_run %>
+    <%= tag.hr if last_run.csv_file.present? %>
+    <%= render "maintenance_tasks/runs/arguments", run: last_run %>
+    <%= tag.hr if last_run.arguments.present? %>
+  <% end %>
 
-<div class="buttons">
-  <% if last_run.nil? || last_run.completed? %>
-    <%= form_with url: run_task_path(@task), method: :put do |form| %>
-      <% if @task.csv_task? %>
-        <div class="block">
-          <%= form.label :csv_file %>
-          <%= form.file_field :csv_file %>
-        </div>
-      <% end %>
-      <% parameter_names = @task.parameter_names %>
-      <% if parameter_names.any? %>
-        <div class="block">
-          <%= form.fields_for :task_arguments, @task.new do |ff| %>
-            <% parameter_names.each do |parameter_name| %>
-              <div class="field">
-                <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
-                <div class="control">
-                  <%= parameter_field(ff, parameter_name) %>
+  <div class="buttons">
+    <% if last_run.nil? || last_run.completed? %>
+      <%= form_with url: run_task_path(@task), method: :put, data: {turbo: false} do |form| %>
+        <% if @task.csv_task? %>
+          <div class="block">
+            <%= form.label :csv_file %>
+            <%= form.file_field :csv_file %>
+          </div>
+        <% end %>
+        <% parameter_names = @task.parameter_names %>
+        <% if parameter_names.any? %>
+          <div class="block">
+            <%= form.fields_for :task_arguments, @task.new do |ff| %>
+              <% parameter_names.each do |parameter_name| %>
+                <div class="field">
+                  <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
+                  <div class="control">
+                    <%= parameter_field(ff, parameter_name) %>
+                  </div>
                 </div>
-              </div>
+              <% end %>
             <% end %>
-          <% end %>
+          </div>
+        <% end %>
+        <%= render "maintenance_tasks/tasks/custom", form: form %>
+        <div class="block">
+          <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
         </div>
       <% end %>
-      <%= render "maintenance_tasks/tasks/custom", form: form %>
-      <div class="block">
-        <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
-      </div>
-    <% end %>
-  <% elsif last_run.cancelling? %>
-    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
-    <% if last_run.stuck? %>
-      <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
-    <% end %>
-  <% elsif last_run.pausing? %>
-    <%= button_to 'Pausing', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: true %>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
-  <% elsif last_run.paused? %>
-    <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
-  <% else %>
-    <%= button_to 'Pause', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
-  <% end%>
-</div>
+    <% elsif last_run.cancelling? %>
+      <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true, data: {turbo: false} %>
+      <% if last_run.stuck? %>
+        <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', disabled: @task.deleted?, data: {turbo: false} %>
+      <% end %>
+    <% elsif last_run.pausing? %>
+      <%= button_to 'Pausing', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: true, data: {turbo: false} %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', data: {turbo: false} %>
+    <% elsif last_run.paused? %>
+      <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: @task.deleted?, data: {turbo: false} %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', data: {turbo: false} %>
+    <% else %>
+      <%= button_to 'Pause', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: @task.deleted?, data: {turbo: false} %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', data: {turbo: false} %>
+    <% end%>
+  </div>
 
-<% if (code = @task.code) %>
-  <pre><code><%= highlight_code(code) %></code></pre>
-<% end %>
+  <% if (code = @task.code) %>
+    <pre><code><%= highlight_code(code) %></code></pre>
+  <% end %>
 
-<% if @runs_page.records.present? %>
-  <hr/>
+  <% if @runs_page.records.present? %>
+    <hr/>
 
-  <h4 class="title is-4">Previous Runs</h4>
+    <h4 class="title is-4">Previous Runs</h4>
 
-  <%= render @runs_page.records %>
+    <%= render @runs_page.records %>
 
-  <%= link_to "Next page", task_path(@task, cursor: @runs_page.next_cursor) unless @runs_page.last? %>
-<% end %>
+    <%= link_to "Next page", task_path(@task, cursor: @runs_page.next_cursor) unless @runs_page.last? %>
+  <% end %>
+</turbo-frame>

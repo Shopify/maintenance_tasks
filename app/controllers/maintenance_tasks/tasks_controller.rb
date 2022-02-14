@@ -7,8 +7,6 @@ module MaintenanceTasks
   #
   # @api private
   class TasksController < ApplicationController
-    before_action :set_refresh, only: [:index]
-
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
     def index
@@ -19,7 +17,6 @@ module MaintenanceTasks
     # Shows running and completed instances of the Task.
     def show
       @task = TaskData.find(params.fetch(:id))
-      set_refresh if @task.last_run&.active?
       @runs_page = RunsPage.new(@task.previous_runs, params[:cursor])
     end
 
@@ -39,12 +36,6 @@ module MaintenanceTasks
       redirect_to(task_path(task_name), alert: error.message)
     rescue Runner::EnqueuingError => error
       redirect_to(task_path(error.run.task_name), alert: error.message)
-    end
-
-    private
-
-    def set_refresh
-      @refresh = 3
     end
   end
 end

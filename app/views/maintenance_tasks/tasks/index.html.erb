@@ -8,15 +8,40 @@
   </div>
 <% else %>
   <% if active_tasks = @available_tasks[:active] %>
-    <h3 class="title is-3">Active Tasks</h3>
-    <%= render partial: 'task', collection: active_tasks %>
+    <turbo-frame id="active_tasks">
+      <div class="is-flex">
+        <h3 class="title is-3">
+          Active Tasks
+        </h3>
+        <%= link_to "update", root_path, class: "button" %>
+      </div>
+      <%= render partial: 'task', collection: active_tasks %>
+    </turbo-frame>
+    <br>
   <% end %>
   <% if new_tasks = @available_tasks[:new] %>
-    <h3 class="title is-3">New Tasks</h3>
-    <%= render partial: 'task', collection: new_tasks %>
+    <turbo-frame id="new_tasks">
+      <div class="is-flex">
+        <h3 class="title is-3">
+          New Tasks
+        </h3>
+        <%= link_to "update", root_path, class: "button" %>
+      </div>
+      <%= render partial: 'task', collection: new_tasks %>
+    </turbo-frame>
+    <br>
   <% end %>
   <% if completed_tasks = @available_tasks[:completed] %>
-    <h3 class="title is-3">Completed Tasks</h3>
-    <%= render partial: 'task', collection: completed_tasks %>
+    <turbo-frame id="completed_tasks">
+      <div class="is-flex">
+        <h3 class="title is-3">
+          Completed Tasks
+        </h3>
+        <%= link_to "update", root_path, class: "button" %>
+      </div>
+      <div id="completed_tasks">
+        <%= render partial: 'task', collection: completed_tasks %>
+      </div>
+    </turbo-frame>
   <% end %>
 <% end %>

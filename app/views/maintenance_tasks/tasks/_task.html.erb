@@ -1,6 +1,6 @@
 <div class="box">
   <h3 class="title is-3">
-    <%= link_to task, task_path(task) %>
+    <%= link_to task, task_path(task), data: {turbo_frame: "_top"} %>
     <%= status_tag(task.status) %>
   </h3>
 
