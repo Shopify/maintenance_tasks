@@ -10,15 +10,11 @@ module MaintenanceTasks
     content_security_policy do |policy|
       policy.style_src(
         JSDELIVR_CDN,
-        # https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es2017-umd.js
-        # line 1188
+        # https://github.com/hotwired/turbo/blob/201f8b3260bfbc15635d24c9961ff027747fb046/src/core/drive/progress_bar.ts#L66
+        # https://github.com/hotwired/turbo/pull/501
         "'sha256-rql2tlBWA4Hb3HHbUfw797urk+ifBd6EAovoOUGt0oI='",
-        # https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es2017-umd.js
-        # line 334
-        "'sha256-y9V0na/WU44EUNI/HDP7kZ7mfEci4PAOIjYOOan6JMA='",
-        # https://cdn.jsdelivr.net/npm/@hotwired/turbo@7.1.0/dist/turbo.es2017-umd.js
-        # line 334
-        "'sha256-VELoZazE4c2GJUpn8GbzkTIBqEEuvRmGtUwrKI578Ak='",
+        # ruby highlight inline style in applcation.html.erb
+        "'sha256-ZKMT34GDkdZirz8F7qMQsvFYVJqdYSQfNGCP1BX1VbY='",
       )
       policy.script_src(JSDELIVR_CDN)
       policy.frame_ancestors(:self)
