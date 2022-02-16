@@ -57,7 +57,7 @@ module MaintenanceTasks
       job = instantiate_job(run)
       run.job_id = job.job_id
       yield run if block_given?
-      enqueue(run, job)
+      enqueue(run, job) unless run.enqueued?
       run.enqueued!
       Task.named(name)
     end
