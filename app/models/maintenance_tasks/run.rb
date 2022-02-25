@@ -424,7 +424,7 @@ module MaintenanceTasks
     end
 
     def truncate(attribute_name, value)
-      limit = MaintenanceTasks::Run.column_for_attribute(attribute_name).limit
+      limit = self.class.column_for_attribute(attribute_name).limit
       return value unless limit
       value&.first(limit)
     end
