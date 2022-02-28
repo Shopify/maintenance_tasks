@@ -70,7 +70,8 @@ module MaintenanceTasks
     #
     # @return [String] the description of the time running attribute.
     def time_running_in_words(run)
-      distance_of_time_in_words(0, run.time_running, include_seconds: true)
+      time_running = run.started_at + run.time_running.seconds
+      distance_of_time_in_words(run.started_at, time_running, include_seconds: true)
     end
 
     # Very simple syntax highlighter based on Ripper.

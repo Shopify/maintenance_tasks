@@ -55,6 +55,7 @@ module MaintenanceTasks
     end
 
     test "#time_running_in_words reports the approximate time running of the given Run" do
+      @run.started_at = Time.now
       @run.time_running = 182.5
       assert_equal "3 minutes", time_running_in_words(@run)
     end
