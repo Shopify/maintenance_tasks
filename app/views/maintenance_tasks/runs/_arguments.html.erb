@@ -3,11 +3,11 @@
     <h6 class="title is-6">Arguments:</h6>
     <table class="table">
       <tbody>
-        <% run.arguments.each do |key, value| %>
+        <% run.arguments.transform_values(&:to_s).each do |key, value| %>
           <tr>
             <td class="is-family-monospace"><%= key %></td>
             <td>
-              <% next if value.nil? || value.empty? %>
+              <% next if value.empty? %>
               <% if value.include?("\n") %>
                 <pre><%= value %><pre>
               <% else %>
