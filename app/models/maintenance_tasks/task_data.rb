@@ -73,6 +73,7 @@ module MaintenanceTasks
     # @return [nil] if the Task file was deleted.
     def code
       return if deleted?
+
       task = Task.named(name)
       file = if Object.respond_to?(:const_source_location)
         Object.const_source_location(task.name).first
@@ -88,6 +89,7 @@ module MaintenanceTasks
     # @return [nil] if there are no Runs associated with the Task.
     def last_run
       return @last_run if defined?(@last_run)
+
       @last_run = runs.first
     end
 
@@ -100,6 +102,7 @@ module MaintenanceTasks
     #   record previous to the last Run.
     def previous_runs
       return Run.none unless last_run
+
       runs.where.not(id: last_run.id)
     end
 
@@ -150,6 +153,7 @@ module MaintenanceTasks
     # @return [nil] if the Task file was deleted.
     def new
       return if deleted?
+
       MaintenanceTasks::Task.named(name).new
     end
 

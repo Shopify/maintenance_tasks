@@ -52,6 +52,7 @@ module MaintenanceTasks
     # Ensure ActiveStorage is in use before preloading the attachments
     scope :with_attached_csv, -> do
       return unless defined?(ActiveStorage)
+
       with_attached_csv_file if ActiveStorage::Attachment.table_exists?
     end
 
@@ -240,6 +241,7 @@ module MaintenanceTasks
         # Preserve swap-and-replace solution for data races until users
         # run migration to upgrade to optimistic locking solution
         return if stopping?
+
         updated = self.class.where(id: id).where.not(status: STOPPING_STATUSES)
           .update_all(status: :running, updated_at: Time.now) > 0
         if updated
@@ -384,6 +386,7 @@ module MaintenanceTasks
     def csv_file
       return unless defined?(ActiveStorage)
       return unless ActiveStorage::Attachment.table_exists?
+
       super
     end
 
@@ -426,6 +429,7 @@ module MaintenanceTasks
     def truncate(attribute_name, value)
       limit = self.class.column_for_attribute(attribute_name).limit
       return value unless limit
+
       value&.first(limit)
     end
   end

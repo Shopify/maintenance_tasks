@@ -47,6 +47,7 @@ module MaintenanceTasks
             a batch enumerator with the "start" or "finish" options.
           MSG
         end
+
         # For now, only support automatic count based on the enumerator for
         # batches
         @enumerator = enumerator_builder.active_record_on_batch_relations(

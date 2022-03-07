@@ -66,6 +66,7 @@ module MaintenanceTasks
   # @private
   def self.error_handler
     return @error_handler if defined?(@error_handler)
+
     @error_handler = ->(_error, _task_context, _errored_element) {}
   end
 

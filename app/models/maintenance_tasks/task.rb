@@ -38,6 +38,7 @@ module MaintenanceTasks
         unless task.is_a?(Class) && task < Task
           raise NotFoundError.new("#{name} is not a Task.", name)
         end
+
         task
       end
 
@@ -172,6 +173,7 @@ module MaintenanceTasks
       def load_constants
         namespace = MaintenanceTasks.tasks_module.safe_constantize
         return unless namespace
+
         namespace.constants.map { |constant| namespace.const_get(constant) }
       end
     end
