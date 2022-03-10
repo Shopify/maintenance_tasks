@@ -407,6 +407,22 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test ".perform_now with a throttle doesn't enqueue a job if run is stopping" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsThrottledTask")
+      Maintenance::UpdatePostsThrottledTask.any_instance
+        .expects(:process).once.with do
+        run.cancelling!
+        Maintenance::UpdatePostsThrottledTask.throttle = true
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_predicate(run.reload, :cancelled?)
+      assert_empty(enqueued_jobs)
+    ensure
+      Maintenance::UpdatePostsThrottledTask.throttle = false
+    end
+
     test ".perform_now makes arguments supplied for Task parameters available" do
       post = Post.last
       Maintenance::ParamsTask.any_instance.expects(:process).once.with(post)

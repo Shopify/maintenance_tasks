@@ -152,7 +152,7 @@ module MaintenanceTasks
     def after_perform
       @run.persist_transition
       if defined?(@reenqueue_iteration_job) && @reenqueue_iteration_job
-        reenqueue_iteration_job(should_ignore: false)
+        reenqueue_iteration_job(should_ignore: false) unless @run.stopped?
       end
     end
 
