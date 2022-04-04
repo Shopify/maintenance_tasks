@@ -118,6 +118,33 @@ The files uploaded to your Active Storage service provider will be renamed
 to include an ISO8601 timestamp and the Task name in snake case format.
 The CSV is expected to have a trailing newline at the end of the file.
 
+#### Batch CSV Tasks
+
+Tasks can process CSVs in batches. Add the `in_batches` option to your task's
+`csv_collection` macro:
+
+```ruby
+# app/tasks/maintenance/batch_import_posts_task.rb
+
+module Maintenance
+  class BatchImportPostsTask < MaintenanceTasks::Task
+    csv_collection(in_batches: 50)
+
+    def process(batch_of_rows)
+      Post.insert_all(post_rows.map(&:to_h))
+    end
+  end
+end
+```
+
+As with a regular CSV task, ensure you've implemented the following method:
+
+* `process`: do the work of your Task on a batch (array of `CSV::Row` objects).
+
+Note that `#count` is calculated automatically based on the number of batches in
+your collection, and your Task's progress will be displayed in terms of batches
+(not the total number of rows in your CSV).
+
 ### Processing Batch Collections
 
 The Maintenance Tasks gem supports processing Active Records in batches. This

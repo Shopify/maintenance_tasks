@@ -263,6 +263,17 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test ".perform_now accepts a CSV collection to be performed in batches" do
+      Maintenance::BatchImportPostsTask.any_instance.expects(:process).times(3)
+
+      run = Run.new(task_name: "Maintenance::BatchImportPostsTask")
+      run.csv_file.attach(
+        { io: File.open(file_fixture("sample.csv")), filename: "sample.csv" }
+      )
+      run.save
+      TaskJob.perform_now(run)
+    end
+
     test ".perform_now sets the Run as errored when the Task collection is invalid" do
       freeze_time
       Maintenance::TestTask.any_instance.stubs(collection: "not a collection")
