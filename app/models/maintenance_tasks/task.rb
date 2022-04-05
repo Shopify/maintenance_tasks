@@ -53,16 +53,23 @@ module MaintenanceTasks
 
       # Make this Task a task that handles CSV.
       #
+      # @param in_batches [Integer] optionally, supply a batch size if the CSV
+      # should be processed in batches.
+      #
       # An input to upload a CSV will be added in the form to start a Run. The
       # collection and count method are implemented.
-      def csv_collection
+      def csv_collection(in_batches: nil)
         unless defined?(ActiveStorage)
           raise NotImplementedError, "Active Storage needs to be installed\n"\
             "To resolve this issue run: bin/rails active_storage:install"
         end
 
-        self.collection_builder_strategy =
-          MaintenanceTasks::CsvCollectionBuilder.new
+        if in_batches
+          self.collection_builder_strategy =
+            BatchCsvCollectionBuilder.new(in_batches)
+        else
+          self.collection_builder_strategy = CsvCollectionBuilder.new
+        end
       end
 
       # Make this a Task that calls #process once, instead of iterating over

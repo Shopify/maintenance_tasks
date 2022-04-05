@@ -22,6 +22,7 @@ module MaintenanceTasks
 
     test ".available_tasks returns a list of Tasks as TaskData, ordered alphabetically by name" do
       expected = [
+        "Maintenance::BatchImportPostsTask",
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
         "Maintenance::EnqueueErrorTask",

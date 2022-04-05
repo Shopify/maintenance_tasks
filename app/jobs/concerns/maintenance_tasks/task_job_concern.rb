@@ -57,6 +57,11 @@ module MaintenanceTasks
         )
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor)
+      when BatchCsvCollectionBuilder::BatchCsv
+        JobIteration::CsvEnumerator.new(collection.csv).batches(
+          batch_size: collection.batch_size,
+          cursor: cursor,
+        )
       when CSV
         JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
       else
