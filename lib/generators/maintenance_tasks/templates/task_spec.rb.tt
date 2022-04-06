@@ -1,12 +1,12 @@
 # frozen_string_literal: true
-require 'rails_helper'
+require "rails_helper"
 
 module <%= tasks_module %>
 <% module_namespacing do -%>
   RSpec.describe <%= class_name %>Task do
     describe "#process" do
       subject(:process) { described_class.process(element) }
-      let(:element) { 
+      let(:element) {
         # Object to be processed in a single iteration of this task
       }
       pending "add some examples to (or delete) #{__FILE__}"
