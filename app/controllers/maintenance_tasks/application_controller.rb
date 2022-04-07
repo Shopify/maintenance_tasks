@@ -8,7 +8,12 @@ module MaintenanceTasks
     BULMA_CDN = "https://cdn.jsdelivr.net"
 
     content_security_policy do |policy|
-      policy.style_src(BULMA_CDN)
+      policy.style_src(
+        BULMA_CDN,
+        # ruby syntax highlighting
+        "'sha384-" \
+          "MJ6MP7wjBI68eI1gLBSKU86HYHooeOnBdlmsV/RfzritEYu5Xaa1vROm+3dkbeZt'",
+      )
       policy.frame_ancestors(:self)
     end
 
