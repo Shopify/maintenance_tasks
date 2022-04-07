@@ -10,7 +10,7 @@ Rails.application.config.content_security_policy do |policy|
   policy.base_uri(:none)
   policy.default_src(:self)
   policy.object_src(:none)
-  policy.script_src(:self, :strict_dynamic)
+  policy.script_src(:none)
   policy.frame_ancestors(:none)
 
   policy.block_all_mixed_content
