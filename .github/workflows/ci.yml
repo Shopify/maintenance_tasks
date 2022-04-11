@@ -44,7 +44,7 @@ jobs:
     - name: RuboCop
       run: bundle exec rubocop
     - name: Archive system test artifacts
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       if: failure()
       with:
         name: screenshots
