@@ -15,10 +15,10 @@
     <%= csrf_meta_tags %>
 
     <%=
-      stylesheet_link_tag URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.3/css/bulma.css'),
+      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.3/css/bulma.css'),
         media: :all,
         integrity: 'sha384-Zkr9rpl37lclZu6AwYQZZm0CxiMqLZFiibodW+UXLnAWPBr6qgIzPpcmHkpwnyWD',
-        crossorigin: 'anonymous'
+        crossorigin: 'anonymous') if request.headers.key?('Sec-Fetch-User')
     %>
 
     <style>
@@ -32,7 +32,19 @@
     </style>
 
     <% if defined?(@refresh) %>
-      <meta http-equiv="refresh" content="<%= @refresh %>">
+      <script>
+        function refresh() {
+          fetch(document.location).then(
+            async response => {
+              const text = await response.text()
+              const newDocument = new DOMParser().parseFromString(text, "text/html")
+              document.body.replaceWith(newDocument.body)
+            },
+            error => location.reload()
+          )
+        }
+        window.setInterval(refresh, <%= @refresh * 1000 %>)
+      </script>
     <% end %>
   </head>
 

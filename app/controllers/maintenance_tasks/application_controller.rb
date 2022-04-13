@@ -14,6 +14,10 @@ module MaintenanceTasks
         "'sha384-" \
           "MJ6MP7wjBI68eI1gLBSKU86HYHooeOnBdlmsV/RfzritEYu5Xaa1vROm+3dkbeZt'",
       )
+      policy.script_src(
+        # page refresh script
+        "'sha256-fADwJN++FN9LuhJ4XRCiIoJ7KPwmDYx2qiBgm20D8rA='",
+      )
       policy.frame_ancestors(:self)
     end
 
