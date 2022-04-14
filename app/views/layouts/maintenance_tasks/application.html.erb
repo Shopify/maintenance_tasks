@@ -18,7 +18,7 @@
       stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.3/css/bulma.css'),
         media: :all,
         integrity: 'sha384-Zkr9rpl37lclZu6AwYQZZm0CxiMqLZFiibodW+UXLnAWPBr6qgIzPpcmHkpwnyWD',
-        crossorigin: 'anonymous') if request.headers.key?('Sec-Fetch-User')
+        crossorigin: 'anonymous') unless request.xhr?
     %>
 
     <style>
@@ -34,7 +34,7 @@
     <% if defined?(@refresh) %>
       <script>
         function refresh() {
-          fetch(document.location).then(
+          fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } }).then(
             async response => {
               const text = await response.text()
               const newDocument = new DOMParser().parseFromString(text, "text/html")
