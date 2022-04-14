@@ -44,7 +44,7 @@ module MaintenanceTasks
     private
 
     def set_refresh
-      @refresh = 3
+      @refresh = true
     end
   end
 end
