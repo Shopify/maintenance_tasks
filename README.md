@@ -8,9 +8,9 @@ A Rails engine for queuing and managing maintenance tasks.
 
 To install the gem and run the install generator, execute:
 
-```bash
-$ bundle add maintenance_tasks
-$ bin/rails generate maintenance_tasks:install
+```sh-session
+bundle add maintenance_tasks
+bin/rails generate maintenance_tasks:install
 ```
 
 The generator creates and runs a migration to add the necessary table to your
@@ -39,8 +39,8 @@ take a look at the [Active Job documentation][active-job-docs].
 
 A generator is provided to create tasks. Generate a new task by running:
 
-```bash
-$ bin/rails generate maintenance_tasks:task update_posts
+```sh-session
+bin/rails generate maintenance_tasks:task update_posts
 ```
 
 This creates the task file `app/tasks/maintenance/update_posts_task.rb`.
@@ -86,8 +86,8 @@ instuctions][setup].
 
 Generate a CSV Task by running:
 
-```bash
-$ bin/rails generate maintenance_tasks:task import_posts --csv
+```sh-session
+bin/rails generate maintenance_tasks:task import_posts --csv
 ```
 
 The generated task is a subclass of `MaintenanceTasks::Task` that implements:
@@ -195,8 +195,8 @@ collection-less tasks.
 
 Generate a collection-less Task by running:
 
-```bash
-$ bin/rails generate maintenance_tasks:task no_collection_task --no-collection
+```sh-session
+bin/rails generate maintenance_tasks:task no_collection_task --no-collection
 ```
 
 The generated task is a subclass of `MaintenanceTasks::Task` that implements:
@@ -483,21 +483,21 @@ You can run your new Task by accessing the Web UI and clicking on "Run".
 
 Alternatively, you can run your Task in the command line:
 
-```bash
-$ bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
+```sh-session
+bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
 ```
 
 To run a Task that processes CSVs from the command line, use the --csv option:
 
-```bash
-$ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path/to/my_csv.csv"
+```sh-session
+bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path/to/my_csv.csv"
 ```
 
 To run a Task that takes arguments from the command line, use the --arguments
 option, passing arguments as a set of \<key>:\<value> pairs:
 
-```bash
-$ bundle exec maintenance_tasks perform Maintenance::ParamsTask \
+```sh-session
+bundle exec maintenance_tasks perform Maintenance::ParamsTask \
   --arguments post_ids:1,2,3 content:"Hello, World!"
 ```
 
@@ -745,8 +745,8 @@ clean backtraces.
 Use bundler to check for and upgrade to newer versions. After installing a new
 version, re-run the install command:
 
-```bash
-$ bin/rails generate maintenance_tasks:install
+```sh-session
+bin/rails generate maintenance_tasks:install
 ```
 
 This ensures that new migrations are installed and run as well.
