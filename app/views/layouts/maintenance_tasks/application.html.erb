@@ -15,10 +15,10 @@
     <%= csrf_meta_tags %>
 
     <%=
-      stylesheet_link_tag URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.3/css/bulma.css'),
+      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.3/css/bulma.css'),
         media: :all,
         integrity: 'sha384-Zkr9rpl37lclZu6AwYQZZm0CxiMqLZFiibodW+UXLnAWPBr6qgIzPpcmHkpwnyWD',
-        crossorigin: 'anonymous'
+        crossorigin: 'anonymous') unless request.xhr?
     %>
 
     <style>
@@ -31,12 +31,26 @@
       .ruby-label, .ruby-tstring-beg, .ruby-tstring-content, .ruby-tstring-end { color: #032f62; }
     </style>
 
-    <% if defined?(@refresh) %>
-      <meta http-equiv="refresh" content="<%= @refresh %>">
-    <% end %>
+    <script>
+      function refresh() {
+        if (!("refresh" in document.body.dataset)) return
+        window.setTimeout(() => {
+          fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } }).then(
+            async response => {
+              const text = await response.text()
+              const newDocument = new DOMParser().parseFromString(text, "text/html")
+              document.body.replaceWith(newDocument.body)
+              refresh()
+            },
+            error => location.reload()
+          )
+        }, 3000)
+      }
+      document.addEventListener('DOMContentLoaded', refresh)
+    </script>
   </head>
 
-  <body>
+  <body <%= "data-refresh" if defined?(@refresh) && @refresh %>>
     <%= render 'layouts/maintenance_tasks/navbar' %>
 
     <section class="section">
