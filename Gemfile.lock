@@ -113,7 +113,7 @@ GEM
     mini_mime (1.1.2)
     mini_portile2 (2.8.0)
     minitest (5.15.0)
-    mocha (1.13.0)
+    mocha (1.14.0)
     net-imap (0.2.3)
       digest
       net-protocol
