@@ -33,6 +33,13 @@ take a look at the [Active Job documentation][active-job-docs].
 [async-adapter]: https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/AsyncAdapter.html
 [active-job-docs]: https://guides.rubyonrails.org/active_job_basics.html#setting-the-backend
 
+
+### Autoloading
+
+The Maintenance Tasks framework does not support autoloading in `:classic` mode.
+Please ensure your application is using [Zeitwerk](https://github.com/fxn/zeitwerk) to load your code.
+For more information, please consult the [Rails guides on autoloading and reloading constants](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html).
+
 ## Usage
 
 ### Creating a Task
