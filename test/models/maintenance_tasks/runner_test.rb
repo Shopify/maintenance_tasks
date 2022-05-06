@@ -167,12 +167,5 @@ module MaintenanceTasks
     def csv_io
       { io: File.open(@csv), filename: "sample.csv" }
     end
-
-    test "#new raises deprecation warning and returns self" do
-      dep_msg = "Use Runner.run instead of Runner.new.run"
-      assert_deprecated(dep_msg) do
-        assert_equal Runner, Runner.new
-      end
-    end
   end
 end
