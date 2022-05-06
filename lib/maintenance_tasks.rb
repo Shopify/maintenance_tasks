@@ -63,27 +63,6 @@ module MaintenanceTasks
   #     use when cleaning a Run's backtrace.
   mattr_accessor :backtrace_cleaner
 
-  # @private
-  def self.error_handler
-    return @error_handler if defined?(@error_handler)
-
-    @error_handler = ->(_error, _task_context, _errored_element) {}
-  end
-
-  # @private
-  def self.error_handler=(error_handler)
-    unless error_handler.arity == 3
-      ActiveSupport::Deprecation.warn(
-        "MaintenanceTasks.error_handler should be a lambda that takes three "\
-          "arguments: error, task_context, and errored_element."
-      )
-      @error_handler = ->(error, _task_context, _errored_element) do
-        error_handler.call(error)
-      end
-    end
-    @error_handler = error_handler
-  end
-
   # @!attribute error_handler
   #   @scope class
   #
@@ -91,4 +70,6 @@ module MaintenanceTasks
   #   {file:README#label-Customizing+the+error+handler} for details.
   #
   #   @return [Proc] the callback to perform when an error occurs in the Task.
+  mattr_accessor :error_handler, default:
+    ->(_error, _task_context, _errored_element) {}
 end
