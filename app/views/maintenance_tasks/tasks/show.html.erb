@@ -31,6 +31,11 @@
     <%= form_with url: run_task_path(@task), method: :put do |form| %>
       <% if @task.csv_task? %>
         <div class="block">
+          <%  if @task.has_csv_sample? %>
+            <div>
+              <%= link_to("Download CSV Sample", sample_csv_task_path(@task)) %>
+            </div>
+          <% end %>
           <%= form.label :csv_file %>
           <%= form.file_field :csv_file %>
         </div>

@@ -140,6 +140,16 @@ module MaintenanceTasks
       !deleted? && Task.named(name).has_csv_content?
     end
 
+    # @return [String] CSV sample.
+    def csv_sample_content
+      Task.named(name).csv_sample_content
+    end
+
+    # @return [Boolean] whether the Task has a CSV sample.
+    def has_csv_sample?
+      Task.named(name).has_csv_sample?
+    end
+
     # @return [Array<String>] the names of parameters the Task accepts.
     def parameter_names
       if deleted?

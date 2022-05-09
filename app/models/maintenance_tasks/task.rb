@@ -22,6 +22,8 @@ module MaintenanceTasks
     class_attribute :collection_builder_strategy,
       default: NullCollectionBuilder.new
 
+    class_attribute :csv_sample
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
@@ -72,6 +74,15 @@ module MaintenanceTasks
         end
       end
 
+      # Sets the CSV sample for the task.
+      def csv_sample(sample)
+        self.collection_builder_strategy.csv_sample = sample
+      end
+
+      def csv_sample_content
+        self.collection_builder_strategy.csv_sample
+      end
+
       # Make this a Task that calls #process once, instead of iterating over
       # a collection.
       def no_collection
@@ -79,7 +90,7 @@ module MaintenanceTasks
           MaintenanceTasks::NoCollectionBuilder.new
       end
 
-      delegate :has_csv_content?, :no_collection?,
+      delegate :has_csv_content?, :no_collection?, :has_csv_sample?,
         to: :collection_builder_strategy
 
       # Processes one item.

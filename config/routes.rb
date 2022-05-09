@@ -4,6 +4,7 @@ MaintenanceTasks::Engine.routes.draw do
   resources :tasks, only: [:index, :show], format: false do
     member do
       put "run"
+      get "csv_sample"
     end
 
     resources :runs, only: [], format: false do

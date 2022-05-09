@@ -41,6 +41,19 @@ module MaintenanceTasks
       redirect_to(task_path(error.run.task_name), alert: error.message)
     end
 
+    # Downloads the CSV sample
+    def csv_sample
+      task = TaskData.find(params.fetch(:id))
+      filename = "#{task.name.demodulize.underscore}_template.csv"
+
+      send_data(
+        task.csv_sample_content,
+        type: "text/csv",
+        disposition: "attachment",
+        filename: filename,
+      )
+    end
+
     private
 
     def set_refresh

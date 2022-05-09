@@ -34,5 +34,17 @@ module MaintenanceTasks
     def no_collection?
       false
     end
+
+    def has_csv_sample?
+      false
+    end
+
+    def csv_sample
+      raise NotImplementedError, "Only CSV tasks can have a sample CSV"
+    end
+
+    def csv_sample=(_sample)
+      raise NotImplementedError, "Only CSV tasks can have a sample CSV"
+    end
   end
 end

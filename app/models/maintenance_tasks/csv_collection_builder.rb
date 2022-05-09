@@ -7,6 +7,8 @@ module MaintenanceTasks
   #
   # @api private
   class CsvCollectionBuilder
+    attr_accessor :csv_sample
+
     # Defines the collection to be iterated over, based on the provided CSV.
     #
     # @return [CSV] the CSV object constructed from the specified CSV content,
@@ -33,6 +35,14 @@ module MaintenanceTasks
     # Returns that the Task processes a collection.
     def no_collection?
       false
+    end
+
+    # Checks if CSV sample is present on the task.
+    #
+    # @return [boolean] true if sample is present, false otherwise.
+
+    def has_csv_sample?
+      csv_sample.present?
     end
   end
 end
