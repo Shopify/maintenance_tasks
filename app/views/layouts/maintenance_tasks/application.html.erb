@@ -54,7 +54,7 @@
     </script>
   </head>
 
-  <body <%= "data-refresh" if defined?(@refresh) && @refresh %>>
+  <%= tag.body(data: { refresh: defined?(@refresh) && @refresh }) do %>
     <%= render 'layouts/maintenance_tasks/navbar' %>
 
     <section class="section">
@@ -68,5 +68,5 @@
         <%= yield %>
       </div>
     </div>
-  </body>
+  <% end %>
 </html>

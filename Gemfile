@@ -4,6 +4,7 @@ source "https://rubygems.org"
 
 gemspec
 
+gem "better_html"
 gem "capybara"
 gem "mocha"
 gem "net-smtp" # mail is missing a dependency on net-smtp https://github.com/mikel/mail/pull/1439
