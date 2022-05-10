@@ -83,6 +83,12 @@ module MaintenanceTasks
       File.read(file)
     end
 
+    def collection_preview
+      task = Task.named(name)
+
+      task.collection
+    end
+
     # Retrieves the latest Run associated with the Task.
     #
     # @return [MaintenanceTasks::Run] the Run record.

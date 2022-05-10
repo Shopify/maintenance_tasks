@@ -53,6 +53,7 @@
       <%= render "maintenance_tasks/tasks/custom", form: form %>
       <div class="block">
         <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
+        <%= link_to 'Preview', '/', class: "button is-info is-light", disabled: @task.deleted? %>
       </div>
     <% end %>
   <% elsif last_run.cancelling? %>
