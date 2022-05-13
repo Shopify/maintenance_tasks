@@ -401,6 +401,20 @@ depend on the queue adapter but in general, you should follow these rules:
 
 [sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
 
+#### Task object life cycle and memoization
+
+When the Task runs or resumes, the Runner enqueues a job, which processes the
+Task. That job will instantiate a Task object which will live for the duration
+of the job. The first time the job runs, it will call `count`. Every time a job
+runs, it will call `collection` on the Task object, and then `process`
+for each item in the collection, until the job stops. The job stops when either the
+collection is finished processing or after the maximum job runtime has expired.
+
+This means memoization can be misleading within `process`, since the memoized
+values will be available for subsequent calls to `process` within the same job.
+Still, memoization can be used for throttling or reporting, and you can use [Task
+callbacks](#using-task-callbacks) to persist or log a report for example.
+
 ### Writing tests for a Task
 
 The task generator will also create a test file for your task in the folder
