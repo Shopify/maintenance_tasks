@@ -588,9 +588,9 @@ Running tasks will also be interrupted and re-enqueued when needed. For example
 
 When Sidekiq is stopping, it will give workers 25 seconds to finish before
 forcefully terminating them (this is the default but can be configured with the
-`--timeout` option).  Before the worker threads are terminated, Sidekiq will try
-to re-enqueue the job so your Task will be resumed. However, the position in the
-collection won't be persisted so at least one iteration may run again.
+`--timeout` option). Before the worker threads are terminated, Sidekiq will try
+to re-enqueue the job so your Task will be resumed. However, the position in
+the collection won't be persisted so at least one iteration may run again.
 
 #### Help! My Task is stuck
 
@@ -764,7 +764,7 @@ The install command will attempt to reinstall these old migrations and migrating
 the database will cause problems. Use `bin/rails
 maintenance_tasks:install:migrations` to copy the gem's migrations to your
 `db/migrate` folder. Check the release notes to see if any new migrations were
-added since your last gem upgrade.  Ensure that these are kept, but remove any
+added since your last gem upgrade. Ensure that these are kept, but remove any
 migrations that already ran.
 
 Run the migrations using `bin/rails db:migrate`.
