@@ -573,7 +573,7 @@ By default, a running Task will be interrupted after running for more 5 minutes.
 This is [configured in the `job-iteration` gem][max-job-runtime] and can be
 tweaked in an initializer if necessary.
 
-[max-job-runtime]: https://github.com/Shopify/job-iteration/blob/master/guides/best-practices.md#max-job-runtime
+[max-job-runtime]: https://github.com/Shopify/job-iteration/blob/-/guides/best-practices.md#max-job-runtime
 
 Running tasks will also be interrupted and re-enqueued when needed. For example
 [when Sidekiq workers shuts down for a deploy][sidekiq-deploy]:
