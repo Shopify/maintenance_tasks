@@ -401,6 +401,20 @@ depend on the queue adapter but in general, you should follow these rules:
 
 [sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
 
+#### Task object life cycle and memoization
+
+When the Task runs or resumes, the Runner enqueues a job, which processes the
+Task. That job will instantiate a Task object which will live for the duration
+of the job. The first time the job runs, it will call `count`. Every time a job
+runs, it will call `collection` on the Task object, and then `process`
+for each item in the collection, until the job stops. The job stops when either the
+collection is finished processing or after the maximum job runtime has expired.
+
+This means memoization can be misleading within `process`, since the memoized
+values will be available for subsequent calls to `process` within the same job.
+Still, memoization can be used for throttling or reporting, and you can use [Task
+callbacks](#using-task-callbacks) to persist or log a report for example.
+
 ### Writing tests for a Task
 
 The task generator will also create a test file for your task in the folder
@@ -573,7 +587,7 @@ By default, a running Task will be interrupted after running for more 5 minutes.
 This is [configured in the `job-iteration` gem][max-job-runtime] and can be
 tweaked in an initializer if necessary.
 
-[max-job-runtime]: https://github.com/Shopify/job-iteration/blob/master/guides/best-practices.md#max-job-runtime
+[max-job-runtime]: https://github.com/Shopify/job-iteration/blob/-/guides/best-practices.md#max-job-runtime
 
 Running tasks will also be interrupted and re-enqueued when needed. For example
 [when Sidekiq workers shuts down for a deploy][sidekiq-deploy]:
@@ -588,9 +602,9 @@ Running tasks will also be interrupted and re-enqueued when needed. For example
 
 When Sidekiq is stopping, it will give workers 25 seconds to finish before
 forcefully terminating them (this is the default but can be configured with the
-`--timeout` option).  Before the worker threads are terminated, Sidekiq will try
-to re-enqueue the job so your Task will be resumed. However, the position in the
-collection won't be persisted so at least one iteration may run again.
+`--timeout` option). Before the worker threads are terminated, Sidekiq will try
+to re-enqueue the job so your Task will be resumed. However, the position in
+the collection won't be persisted so at least one iteration may run again.
 
 #### Help! My Task is stuck
 
@@ -764,7 +778,7 @@ The install command will attempt to reinstall these old migrations and migrating
 the database will cause problems. Use `bin/rails
 maintenance_tasks:install:migrations` to copy the gem's migrations to your
 `db/migrate` folder. Check the release notes to see if any new migrations were
-added since your last gem upgrade.  Ensure that these are kept, but remove any
+added since your last gem upgrade. Ensure that these are kept, but remove any
 migrations that already ran.
 
 Run the migrations using `bin/rails db:migrate`.
