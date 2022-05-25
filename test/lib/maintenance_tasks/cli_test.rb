@@ -31,21 +31,47 @@ module MaintenanceTasks
       @cli.perform("Wrong")
     end
 
-    test "#perform runs a CSV Task with the supplied CSV when --csv option used" do
+    test "#perform runs CSV task with supplied CSV when --csv option used" do
       task = mock(name: "MyCsvTask")
       csv_file_path = file_fixture("sample.csv")
-      opened_csv_file = File.open(csv_file_path)
-      expected_attachable = { io: opened_csv_file, filename: "sample.csv" }
 
-      @cli.expects(:options).at_least_once.returns(csv: csv_file_path)
-      File.expects(:open).with(csv_file_path).returns(opened_csv_file)
       Runner.expects(:run)
-        .with(name: "MyCsvTask", csv_file: expected_attachable, arguments: {})
+        .with do |kwargs|
+          assert_equal("MyCsvTask", kwargs[:name])
+          assert_equal(csv_file_path.to_s, kwargs[:csv_file][:io].path)
+          assert_equal({}, kwargs[:arguments])
+        end
         .returns(task)
-      @cli.expects(:say_status)
-        .with(:success, "MyCsvTask was enqueued.", :green)
 
-      @cli.perform("MyCsvTask")
+      assert_output(/success\s+MyCsvTask was enqueued\./) do
+        CLI.start(["perform", "MyCsvTask", "--csv", csv_file_path])
+      end
+    end
+
+    test "#perform runs CSV task with content from stdin" do
+      task = mock(name: "MyCsvTask")
+      csv_string = "foo,bar\n1,2\n"
+      $stdin = StringIO.new(csv_string)
+
+      Runner.expects(:run)
+        .with do |kwargs|
+          assert_equal("MyCsvTask", kwargs[:name])
+          assert_equal(csv_string, kwargs[:csv_file][:io].read)
+          assert_equal({}, kwargs[:arguments])
+        end
+        .returns(task)
+
+      assert_output(/success\s+MyCsvTask was enqueued\./) do
+        CLI.start(["perform", "MyCsvTask", "--csv"])
+      end
+
+      $stdin = STDIN
+    end
+
+    test "#perform prints error message when CSV file does not exist" do
+      assert_output(/error\s+CSV file not found: foo\.csv/) do
+        CLI.start(["perform", "MyCsvTask", "--csv", "foo.csv"])
+      end
     end
 
     test "#perform runs a Task with the supplied arguments when --arguments option used" do
