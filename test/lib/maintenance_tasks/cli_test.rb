@@ -5,10 +5,6 @@ require "maintenance_tasks/cli"
 
 module MaintenanceTasks
   class CLITest < ActiveSupport::TestCase
-    setup do
-      @cli = CLI.new
-    end
-
     test ".exit_on_failure? is true" do
       assert_predicate CLI, :exit_on_failure?
     end
@@ -18,17 +14,19 @@ module MaintenanceTasks
 
       Runner.expects(:run).with(name: "MyTask", csv_file: nil, arguments: {})
         .returns(task)
-      @cli.expects(:say_status).with(:success, "MyTask was enqueued.", :green)
 
-      @cli.perform("MyTask")
+      assert_output(/success\s+MyTask was enqueued\./) do
+        CLI.start(["perform", "MyTask"])
+      end
     end
 
     test "#perfom prints an error message when the runner raises" do
       Runner.expects(:run).with(name: "Wrong", csv_file: nil, arguments: {})
         .raises("Invalid!")
-      @cli.expects(:say_status).with(:error, "Invalid!", :red)
 
-      @cli.perform("Wrong")
+      assert_output(/error\s+Invalid!/) do
+        CLI.start(["perform", "Wrong"])
+      end
     end
 
     test "#perform runs CSV task with supplied CSV when --csv option used" do
@@ -76,16 +74,15 @@ module MaintenanceTasks
 
     test "#perform runs a Task with the supplied arguments when --arguments option used" do
       task = mock(name: "MyParamsTask")
-      arguments = { "post_ids": "1,2,3" }
+      arguments = { "post_ids" => "1,2,3" }
 
-      @cli.expects(:options).at_least_once.returns(arguments: arguments)
       Runner.expects(:run)
         .with(name: "MyParamsTask", csv_file: nil, arguments: arguments)
         .returns(task)
-      @cli.expects(:say_status)
-        .with(:success, "MyParamsTask was enqueued.", :green)
 
-      @cli.perform("MyParamsTask")
+      assert_output(/success\s+MyParamsTask was enqueued\./) do
+        CLI.start(["perform", "MyParamsTask", "--arguments", "post_ids:1,2,3"])
+      end
     end
   end
 end
