@@ -508,13 +508,19 @@ Alternatively, you can run your Task in the command line:
 bundle exec maintenance_tasks perform Maintenance::UpdatePostsTask
 ```
 
-To run a Task that processes CSVs from the command line, use the --csv option:
+To run a Task that processes CSVs from the command line, use the `--csv` option:
 
 ```sh-session
 bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path/to/my_csv.csv"
 ```
 
-To run a Task that takes arguments from the command line, use the --arguments
+The `--csv` option also works with CSV content coming from the standard input:
+
+```sh-session
+curl "some/remote/csv" | bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv
+```
+
+To run a Task that takes arguments from the command line, use the `--arguments`
 option, passing arguments as a set of \<key>:\<value> pairs:
 
 ```sh-session
