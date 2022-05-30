@@ -19,7 +19,7 @@ else
   gem "rails"
 end
 gem "rubocop"
-gem "rubocop-shopify", "2.5.0"
+gem "rubocop-shopify"
 gem "selenium-webdriver"
 gem "sprockets-rails"
 gem "sqlite3"
