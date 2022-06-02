@@ -33,7 +33,8 @@ module MaintenanceTasks
     #
     # @return [Integer] the approximate number of batches to process.
     def count(task)
-      (task.csv_content.count("\n") + @batch_size - 1) / @batch_size
+      count = task.csv_content.count("\n") - 1
+      (count + @batch_size - 1) / @batch_size
     end
   end
 end
