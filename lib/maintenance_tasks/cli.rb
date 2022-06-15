@@ -58,9 +58,17 @@ module MaintenanceTasks
       csv_option = options[:csv]
 
       if csv_option == :stdin
-        { io: StringIO.new($stdin.read), filename: "stdin.csv" }
+        {
+          io: StringIO.new($stdin.read),
+          filename: "stdin.csv",
+          content_type: "text/csv",
+        }
       else
-        { io: File.open(csv_option), filename: File.basename(csv_option) }
+        {
+          io: File.open(csv_option),
+          filename: File.basename(csv_option),
+          content_type: "text/csv",
+        }
       end
     rescue Errno::ENOENT
       raise ArgumentError, "CSV file not found: #{csv_option}"

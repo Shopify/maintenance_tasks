@@ -165,7 +165,7 @@ module MaintenanceTasks
     private
 
     def csv_io
-      { io: File.open(@csv), filename: "sample.csv" }
+      { io: File.open(@csv), filename: "sample.csv", content_type: "text/csv" }
     end
   end
 end

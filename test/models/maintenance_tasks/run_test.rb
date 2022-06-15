@@ -21,6 +21,14 @@ module MaintenanceTasks
       refute_predicate run, :valid?
     end
 
+    test "invalid if content_type is not text/csv" do
+      run = Run.new(task_name: "Maintenance::ImportPostsTask")
+      tsv = Rack::Test::UploadedFile.new(file_fixture("sample.tsv"),
+        "text/tab-separated-values")
+      run.csv_file.attach(tsv)
+      refute_predicate run, :valid?
+    end
+
     test "invalid if associated Task has parameters and they are invalid" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",
