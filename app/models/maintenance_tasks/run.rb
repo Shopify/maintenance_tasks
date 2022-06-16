@@ -40,6 +40,7 @@ module MaintenanceTasks
       Task.available_tasks.map(&:to_s)
     } }
     validate :csv_attachment_presence, on: :create
+    validate :csv_content_type, on: :create
     validate :validate_task_arguments, on: :create
 
     attr_readonly :task_name
@@ -337,6 +338,18 @@ module MaintenanceTasks
         errors.add(:csv_file, "must be attached to CSV Task.")
       elsif !Task.named(task_name).has_csv_content? && csv_file.present?
         errors.add(:csv_file, "should not be attached to non-CSV Task.")
+      end
+    rescue Task::NotFoundError
+      nil
+    end
+
+    # Performs validation on the content type of the :csv_file attachment.
+    # A Run for a Task that uses CsvCollection must have a present :csv_file
+    # and a content type of "text/csv" to be valid. The appropriate error is
+    # added if the Run does not meet the above criteria.
+    def csv_content_type
+      if csv_file.present? && csv_file.content_type != "text/csv"
+        errors.add(:csv_file, "must be a CSV")
       end
     rescue Task::NotFoundError
       nil

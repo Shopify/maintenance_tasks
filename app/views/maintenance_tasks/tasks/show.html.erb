@@ -32,7 +32,7 @@
       <% if @task.csv_task? %>
         <div class="block">
           <%= form.label :csv_file %>
-          <%= form.file_field :csv_file %>
+          <%= form.file_field :csv_file, accept: "text/csv" %>
         </div>
       <% end %>
       <% parameter_names = @task.parameter_names %>
