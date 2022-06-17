@@ -42,6 +42,18 @@ For more information, please consult the [Rails guides on autoloading and reload
 
 ## Usage
 
+The typical Maintenance Tasks workflow is as follows:
+
+1. [Generate a class describing the Task](#creating-a-task) and the work to be done.
+2. Run the Task
+    - either by [using the included web UI](#running-a-task-from-the-web-ui),
+    - or by [using the command line](#running-a-task-from-the-command-line),
+    - or by [using Ruby](#running-a-task-from-ruby).
+3. [Monitor the Task](#monitoring-your-tasks-status)
+    - either by using the included web UI,
+    - or by manually checking your task's run's status in your database.
+4. Optionally, delete the Task code if you no longer need it.
+
 ### Creating a Task
 
 A generator is provided to create tasks. Generate a new task by running:
@@ -500,7 +512,11 @@ end
 
 ### Running a Task
 
+#### Running a Task from the Web UI
+
 You can run your new Task by accessing the Web UI and clicking on "Run".
+
+#### Running a Task from the command line
 
 Alternatively, you can run your Task in the command line:
 
@@ -527,6 +543,8 @@ option, passing arguments as a set of \<key>:\<value> pairs:
 bundle exec maintenance_tasks perform Maintenance::ParamsTask \
   --arguments post_ids:1,2,3 content:"Hello, World!"
 ```
+
+#### Running a Task from Ruby
 
 You can also run a Task in Ruby by sending `run` with a Task name to Runner:
 
