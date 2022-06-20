@@ -220,7 +220,7 @@ GEM
       actionpack (>= 5.2)
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
-    sqlite3 (1.4.2)
+    sqlite3 (1.4.4)
     strscan (3.0.3)
     thor (1.2.1)
     timeout (0.2.0)
