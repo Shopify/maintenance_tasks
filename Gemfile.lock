@@ -257,7 +257,7 @@ DEPENDENCIES
   pry-byebug
   puma
   rails
-  rubocop
+  rubocop (= 1.30.1)
   rubocop-shopify
   selenium-webdriver
   sprockets-rails
