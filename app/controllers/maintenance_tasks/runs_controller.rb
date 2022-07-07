@@ -24,6 +24,16 @@ module MaintenanceTasks
       redirect_to(task_path(@run.task_name), alert: error.message)
     end
 
+    # Resumes a previously paused Run.
+    def resume
+      Runner.run(name: @run.task_name)
+      redirect_to(task_path(@run.task_name))
+    rescue ActiveRecord::RecordInvalid => error
+      redirect_to(task_path(@run.task_name), alert: error.message)
+    rescue Runner::EnqueuingError => error
+      redirect_to(task_path(@run.task_name), alert: error.message)
+    end
+
     private
 
     def set_run

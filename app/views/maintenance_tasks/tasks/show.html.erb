@@ -64,7 +64,7 @@
     <%= button_to 'Pausing', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: true %>
     <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
   <% elsif last_run.paused? %>
-    <%= button_to 'Resume', run_task_path(@task), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
+    <%= button_to 'Resume', resume_task_run_path(@task, last_run), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
     <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
   <% else %>
     <%= button_to 'Pause', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
