@@ -256,7 +256,7 @@ DEPENDENCIES
   puma
   rails
   rubocop
-  rubocop-shopify (= 2.5.0)
+  rubocop-shopify
   selenium-webdriver
   sprockets-rails
   sqlite3
