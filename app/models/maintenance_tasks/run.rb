@@ -29,6 +29,7 @@ module MaintenanceTasks
     STOPPING_STATUSES = [
       :pausing,
       :cancelling,
+      :cancelled,
     ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
     COMPLETED_RUNS_LIMIT = 10
@@ -169,8 +170,10 @@ module MaintenanceTasks
       self
     end
 
-    # Returns whether the Run is stopping, which is defined as
-    # having a status of pausing or cancelled.
+    # Returns whether the Run is stopping, which is defined as having a status
+    # of pausing or cancelling. The status of cancelled is also considered
+    # stopping since a Run can be cancelled while its job still exists in the
+    # queue, and we want to handle it the same way as a cancelling run.
     #
     # @return [Boolean] whether the Run is stopping.
     def stopping?
@@ -273,6 +276,7 @@ module MaintenanceTasks
         self.ended_at = Time.now
       elsif pausing?
         self.status = :paused
+      elsif cancelled?
       else
         self.status = :interrupted
       end

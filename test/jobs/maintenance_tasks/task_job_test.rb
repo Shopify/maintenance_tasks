@@ -31,6 +31,20 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
+    test ".perform doesn't run a cancelled job" do
+      freeze_time
+      TaskJob.perform_later(@run)
+      @run.cancel
+      travel Run::STUCK_TASK_TIMEOUT
+      @run.cancel # force cancel the Run
+      assert_predicate @run, :cancelled?
+      Maintenance::TestTask.any_instance.expects(:process).never
+
+      assert_nothing_raised do
+        perform_enqueued_jobs
+      end
+    end
+
     test ".perform_now persists ended_at when the Run is cancelled" do
       freeze_time
       Maintenance::TestTask.any_instance.expects(:process).once.with do

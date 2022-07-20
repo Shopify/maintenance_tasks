@@ -222,18 +222,22 @@ module MaintenanceTasks
       assert_equal 2, query_count
     end
 
-    test "#stopping? returns true if status is pausing or cancelling" do
+    test "#stopping? returns true if status is pausing or cancelling or cancelled" do
       run = Run.new(task_name: "Maintenance::UpdatePostsTask")
 
-      (Run.statuses.keys - ["pausing", "cancelling"]).each do |status|
-        run.status = status
-        refute_predicate run, :stopping?
-      end
+      (Run.statuses.keys - ["pausing", "cancelling", "cancelled"])
+        .each do |status|
+          run.status = status
+          refute_predicate run, :stopping?
+        end
 
       run.status = :pausing
       assert_predicate run, :stopping?
 
       run.status = :cancelling
+      assert_predicate run, :stopping?
+
+      run.status = :cancelled
       assert_predicate run, :stopping?
     end
 
@@ -459,6 +463,12 @@ module MaintenanceTasks
       run = Run.new(status: :pausing)
       run.job_shutdown
       assert_predicate run, :paused?
+    end
+
+    test "#job_shutdown doesn't change the status of a cancelled run" do
+      run = Run.new(status: :cancelled)
+      run.job_shutdown
+      assert_predicate run, :cancelled?
     end
 
     test "#complete sets status to succeeded and sets ended_at" do
