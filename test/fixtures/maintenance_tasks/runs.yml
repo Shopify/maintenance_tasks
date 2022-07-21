@@ -10,6 +10,15 @@ update_posts_task:
   started_at: '01 Jan 2020 01:00:25'
   ended_at: '01 Jan 2020 01:00:36'
 
+update_posts_task_paused:
+  task_name: Maintenance::UpdatePostsTask
+  tick_count: 10
+  tick_total: 10
+  job_id: '123abc'
+  status: 'paused'
+  created_at: '18 Jul 2022 11:05:00'
+  started_at: '18 Jul 2022 11:05:20'
+
 deleted_task:
   task_name: Maintenance::DeletedTask
   tick_count: 10
@@ -28,3 +37,30 @@ paused_deleted_task:
   status: 'paused'
   created_at: '09 Jan 2020 09:30:00'
   started_at: '09 Jan 2020 09:30:25'
+
+no_collection_task_paused:
+  task_name: Maintenance::NoCollectionTask
+  tick_count: 5
+  tick_total: 10
+  job_id: '123abc'
+  status: 'paused'
+  created_at: '19 Jul 2022 11:05:00'
+  started_at: '19 Jul 2022 11:05:20'
+
+no_collection_task_enqueued:
+  task_name: Maintenance::NoCollectionTask
+  tick_count: 5
+  tick_total: 10
+  job_id: '123abc'
+  status: 'enqueued'
+  created_at: '19 Jul 2022 12:05:00'
+
+import_posts_task_succeeded:
+  task_name: Maintenance::ImportPostsTask
+  tick_count: 10
+  tick_total: 10
+  job_id: '123abc'
+  status: 'succeeded'
+  created_at: '01 Jan 2020 01:00:00'
+  started_at: '01 Jan 2020 01:00:25'
+  ended_at: '01 Jan 2020 01:00:36'
