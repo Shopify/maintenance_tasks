@@ -40,8 +40,7 @@ module MaintenanceTasks
     # @raise [ActiveRecord::ValueTooLong] if the creation of the Run fails due
     #   to a value being too long for the column type.
     def run(name:, csv_file: nil, arguments: {}, run_model: Run)
-      run = run_model.active.find_by(task_name: name) ||
-        run_model.new(task_name: name, arguments: arguments)
+      run = run_model.new(task_name: name, arguments: arguments)
       if csv_file
         run.csv_file.attach(csv_file)
         run.csv_file.filename = filename(name)
@@ -52,6 +51,23 @@ module MaintenanceTasks
       run.enqueued!
       enqueue(run, job)
       Task.named(name)
+    end
+
+    # Resumes a Task.
+    #
+    # This method re-instantiates and re-enqueues a job for a Run that was
+    # previously paused.
+    #
+    # @param run [MaintenanceTasks::Run] the Run record to be resumed.
+    #
+    # @return [TaskJob] the enqueued Task job.
+    #
+    # @raise [EnqueuingError] if an error occurs while enqueuing the Run.
+    def resume(run)
+      job = instantiate_job(run)
+      run.job_id = job.job_id
+      run.enqueued!
+      enqueue(run, job)
     end
 
     private

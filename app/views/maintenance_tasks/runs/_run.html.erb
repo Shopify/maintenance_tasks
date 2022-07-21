@@ -17,4 +17,21 @@
   <%= render "maintenance_tasks/runs/csv", run: run %>
   <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
   <%= render "maintenance_tasks/runs/arguments", run: run %>
+
+  <div class="buttons">
+    <% if run.paused? %>
+      <%= button_to 'Resume', resume_task_run_path(@task, run), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, run), method: :put, class: 'button is-danger' %>
+    <% elsif run.cancelling? %>
+      <% if run.stuck? %>
+        <%= button_to 'Cancel', cancel_task_run_path(@task, run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
+      <% end %>
+    <% elsif run.pausing? %>
+      <%= button_to 'Pausing', pause_task_run_path(@task, run), method: :put, class: 'button is-warning', disabled: true %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, run), method: :put, class: 'button is-danger' %>
+    <% elsif run.active? %>
+      <%= button_to 'Pause', pause_task_run_path(@task, run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
+      <%= button_to 'Cancel', cancel_task_run_path(@task, run), method: :put, class: 'button is-danger' %>
+    <% end%>
+  </div>
 </div>

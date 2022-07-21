@@ -651,6 +651,11 @@ module MaintenanceTasks
       assert_predicate run, :cancelling?
     end
 
+    test "ACTIVE_STATUSES and COMPLETED_STATUSES contain all valid statuses" do
+      assert Run::STATUSES.sort ==
+        (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
+    end
+
     private
 
     def count_uncached_queries(&block)

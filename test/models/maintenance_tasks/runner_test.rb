@@ -13,7 +13,7 @@ module MaintenanceTasks
       @csv = file_fixture("sample.csv")
     end
 
-    test "#run creates and performs a Run for the given Task when there is no active Run" do
+    test "#run creates and performs a Run for the given Task" do
       assert_difference -> { Run.where(task_name: @name).count }, 1 do
         assert_enqueued_with(job: @job) do
           assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
@@ -21,13 +21,12 @@ module MaintenanceTasks
       end
     end
 
-    test "#run enqueues the existing active Run for the given Task" do
-      run = Run.create!(task_name: @name, status: :paused)
+    test "#run enqueues a new Run for the Task when one already exists" do
+      Run.create!(task_name: @name, status: :paused)
 
-      assert_no_difference -> { Run.where(task_name: @name).count } do
-        assert_enqueued_with(job: @job, args: [run]) do
+      assert_difference -> { Run.where(task_name: @name).count }, 1 do
+        assert_enqueued_with(job: @job) do
           assert_equal Maintenance::UpdatePostsTask, @runner.run(name: @name)
-          assert run.reload.enqueued?
         end
       end
     end
@@ -41,16 +40,16 @@ module MaintenanceTasks
     end
 
     # Yielding the run is undocumented and not supported in the Runner's API
-    test "#run yields the newly created Run when there is no active Run" do
-      run = Run.create!(task_name: @name, status: :paused)
-
-      @runner.run(name: @name) { |yielded| @run = yielded }
-      assert_equal run, @run
+    test "#run yields the newly created Run" do
+      @runner.run(name: @name) { |run| @run = run }
+      assert_equal Run.last, @run
     end
 
     # Yielding the run is undocumented and not supported in the Runner's API
-    test "#run yields the existing active Run" do
-      @runner.run(name: @name) { |run| @run = run }
+    test "#run always yields the newly created Run" do
+      Run.create!(task_name: @name, status: :paused)
+
+      @runner.run(name: @name) { |yielded| @run = yielded }
       assert_equal Run.last, @run
     end
 

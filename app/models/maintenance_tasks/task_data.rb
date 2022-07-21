@@ -24,7 +24,8 @@ module MaintenanceTasks
       #   a Run.
       def find(name)
         task_data = new(name)
-        task_data.last_run || Task.named(name)
+        task_data.active_runs.load
+        task_data.has_any_run? || Task.named(name)
         task_data
       end
 
@@ -32,40 +33,55 @@ module MaintenanceTasks
       # available Tasks.
       #
       # Tasks are sorted by category, and within a category, by Task name.
-      # Determining a Task's category require its latest Run record.
-      # To optimize calls to the database, a single query is done to get the
-      # last Run for each Task, and Task Data instances are initialized with
-      # these last_run values.
+      # Determining a Task's category requires their latest Run records.
+      # Two queries are done to get the currently active and completed Run
+      # records, and Task Data instances are initialized with these last_run
+      # values.
       #
       # @return [Array<TaskData>] the list of Task Data.
       def available_tasks
-        task_names = Task.available_tasks.map(&:name)
-        available_task_runs = Run.where(task_name: task_names)
-        last_runs = Run.with_attached_csv.where(
-          id: available_task_runs.select("MAX(id) as id").group(:task_name)
-        )
+        tasks = []
 
+        task_names = Task.available_tasks.map(&:name)
+
+        active_runs = Run.with_attached_csv.active.where(task_name: task_names)
+        active_runs.each do |run|
+          tasks << TaskData.new(run.task_name, run)
+          task_names.delete(run.task_name)
+        end
+
+        completed_runs = Run.completed.where(task_name: task_names)
+        last_runs = Run.with_attached_csv.where(
+          id: completed_runs.select("MAX(id) as id").group(:task_name)
+        )
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }
-          TaskData.new(task_name, last_run)
-        end.sort_by!(&:name)
+          tasks << TaskData.new(task_name, last_run)
+        end
+
+        # We add an additional sorting key (status) to avoid possible
+        # inconsistencies across database adapters when a Task has
+        # multiple active Runs.
+        tasks.sort_by! { |task| [task.name, task.status] }
       end
     end
 
-    # Initializes a Task Data with a name and optionally a last_run.
+    # Initializes a Task Data with a name and optionally a related run.
     #
     # @param name [String] the name of the Task subclass.
-    # @param last_run [MaintenanceTasks::Run] optionally, a Run record to
+    # @param related_run [MaintenanceTasks::Run] optionally, a Run record to
     #   set for the Task.
-    def initialize(name, last_run = :none_passed)
+    def initialize(name, related_run = nil)
       @name = name
-      @last_run = last_run unless last_run == :none_passed
+      @related_run = related_run
     end
 
     # @return [String] the name of the Task.
     attr_reader :name
+    attr_reader :related_run
 
     alias_method :to_s, :name
+    alias_method :last_run, :related_run
 
     # The Task's source code.
     #
@@ -83,27 +99,23 @@ module MaintenanceTasks
       File.read(file)
     end
 
-    # Retrieves the latest Run associated with the Task.
-    #
-    # @return [MaintenanceTasks::Run] the Run record.
-    # @return [nil] if there are no Runs associated with the Task.
-    def last_run
-      return @last_run if defined?(@last_run)
-
-      @last_run = runs.first
-    end
-
-    # Returns the set of Run records associated with the Task previous to the
-    # last Run. This collection represents a historic of past Runs for
-    # information purposes, since the base for Task Data information comes
-    # primarily from the last Run.
+    # Returns the set of currently active Run records associated with the Task.
     #
     # @return [ActiveRecord::Relation<MaintenanceTasks::Run>] the relation of
-    #   record previous to the last Run.
-    def previous_runs
-      return Run.none unless last_run
+    #   active Run records.
+    def active_runs
+      @active_runs ||= runs.active
+    end
 
-      runs.where.not(id: last_run.id)
+    # Returns the set of completed Run records associated with the Task.
+    # This collection represents a historic of past Runs for information
+    # purposes, since the base for Task Data information comes
+    # primarily from currently active runs.
+    #
+    # @return [ActiveRecord::Relation<MaintenanceTasks::Run>] the relation of
+    #   completed Run records.
+    def completed_runs
+      @completed_runs ||= runs.completed
     end
 
     # @return [Boolean] whether the Task has been deleted.
@@ -114,8 +126,8 @@ module MaintenanceTasks
       true
     end
 
-    # The Task status. It returns the status of the last Run, if present. If the
-    # Task does not have any Runs, the Task status is `new`.
+    # Returns the status of the latest active or completed Run, if present.
+    # If the Task does not have any Runs, the Task status is `new`.
     #
     # @return [String] the Task status.
     def status
@@ -155,6 +167,12 @@ module MaintenanceTasks
       return if deleted?
 
       MaintenanceTasks::Task.named(name).new
+    end
+
+    # @return [Boolean] whether the Task has any Run.
+    # @api private
+    def has_any_run?
+      active_runs.any? || completed_runs.any?
     end
 
     private

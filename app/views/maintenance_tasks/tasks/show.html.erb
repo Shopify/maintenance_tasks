@@ -1,79 +1,49 @@
 <% content_for :page_title, @task %>
 
 <h1 class="title is-1">
-  <%= @task %> <%= status_tag(@task.status) %>
+  <%= @task %>
 </h1>
 
-<% last_run = @task.last_run %>
-<% if last_run %>
-  <h5 class="title is-5">
-    <%= time_tag last_run.created_at, title: last_run.created_at %>
-  </h5>
-
-  <%= progress last_run %>
-
-  <div class="content">
-    <%= render "maintenance_tasks/runs/info/#{last_run.status}", run: last_run %>
-  </div>
-
-  <div class="content" id="custom-content">
-    <%= render "maintenance_tasks/runs/info/custom", run: last_run %>
-  </div>
-
-  <%= render "maintenance_tasks/runs/csv", run: last_run %>
-  <%= tag.hr if last_run.csv_file.present? %>
-  <%= render "maintenance_tasks/runs/arguments", run: last_run %>
-  <%= tag.hr if last_run.arguments.present? %>
-<% end %>
-
 <div class="buttons">
-  <% if last_run.nil? || last_run.completed? %>
-    <%= form_with url: run_task_path(@task), method: :put do |form| %>
-      <% if @task.csv_task? %>
-        <div class="block">
-          <%= form.label :csv_file %>
-          <%= form.file_field :csv_file, accept: "text/csv" %>
-        </div>
-      <% end %>
-      <% parameter_names = @task.parameter_names %>
-      <% if parameter_names.any? %>
-        <div class="block">
-          <%= form.fields_for :task_arguments, @task.new do |ff| %>
-            <% parameter_names.each do |parameter_name| %>
-              <div class="field">
-                <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
-                <div class="control">
-                  <%= parameter_field(ff, parameter_name) %>
-                </div>
-              </div>
-            <% end %>
-          <% end %>
-        </div>
-      <% end %>
-      <%= render "maintenance_tasks/tasks/custom", form: form %>
+  <%= form_with url: run_task_path(@task), method: :put do |form| %>
+    <% if @task.csv_task? %>
       <div class="block">
-        <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
+        <%= form.label :csv_file %>
+        <%= form.file_field :csv_file, accept: "text/csv" %>
       </div>
     <% end %>
-  <% elsif last_run.cancelling? %>
-    <%= button_to 'Run', run_task_path(@task), method: :put, class: 'button is-success', disabled: true %>
-    <% if last_run.stuck? %>
-      <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
+    <% parameter_names = @task.parameter_names %>
+    <% if parameter_names.any? %>
+      <div class="block">
+        <%= form.fields_for :task_arguments, @task.new do |ff| %>
+          <% parameter_names.each do |parameter_name| %>
+            <div class="field">
+              <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
+              <div class="control">
+                <%= parameter_field(ff, parameter_name) %>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
     <% end %>
-  <% elsif last_run.pausing? %>
-    <%= button_to 'Pausing', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: true %>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
-  <% elsif last_run.paused? %>
-    <%= button_to 'Resume', resume_task_run_path(@task, last_run), method: :put, class: 'button is-primary', disabled: @task.deleted? %>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
-  <% else %>
-    <%= button_to 'Pause', pause_task_run_path(@task, last_run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
-    <%= button_to 'Cancel', cancel_task_run_path(@task, last_run), method: :put, class: 'button is-danger' %>
-  <% end%>
+    <%= render "maintenance_tasks/tasks/custom", form: form %>
+    <div class="block">
+      <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
+    </div>
+  <% end %>
 </div>
 
 <% if (code = @task.code) %>
   <pre><code><%= highlight_code(code) %></code></pre>
+<% end %>
+
+<% if @active_runs.any? %>
+  <hr/>
+
+  <h4 class="title is-4">Active Runs</h4>
+
+  <%= render @active_runs %>
 <% end %>
 
 <% if @runs_page.records.present? %>

@@ -50,6 +50,7 @@ module MaintenanceTasks
     serialize :arguments, JSON
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
+    scope :completed, -> { where(status: COMPLETED_STATUSES) }
 
     # Ensure ActiveStorage is in use before preloading the attachments
     scope :with_attached_csv, -> do

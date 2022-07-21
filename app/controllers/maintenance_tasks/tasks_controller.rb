@@ -19,8 +19,9 @@ module MaintenanceTasks
     # Shows running and completed instances of the Task.
     def show
       @task = TaskData.find(params.fetch(:id))
-      set_refresh if @task.last_run&.active?
-      @runs_page = RunsPage.new(@task.previous_runs, params[:cursor])
+      @active_runs = @task.active_runs
+      set_refresh if @active_runs.any?
+      @runs_page = RunsPage.new(@task.completed_runs, params[:cursor])
     end
 
     # Runs a given Task and redirects to the Task page.
