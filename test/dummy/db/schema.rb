@@ -56,8 +56,8 @@ ActiveRecord::Schema.define(version: 2022_07_06_101937) do
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
     t.text "arguments"
-    t.index ["task_name", "created_at"], name: "index_maintenance_tasks_runs_on_task_name_and_created_at"
     t.integer "lock_version", default: 0, null: false
+    t.index ["task_name", "created_at"], name: "index_maintenance_tasks_runs_on_task_name_and_created_at", order: { created_at: :desc }
   end
 
   create_table "posts", force: :cascade do |t|
