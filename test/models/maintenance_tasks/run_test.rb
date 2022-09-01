@@ -172,6 +172,18 @@ module MaintenanceTasks
       run.persist_error(error)
     end
 
+    test "#persist_error can handle error callback raising" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      error = ArgumentError.new("Something went wrong")
+      error.set_backtrace(["lib/foo.rb:42:in `bar'"])
+
+      run.task.expects(:after_error_callback).raises("Callback error!")
+
+      assert_nothing_raised do
+        run.persist_error(error)
+      end
+    end
+
     test "#persist_error does not raise on longer error class names" do
       run = Run.create!(task_name: "Maintenance::ErrorTask")
       error = ArgumentError.new("Something went wrong")

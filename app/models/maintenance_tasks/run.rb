@@ -140,7 +140,7 @@ module MaintenanceTasks
         backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
         ended_at: Time.now,
       )
-      run_task_callbacks(:error)
+      run_error_callback
     rescue ActiveRecord::StaleObjectError
       reload_status
       retry
@@ -264,7 +264,7 @@ module MaintenanceTasks
     #   specified by the Task.
     def start(count)
       update!(started_at: Time.now, tick_total: count)
-      run_task_callbacks(:start)
+      task.run_callbacks(:start)
     rescue ActiveRecord::StaleObjectError
       reload_status
       retry
@@ -430,6 +430,12 @@ module MaintenanceTasks
 
     def run_task_callbacks(callback)
       task.run_callbacks(callback)
+    rescue Task::NotFoundError
+      nil
+    end
+
+    def run_error_callback
+      task.run_callbacks(:error)
     rescue
       nil
     end
