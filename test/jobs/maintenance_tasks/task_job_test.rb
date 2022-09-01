@@ -580,5 +580,21 @@ module MaintenanceTasks
     ensure
       CustomTaskJob.race_condition_prepended_after_hook = nil
     end
+
+    test ".perform_now bubbles up callback errors" do
+      Maintenance::CallbackTestTask
+        .any_instance
+        .expects(:after_start_callback)
+        .raises("Callback error!")
+
+      Maintenance::CallbackTestTask.any_instance.expects(:process).never
+
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      run.expects(:persist_error).with do |exception|
+        assert_equal "Callback error!", exception.message
+      end
+
+      TaskJob.perform_now(run)
+    end
   end
 end
