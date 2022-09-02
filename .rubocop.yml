@@ -26,3 +26,6 @@ Style/DocumentationMethod:
   Include:
     - app/**/*.rb
     - lib/**/*.rb
+
+Style/ClassMethodsDefinitions:
+  Enabled: False
