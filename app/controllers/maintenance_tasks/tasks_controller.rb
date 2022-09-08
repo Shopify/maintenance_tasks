@@ -24,24 +24,6 @@ module MaintenanceTasks
       @runs_page = RunsPage.new(@task.completed_runs, params[:cursor])
     end
 
-    # Runs a given Task and redirects to the Task page.
-    def run(&block)
-      task = Runner.run(
-        name: params.fetch(:id),
-        csv_file: params[:csv_file],
-        arguments: params.fetch(:task_arguments, {}).permit!.to_h,
-        &block
-      )
-      redirect_to(task_path(task))
-    rescue ActiveRecord::RecordInvalid => error
-      redirect_to(task_path(error.record.task_name), alert: error.message)
-    rescue ActiveRecord::ValueTooLong => error
-      task_name = params.fetch(:id)
-      redirect_to(task_path(task_name), alert: error.message)
-    rescue Runner::EnqueuingError => error
-      redirect_to(task_path(error.run.task_name), alert: error.message)
-    end
-
     private
 
     def set_refresh
