@@ -6,7 +6,25 @@ module MaintenanceTasks
   #
   # @api private
   class RunsController < ApplicationController
-    before_action :set_run
+    before_action :set_run, except: :create
+
+    # Creates a Run for a given Task and redirects to the Task page.
+    def create(&block)
+      task = Runner.run(
+        name: params.fetch(:task_id),
+        csv_file: params[:csv_file],
+        arguments: params.fetch(:task_arguments, {}).permit!.to_h,
+        &block
+      )
+      redirect_to(task_path(task))
+    rescue ActiveRecord::RecordInvalid => error
+      redirect_to(task_path(error.record.task_name), alert: error.message)
+    rescue ActiveRecord::ValueTooLong => error
+      task_name = params.fetch(:id)
+      redirect_to(task_path(task_name), alert: error.message)
+    rescue Runner::EnqueuingError => error
+      redirect_to(task_path(error.run.task_name), alert: error.message)
+    end
 
     # Updates a Run status to paused.
     def pause
