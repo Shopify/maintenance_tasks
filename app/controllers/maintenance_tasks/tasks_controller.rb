@@ -12,13 +12,13 @@ module MaintenanceTasks
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
     def index
-      @available_tasks = TaskData.available_tasks.group_by(&:category)
+      @available_tasks = TaskDataIndex.available_tasks.group_by(&:category)
     end
 
     # Renders the page responsible for providing Task actions to users.
     # Shows running and completed instances of the Task.
     def show
-      @task = TaskData.find(params.fetch(:id))
+      @task = TaskDataShow.find(params.fetch(:id))
       @active_runs = @task.active_runs
       set_refresh if @active_runs.any?
       @runs_page = RunsPage.new(@task.completed_runs, params[:cursor])
