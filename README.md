@@ -834,3 +834,15 @@ Once a release is ready, follow these steps:
 
 [release]: https://help.github.com/articles/creating-releases/
 [shipit]: https://shipit.shopify.io/shopify/maintenance_tasks/rubygems
+
+### Backporting changes to a previous major version
+
+Bug fixes and backwards-compatible changes should typically be backported to previous
+major versions of the gem. To do this, follow these steps:
+
+* Checkout the release branch you'd like to backport changes to, e.g. `v1.x`
+* Cherry-pick relevant commits to that branch. If changes were just merged into main,
+you can use `git cherry-pick main -m 1` to cherry-pick the most recent merge commit.
+* Bump the spec version in `maintenance_tasks.gemspec` and run `bundle install`.
+* Follow the process documented above to cut a release, ensuring that it's pointed
+to the correct branch (e.g. `v1.x`).
