@@ -12,9 +12,6 @@ AllCops:
 Bundler/OrderedGems:
   Enabled: true
 
-Layout/LineLength:
-  Max: 80
-
 Style/Documentation:
   Enabled: true
   Include:

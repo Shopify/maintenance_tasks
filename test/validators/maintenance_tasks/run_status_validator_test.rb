@@ -94,10 +94,7 @@ module MaintenanceTasks
 
       assert pausing_run.valid?
 
-      assert_no_invalid_transitions(
-        [:enqueued, :running, :interrupted, :pausing],
-        :cancelling
-      )
+      assert_no_invalid_transitions([:enqueued, :running, :interrupted, :pausing], :cancelling)
     end
 
     test "run can go from enqueued, interrupted or running to pausing" do
@@ -122,10 +119,7 @@ module MaintenanceTasks
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions(
-        [:enqueued, :interrupted, :running],
-        :pausing
-      )
+      assert_no_invalid_transitions([:enqueued, :interrupted, :running], :pausing)
     end
 
     test "run can go from pausing to paused" do
@@ -210,10 +204,7 @@ module MaintenanceTasks
 
       assert cancelling_run.valid?
 
-      assert_no_invalid_transitions(
-        [:enqueued, :running, :pausing, :interrupted, :cancelling],
-        :errored
-      )
+      assert_no_invalid_transitions([:enqueued, :running, :pausing, :interrupted, :cancelling], :errored)
     end
 
     private
@@ -228,11 +219,8 @@ module MaintenanceTasks
 
         run.status = end_status
 
-        refute(run.valid?,
-          "Expected transition from #{status} to #{end_status} to be invalid")
-        expected_status_error = [
-          "Cannot transition run from status #{status} to #{end_status}",
-        ]
+        refute(run.valid?, "Expected transition from #{status} to #{end_status} to be invalid")
+        expected_status_error = ["Cannot transition run from status #{status} to #{end_status}"]
         assert_equal(expected_status_error, run.errors[:status])
       end
     end

@@ -74,8 +74,7 @@ module MaintenanceTasks
     end
 
     test "#persist_transition calls the complete callback" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "running")
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "running")
       run.status = :succeeded
       run.task.expects(:after_complete_callback)
       run.persist_transition
@@ -90,16 +89,14 @@ module MaintenanceTasks
     end
 
     test "#persist_transition calls the pause callback" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "pausing")
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "pausing")
       run.status = :paused
       run.task.expects(:after_pause_callback)
       run.persist_transition
     end
 
     test "#persist_transition with a race condition moves the run to the proper status and calls the right callback" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "running")
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "running")
       Run.find(run.id).cancelling!
 
       run.task.expects(:after_interrupt_callback).never
@@ -111,8 +108,7 @@ module MaintenanceTasks
     end
 
     test "#persist_transition with a race condition for a successful run moves to the succeeded status and calls the right callback" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "running")
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "running")
       Run.find(run.id).cancelling!
 
       run.task.expects(:after_interrupt_callback).never
@@ -676,9 +672,7 @@ module MaintenanceTasks
       query_cb = ->(*, payload) do
         count += 1 if !payload[:cached] && payload[:sql] != "SHOW search_path"
       end
-      ActiveSupport::Notifications.subscribed(query_cb,
-        "sql.active_record",
-        &block)
+      ActiveSupport::Notifications.subscribed(query_cb, "sql.active_record", &block)
 
       count
     end
