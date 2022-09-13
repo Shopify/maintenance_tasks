@@ -18,7 +18,7 @@ module MaintenanceTasks
       # Tasks are sorted by category, and within a category, by Task name.
       # Determining a Task's category requires their latest Run records.
       # Two queries are done to get the currently active and completed Run
-      # records, and Task Data instances are initialized with these last_run
+      # records, and Task Data instances are initialized with these related run
       # values.
       #
       # @return [Array<TaskDataIndex>] the list of Task Data.
@@ -34,9 +34,7 @@ module MaintenanceTasks
         end
 
         completed_runs = Run.completed.where(task_name: task_names)
-        last_runs = Run.with_attached_csv.where(
-          id: completed_runs.select("MAX(id) as id").group(:task_name),
-        )
+        last_runs = Run.with_attached_csv.where(id: completed_runs.select("MAX(id) as id").group(:task_name))
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }
           tasks << TaskDataIndex.new(task_name, last_run)
@@ -64,23 +62,22 @@ module MaintenanceTasks
     attr_reader :related_run
 
     alias_method :to_s, :name
-    alias_method :last_run, :related_run
 
     # Returns the status of the latest active or completed Run, if present.
     # If the Task does not have any Runs, the Task status is `new`.
     #
     # @return [String] the Task status.
     def status
-      last_run&.status || "new"
+      related_run&.status || "new"
     end
 
     # Retrieves the Task's category, which is one of active, new, or completed.
     #
     # @return [Symbol] the category of the Task.
     def category
-      if last_run.present? && last_run.active?
+      if related_run.present? && related_run.active?
         :active
-      elsif last_run.nil?
+      elsif related_run.nil?
         :new
       else
         :completed
