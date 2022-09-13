@@ -27,7 +27,7 @@ module MaintenanceTasks
         assert_match(/module Maintenance/, task_test)
         assert_match(
           /class SleepyTaskTest < ActiveSupport::TestCase/,
-          task_test
+          task_test,
         )
       end
     end

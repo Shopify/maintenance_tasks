@@ -115,7 +115,7 @@ module MaintenanceTasks
         tick_count: 2,
         tick_total: 10,
         status: :errored,
-        ended_at: 1.hour.ago
+        ended_at: 1.hour.ago,
       )
       21.times do |i|
         Run.create!(
@@ -125,7 +125,7 @@ module MaintenanceTasks
           tick_count: 10,
           tick_total: 10,
           status: :succeeded,
-          ended_at: i.minutes.ago
+          ended_at: i.minutes.ago,
         )
       end
 

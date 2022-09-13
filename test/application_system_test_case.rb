@@ -22,7 +22,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
     options.add_argument("--disable-dev-shm-usage")
     options.add_preference(
       :download,
-      default_directory: "test/dummy/tmp/downloads"
+      default_directory: "test/dummy/tmp/downloads",
     )
   end
 

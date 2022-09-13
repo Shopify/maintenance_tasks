@@ -79,7 +79,7 @@ module MaintenanceTasks
         enumerator_builder.build_throttle_enumerator(
           enum,
           throttle_on: condition[:throttle_on],
-          backoff: condition[:backoff].call
+          backoff: condition[:backoff].call,
         )
       end
     end

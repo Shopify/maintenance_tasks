@@ -62,7 +62,7 @@ module MaintenanceTasks
 
           assert_equal(
             "Validation failed: Task name is not included in the list",
-            error.message
+            error.message,
           )
         end
       end
@@ -77,7 +77,7 @@ module MaintenanceTasks
         assert_equal(
           "The job to perform Maintenance::EnqueueErrorTask "\
             "could not be enqueued",
-          error.message
+          error.message,
         )
         assert_kind_of RuntimeError, error.cause
         assert_equal "Error enqueuing", error.cause.message
@@ -93,14 +93,14 @@ module MaintenanceTasks
         assert_equal(
           "The job to perform Maintenance::CancelledEnqueueTask "\
             "could not be enqueued",
-          error.message
+          error.message,
         )
         assert_kind_of RuntimeError, error.cause
         assert_equal(
           "The job to perform Maintenance::CancelledEnqueueTask "\
             "could not be enqueued. "\
             "Enqueuing has been prevented by a callback.",
-          error.cause.message
+          error.cause.message,
         )
       end
     end
@@ -110,7 +110,7 @@ module MaintenanceTasks
       assert_raises(ActiveRecord::ValueTooLong) do
         @runner.run(
           name: "Maintenance::ParamsTask",
-          arguments: { post_ids: "123" }
+          arguments: { post_ids: "123" },
         )
       end
     end
@@ -131,7 +131,7 @@ module MaintenanceTasks
 
         assert_equal(
           "Validation failed: Csv file should not be attached to non-CSV Task.",
-          error.message
+          error.message,
         )
       end
     end
@@ -146,7 +146,7 @@ module MaintenanceTasks
 
           assert_equal(
             "Validation failed: Csv file must be attached to CSV Task.",
-            error.message
+            error.message,
           )
         end
       end

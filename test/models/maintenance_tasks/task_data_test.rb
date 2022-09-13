@@ -78,7 +78,7 @@ module MaintenanceTasks
 
       run_2 = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :succeeded
+        status: :succeeded,
       )
 
       Run.create!(task_name: "Maintenance::UpdatePostsTask")
@@ -114,7 +114,7 @@ module MaintenanceTasks
     test "#status is the latest Run status" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :paused
+        status: :paused,
       )
       task_data = TaskData.new("Maintenance::UpdatePostsTask", run)
       assert_equal "paused", task_data.status
@@ -133,7 +133,7 @@ module MaintenanceTasks
     test "#category returns :completed if the task is completed" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :succeeded
+        status: :succeeded,
       )
       task_data = TaskData.new("Maintenance::UpdatePostsTask", run)
       assert_equal :completed, task_data.category
@@ -158,7 +158,7 @@ module MaintenanceTasks
           "float_attr", "decimal_attr", "datetime_attr", "date_attr",
           "time_attr", "boolean_attr",
         ],
-        TaskData.new("Maintenance::ParamsTask").parameter_names
+        TaskData.new("Maintenance::ParamsTask").parameter_names,
       )
     end
 

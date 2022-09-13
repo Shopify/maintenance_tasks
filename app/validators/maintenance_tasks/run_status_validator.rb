@@ -81,7 +81,7 @@ module MaintenanceTasks
     def add_invalid_status_error(record, previous_status, new_status)
       record.errors.add(
         :status,
-        "Cannot transition run from status #{previous_status} to #{new_status}"
+        "Cannot transition run from status #{previous_status} to #{new_status}",
       )
     end
   end
