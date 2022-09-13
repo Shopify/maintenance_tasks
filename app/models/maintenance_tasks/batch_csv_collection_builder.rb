@@ -22,7 +22,7 @@ module MaintenanceTasks
     def collection(task)
       BatchCsv.new(
         csv: CSV.new(task.csv_content, headers: true),
-        batch_size: @batch_size
+        batch_size: @batch_size,
       )
     end
 

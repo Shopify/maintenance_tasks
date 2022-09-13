@@ -55,9 +55,7 @@ module MaintenanceTasks
       fill_in("_task_arguments_post_ids", with: "xyz")
       click_on "Run"
 
-      alert_text = "Validation failed: Arguments are invalid: :post_ids is "\
-        "invalid"
-      assert_text alert_text
+      assert_text "Validation failed: Arguments are invalid: :post_ids is invalid"
     end
 
     test "download the CSV attached to a run for a CSV Task" do
@@ -72,8 +70,7 @@ module MaintenanceTasks
 
       click_on("Download CSV")
 
-      downloaded_csv = "test/dummy/tmp/downloads/"\
-        "20200109T094144Z_maintenance_import_posts_task.csv"
+      downloaded_csv = "test/dummy/tmp/downloads/20200109T094144Z_maintenance_import_posts_task.csv"
 
       Timeout.timeout(1) do
         sleep(0.1) until File.exist?(downloaded_csv)
@@ -163,8 +160,7 @@ module MaintenanceTasks
       end
 
       assert_text "Errored"
-      assert_text "Ran for less than 5 seconds until an error happened "\
-        "less than a minute ago."
+      assert_text "Ran for less than 5 seconds until an error happened less than a minute ago."
       assert_text "ArgumentError"
       assert_text "Something went wrong"
       assert_text "app/tasks/maintenance/error_task.rb:10:in `process'"
@@ -190,9 +186,7 @@ module MaintenanceTasks
 
       click_on "Resume"
 
-      alert_text = "Validation failed: " \
-        "Status Cannot transition run from status enqueued to enqueued"
-      assert_text alert_text
+      assert_text "Validation failed: Status Cannot transition run from status enqueued to enqueued"
     end
 
     test "errors when enqueuing are shown" do
@@ -200,15 +194,13 @@ module MaintenanceTasks
 
       click_on "Maintenance::EnqueueErrorTask"
       click_on "Run"
-      assert_text "The job to perform Maintenance::EnqueueErrorTask "\
-        "could not be enqueued"
+      assert_text "The job to perform Maintenance::EnqueueErrorTask could not be enqueued"
       assert_text "Error enqueuing"
 
       visit maintenance_tasks_path
       click_on "Maintenance::CancelledEnqueueTask"
       click_on "Run"
-      assert_text "The job to perform Maintenance::CancelledEnqueueTask "\
-        "could not be enqueued"
+      assert_text "The job to perform Maintenance::CancelledEnqueueTask could not be enqueued"
       assert_text "The job to perform Maintenance::CancelledEnqueueTask "\
         "could not be enqueued. Enqueuing has been prevented by a callback."
     end
@@ -227,9 +219,7 @@ module MaintenanceTasks
 
       click_on "Pause"
 
-      alert_text = "Validation failed: " \
-        "Status Cannot transition run from status cancelling to pausing"
-      assert_text alert_text
+      assert_text "Validation failed: Status Cannot transition run from status cancelling to pausing"
     end
   end
 end

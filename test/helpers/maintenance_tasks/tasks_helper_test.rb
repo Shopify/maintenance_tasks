@@ -24,7 +24,7 @@ module MaintenanceTasks
       @run.started_at = Time.now
 
       Progress.expects(:new).with(@run).returns(
-        mock(value: 42, max: 84, text: "Almost there!")
+        mock(value: 42, max: 84, text: "Almost there!"),
       )
 
       expected = '<div class="block"><progress value="42" max="84" '\
@@ -40,7 +40,7 @@ module MaintenanceTasks
     test "#progress returns a a <div> with a <progress> with no value when the Progress value is nil" do
       @run.started_at = Time.now
       Progress.expects(:new).with(@run).returns(
-        mock(value: nil, max: 84, text: "Almost there!")
+        mock(value: nil, max: 84, text: "Almost there!"),
       )
 
       expected = '<div class="block"><progress max="84" '\

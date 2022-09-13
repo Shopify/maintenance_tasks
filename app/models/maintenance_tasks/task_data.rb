@@ -52,7 +52,7 @@ module MaintenanceTasks
 
         completed_runs = Run.completed.where(task_name: task_names)
         last_runs = Run.with_attached_csv.where(
-          id: completed_runs.select("MAX(id) as id").group(:task_name)
+          id: completed_runs.select("MAX(id) as id").group(:task_name),
         )
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }

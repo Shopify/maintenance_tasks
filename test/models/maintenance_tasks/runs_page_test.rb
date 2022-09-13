@@ -13,7 +13,7 @@ module MaintenanceTasks
           tick_count: 10,
           tick_total: 10,
           status: :succeeded,
-          ended_at: Time.now
+          ended_at: Time.now,
         )
       end
       @runs = Run.where(task_name: @task_name).order(created_at: :desc)

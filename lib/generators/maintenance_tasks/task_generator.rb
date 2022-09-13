@@ -26,7 +26,7 @@ module MaintenanceTasks
       template_file = File.join(
         "app/tasks/#{tasks_module_file_path}",
         class_path,
-        "#{file_name}_task.rb"
+        "#{file_name}_task.rb",
       )
       if options[:csv]
         template("csv_task.rb", template_file)
@@ -56,7 +56,7 @@ module MaintenanceTasks
       template_file = File.join(
         "test/tasks/#{tasks_module_file_path}",
         class_path,
-        "#{file_name}_task_test.rb"
+        "#{file_name}_task_test.rb",
       )
       template("task_test.rb", template_file)
     end
@@ -65,7 +65,7 @@ module MaintenanceTasks
       template_file = File.join(
         "spec/tasks/#{tasks_module_file_path}",
         class_path,
-        "#{file_name}_task_spec.rb"
+        "#{file_name}_task_spec.rb",
       )
       template("task_spec.rb", template_file)
     end

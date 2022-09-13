@@ -259,7 +259,7 @@ module MaintenanceTasks
 
       run = Run.new(task_name: "Maintenance::ImportPostsTask")
       run.csv_file.attach(
-        { io: File.open(file_fixture("sample.csv")), filename: "sample.csv" }
+        { io: File.open(file_fixture("sample.csv")), filename: "sample.csv" },
       )
       run.save
       TaskJob.perform_now(run)
@@ -282,7 +282,7 @@ module MaintenanceTasks
 
       run = Run.new(task_name: "Maintenance::BatchImportPostsTask")
       run.csv_file.attach(
-        { io: File.open(file_fixture("sample.csv")), filename: "sample.csv" }
+        { io: File.open(file_fixture("sample.csv")), filename: "sample.csv" },
       )
       run.save
       TaskJob.perform_now(run)
@@ -454,7 +454,7 @@ module MaintenanceTasks
 
       run = Run.create!(
         task_name: "Maintenance::ParamsTask",
-        arguments: { post_ids: post.id.to_s }
+        arguments: { post_ids: post.id.to_s },
       )
       TaskJob.perform_now(run)
 

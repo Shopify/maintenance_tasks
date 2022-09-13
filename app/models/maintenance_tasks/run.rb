@@ -119,7 +119,7 @@ module MaintenanceTasks
         id,
         tick_count: number_of_ticks,
         time_running: duration,
-        touch: true
+        touch: true,
       )
       if locking_enabled?
         locking_column = self.class.locking_column
@@ -372,7 +372,7 @@ module MaintenanceTasks
             .map { |attribute, message| "#{attribute.inspect} #{message}" }
           errors.add(
             :arguments,
-            "are invalid: #{error_messages.join("; ")}"
+            "are invalid: #{error_messages.join("; ")}",
           )
         end
       rescue Task::NotFoundError
@@ -388,7 +388,7 @@ module MaintenanceTasks
             .map { |error| "#{error.attribute.inspect} #{error.message}" }
           errors.add(
             :arguments,
-            "are invalid: #{error_messages.join("; ")}"
+            "are invalid: #{error_messages.join("; ")}",
           )
         end
       rescue Task::NotFoundError

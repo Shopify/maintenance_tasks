@@ -12,7 +12,7 @@ module MaintenanceTasks
 
       interrupted_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :interrupted
+        status: :interrupted,
       )
       interrupted_run.status = :running
 
@@ -24,7 +24,7 @@ module MaintenanceTasks
     test "run can go from paused to enqueued" do
       paused_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :paused
+        status: :paused,
       )
       paused_run.status = :enqueued
 
@@ -36,7 +36,7 @@ module MaintenanceTasks
     test "run can go from running, cancelling or pausing to succeeded" do
       running_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :running
+        status: :running,
       )
       running_run.status = :succeeded
 
@@ -44,7 +44,7 @@ module MaintenanceTasks
 
       pausing_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :pausing
+        status: :pausing,
       )
       pausing_run.status = :succeeded
 
@@ -52,7 +52,7 @@ module MaintenanceTasks
 
       cancelling_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :cancelling
+        status: :cancelling,
       )
       cancelling_run.status = :succeeded
 
@@ -60,7 +60,7 @@ module MaintenanceTasks
 
       assert_no_invalid_transitions(
         [:running, :pausing, :cancelling],
-        :succeeded
+        :succeeded,
       )
     end
 
@@ -72,7 +72,7 @@ module MaintenanceTasks
 
       running_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :running
+        status: :running,
       )
       running_run.status = :cancelling
 
@@ -80,7 +80,7 @@ module MaintenanceTasks
 
       interrupted_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :interrupted
+        status: :interrupted,
       )
       interrupted_run.status = :cancelling
 
@@ -88,16 +88,13 @@ module MaintenanceTasks
 
       pausing_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :pausing
+        status: :pausing,
       )
       pausing_run.status = :cancelling
 
       assert pausing_run.valid?
 
-      assert_no_invalid_transitions(
-        [:enqueued, :running, :interrupted, :pausing],
-        :cancelling
-      )
+      assert_no_invalid_transitions([:enqueued, :running, :interrupted, :pausing], :cancelling)
     end
 
     test "run can go from enqueued, interrupted or running to pausing" do
@@ -108,7 +105,7 @@ module MaintenanceTasks
 
       interrupted_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :interrupted
+        status: :interrupted,
       )
       interrupted_run.status = :pausing
 
@@ -116,22 +113,19 @@ module MaintenanceTasks
 
       running_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :running
+        status: :running,
       )
       running_run.status = :pausing
 
       assert running_run.valid?
 
-      assert_no_invalid_transitions(
-        [:enqueued, :interrupted, :running],
-        :pausing
-      )
+      assert_no_invalid_transitions([:enqueued, :interrupted, :running], :pausing)
     end
 
     test "run can go from pausing to paused" do
       pausing_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :pausing
+        status: :pausing,
       )
       pausing_run.status = :paused
 
@@ -143,7 +137,7 @@ module MaintenanceTasks
     test "run can go from cancelling or paused to cancelled" do
       cancelling_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :cancelling
+        status: :cancelling,
       )
       cancelling_run.status = :cancelled
 
@@ -151,7 +145,7 @@ module MaintenanceTasks
 
       paused_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :paused
+        status: :paused,
       )
       paused_run.status = :cancelled
 
@@ -163,7 +157,7 @@ module MaintenanceTasks
     test "run can go from running to interrupted" do
       running_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :running
+        status: :running,
       )
       running_run.status = :interrupted
 
@@ -180,7 +174,7 @@ module MaintenanceTasks
 
       running_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :running
+        status: :running,
       )
       running_run.status = :errored
 
@@ -188,7 +182,7 @@ module MaintenanceTasks
 
       pausing_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :pausing
+        status: :pausing,
       )
       pausing_run.status = :errored
 
@@ -196,7 +190,7 @@ module MaintenanceTasks
 
       interrupted_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :interrupted
+        status: :interrupted,
       )
       interrupted_run.status = :errored
 
@@ -204,16 +198,13 @@ module MaintenanceTasks
 
       cancelling_run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        status: :cancelling
+        status: :cancelling,
       )
       cancelling_run.status = :errored
 
       assert cancelling_run.valid?
 
-      assert_no_invalid_transitions(
-        [:enqueued, :running, :pausing, :interrupted, :cancelling],
-        :errored
-      )
+      assert_no_invalid_transitions([:enqueued, :running, :pausing, :interrupted, :cancelling], :errored)
     end
 
     private
@@ -223,16 +214,13 @@ module MaintenanceTasks
       invalid_statuses.each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
-          status: status
+          status: status,
         )
 
         run.status = end_status
 
-        refute(run.valid?,
-          "Expected transition from #{status} to #{end_status} to be invalid")
-        expected_status_error = [
-          "Cannot transition run from status #{status} to #{end_status}",
-        ]
+        refute(run.valid?, "Expected transition from #{status} to #{end_status} to be invalid")
+        expected_status_error = ["Cannot transition run from status #{status} to #{end_status}"]
         assert_equal(expected_status_error, run.errors[:status])
       end
     end

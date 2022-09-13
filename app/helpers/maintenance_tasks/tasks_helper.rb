@@ -47,7 +47,7 @@ module MaintenanceTasks
       progress_bar = tag.progress(
         value: progress.value,
         max: progress.max,
-        class: ["progress"] + STATUS_COLOURS.fetch(run.status)
+        class: ["progress"] + STATUS_COLOURS.fetch(run.status),
       )
       progress_text = tag.p(tag.i(progress.text))
       tag.div(progress_bar + progress_text, class: "block")
@@ -97,7 +97,7 @@ module MaintenanceTasks
     def csv_file_download_path(run)
       Rails.application.routes.url_helpers.rails_blob_path(
         run.csv_file,
-        only_path: true
+        only_path: true,
       )
     end
 

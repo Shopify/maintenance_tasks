@@ -19,8 +19,7 @@ module MaintenanceTasks
     class_attribute :throttle_conditions, default: []
 
     # @api private
-    class_attribute :collection_builder_strategy,
-      default: NullCollectionBuilder.new
+    class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
@@ -64,23 +63,20 @@ module MaintenanceTasks
             "To resolve this issue run: bin/rails active_storage:install"
         end
 
-        if in_batches
-          self.collection_builder_strategy =
-            BatchCsvCollectionBuilder.new(in_batches)
+        self.collection_builder_strategy = if in_batches
+          BatchCsvCollectionBuilder.new(in_batches)
         else
-          self.collection_builder_strategy = CsvCollectionBuilder.new
+          CsvCollectionBuilder.new
         end
       end
 
       # Make this a Task that calls #process once, instead of iterating over
       # a collection.
       def no_collection
-        self.collection_builder_strategy =
-          MaintenanceTasks::NoCollectionBuilder.new
+        self.collection_builder_strategy = MaintenanceTasks::NoCollectionBuilder.new
       end
 
-      delegate :has_csv_content?, :no_collection?,
-        to: :collection_builder_strategy
+      delegate :has_csv_content?, :no_collection?, to: :collection_builder_strategy
 
       # Processes one item.
       #
@@ -122,9 +118,7 @@ module MaintenanceTasks
         backoff_as_proc = backoff
         backoff_as_proc = -> { backoff } unless backoff.respond_to?(:call)
 
-        self.throttle_conditions += [
-          { throttle_on: condition, backoff: backoff_as_proc },
-        ]
+        self.throttle_conditions += [{ throttle_on: condition, backoff: backoff_as_proc }]
       end
 
       # Initialize a callback to run after the task starts.
