@@ -4,7 +4,7 @@
     <%= status_tag(task.status) %>
   </h3>
 
-  <% if (run = task.last_run) %>
+  <% if (run = task.related_run) %>
     <h5 class="title is-5">
       <%= time_tag run.created_at, title: run.created_at %>
     </h5>
