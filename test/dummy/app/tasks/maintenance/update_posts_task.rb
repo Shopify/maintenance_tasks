@@ -10,10 +10,6 @@ module Maintenance
       Post.all
     end
 
-    def count
-      collection.count
-    end
-
     def process(post)
       sleep(1) unless self.class.fast_task
 

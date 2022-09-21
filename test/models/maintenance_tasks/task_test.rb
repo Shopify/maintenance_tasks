@@ -57,7 +57,7 @@ module MaintenanceTasks
     end
 
     test ".count calls #count" do
-      assert_equal 2, Maintenance::TestTask.count
+      assert_equal :no_count, Maintenance::TestTask.count
     end
 
     test "#count is :no_count by default" do

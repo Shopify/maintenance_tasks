@@ -35,7 +35,7 @@ module MaintenanceTasks
       collection = @task.collection
       @enumerator = nil
 
-      collection_enum = case collection
+      @collection_enum = case collection
       when :no_collection
         enumerator_builder.build_once_enumerator(cursor: nil)
       when ActiveRecord::Relation
@@ -50,7 +50,7 @@ module MaintenanceTasks
 
         # For now, only support automatic count based on the enumerator for
         # batches
-        @enumerator = enumerator_builder.active_record_on_batch_relations(
+        enumerator_builder.active_record_on_batch_relations(
           collection.relation,
           cursor: cursor,
           batch_size: collection.batch_size,
@@ -71,7 +71,7 @@ module MaintenanceTasks
           Array, or CSV.
         MSG
       end
-      throttle_enumerator(collection_enum)
+      throttle_enumerator(@collection_enum)
     end
 
     def throttle_enumerator(collection_enum)
@@ -123,7 +123,7 @@ module MaintenanceTasks
 
     def on_start
       count = @task.count
-      count = @enumerator&.size if count == :no_count
+      count = @collection_enum.size if count == :no_count
       @run.start(count)
     end
 

@@ -69,8 +69,12 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 * `collection`: return an Active Record Relation or an Array to be iterated
   over.
 * `process`: do the work of your maintenance task on a single record
-* `count`: return the number of rows that will be iterated over (optional, to be
-  able to show progress)
+
+Optionally, tasks can also implement a custom `#count` method, defining the number
+of elements that will be iterated over. Your task's `tick_total` will be calculated
+automatically based on the collection size, but this value may be overriden if desired
+using the `#count` method (this might be done, for example, to avoid the query that would
+be produced to determine the size of your collection).
 
 Example:
 
@@ -81,10 +85,6 @@ module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
     def collection
       Post.all
-    end
-
-    def count
-      collection.count
     end
 
     def process(post)
@@ -257,10 +257,6 @@ module Maintenance
       Post.all
     end
 
-    def count
-      collection.count
-    end
-
     def process(post)
       post.update!(content: "New content added on #{Time.now.utc}")
     end
@@ -307,10 +303,6 @@ module Maintenance
 
     def collection
       Post.all
-    end
-
-    def count
-      collection.count
     end
 
     def process(post)
