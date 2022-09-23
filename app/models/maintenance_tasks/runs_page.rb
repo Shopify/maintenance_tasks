@@ -24,6 +24,8 @@ module MaintenanceTasks
     # Returns the records for a Page, taking into account the cursor if one is
     # present. Limits the number of records to 20.
     #
+    # An extra Run is loaded so that we can verify whether we're on the last Page.
+    #
     # @return [ActiveRecord::Relation<MaintenanceTasks::Run>] a limited amount
     #  of Run records.
     def records
@@ -33,7 +35,9 @@ module MaintenanceTasks
         else
           @runs
         end
-        runs_after_cursor.limit(RUNS_PER_PAGE)
+        limited_runs = runs_after_cursor.limit(RUNS_PER_PAGE + 1).load
+        @extra_run = limited_runs.length > RUNS_PER_PAGE ? limited_runs.last : nil
+        limited_runs.take(RUNS_PER_PAGE)
       end
     end
 
@@ -47,10 +51,12 @@ module MaintenanceTasks
 
     # Returns whether this Page is the last one.
     #
-    # @return [Boolean] whether this Page contains the last Run record in the
-    #   Runs dataset that is being paginated.
+    # @return [Boolean] whether this Page contains the last Run record in the Runs
+    #   dataset that is being paginated. This is done by checking whether an extra
+    #   Run was loaded by #records - if no extra Run was loaded, this is the last page.
     def last?
-      @runs.unscope(:includes).pluck(:id).last == next_cursor
+      records
+      @extra_run.nil?
     end
   end
 end
