@@ -95,5 +95,12 @@ module MaintenanceTasks
     ensure
       Maintenance::TestTask.throttle_conditions = []
     end
+
+    test ".documentation sets task documentation" do
+      docs = "this is the documentation for the TestTask"
+      Maintenance::TestTask.documentation(docs)
+
+      assert_equal(Maintenance::TestTask.task_documentation, docs)
+    end
   end
 end

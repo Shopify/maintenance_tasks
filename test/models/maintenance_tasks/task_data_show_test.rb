@@ -113,5 +113,14 @@ module MaintenanceTasks
     test "#new returns nil for a deleted Task" do
       assert_nil TaskDataShow.new("Maintenance::DoesNotExist").new
     end
+
+    test "#task_documentation returns the docs for a task" do
+      docs = TaskDataShow.new("Maintenance::UpdatePostsTask").task_documentation
+      assert_equal "This task updates posts", docs
+    end
+
+    test "#task_documentation returns nil for a deleted Task" do
+      assert_nil TaskDataShow.new("Maintenance::DoesNotExist").task_documentation
+    end
   end
 end

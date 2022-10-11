@@ -4,6 +4,13 @@
   <%= @task %>
 </h1>
 
+<% if @task.task_documentation %>
+  </br>
+  <h4 class="subtitle is-4">Documentation:</h4>
+  <p><%= @task.task_documentation %></p>
+  </br>
+<% end %>
+
 <div class="buttons">
   <%= form_with url: task_runs_path(@task), method: :post do |form| %>
     <% if @task.csv_task? %>

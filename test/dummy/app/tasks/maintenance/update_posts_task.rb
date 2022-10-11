@@ -6,6 +6,8 @@ module Maintenance
       attr_accessor :fast_task
     end
 
+    documentation "This task updates posts"
+
     def collection
       Post.all
     end

@@ -21,6 +21,9 @@ module MaintenanceTasks
     # @api private
     class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
+    # @api private
+    class_attribute :task_documentation
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
@@ -167,6 +170,13 @@ module MaintenanceTasks
       #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
       def after_error(*filter_list, &block)
         set_callback(:error, :after, *filter_list, &block)
+      end
+
+      # Set the documentation string for the task
+      #
+      # @param doc [String] the documentation for the task
+      def documentation(doc)
+        self.task_documentation = doc
       end
 
       private
