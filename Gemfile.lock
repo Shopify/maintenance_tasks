@@ -256,7 +256,7 @@ DEPENDENCIES
   net-smtp
   pg
   pry-byebug
-  puma
+  puma (< 6.0)
   rails
   rubocop (= 1.36.0)
   rubocop-shopify

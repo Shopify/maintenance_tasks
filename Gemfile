@@ -10,7 +10,7 @@ gem "mocha"
 gem "net-smtp" # mail is missing a dependency on net-smtp https://github.com/mikel/mail/pull/1439
 gem "pg"
 gem "pry-byebug"
-gem "puma"
+gem "puma", "< 6.0"
 if defined?(@rails_gem_requirement) && @rails_gem_requirement
   # causes Dependabot to ignore the next line and update the next gem "rails"
   rails = "rails"
