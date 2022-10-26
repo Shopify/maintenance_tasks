@@ -37,8 +37,10 @@ take a look at the [Active Job documentation][active-job-docs].
 ### Autoloading
 
 The Maintenance Tasks framework does not support autoloading in `:classic` mode.
-Please ensure your application is using [Zeitwerk](https://github.com/fxn/zeitwerk) to load your code.
-For more information, please consult the [Rails guides on autoloading and reloading constants](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html).
+Please ensure your application is using
+[Zeitwerk](https://github.com/fxn/zeitwerk) to load your code.  For more
+information, please consult the [Rails guides on autoloading and reloading
+constants](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html).
 
 ## Usage
 
@@ -70,11 +72,12 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
   over.
 * `process`: do the work of your maintenance task on a single record
 
-Optionally, tasks can also implement a custom `#count` method, defining the number
-of elements that will be iterated over. Your task's `tick_total` will be calculated
-automatically based on the collection size, but this value may be overridden if desired
-using the `#count` method (this might be done, for example, to avoid the query that would
-be produced to determine the size of your collection).
+Optionally, tasks can also implement a custom `#count` method, defining the
+number of elements that will be iterated over. Your task's `tick_total` will be
+calculated automatically based on the collection size, but this value may be
+overridden if desired using the `#count` method (this might be done, for
+example, to avoid the query that would be produced to determine the size of your
+collection).
 
 Example:
 
@@ -527,7 +530,8 @@ bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv "path/t
 The `--csv` option also works with CSV content coming from the standard input:
 
 ```sh-session
-curl "some/remote/csv" | bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv
+curl "some/remote/csv" |
+  bundle exec maintenance_tasks perform Maintenance::ImportPostsTask --csv
 ```
 
 To run a Task that takes arguments from the command line, use the `--arguments`
