@@ -730,7 +730,7 @@ If no value is specified, it will default to 1 second.
 #### Customizing which Active Storage service to use
 
 The Active Storage framework in Rails 6.1 and up supports multiple storage
-services per environment. To specify which service to use,
+services. To specify which service to use,
 `MaintenanceTasks.active_storage_service` can be configured with the service's
 key, as specified in your application's `config/storage.yml`:
 
@@ -757,7 +757,8 @@ MaintenanceTasks.active_storage_service = :internal
 ```
 
 There is no need to configure this option if your application uses only one
-storage service per environment.
+storage service. `Rails.configuration.active_storage.service` is used by
+default.
 
 #### Customizing the backtrace cleaner
 
