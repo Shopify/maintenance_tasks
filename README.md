@@ -72,7 +72,7 @@ The generated task is a subclass of `MaintenanceTasks::Task` that implements:
 
 Optionally, tasks can also implement a custom `#count` method, defining the number
 of elements that will be iterated over. Your task's `tick_total` will be calculated
-automatically based on the collection size, but this value may be overriden if desired
+automatically based on the collection size, but this value may be overridden if desired
 using the `#count` method (this might be done, for example, to avoid the query that would
 be produced to determine the size of your collection).
 
@@ -99,7 +99,7 @@ end
 You can also write a Task that iterates on a CSV file. Note that writing CSV
 Tasks **requires Active Storage to be configured**. Ensure that the dependency
 is specified in your application's Gemfile, and that you've followed the [setup
-instuctions][setup].
+instructions][setup].
 
 [setup]: https://edgeguides.rubyonrails.org/active_storage_overview.html#setup
 
@@ -134,7 +134,7 @@ My Title,Hello World!
 ```
 
 The files uploaded to your Active Storage service provider will be renamed
-to include an ISO8601 timestamp and the Task name in snake case format.
+to include an ISO 8601 timestamp and the Task name in snake case format.
 The CSV is expected to have a trailing newline at the end of the file.
 
 #### Batch CSV Tasks
@@ -273,7 +273,7 @@ Tasks can define multiple throttle conditions. Throttle conditions are inherited
 by descendants, and new conditions will be appended without impacting existing
 conditions.
 
-The backoff can also be specified as a proc:
+The backoff can also be specified as a Proc:
 
 ```ruby
 # app/tasks/maintenance/update_posts_throttled_task.rb
@@ -477,7 +477,7 @@ end
 
 ### Writing tests for a Task with parameters
 
-Tests for tasks with parameters need to instatiate the task class in order to
+Tests for tasks with parameters need to instantiate the task class in order to
 assign attributes. Once the task instance is setup, you may test `#process`
 normally.
 
