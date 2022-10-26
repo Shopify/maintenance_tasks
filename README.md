@@ -33,7 +33,6 @@ take a look at the [Active Job documentation][active-job-docs].
 [async-adapter]: https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/AsyncAdapter.html
 [active-job-docs]: https://guides.rubyonrails.org/active_job_basics.html#setting-the-backend
 
-
 ### Autoloading
 
 The Maintenance Tasks framework does not support autoloading in `:classic` mode.
@@ -292,6 +291,7 @@ module Maintenance
   end
 end
 ```
+
 ### Custom Task Parameters
 
 Tasks may need additional information, supplied via parameters, to run.
