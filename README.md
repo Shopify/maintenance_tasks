@@ -99,9 +99,11 @@ end
 You can also write a Task that iterates on a CSV file. Note that writing CSV
 Tasks **requires Active Storage to be configured**. Ensure that the dependency
 is specified in your application's Gemfile, and that you've followed the [setup
-instructions][setup].
+instructions][storage-setup]. See also [Customizing which Active Storage service
+to use][storage-customizing].
 
-[setup]: https://edgeguides.rubyonrails.org/active_storage_overview.html#setup
+[storage-setup]: https://edgeguides.rubyonrails.org/active_storage_overview.html#setup
+[storage-customizing]: #customizing-which-active-storage-service-to-use
 
 Generate a CSV Task by running:
 
