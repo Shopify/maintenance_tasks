@@ -8,4 +8,6 @@ module MaintenanceTasks
   class ApplicationRecord < ActiveRecord::Base
     self.abstract_class = true
   end
+
+  ActiveSupport.run_load_hooks(:maintenance_tasks_record, ApplicationRecord)
 end
