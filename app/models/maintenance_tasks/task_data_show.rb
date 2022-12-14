@@ -11,26 +11,6 @@ module MaintenanceTasks
   #
   # @api private
   class TaskDataShow
-    class << self
-      # Initializes a Task Data by name, raising if the Task does not exist.
-      #
-      # For the purpose of this method, a Task does not exist if it's deleted
-      # and doesn't have a Run. While technically, it could have existed and
-      # been deleted since, if it never had a Run we may as well consider it
-      # non-existent since we don't have interesting data to show.
-      #
-      # @param name [String] the name of the Task subclass.
-      # @return [TaskDataShow] a Task Data instance.
-      # @raise [Task::NotFoundError] if the Task does not exist and doesn't have
-      #   a Run.
-      def find(name)
-        task_data = new(name)
-        task_data.active_runs.load
-        task_data.has_any_run? || Task.named(name)
-        task_data
-      end
-    end
-
     # Initializes a Task Data with a name and optionally a related run.
     #
     # @param name [String] the name of the Task subclass.
@@ -105,12 +85,6 @@ module MaintenanceTasks
       return if deleted?
 
       MaintenanceTasks::Task.named(name).new
-    end
-
-    # @return [Boolean] whether the Task has any Run.
-    # @api private
-    def has_any_run?
-      active_runs.any? || completed_runs.any?
     end
 
     private
