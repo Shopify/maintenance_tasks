@@ -4,22 +4,6 @@ require "test_helper"
 
 module MaintenanceTasks
   class TaskDataShowTest < ActiveSupport::TestCase
-    test ".find returns a TaskDataShow for an existing Task" do
-      task_data = TaskDataShow.find("Maintenance::UpdatePostsTask")
-      assert_equal "Maintenance::UpdatePostsTask", task_data.name
-    end
-
-    test ".find returns a TaskDataShow for a deleted Task with a Run" do
-      task_data = TaskDataShow.find("Maintenance::DeletedTask")
-      assert_equal "Maintenance::DeletedTask", task_data.name
-    end
-
-    test ".find raises if the Task does not exist" do
-      assert_raises Task::NotFoundError do
-        TaskDataShow.find("Maintenance::DoesNotExist")
-      end
-    end
-
     test "#code returns the code source of the Task" do
       task_data = TaskDataShow.new("Maintenance::UpdatePostsTask")
 
@@ -55,7 +39,7 @@ module MaintenanceTasks
 
       Run.create!(task_name: "Maintenance::UpdatePostsTask")
 
-      task_data = TaskDataShow.find("Maintenance::UpdatePostsTask")
+      task_data = TaskDataShow.new("Maintenance::UpdatePostsTask")
 
       assert_equal 2, task_data.completed_runs.count
       assert_equal run_2, task_data.completed_runs.first
@@ -65,7 +49,7 @@ module MaintenanceTasks
     test "#completed_runs is empty when there are no Runs for the Task" do
       Run.destroy_all
 
-      task_data = TaskDataShow.find("Maintenance::UpdatePostsTask")
+      task_data = TaskDataShow.new("Maintenance::UpdatePostsTask")
 
       assert_empty task_data.completed_runs
     end
