@@ -28,7 +28,7 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
         cache-version: 1
-        rubygems: ${{ matrix.ruby == '2.7' && 'latest' || 'default' }}
+        rubygems: ${{ (matrix.ruby == '2.7' || matrix.ruby == '3.0') && 'latest' || 'default' }}
     - name: Rails version
       if: ${{ matrix.gemfile == 'gemfiles/rails_edge.gemfile' }}
       run: bundle info rails | head -1
