@@ -23,8 +23,10 @@ module MaintenanceTasks
 
     test "invalid if content_type is not text/csv" do
       run = Run.new(task_name: "Maintenance::ImportPostsTask")
-      tsv = Rack::Test::UploadedFile.new(file_fixture("sample.tsv"),
-        "text/tab-separated-values")
+      tsv = Rack::Test::UploadedFile.new(
+        file_fixture("sample.tsv"),
+        "text/tab-separated-values",
+      )
       run.csv_file.attach(tsv)
       refute_predicate run, :valid?
     end
@@ -66,8 +68,10 @@ module MaintenanceTasks
     end
 
     test "#persist_transition calls the interrupt callback" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "running")
+      run = Run.create!(
+        task_name: "Maintenance::CallbackTestTask",
+        status: "running",
+      )
       run.status = :interrupted
       run.task.expects(:after_interrupt_callback)
       run.persist_transition
@@ -81,8 +85,10 @@ module MaintenanceTasks
     end
 
     test "#persist_transition calls the cancel callback" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "cancelling")
+      run = Run.create!(
+        task_name: "Maintenance::CallbackTestTask",
+        status: "cancelling",
+      )
       run.status = :cancelled
       run.task.expects(:after_cancel_callback)
       run.persist_transition
@@ -555,8 +561,10 @@ module MaintenanceTasks
     end
 
     test "#cancel calls the cancel callback if the job was paused" do
-      run = Run.create!(task_name: "Maintenance::CallbackTestTask",
-        status: "paused")
+      run = Run.create!(
+        task_name: "Maintenance::CallbackTestTask",
+        status: "paused",
+      )
       run.task.expects(:after_cancel_callback)
       run.cancel
     end
