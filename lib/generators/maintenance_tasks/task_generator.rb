@@ -9,10 +9,14 @@ module MaintenanceTasks
     desc "This generator creates a task file at app/tasks and a corresponding "\
       "test."
 
-    class_option :csv, type: :boolean, default: false,
+    class_option :csv,
+      type: :boolean,
+      default: false,
       desc: "Generate a CSV Task."
 
-    class_option :no_collection, type: :boolean, default: false,
+    class_option :no_collection,
+      type: :boolean,
+      default: false,
       desc: "Generate a collection-less Task."
 
     check_class_collision suffix: "Task"

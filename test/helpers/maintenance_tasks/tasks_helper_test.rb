@@ -73,9 +73,11 @@ module MaintenanceTasks
 
     test "#highlight_code does not wrap whitespace" do
       assert_equal '<span class="ruby-int">1</span>' + "\n"\
-        '<span class="ruby-int">2</span>', highlight_code("1\n2")
+        '<span class="ruby-int">2</span>',
+        highlight_code("1\n2")
       assert_equal '<span class="ruby-int">1</span>' + " "\
-        '<span class="ruby-int">2</span>', highlight_code("1 2")
+        '<span class="ruby-int">2</span>',
+        highlight_code("1 2")
       assert_equal "\n", highlight_code("\n")
     end
 

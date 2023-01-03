@@ -37,9 +37,9 @@ module MaintenanceTasks
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
-    validates :task_name, on: :create, inclusion: { in: ->(_) {
-      Task.available_tasks.map(&:to_s)
-    } }
+    validates :task_name, on: :create, inclusion: {
+      in: ->(_) { Task.available_tasks.map(&:to_s) },
+    }
     validate :csv_attachment_presence, on: :create
     validate :csv_content_type, on: :create
     validate :validate_task_arguments, on: :create
