@@ -193,17 +193,17 @@ GEM
     rake (13.0.6)
     regexp_parser (2.6.1)
     rexml (3.2.5)
-    rubocop (1.40.0)
+    rubocop (1.42.0)
       json (~> 2.3)
       parallel (~> 1.10)
       parser (>= 3.1.2.1)
       rainbow (>= 2.2.2, < 4.0)
       regexp_parser (>= 1.8, < 3.0)
       rexml (>= 3.2.5, < 4.0)
-      rubocop-ast (>= 1.23.0, < 2.0)
+      rubocop-ast (>= 1.24.1, < 2.0)
       ruby-progressbar (~> 1.7)
       unicode-display_width (>= 1.4.0, < 3.0)
-    rubocop-ast (1.24.0)
+    rubocop-ast (1.24.1)
       parser (>= 3.1.1.0)
     rubocop-shopify (2.10.1)
       rubocop (~> 1.35)
@@ -266,7 +266,7 @@ DEPENDENCIES
   pry-byebug
   puma (< 7.0)
   rails
-  rubocop (= 1.40.0)
+  rubocop (= 1.42.0)
   rubocop-shopify
   selenium-webdriver
   sprockets-rails
