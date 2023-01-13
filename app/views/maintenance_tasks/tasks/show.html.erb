@@ -38,12 +38,12 @@
   <pre><code><%= highlight_code(code) %></code></pre>
 <% end %>
 
-<% if @active_runs.any? %>
+<% if @task.active_runs.any? %>
   <hr/>
 
   <h4 class="title is-4">Active Runs</h4>
 
-  <%= render @active_runs %>
+  <%= render @task.active_runs %>
 <% end %>
 
 <% if @runs_page.records.present? %>
