@@ -85,6 +85,7 @@ module MaintenanceTasks
       run = Run.new(task_name: "Maintenance::ImportPostsTask")
       csv = Rack::Test::UploadedFile.new(file_fixture("sample.csv"), "text/csv")
       run.csv_file.attach(csv)
+      run.save!
 
       assert_match %r{rails/active_storage/blobs/\S+/sample.csv},
         csv_file_download_path(run)
