@@ -19,7 +19,7 @@ if defined?(@rails_gem_requirement) && @rails_gem_requirement
 else
   gem "rails"
 end
-gem "rubocop", "1.43.0"
+gem "rubocop", "1.44.0"
 gem "rubocop-shopify"
 gem "selenium-webdriver"
 gem "sprockets-rails"
