@@ -13,10 +13,7 @@ Before engaging with this community, please read and understand our
 
 ## Setting up development environment
 
-* Make sure you have PostgreSQL installed, to be able to build the `pg` gem's
-  native extensions.
-  * If you're on MacOS and using Homebrew, you can `brew install postgresql`.
-* Everything else follows standard Rails practices:
+* The gem follows standard Rails practices:
   * `bundle install` to install dependencies
   * `bin/rails server` to start the server
   * `bin/rails test` to run tests
