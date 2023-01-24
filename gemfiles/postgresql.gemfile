@@ -1,0 +1,5 @@
+# frozen_string_literal: true
+
+gem "pg"
+
+eval_gemfile "../Gemfile"
