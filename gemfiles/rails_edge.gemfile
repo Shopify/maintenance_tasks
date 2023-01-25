@@ -3,3 +3,4 @@
 @rails_gem_requirement = { github: "rails/rails" }
 
 eval_gemfile "../Gemfile"
+gem "rack", "< 3"
