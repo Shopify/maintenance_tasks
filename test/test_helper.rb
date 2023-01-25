@@ -40,6 +40,11 @@ require "csv"
 module Warning
   class << self
     def warn(message)
+      # gems/selenium-webdriver-4.7.1/lib/selenium/webdriver/remote/bridge.rb:633:
+      # warning: Expected selenium/webdriver/remote/commands
+      # to define Selenium::WebDriver::Remote::COMMANDS but it didn't
+      return if message.match?(/Selenium::WebDriver::Remote::COMMANDS/)
+
       raise message.to_s
     end
   end

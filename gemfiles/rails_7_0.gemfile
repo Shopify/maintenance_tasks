@@ -1,0 +1,5 @@
+# frozen_string_literal: true
+
+@rails_gem_requirement = "~> 7.0.4"
+
+eval_gemfile "../Gemfile"
