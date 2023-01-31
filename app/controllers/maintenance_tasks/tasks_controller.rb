@@ -23,7 +23,7 @@ module MaintenanceTasks
       @task.active_runs.load
       set_refresh if @task.active_runs.any?
       @runs_page = RunsPage.new(@task.completed_runs, params[:cursor])
-      unless @task.active_runs.any? || @runs_page.records.any?
+      if @task.active_runs.none? && @runs_page.records.none?
         Task.named(task_name)
       end
     end
