@@ -1,5 +1,4 @@
 .bundle/
-.byebug_history
 .yardoc/
 doc/
 gemfiles/rails_6_0.gemfile.lock
