@@ -1,8 +1,7 @@
 .bundle/
 .yardoc/
 doc/
-gemfiles/rails_6_0.gemfile.lock
-gemfiles/rails_edge.gemfile.lock
+gemfiles/*.gemfile.lock
 log/*.log
 pkg/
 test/dummy/db/*.sqlite3
