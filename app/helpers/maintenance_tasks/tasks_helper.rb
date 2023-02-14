@@ -104,9 +104,10 @@ module MaintenanceTasks
     # Return the appropriate field tag for the parameter
     def parameter_field(form_builder, parameter_name)
       case form_builder.object.class.attribute_types[parameter_name]
-      when ActiveModel::Type::Integer, ActiveModel::Type::Decimal,
-           ActiveModel::Type::Float
+      when ActiveModel::Type::Integer
         form_builder.number_field(parameter_name)
+      when ActiveModel::Type::Decimal, ActiveModel::Type::Float
+        form_builder.number_field(parameter_name, { step: "any" })
       when ActiveModel::Type::DateTime
         form_builder.datetime_field(parameter_name)
       when ActiveModel::Type::Date
