@@ -2,7 +2,6 @@
 
 require "test_helper"
 require "webdrivers/chromedriver"
-require "selenium/webdriver/remote/commands"
 require "action_dispatch/system_testing/server"
 
 ActionDispatch::SystemTesting::Server.silence_puma = true
