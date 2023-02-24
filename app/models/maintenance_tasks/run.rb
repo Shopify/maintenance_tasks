@@ -46,8 +46,13 @@ module MaintenanceTasks
 
     attr_readonly :task_name
 
-    serialize :backtrace
-    serialize :arguments, JSON
+    if Rails.gem_version >= Gem::Version.new("7.1.alpha")
+      serialize :backtrace, coder: YAML
+      serialize :arguments, coder: JSON
+    else
+      serialize :backtrace
+      serialize :arguments, JSON
+    end
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }
     scope :completed, -> { where(status: COMPLETED_STATUSES) }
