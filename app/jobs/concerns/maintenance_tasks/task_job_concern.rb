@@ -177,7 +177,7 @@ module MaintenanceTasks
       end
       errored_element = @errored_element if defined?(@errored_element)
     ensure
-      MaintenanceTasks.error_handler.call(error, task_context, errored_element)
+      instance_exec(*[error, task_context, errored_element], &MaintenanceTasks.error_handler)
     end
   end
 end
