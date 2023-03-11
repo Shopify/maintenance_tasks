@@ -33,17 +33,19 @@
 
     <script>
       function refresh() {
-        if (!("refresh" in document.body.dataset)) return
+        const target = document.querySelector("[data-refresh]")
+        if (!target || !target.dataset.refresh) return
         window.setTimeout(() => {
           document.body.style.cursor = "wait"
           fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } }).then(
             async response => {
               const text = await response.text()
               const newDocument = new DOMParser().parseFromString(text, "text/html")
-              document.body.replaceWith(newDocument.body)
-              <%# force a redraw for Safari %>
-              window.scrollTo({ top: document.documentElement.scrollTop + 1 })
-              window.scrollTo({ top: document.documentElement.scrollTop - 1 })
+              const newTarget = newDocument.querySelector("[data-refresh]")
+              if (newTarget) {
+                target.replaceWith(newTarget)
+              }
+              document.body.style.cursor = ""
               refresh()
             },
             error => location.reload()
@@ -54,7 +56,7 @@
     </script>
   </head>
 
-  <%= tag.body(data: { refresh: defined?(@refresh) && @refresh }) do %>
+  <body>
     <%= render 'layouts/maintenance_tasks/navbar' %>
 
     <section class="section">
@@ -68,5 +70,5 @@
         <%= yield %>
       </div>
     </div>
-  <% end %>
+  </body>
 </html>

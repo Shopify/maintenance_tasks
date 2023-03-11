@@ -15,7 +15,7 @@ module MaintenanceTasks
       )
       policy.script_src(
         # page refresh script
-        "'sha256-2RPaBS4XCMLp0JJ/sW407W9l4qjC+WQAHmTOFJTGfqo='",
+        "'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='",
       )
       policy.frame_ancestors(:self)
     end
