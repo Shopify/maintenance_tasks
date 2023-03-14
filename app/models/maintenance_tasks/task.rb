@@ -175,7 +175,17 @@ module MaintenanceTasks
         namespace = MaintenanceTasks.tasks_module.safe_constantize
         return unless namespace
 
-        namespace.constants.map { |constant| namespace.const_get(constant) }
+        namespace.constants
+          .map { |constant| namespace.const_get(constant) }
+          .filter { |klass| can_initialize?(klass) }
+      end
+
+      def can_initialize?(klass)
+        klass.new
+
+        true
+      rescue
+        false
       end
     end
 
