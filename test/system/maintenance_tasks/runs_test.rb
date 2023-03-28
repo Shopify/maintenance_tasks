@@ -34,18 +34,19 @@ module MaintenanceTasks
       post_id = Post.first.id
       fill_in("_task_arguments_post_ids", with: post_id.to_s)
 
-      perform_enqueued_jobs do
-        click_on "Run"
-      end
+      click_on "Run"
+      fill_in("_task_arguments_post_ids", with: "42")
+      perform_enqueued_jobs
 
       assert_title "Maintenance::ParamsTask"
-      assert_text "Succeeded"
+      assert_text "Succeeded", wait: 3 # refreshes every 3 seconds
       assert_text "Processed 1 out of 1 item (100%)."
       assert_text "Arguments"
       assert_table do |table|
         table.assert_text("post_ids")
         table.assert_text(post_id.to_s)
       end
+      assert has_field?("_task_arguments_post_ids", with: "42")
     end
 
     test "errors for Task with invalid arguments shown" do
