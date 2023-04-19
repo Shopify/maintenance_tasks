@@ -696,6 +696,26 @@ MaintenanceTasks.tasks_module = "TaskModule"
 
 If no value is specified, it will default to `Maintenance`.
 
+#### Organizing tasks using namespaces
+
+Tasks may be nested arbitrarily deeply under `app/tasks/maintenance`, for example given a
+task file `app/tasks/maintenance/team_name/service_name/update_posts_task.rb` we
+can define the task as:
+
+```ruby
+module Maintenance
+  module TeamName
+    module ServiceName
+      class UpdatePostsTask < MaintenanceTasks::Task
+        def process(rows)
+          # ...
+        end
+      end
+    end
+  end
+end
+```
+
 #### Customizing the underlying job class
 
 `MaintenanceTasks.job` can be configured to define a Job class for your tasks to
