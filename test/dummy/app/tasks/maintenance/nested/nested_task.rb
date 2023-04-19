@@ -3,7 +3,9 @@
 module Maintenance
   module Nested
     class NestedTask < MaintenanceTasks::Task
-      def process(rows)
+      no_collection
+
+      def process
         # Task only exists to verify correct loading of tasks within subfolders
       end
     end
