@@ -27,6 +27,7 @@ module MaintenanceTasks
         "Maintenance::CancelledEnqueueTask\nNew",
         "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
+        "Maintenance::Nested::NestedTask\nNew",
         "Maintenance::ParamsTask\nNew",
         "Maintenance::TestTask\nNew",
         "Maintenance::UpdatePostsInBatchesTask\nNew",
