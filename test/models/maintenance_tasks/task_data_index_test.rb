@@ -12,6 +12,8 @@ module MaintenanceTasks
         "Maintenance::EnqueueErrorTask",
         "Maintenance::ErrorTask",
         "Maintenance::ImportPostsTask",
+        "Maintenance::Nested::NestedMore::NestedMoreTask",
+        "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",
         # duplicate due to fixtures containing two active runs of this task
         "Maintenance::NoCollectionTask",

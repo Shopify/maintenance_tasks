@@ -12,6 +12,8 @@ module MaintenanceTasks
         "Maintenance::EnqueueErrorTask",
         "Maintenance::ErrorTask",
         "Maintenance::ImportPostsTask",
+        "Maintenance::Nested::NestedMore::NestedMoreTask",
+        "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
