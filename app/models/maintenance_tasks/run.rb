@@ -32,7 +32,6 @@ module MaintenanceTasks
       :cancelled,
     ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
-    COMPLETED_RUNS_LIMIT = 10
     STUCK_TASK_TIMEOUT = 5.minutes
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
