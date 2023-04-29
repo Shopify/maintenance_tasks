@@ -63,6 +63,15 @@ module MaintenanceTasks
       tag.span(status.capitalize, class: ["tag"] + STATUS_COLOURS.fetch(status))
     end
 
+    # Returns the list of all available tags.
+    #
+    # This list is used to filter Tasks by tags in the index page.
+    #
+    # @return [Array<String>] the list of all available tags.
+    def tag_names
+      MaintenanceTasks::Task.available_tasks.map(&:tags).flatten.uniq
+    end
+
     # Reports the approximate elapsed time a Run has been processed so far based
     # on the Run's time running attribute.
     #

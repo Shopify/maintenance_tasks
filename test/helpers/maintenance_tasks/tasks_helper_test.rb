@@ -54,6 +54,10 @@ module MaintenanceTasks
       assert_equal expected, status_tag("pausing")
     end
 
+    test "#tag_names returns a lists of tags assigned to tasks" do
+      assert_equal ["data_maintenance", "one_off"], tag_names
+    end
+
     test "#time_running_in_words reports the approximate time running of the given Run" do
       @run.time_running = 182.5
       assert_equal "3 minutes", time_running_in_words(@run)

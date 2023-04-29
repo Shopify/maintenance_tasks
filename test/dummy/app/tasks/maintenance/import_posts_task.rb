@@ -2,6 +2,8 @@
 
 module Maintenance
   class ImportPostsTask < MaintenanceTasks::Task
+    self.tags = [:data_maintenance]
+
     csv_collection
 
     def process(row)

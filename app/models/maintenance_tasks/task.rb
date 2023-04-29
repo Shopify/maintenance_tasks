@@ -21,6 +21,10 @@ module MaintenanceTasks
     # @api private
     class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
+    # The tags for a given Task. This is provided as an array of strings.
+    # Tags are used to group and filter tasks in the UI.
+    class_attribute :tags, default: []
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self

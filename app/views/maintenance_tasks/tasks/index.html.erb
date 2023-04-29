@@ -8,6 +8,14 @@
       </p>
     </div>
   <% else %>
+    <% if tag_names.any? %>
+      <h3 class="title is-3">Task Tags</h3>
+      <div class="box">
+        <% tag_names.each do |t| %>
+          <%= link_to "#{t} ", tasks_path(tag: t) %>
+        <% end %>
+      </div>
+    <% end %>
     <% if active_tasks = @available_tasks[:active] %>
       <h3 class="title is-3">Active Tasks</h3>
       <%= render partial: 'task', collection: active_tasks %>

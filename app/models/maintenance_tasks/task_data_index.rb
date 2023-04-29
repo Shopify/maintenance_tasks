@@ -19,13 +19,19 @@ module MaintenanceTasks
       # Determining a Task's category requires their latest Run records.
       # Two queries are done to get the currently active and completed Run
       # records, and Task Data instances are initialized with these related run
-      # values.
+      # values. Tasks are filtered by tag if a tag is provided.
       #
       # @return [Array<TaskDataIndex>] the list of Task Data.
-      def available_tasks
+      def available_tasks(tag = nil)
         tasks = []
 
-        task_names = Task.available_tasks.map(&:name)
+        task_names = Task.available_tasks
+
+        if tag.present?
+          task_names.select!{ |t| t.tags.include?(tag.to_sym) }
+        end
+
+        task_names.map!(&:name)
 
         active_runs = Run.with_attached_csv.active.where(task_name: task_names)
         active_runs.each do |run|

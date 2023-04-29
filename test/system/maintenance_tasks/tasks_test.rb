@@ -4,6 +4,15 @@ require "application_system_test_case"
 
 module MaintenanceTasks
   class TasksTest < ApplicationSystemTestCase
+    test "list all tags" do
+      visit maintenance_tasks_path
+
+      assert_title "Maintenance Tasks"
+
+      assert_link "one_off"
+      assert_link "data_maintenance"
+    end
+
     test "list all tasks" do
       visit maintenance_tasks_path
 
