@@ -12,7 +12,7 @@ module MaintenanceTasks
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
     def index
-      tag = params[:tag] || nil
+      tag = params[:tag]
 
       @available_tasks = TaskDataIndex.available_tasks(tag).group_by(&:category)
     end

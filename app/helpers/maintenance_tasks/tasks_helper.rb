@@ -69,7 +69,7 @@ module MaintenanceTasks
     #
     # @return [Array<String>] the list of all available tags.
     def tag_names
-      MaintenanceTasks::Task.available_tasks.map(&:tags).flatten.uniq
+      @tag_names = MaintenanceTasks::Task.available_tasks.flat_map(&:tags).uniq
     end
 
     # Reports the approximate elapsed time a Run has been processed so far based
