@@ -806,11 +806,12 @@ clean backtraces.
 
 #### Customizing the parent controller for the web UI
 
-`MaintenanceTasks.parent_controller` can be configured to specify a controller class 
-for all of the web UI engine's controllers to inherit from.
+`MaintenanceTasks.parent_controller` can be configured to specify a controller class for all of the web UI engine's
+controllers to inherit from.
 
-This allows applications with common logic in their `ApplicationController` (or any other controller) 
-to optionally configure the web UI to inherit that logic with a simple assignment in the initializer.
+This allows applications with common logic in their `ApplicationController` (or
+any other controller) to optionally configure the web UI to inherit that logic
+with a simple assignment in the initializer.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
@@ -826,8 +827,8 @@ class Services::CustomController < ActionController::Base
 end
 ```
 
-The parent controller value **must** be a string corresponding to an existing 
-controller class which **must inherit** from `ActionController::Base`. 
+The parent controller value **must** be a string corresponding to an existing
+controller class which **must inherit** from `ActionController::Base`.
 
 If no value is specified, it will default to `"ActionController::Base"`.
 
