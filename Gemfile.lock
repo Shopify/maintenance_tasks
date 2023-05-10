@@ -259,11 +259,11 @@ DEPENDENCIES
   mocha
   net-http
   net-smtp
-  puma (< 7.0)
+  puma
   rails
   rubocop
   rubocop-shopify
-  selenium-webdriver
+  selenium-webdriver (< 4.9.1)
   sprockets-rails
   sqlite3
   webdrivers
