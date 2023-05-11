@@ -4,7 +4,7 @@ module MaintenanceTasks
   # Base class for all controllers used by this engine.
   #
   # Can be extended to add different authentication and authorization code.
-  class ApplicationController < ActionController::Base
+  class ApplicationController < MaintenanceTasks.parent_controller.constantize
     BULMA_CDN = "https://cdn.jsdelivr.net"
 
     content_security_policy do |policy|
