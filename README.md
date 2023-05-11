@@ -816,7 +816,7 @@ with a simple assignment in the initializer.
 ```ruby
 # config/initializers/maintenance_tasks.rb
 
-MaintenanceTasks.parent_controller = "CustomController"
+MaintenanceTasks.parent_controller = "Services::CustomController"
 
 # app/controllers/services/custom_controller.rb
 
