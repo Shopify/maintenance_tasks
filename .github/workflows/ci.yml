@@ -10,11 +10,11 @@ jobs:
       fail-fast: false
       matrix:
         gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_6_1.gemfile, gemfiles/rails_7_0.gemfile, gemfiles/rails_edge.gemfile]
-        ruby: ["2.7", "3.0", "3.1", "3.2"]
+        ruby: ["3.0", "3.1", "3.2"]
         database: [sqlite]
         include:
           - gemfile: "gemfiles/postgresql.gemfile"
-            ruby: 3.1
+            ruby: 3.2
             database: postgres
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
@@ -28,7 +28,7 @@ jobs:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
         cache-version: 1
-        rubygems: ${{ (matrix.ruby == '2.7' || matrix.ruby == '3.0') && 'latest' || 'default' }}
+        rubygems: ${{ matrix.ruby == '3.0' && 'latest' || 'default' }}
     - name: Rails version
       if: ${{ matrix.gemfile == 'gemfiles/rails_edge.gemfile' }}
       run: bundle info rails | head -1
