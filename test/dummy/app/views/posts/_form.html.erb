@@ -11,6 +11,11 @@
     </div>
   <% end %>
 
+  <div>
+    <%= form.label :content, style: "display:block" %>
+    <%= form.text_area :content, cols: 80, rows: 42 %>
+  </div>
+
   <div class="actions">
     <%= form.submit %>
   </div>
