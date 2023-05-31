@@ -79,6 +79,11 @@ module MaintenanceTasks
       end
     end
 
+    # @return [String] the description of the task.
+    def description
+      !deleted? && Task.named(name).description
+    end
+
     # @return [MaintenanceTasks::Task, nil] an instance of the Task class.
     # @return [nil] if the Task file was deleted.
     def new

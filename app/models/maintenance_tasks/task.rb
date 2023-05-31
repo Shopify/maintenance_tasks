@@ -41,6 +41,16 @@ module MaintenanceTasks
         task
       end
 
+      # Sets/Returns a description of the task
+      #
+      # @param  [String] the description of the task.
+      #
+      # @return [Array<Class>] the list of classes.
+      def description(desc = nil)
+        @description = desc if desc
+        @description
+      end
+
       # Returns a list of concrete classes that inherit from the Task
       # superclass.
       #

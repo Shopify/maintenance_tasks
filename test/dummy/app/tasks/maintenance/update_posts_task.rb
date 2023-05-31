@@ -2,6 +2,8 @@
 
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
+    description "Updates every post with new content"
+
     class << self
       attr_accessor :fast_task
     end

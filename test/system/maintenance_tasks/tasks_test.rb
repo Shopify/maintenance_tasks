@@ -47,6 +47,7 @@ module MaintenanceTasks
       click_on("Maintenance::UpdatePostsTask")
 
       assert_title "Maintenance::UpdatePostsTask"
+      assert_text "Updates every post with new content"
       assert_selector "time", text: "January 01, 2020" do |tag|
         assert_equal "2020-01-01T01:00:00Z", tag[:title]
       end

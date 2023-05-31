@@ -2,6 +2,8 @@
 
 module Maintenance
   class ParamsTask < MaintenanceTasks::Task
+    description "An example task containing the different types of parameters."
+
     attribute :post_ids, :string
 
     validates :post_ids,
