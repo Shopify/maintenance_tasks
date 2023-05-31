@@ -22,6 +22,9 @@
               <div class="control">
                 <%= parameter_field(ff, parameter_name) %>
               </div>
+              <% unless @task.required_parameter?(parameter_name) %>
+                <p class="help">Optional</p>
+              <% end %>
             </div>
           <% end %>
         <% end %>

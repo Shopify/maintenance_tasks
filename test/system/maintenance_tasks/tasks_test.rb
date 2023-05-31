@@ -79,6 +79,15 @@ module MaintenanceTasks
       assert_equal("111222333", integer_attr_val)
     end
 
+    test "task with optional attributes renders with helper text on the form" do
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ParamsTask")
+
+      refute_selector ".field:has(label[for='_task_arguments_post_ids']) .help"
+      assert_selector ".field:has(label[for='_task_arguments_content']) .help", text: "Optional"
+    end
+
     test "task with attributes renders correct field tags on the form" do
       visit maintenance_tasks_path
 

@@ -79,6 +79,16 @@ module MaintenanceTasks
       end
     end
 
+    # Returns whether a given attribute name is required
+    # by checking if a presence validator is added to the attribute.
+    #
+    # @param attribute_name [String] the name of the Task attribute.
+    # @return [Boolean] whether the Task attribute is required
+    def required_parameter?(attribute_name)
+      Task.named(name).validators_on(attribute_name)
+        .any? { |v| v.is_a?(ActiveModel::Validations::PresenceValidator) }
+    end
+
     # @return [MaintenanceTasks::Task, nil] an instance of the Task class.
     # @return [nil] if the Task file was deleted.
     def new
