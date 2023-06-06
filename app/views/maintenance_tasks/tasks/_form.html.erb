@@ -1,0 +1,3 @@
+<%= form_tag(search_path, :method => "get") do %>
+    <%= search_field_tag :search, params[:search], placeholder: "Search for a task...", class:'input is-rounded' %>
+<% end %>

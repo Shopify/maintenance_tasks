@@ -1,5 +1,6 @@
-<nav class="navbar is-dark is-spaced" role="navigation" aria-label="main navigation">
-  <div class="navbar-brand">
-    <%= link_to 'Maintenance Tasks', root_path, class: 'navbar-item is-size-4 has-text-weight-semibold has-text-danger' %>
+<nav class="navbar is-dark px-5 py-3" role="navigation" aria-label="main navigation">
+  <div class="container navbar-brand is-justify-content-space-between is-align-items-center ">
+    <%= link_to 'Maintenance Tasks', root_path, class: 'navbar-item is-size-4 has-text-weight-semibold has-text-danger px-0' %>
+    <%= render partial: 'form', class:'navbar-item' %>
   </div>
 </nav>
