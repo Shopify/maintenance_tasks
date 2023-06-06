@@ -2,6 +2,7 @@
 
 module Maintenance
   class UpdatePostsThrottledTask < MaintenanceTasks::Task
+    self.archived = true
     class << self
       attr_accessor :throttle, :throttle_proc
     end

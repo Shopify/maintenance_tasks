@@ -18,6 +18,7 @@ module MaintenanceTasks
       "cancelling" => ["is-light"],
       "cancelled" => ["is-dark"],
       "errored" => ["is-danger"],
+      "archived" => ["is-black"],
     }
 
     # Formats a run backtrace.
@@ -59,8 +60,10 @@ module MaintenanceTasks
     # @param status [String] the status for the Run.
     # @return [String] the span element containing the status, with the
     #   appropriate tag class attached.
-    def status_tag(status)
-      tag.span(status.capitalize, class: ["tag"] + STATUS_COLOURS.fetch(status))
+    def status_tag(status, size = :normal)
+      classes = ["tag"] + STATUS_COLOURS.fetch(status)
+      classes << "is-large" if size == :large
+      tag.span(status.capitalize, class: classes)
     end
 
     # Reports the approximate elapsed time a Run has been processed so far based

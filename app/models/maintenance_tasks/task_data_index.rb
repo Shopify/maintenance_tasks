@@ -25,11 +25,13 @@ module MaintenanceTasks
       def available_tasks
         tasks = []
 
-        task_names = Task.available_tasks.map(&:name)
+        available_tasks = Task.available_tasks
+        task_names = available_tasks.map(&:name)
 
         active_runs = Run.with_attached_csv.active.where(task_name: task_names)
         active_runs.each do |run|
-          tasks << TaskDataIndex.new(run.task_name, run)
+          task = available_tasks.find { |task| task.name == run.task_name }
+          tasks << TaskDataIndex.new(run.task_name, task.archived?, run)
           task_names.delete(run.task_name)
         end
 
@@ -37,7 +39,8 @@ module MaintenanceTasks
         last_runs = Run.with_attached_csv.where(id: completed_runs.select("MAX(id) as id").group(:task_name))
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }
-          tasks << TaskDataIndex.new(task_name, last_run)
+          task = available_tasks.find { |task| task.name == task_name }
+          tasks << TaskDataIndex.new(task_name, task.archived?, last_run)
         end
 
         # We add an additional sorting key (status) to avoid possible
@@ -52,14 +55,16 @@ module MaintenanceTasks
     # @param name [String] the name of the Task subclass.
     # @param related_run [MaintenanceTasks::Run] optionally, a Run record to
     #   set for the Task.
-    def initialize(name, related_run = nil)
+    def initialize(name, archived, related_run = nil)
       @name = name
+      @archived = archived
       @related_run = related_run
     end
 
     # @return [String] the name of the Task.
     attr_reader :name
     attr_reader :related_run
+    attr_reader :archived
 
     alias_method :to_s, :name
 
@@ -68,14 +73,16 @@ module MaintenanceTasks
     #
     # @return [String] the Task status.
     def status
-      related_run&.status || "new"
+      archived ? "archived" : related_run&.status || "new"
     end
 
     # Retrieves the Task's category, which is one of active, new, or completed.
     #
     # @return [Symbol] the category of the Task.
     def category
-      if related_run.present? && related_run.active?
+      if archived
+        :archived
+      elsif related_run.present? && related_run.active?
         :active
       elsif related_run.nil?
         :new

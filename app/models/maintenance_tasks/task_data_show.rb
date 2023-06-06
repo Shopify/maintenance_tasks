@@ -65,6 +65,11 @@ module MaintenanceTasks
       true
     end
 
+    # @return [Boolean] whether the Task has been archived.
+    def archived?
+      !deleted? && Task.named(name).archived?
+    end
+
     # @return [Boolean] whether the Task inherits from CsvTask.
     def csv_task?
       !deleted? && Task.named(name).has_csv_content?

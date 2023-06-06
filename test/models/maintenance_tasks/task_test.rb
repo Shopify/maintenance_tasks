@@ -6,6 +6,7 @@ module MaintenanceTasks
   class TaskTest < ActiveSupport::TestCase
     test ".available_tasks returns list of tasks that inherit from the Task superclass" do
       expected = [
+        "Maintenance::ArchivedTask",
         "Maintenance::BatchImportPostsTask",
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
@@ -96,6 +97,10 @@ module MaintenanceTasks
       assert_equal(30.seconds, condition[:backoff].call)
     ensure
       Maintenance::TestTask.throttle_conditions = []
+    end
+
+    test ".archived inherits conditions from superclass" do
+      assert_equal false, Maintenance::TestTask.archived
     end
   end
 end

@@ -4,6 +4,7 @@ require "test_module"
 
 module Maintenance
   class UpdatePostsModulePrependedTask < MaintenanceTasks::Task
+    self.archived = true
     prepend TestModule
 
     class << self

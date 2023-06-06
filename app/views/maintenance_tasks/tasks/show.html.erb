@@ -2,6 +2,7 @@
 
 <h1 class="title is-1">
   <%= @task %>
+  <%= @task.archived? && status_tag("archived", :large) %>
 </h1>
 
 <div class="buttons">
@@ -29,7 +30,7 @@
     <% end %>
     <%= render "maintenance_tasks/tasks/custom", form: form %>
     <div class="block">
-      <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
+      <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? || @task.archived? %>
     </div>
   <% end %>
 </div>

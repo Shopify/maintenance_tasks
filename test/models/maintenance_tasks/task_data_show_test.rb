@@ -62,6 +62,18 @@ module MaintenanceTasks
       refute_predicate TaskDataShow.new("Maintenance::UpdatePostsTask"), :deleted?
     end
 
+    test "#archived? returns true if the Task is archived" do
+      assert_predicate TaskDataShow.new("Maintenance::ArchivedTask"), :archived?
+    end
+
+    test "#archived? returns false if the Task is not archived" do
+      refute_predicate TaskDataShow.new("Maintenance::TestTask"), :archived?
+    end
+
+    test "#archived? returns false if the Task is deleted" do
+      refute_predicate TaskDataShow.new("Maintenance::DoesNotExist"), :archived?
+    end
+
     test "#csv_task? returns true if the Task includes the CsvTask module" do
       assert_predicate TaskDataShow.new("Maintenance::ImportPostsTask"), :csv_task?
     end

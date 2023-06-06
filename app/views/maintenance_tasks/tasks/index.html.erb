@@ -20,5 +20,9 @@
       <h3 class="title is-3">Completed Tasks</h3>
       <%= render partial: 'task', collection: completed_tasks %>
     <% end %>
+    <% if archived_tasks = @available_tasks[:archived] %>
+      <h3 class="title is-3">Archived Tasks</h3>
+      <%= render partial: 'task', collection: archived_tasks %>
+    <% end %>
   <% end %>
 <% end %>
