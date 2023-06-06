@@ -15,6 +15,15 @@ module MaintenanceTasks
       @available_tasks = TaskDataIndex.available_tasks.group_by(&:category)
     end
 
+    def search
+      if params[:search].blank?
+        redirect_to tasks_path and return
+      else
+        @parameter = params[:search]
+        @available_tasks = TaskDataIndex.available_tasks.select { |task| task.name.include? "#{@parameter}" }.group_by(&:category)
+      end
+    end
+
     # Renders the page responsible for providing Task actions to users.
     # Shows running and completed instances of the Task.
     def show

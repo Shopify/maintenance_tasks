@@ -1,0 +1,9 @@
+<%= tag.div(data: { refresh: (defined?(@refresh) && @refresh) || "" }) do %>
+  <% if @available_tasks.empty? %>
+    <div class="content is-large">
+      <h3 class="title is-3"> No results found </h3>
+    </div>
+  <% else %>
+    <%= render partial: 'results' %>
+  <% end %>
+<% end %>
