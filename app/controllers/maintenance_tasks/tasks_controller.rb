@@ -19,8 +19,8 @@ module MaintenanceTasks
       if params[:search].blank?
         redirect_to tasks_path and return
       else
-        @parameter = params[:search]
-        @available_tasks = TaskDataIndex.available_tasks.select { |task| task.name.include? "#{@parameter}" }.group_by(&:category)
+        @parameter = params[:search].downcase
+        @available_tasks = TaskDataIndex.available_tasks.select { |task| task.name.downcase.include? "#{@parameter}" }.group_by(&:category)
       end
     end
 
