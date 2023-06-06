@@ -2,7 +2,6 @@
 
 module Maintenance
   class CallbackTestTask < MaintenanceTasks::Task
-    self.archived = true
     after_start :after_start_callback
     after_complete :after_complete_callback
     after_pause :after_pause_callback

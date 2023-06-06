@@ -2,7 +2,6 @@
 
 module Maintenance
   class BatchImportPostsTask < MaintenanceTasks::Task
-    self.archived = true
     csv_collection(in_batches: 2)
 
     def process(post_rows)

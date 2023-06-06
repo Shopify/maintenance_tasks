@@ -2,7 +2,6 @@
 
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
-    self.archived = true
     class << self
       attr_accessor :fast_task
     end

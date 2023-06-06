@@ -5,23 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="93b768d2-5941-480d-b8ad-4ebf91935ea7" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/app/helpers/maintenance_tasks/tasks_helper.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/helpers/maintenance_tasks/tasks_helper.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/maintenance_tasks/task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/maintenance_tasks/task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/maintenance_tasks/task_data_index.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/maintenance_tasks/task_data_index.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/models/maintenance_tasks/task_data_show.rb" beforeDir="false" afterPath="$PROJECT_DIR$/app/models/maintenance_tasks/task_data_show.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/maintenance_tasks/tasks/_task.html.erb" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/maintenance_tasks/tasks/_task.html.erb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/maintenance_tasks/tasks/index.html.erb" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/maintenance_tasks/tasks/index.html.erb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/app/views/maintenance_tasks/tasks/show.html.erb" beforeDir="false" afterPath="$PROJECT_DIR$/app/views/maintenance_tasks/tasks/show.html.erb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/batch_import_posts_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/batch_import_posts_task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/callback_test_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/callback_test_task.rb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/cancelled_enqueue_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/cancelled_enqueue_task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/enqueue_error_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/enqueue_error_task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/update_posts_module_prepended_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/update_posts_module_prepended_task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/update_posts_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/update_posts_task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/update_posts_throttled_task.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/dummy/app/tasks/maintenance/update_posts_throttled_task.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/models/maintenance_tasks/task_data_index_test.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/models/maintenance_tasks/task_data_index_test.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/models/maintenance_tasks/task_data_show_test.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/models/maintenance_tasks/task_data_show_test.rb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/test/models/maintenance_tasks/task_test.rb" beforeDir="false" afterPath="$PROJECT_DIR$/test/models/maintenance_tasks/task_test.rb" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,22 +26,22 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "git-widget-placeholder": "archive-tasks",
-    "last_opened_file_path": "/Users/kristian.armstrong/Documents/projects/maintenance_tasks/test/dummy/app/tasks/maintenance",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "ruby.rails.projectView.checked": "true",
-    "ruby.structure.view.model.defaults.configured": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;archive-tasks&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/kristian.armstrong/Documents/projects/maintenance_tasks/test/dummy/app/tasks/maintenance&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;ruby.rails.projectView.checked&quot;: &quot;true&quot;,
+    &quot;ruby.structure.view.model.defaults.configured&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/test/dummy/app/tasks/maintenance" />
@@ -309,7 +295,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1685999437214</updated>
-      <workItem from="1685999439028" duration="16744000" />
+      <workItem from="1685999439028" duration="17713000" />
     </task>
     <servers />
   </component>
