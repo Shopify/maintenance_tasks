@@ -20,7 +20,7 @@ else
 end
 gem "rubocop"
 gem "rubocop-shopify"
-gem "selenium-webdriver", "< 4.9.2"
+gem "selenium-webdriver", "< 4.10.1"
 gem "sprockets-rails"
 gem "sqlite3"
 gem "webdrivers", require: false
