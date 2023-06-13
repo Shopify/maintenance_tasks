@@ -29,7 +29,7 @@ module Maintenance
     def process(post)
       sleep(1) unless self.class.fast_task
 
-      post.update!(content: "New content added on #{Time.now.utc}")
+      post.update!(content: "New content added on #{Time.now.utc}:\ndatetime_attr: #{datetime_attr.inspect}")
     end
 
     private

@@ -90,5 +90,59 @@ module MaintenanceTasks
       assert_match %r{rails/active_storage/blobs/\S+/sample.csv},
         csv_file_download_path(run)
     end
+
+    test "#parameter_field adds information about datetime fields when Time.zone_default is not set" do
+      with_zone_default(nil) do
+        markup = render(inline: <<~TEMPLATE)
+          <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
+            <%= parameter_field(form, 'datetime_attr') %>
+          <% end %>
+        TEMPLATE
+        assert_match "UTC", markup
+      end
+    end
+
+    test "#datetime_field_help_text is correct about the timezone when Time.zone_default is not set/default" do
+      with_zone_default(nil) do
+        value = ActiveModel::Type::DateTime.new.cast("2023-06-01T12:00:00") # a local ISO8601 time (no timezone)
+        assert_predicate(value, :utc?) # uses UTC
+      end
+    end
+
+    test "#parameter_field adds information about datetime fields when Time.zone_default is set" do
+      with_zone_default(Time.find_zone!("EST")) do # ignored
+        markup = render(inline: <<~TEMPLATE)
+          <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
+            <%= parameter_field(form, 'datetime_attr') %>
+          <% end %>
+        TEMPLATE
+        assert_match Time.now.zone.to_s, markup
+      end
+    end
+
+    test "#datetime_field_help_text is correct about the timezone when Time.zone_default is set" do
+      now = Time.now
+      sign = now.utc_offset > 0 ? -1 : 1 # make sure we don't overflow
+      sign = -1
+      # Time.use_zone leaks Time.zone_default in the IsolatedExecutionState, so it needs to be called before changing
+      # Time.zone_default
+      Time.use_zone(now.utc_offset + 2.hour * sign) do # a timezone that is not the system timezone
+        with_zone_default(Time.find_zone!(now.utc_offset + 1.hour * sign)) do # another non-system timezone
+          value = ActiveModel::Type::DateTime.new.cast("2023-06-01T12:00:00") # a local ISO8601 time (no timezone)
+          refute_predicate(value, :utc?)
+          assert_equal(now.utc_offset, value.utc_offset) # uses system time zone
+        end
+      end
+    end
+
+    private
+
+    def with_zone_default(new_zone)
+      zone = Time.zone_default
+      Time.zone_default = new_zone
+      yield
+    ensure
+      Time.zone_default = zone
+    end
   end
 end

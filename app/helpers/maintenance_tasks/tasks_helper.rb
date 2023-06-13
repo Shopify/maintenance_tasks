@@ -109,7 +109,7 @@ module MaintenanceTasks
       when ActiveModel::Type::Decimal, ActiveModel::Type::Float
         form_builder.number_field(parameter_name, { step: "any" })
       when ActiveModel::Type::DateTime
-        form_builder.datetime_field(parameter_name)
+        form_builder.datetime_field(parameter_name) + datetime_field_help_text
       when ActiveModel::Type::Date
         form_builder.date_field(parameter_name)
       when ActiveModel::Type::Time
@@ -119,6 +119,20 @@ module MaintenanceTasks
       else
         form_builder.text_area(parameter_name, class: "textarea")
       end
+    end
+
+    # Return helper text for the datetime-local form field.
+    def datetime_field_help_text
+      text =
+        if Time.zone_default.nil? || Time.zone_default.name == "UTC"
+          "Timezone: UTC."
+        else
+          "Timezone: #{Time.now.zone}."
+        end
+      tag.div(
+        tag.p(text),
+        class: "content is-small",
+      )
     end
   end
 end
