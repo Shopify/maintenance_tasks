@@ -56,14 +56,14 @@ module MaintenanceTasks
           batch_size: collection.batch_size,
         )
       when Array
-        enumerator_builder.build_array_enumerator(collection, cursor: cursor)
+        enumerator_builder.build_array_enumerator(collection, cursor: cursor&.to_i)
       when BatchCsvCollectionBuilder::BatchCsv
         JobIteration::CsvEnumerator.new(collection.csv).batches(
           batch_size: collection.batch_size,
-          cursor: cursor,
+          cursor: cursor&.to_i,
         )
       when CSV
-        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor)
+        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor&.to_i)
       else
         raise ArgumentError, <<~MSG.squish
           #{@task.class.name}#collection must be either an
