@@ -60,6 +60,9 @@ module MaintenanceTasks
       # interrupted -> errored occurs when the task is deleted while it is
       #   interrupted.
       "interrupted" => ["running", "pausing", "cancelling", "errored"],
+      # errored -> enqueued occurs when the task is retried after encounting an
+      #   error.
+      "errored" => ["enqueued"],
     }
 
     # Validate whether a transition from one Run status

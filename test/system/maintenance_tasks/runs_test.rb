@@ -191,6 +191,11 @@ module MaintenanceTasks
       assert_text "ArgumentError"
       assert_text "Something went wrong"
       assert_text "app/tasks/maintenance/error_task.rb:10:in `process'"
+
+      click_on "Resume"
+
+      assert_text "Enqueued"
+      assert_text "Waiting to start."
     end
 
     test "errors for double enqueue are shown" do
