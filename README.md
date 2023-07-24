@@ -4,6 +4,22 @@ A Rails engine for queuing and managing maintenance tasks.
 
 [![Link to demo video](static/demo.png)](https://www.youtube.com/watch?v=BTuvTQxlFzs)
 
+> [!NOTE]\
+> By ”maintenance task”, this project means a data migration, i.e. code that
+changes data in the database, often to support schema migrations. For example,
+in order to introduce a new `NOT NULL` column, it has to be added as nullable
+first, backfilled with values, before finally being changed to `NOT NULL`. This
+engine helps with the second part of this process, backfilling.
+>
+> While the engine can used to provide a user interface for other data changes,
+such as data changes for support requests for example, we recommend you use
+regular application code or [Rails administration engines][rails-admin-engines]
+for those use cases instead. We feel like these inevitably require more
+flexibility than this engine will be able to provide. As a result, we won’t
+accept pull requests not aligned with this perspective.
+
+[rails-admin-engines]: https://www.ruby-toolbox.com/categories/rails_admin_interfaces
+
 ## Installation
 
 To install the gem and run the install generator, execute:
