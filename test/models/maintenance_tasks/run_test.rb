@@ -688,6 +688,15 @@ module MaintenanceTasks
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
     end
 
+    test "#destroy does not raise for applications that do no user ActiveStorage" do
+      ActiveRecord.schema_cache_ignored_tables = [/^active_storage/]
+      Rails.application.reloader.reload!
+      Run.create!(task_name: "Maintenance::UpdatePostsTask").destroy!
+    ensure
+      ActiveRecord.schema_cache_ignored_tables = []
+      Rails.application.reloader.reload!
+    end
+
     private
 
     def count_uncached_queries(&block)

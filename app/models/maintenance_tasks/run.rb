@@ -58,18 +58,20 @@ module MaintenanceTasks
 
     # Ensure ActiveStorage is in use before preloading the attachments
     scope :with_attached_csv, -> do
-      return unless defined?(ActiveStorage)
+      return unless MaintenanceTasks.active_storage_installed?
 
-      with_attached_csv_file if ActiveStorage::Attachment.table_exists?
+      with_attached_csv_file
     end
 
     validates_with RunStatusValidator, on: :update
 
-    if MaintenanceTasks.active_storage_service.present?
-      has_one_attached :csv_file,
-        service: MaintenanceTasks.active_storage_service
-    elsif respond_to?(:has_one_attached)
-      has_one_attached :csv_file
+    if MaintenanceTasks.active_storage_installed?
+      if MaintenanceTasks.active_storage_service.present?
+        has_one_attached :csv_file,
+          service: MaintenanceTasks.active_storage_service
+      else
+        has_one_attached :csv_file
+      end
     end
 
     # Sets the run status to enqueued, making sure the transition is validated
@@ -423,8 +425,7 @@ module MaintenanceTasks
     #
     # @return [ActiveStorage::Attached::One] the attached CSV file
     def csv_file
-      return unless defined?(ActiveStorage)
-      return unless ActiveStorage::Attachment.table_exists?
+      return unless MaintenanceTasks.active_storage_installed?
 
       super
     end

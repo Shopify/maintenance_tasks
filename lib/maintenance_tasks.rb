@@ -89,4 +89,13 @@ module MaintenanceTasks
   #
   #   @return [Proc] generates a hash containing the metadata to be stored on the Run
   mattr_accessor :metadata, default: nil
+
+  class << self
+    # Checks if ActiveStorage in installed on the main Rails application.
+    #
+    # @return [Boolean] whether Active Storage is installed and configured.
+    def active_storage_installed?
+      defined?(ActiveStorage) && ActiveStorage::Attachment.table_exists?
+    end
+  end
 end
