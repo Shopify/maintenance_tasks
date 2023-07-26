@@ -5,6 +5,7 @@ require "webdrivers/chromedriver"
 require "action_dispatch/system_testing/server"
 
 ActionDispatch::SystemTesting::Server.silence_puma = true
+Webdrivers::Chromedriver.required_version = "114.0.5735.90"
 
 # Necessary so that Capybara::Selenium::DeprecationSuppressor is prepended in
 # Selenium::WebDriver::Logger before it is instantiated in
