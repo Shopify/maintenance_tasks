@@ -48,9 +48,11 @@ module MaintenanceTasks
     if Rails.gem_version >= Gem::Version.new("7.1.alpha")
       serialize :backtrace, coder: YAML
       serialize :arguments, coder: JSON
+      serialize :metadata, coder: JSON
     else
       serialize :backtrace
       serialize :arguments, JSON
+      serialize :metadata, JSON
     end
 
     scope :active, -> { where(status: ACTIVE_STATUSES) }

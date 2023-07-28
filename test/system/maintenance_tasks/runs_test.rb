@@ -7,12 +7,38 @@ module MaintenanceTasks
     test "run a Task" do
       visit maintenance_tasks_path
 
-      click_on("Maintenance::UpdatePostsTask")
-      click_on "Run"
+      assert_difference("Run.count") do
+        click_on("Maintenance::UpdatePostsTask")
+        click_on "Run"
 
-      assert_title "Maintenance::UpdatePostsTask"
-      assert_text "Enqueued"
-      assert_text "Waiting to start."
+        assert_title "Maintenance::UpdatePostsTask"
+        assert_text "Enqueued"
+        assert_text "Waiting to start."
+      end
+      run = Run.last
+      assert_nil run.metadata
+      assert_equal "Maintenance::UpdatePostsTask", run.task_name
+      assert_equal "enqueued", run.status
+    end
+
+    test "run a Task and log the user email" do
+      MaintenanceTasks.metadata = -> { { user_email: "michael.elfassy@shopify.com" } }
+      visit(maintenance_tasks_path)
+
+      assert_difference("Run.count") do
+        click_on("Maintenance::UpdatePostsTask")
+        click_on("Run")
+
+        assert_title("Maintenance::UpdatePostsTask")
+        assert_text("Enqueued")
+        assert_text("Waiting to start.")
+      end
+      run = Run.last
+      assert_equal("michael.elfassy@shopify.com", run.metadata["user_email"])
+      assert_equal("Maintenance::UpdatePostsTask", run.task_name)
+      assert_equal("enqueued", run.status)
+    ensure
+      MaintenanceTasks.metadata = nil
     end
 
     test "run a CSV Task" do
