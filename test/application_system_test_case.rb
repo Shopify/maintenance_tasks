@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "webdrivers/chromedriver"
 require "action_dispatch/system_testing/server"
 
 ActionDispatch::SystemTesting::Server.silence_puma = true

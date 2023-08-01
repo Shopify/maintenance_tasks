@@ -214,7 +214,7 @@ GEM
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
     rubyzip (2.3.2)
-    selenium-webdriver (4.10.0)
+    selenium-webdriver (4.11.0)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
@@ -237,10 +237,6 @@ GEM
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
     uri (0.12.2)
-    webdrivers (5.2.0)
-      nokogiri (~> 1.6)
-      rubyzip (>= 1.3.0)
-      selenium-webdriver (~> 4.0)
     websocket (1.2.9)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
@@ -268,10 +264,9 @@ DEPENDENCIES
   rails
   rubocop
   rubocop-shopify
-  selenium-webdriver (< 4.10.1)
+  selenium-webdriver (~> 4.11)
   sprockets-rails
   sqlite3
-  webdrivers
   yard
 
 BUNDLED WITH
