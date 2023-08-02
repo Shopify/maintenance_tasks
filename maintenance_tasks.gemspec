@@ -9,6 +9,8 @@ Gem::Specification.new do |spec|
   spec.summary = "A Rails engine for queuing and managing maintenance tasks"
   spec.license = "MIT"
 
+  spec.required_ruby_version = ">= 3.0"
+
   spec.metadata = {
     "source_code_uri" =>
       "https://github.com/Shopify/maintenance_tasks/tree/v#{spec.version}",
