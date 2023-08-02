@@ -2,12 +2,14 @@
 
 Gem::Specification.new do |spec|
   spec.name = "maintenance_tasks"
-  spec.version = "2.1.1"
+  spec.version = "2.2.0"
   spec.author = "Shopify Engineering"
   spec.email = "gems@shopify.com"
   spec.homepage = "https://github.com/Shopify/maintenance_tasks"
   spec.summary = "A Rails engine for queuing and managing maintenance tasks"
   spec.license = "MIT"
+
+  spec.required_ruby_version = ">= 3.0"
 
   spec.metadata = {
     "source_code_uri" =>
