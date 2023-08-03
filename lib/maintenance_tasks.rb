@@ -82,4 +82,11 @@ module MaintenanceTasks
   #
   #   @return [String] the name of the parent controller for web UI.
   mattr_accessor :parent_controller, default: "ActionController::Base"
+
+  # @!attribute metadata
+  #  @scope class
+  #   The Proc to call from the controller to generate metadata that will be persisted on the Run.
+  #
+  #   @return [Proc] generates a hash containing the metadata to be stored on the Run
+  mattr_accessor :metadata, default: nil
 end

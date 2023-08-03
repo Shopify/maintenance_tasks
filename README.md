@@ -832,6 +832,19 @@ controller class which **must inherit** from `ActionController::Base`.
 
 If no value is specified, it will default to `"ActionController::Base"`.
 
+### Metadata
+
+`MaintenanceTasks.metadata` can be configured to specify a proc from which to get extra information about the run.
+Since this proc will be ran in the context of the `MaintenanceTasks.parent_controller`, it can be used to keep the id
+or email of the user who performed the maintenance task.
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+MaintenanceTasks.metadata = -> do
+ { user_email: current_user.email }
+end
+```
+
 ## Upgrading
 
 Use bundler to check for and upgrade to newer versions. After installing a new
