@@ -16,15 +16,6 @@ module MaintenanceTasks
 
     desc "perform [TASK NAME]", "Runs the given Maintenance Task"
 
-    long_desc <<-LONGDESC
-      `maintenance_tasks perform` will run the Maintenance Task specified by the
-      [TASK NAME] argument.
-
-      Available Tasks:
-
-      #{MaintenanceTasks::Task.available_tasks.join("\n\n")}
-    LONGDESC
-
     # Specify the CSV file to process for CSV Tasks
     desc = "Supply a CSV file to be processed by a CSV Task, "\
       "--csv path/to/csv/file.csv"
@@ -48,6 +39,24 @@ module MaintenanceTasks
       say_status(:success, "#{task.name} was enqueued.", :green)
     rescue => error
       say_status(:error, error.message, :red)
+    end
+
+    # `long_desc` only allows us to use a static string as "long description".
+    # By redefining the `#long_description` method on the "perform" Command
+    # object instead, we make it dynamic, thus delaying the task loading
+    # process until it's actually required.
+    commands["perform"].define_singleton_method(:long_description) do
+      # Ensure all tasks are loaded before listing them.
+      MaintenanceTasks.task_loader.call
+
+      <<~LONGDESC
+        `maintenance_tasks perform` will run the Maintenance Task specified by the
+        [TASK NAME] argument.
+
+        Available Tasks:
+
+        #{Task.descendants.map(&:name).sort.join("\n\n")}
+      LONGDESC
     end
 
     private

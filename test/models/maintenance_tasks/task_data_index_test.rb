@@ -27,6 +27,14 @@ module MaintenanceTasks
       assert_equal expected, TaskDataIndex.available_tasks.map(&:name)
     end
 
+    test ".available_tasks calls MaintenanceTasks.task_loader to load all tasks" do
+      dummy_loader = -> {}
+      MaintenanceTasks.expects(:task_loader).returns(dummy_loader)
+      dummy_loader.expects(:call)
+
+      TaskDataIndex.available_tasks
+    end
+
     test "#new sets last_run if one is passed as an argument" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
       task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask", run)

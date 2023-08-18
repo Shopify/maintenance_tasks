@@ -21,6 +21,12 @@ module MaintenanceTasks
   #   @return [String] the name of the module.
   mattr_accessor :tasks_module, default: "Maintenance"
 
+  # @!atribute task_loader
+  #   @scope class
+  #
+  #   A Proc that loads all the Tasks to be used by the application.
+  mattr_accessor :task_loader, default: -> { DefaultTaskLoader.load_all }
+
   # @!attribute job
   #   @scope class
   #

@@ -41,15 +41,6 @@ module MaintenanceTasks
         task
       end
 
-      # Returns a list of concrete classes that inherit from the Task
-      # superclass.
-      #
-      # @return [Array<Class>] the list of classes.
-      def available_tasks
-        load_constants
-        descendants
-      end
-
       # Make this Task a task that handles CSV.
       #
       # @param in_batches [Integer] optionally, supply a batch size if the CSV
@@ -167,21 +158,6 @@ module MaintenanceTasks
       #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
       def after_error(*filter_list, &block)
         set_callback(:error, :after, *filter_list, &block)
-      end
-
-      private
-
-      def load_constants
-        namespace = MaintenanceTasks.tasks_module.safe_constantize
-        return unless namespace
-
-        load_const = lambda do |root|
-          root.constants.each do |name|
-            object = root.const_get(name)
-            load_const.call(object) if object.instance_of?(Module)
-          end
-        end
-        load_const.call(namespace)
       end
     end
 

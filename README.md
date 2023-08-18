@@ -41,6 +41,10 @@ Please ensure your application is using
 information, please consult the [Rails guides on autoloading and reloading
 constants](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html).
 
+You might be able to define a different
+[_task loader_](#customizing-the-way-the-gem-loads-all-tasks) that would allow
+you to circumvent this limitation.
+
 ## Usage
 
 The typical Maintenance Tasks workflow is as follows:
@@ -714,6 +718,35 @@ module Maintenance
     end
   end
 end
+```
+
+#### Customizing the way the gem loads all tasks
+
+For the UI (Web and CLI) to be able to display all available tasks, their
+respective classes must have been previously loaded. This can be an issue
+for applications running without
+[eager loading](https://guides.rubyonrails.org/configuring.html#config-eager-load)
+(for example a default Rails application uses lazy loading in development
+mode).
+
+To work around that, this gem uses a task loader, which can be customized
+by changing the `MaintenanceTasks.task_loader` in the configuration:
+
+```rb
+# config/initializers/maintenance_tasks.rb
+
+MaintenanceTasks.task_loader = -> { DefaultTaskLoader.load_all }
+```
+
+By using a different proc, you can define a different way to preload all tasks.
+You could for example browse for tasks in a given directory:
+
+```rb
+# config/initializers/maintenance_tasks.rb
+
+MaintenanceTasks.task_loader = -> {
+  Dir[Rails.root.join("app", "tasks", "**", "*_task.rb")].each { |file| require file }
+}
 ```
 
 #### Customizing the underlying job class

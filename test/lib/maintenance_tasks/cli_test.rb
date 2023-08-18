@@ -84,5 +84,52 @@ module MaintenanceTasks
         CLI.start(["perform", "MyParamsTask", "--arguments", "post_ids:1,2,3"])
       end
     end
+
+    test "`help perform` loads all tasks and displays them" do
+      # Ensure test tasks have been loaded
+      MaintenanceTasks.task_loader.call
+
+      dummy_loader = -> {}
+      MaintenanceTasks.expects(:task_loader).returns(dummy_loader).at_least_once
+      dummy_loader.expects(:call).at_least_once
+
+      expected_output = <<~TASKS
+        Available Tasks:
+
+        Maintenance::BatchImportPostsTask
+
+        Maintenance::CallbackTestTask
+
+        Maintenance::CancelledEnqueueTask
+
+        Maintenance::EnqueueErrorTask
+
+        Maintenance::ErrorTask
+
+        Maintenance::ImportPostsTask
+
+        Maintenance::Nested::NestedMore::NestedMoreTask
+
+        Maintenance::Nested::NestedTask
+
+        Maintenance::NoCollectionTask
+
+        Maintenance::ParamsTask
+
+        Maintenance::TestTask
+
+        Maintenance::UpdatePostsInBatchesTask
+
+        Maintenance::UpdatePostsModulePrependedTask
+
+        Maintenance::UpdatePostsTask
+
+        Maintenance::UpdatePostsThrottledTask
+      TASKS
+
+      assert_output(/#{expected_output.indent(2)}/) do
+        CLI.start(["help", "perform"])
+      end
+    end
   end
 end

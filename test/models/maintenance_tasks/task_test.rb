@@ -4,28 +4,6 @@ require "test_helper"
 
 module MaintenanceTasks
   class TaskTest < ActiveSupport::TestCase
-    test ".available_tasks returns list of tasks that inherit from the Task superclass" do
-      expected = [
-        "Maintenance::BatchImportPostsTask",
-        "Maintenance::CallbackTestTask",
-        "Maintenance::CancelledEnqueueTask",
-        "Maintenance::EnqueueErrorTask",
-        "Maintenance::ErrorTask",
-        "Maintenance::ImportPostsTask",
-        "Maintenance::Nested::NestedMore::NestedMoreTask",
-        "Maintenance::Nested::NestedTask",
-        "Maintenance::NoCollectionTask",
-        "Maintenance::ParamsTask",
-        "Maintenance::TestTask",
-        "Maintenance::UpdatePostsInBatchesTask",
-        "Maintenance::UpdatePostsModulePrependedTask",
-        "Maintenance::UpdatePostsTask",
-        "Maintenance::UpdatePostsThrottledTask",
-      ]
-      assert_equal expected,
-        MaintenanceTasks::Task.available_tasks.map(&:name).sort
-    end
-
     test ".named returns the task based on its name" do
       expected_task = Maintenance::UpdatePostsTask
       assert_equal expected_task, Task.named("Maintenance::UpdatePostsTask")
