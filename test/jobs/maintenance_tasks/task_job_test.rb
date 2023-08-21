@@ -617,5 +617,36 @@ module MaintenanceTasks
 
       assert_equal 2, @run.reload.tick_total
     end
+
+    test ".perform_now accepts custom enumerated tasks" do
+      run = Run.create!(task_name: "Maintenance::CustomEnumeratingTask")
+
+      [:a, :b, :c].each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+    end
+
+    test ".perform_now handles cursors provided by custom enumerated tasks" do
+      run = Run.create!(task_name: "Maintenance::CustomEnumeratingTask")
+
+      TaskJob.perform_now(run)
+
+      assert_equal "2", run.reload.cursor
+    end
+
+    test ".perform_now starts custom enumerated tasks from cursor position when job resumes" do
+      run = Run.create!(task_name: "Maintenance::CustomEnumeratingTask")
+      run.update!(cursor: "0")
+
+      [:b, :c].each do |item|
+        Maintenance::CustomEnumeratingTask.any_instance
+          .expects(:process).with(item).once
+      end
+
+      TaskJob.perform_now(run)
+    end
   end
 end
