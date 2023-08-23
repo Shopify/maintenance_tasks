@@ -61,7 +61,7 @@ module MaintenanceTasks
           end
 
           assert_equal(
-            "Validation failed: Task name is not included in the list",
+            "Validation failed: Task name must be the name of an existing Task.",
             error.message,
           )
         end

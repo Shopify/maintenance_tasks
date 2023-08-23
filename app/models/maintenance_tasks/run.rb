@@ -36,9 +36,7 @@ module MaintenanceTasks
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
-    validates :task_name, on: :create, inclusion: {
-      in: ->(_) { Task.available_tasks.map(&:to_s) },
-    }
+    validate :task_name_belongs_to_a_valid_task, on: :create
     validate :csv_attachment_presence, on: :create
     validate :csv_content_type, on: :create
     validate :validate_task_arguments, on: :create
@@ -337,6 +335,15 @@ module MaintenanceTasks
     # @return [Boolean] whether the Run is stuck.
     def stuck?
       cancelling? && updated_at <= STUCK_TASK_TIMEOUT.ago
+    end
+
+    # Performs validation on the task_name attribute.
+    # A Run must be associated with a valid Task to be valid.
+    # In order to confirm that, the Task is looked up by name.
+    def task_name_belongs_to_a_valid_task
+      Task.named(task_name)
+    rescue Task::NotFoundError
+      errors.add(:task_name, "must be the name of an existing Task.")
     end
 
     # Performs validation on the presence of a :csv_file attachment.
