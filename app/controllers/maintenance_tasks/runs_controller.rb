@@ -14,7 +14,7 @@ module MaintenanceTasks
         name: params.fetch(:task_id),
         csv_file: params[:csv_file],
         arguments: params.fetch(:task_arguments, {}).permit!.to_h,
-        metadata: MaintenanceTasks.metadata&.call,
+        metadata: MaintenanceTasks.metadata&.call(self),
         &block
       )
       redirect_to(task_path(task))
