@@ -21,7 +21,7 @@ module MaintenanceTasks
       assert_equal "enqueued", run.status
     end
 
-    test "run a Task and log the user email" do
+    test "run a Task and log the provided metadata" do
       MaintenanceTasks.metadata = -> { { user_email: "michael.elfassy@shopify.com" } }
       visit(maintenance_tasks_path)
 
