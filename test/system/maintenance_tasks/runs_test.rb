@@ -22,7 +22,7 @@ module MaintenanceTasks
     end
 
     test "run a Task and log the provided metadata" do
-      MaintenanceTasks.metadata = ->(context) { { user_email: "michael.elfassy@shopify.com" } }
+      MaintenanceTasks.metadata = -> { { user_email: "michael.elfassy@shopify.com" } }
       visit(maintenance_tasks_path)
 
       assert_difference("Run.count") do
