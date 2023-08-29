@@ -2,6 +2,7 @@
 
 require "test_helper"
 require "maintenance_tasks/cli"
+require "io/console/size"
 
 module MaintenanceTasks
   class CLITest < ActiveSupport::TestCase
@@ -82,6 +83,28 @@ module MaintenanceTasks
 
       assert_output(/success\s+MyParamsTask was enqueued\./) do
         CLI.start(["perform", "MyParamsTask", "--arguments", "post_ids:1,2,3"])
+      end
+    end
+
+    test "`help perform` loads all tasks and displays them" do
+      Task
+        .expects(:available_tasks)
+        .at_least_once
+        .returns([stub(name: "Task1"), stub(name: "Task2")])
+
+      expected_output = Regexp.escape(<<~OUTPUT.indent(2))
+        `maintenance_tasks perform` will run the Maintenance Task specified by the [TASK NAME] argument.
+
+        Available Tasks:
+
+        Task1
+
+        Task2
+      OUTPUT
+
+      assert_output(/#{expected_output}/) do
+        Thor::Base.shell.any_instance.stubs(:terminal_width).returns(200)
+        CLI.start(["help", "perform"])
       end
     end
   end
