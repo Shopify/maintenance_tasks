@@ -52,7 +52,7 @@ module MaintenanceTasks
 
         Available Tasks:
 
-        #{Task.available_tasks.map(&:name).sort.join("\n\n")}
+        #{Task.load_all.map(&:name).sort.join("\n\n")}
       LONGDESC
     end
 

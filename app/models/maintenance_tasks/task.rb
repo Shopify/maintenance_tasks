@@ -41,13 +41,25 @@ module MaintenanceTasks
         task
       end
 
-      # Returns a list of concrete classes that inherit from the Task
-      # superclass.
+      # Loads and returns a list of concrete classes that inherit
+      # from the Task superclass.
+      #
+      # @return [Array<Class>] the list of classes.
+      def load_all
+        load_constants
+        descendants
+      end
+
+      # Loads and returns a list of concrete classes that inherit
+      # from the Task superclass.
       #
       # @return [Array<Class>] the list of classes.
       def available_tasks
-        load_constants
-        descendants
+        warn(<<~MSG.squish, category: :deprecated)
+          MaintenanceTasks::Task.available_tasks is deprecated and will be
+          removed from maintenance-tasks 3.0.0. Use .load_all instead.
+        MSG
+        load_all
       end
 
       # Make this Task a task that handles CSV.
