@@ -2,7 +2,6 @@
 
 require "test_helper"
 require "maintenance_tasks/cli"
-require "io/console/size"
 
 module MaintenanceTasks
   class CLITest < ActiveSupport::TestCase
@@ -92,7 +91,7 @@ module MaintenanceTasks
         .at_least_once
         .returns([stub(name: "Task1"), stub(name: "Task2")])
 
-      expected_output = Regexp.escape(<<~OUTPUT.indent(2))
+      expected_output = <<~OUTPUT.indent(2)
         `maintenance_tasks perform` will run the Maintenance Task specified by the [TASK NAME] argument.
 
         Available Tasks:
@@ -102,7 +101,7 @@ module MaintenanceTasks
         Task2
       OUTPUT
 
-      assert_output(/#{expected_output}/) do
+      assert_output(Regexp.union(expected_output)) do
         Thor::Base.shell.any_instance.stubs(:terminal_width).returns(200)
         CLI.start(["help", "perform"])
       end
