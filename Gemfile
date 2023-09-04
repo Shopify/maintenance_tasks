@@ -20,7 +20,7 @@ else
 end
 gem "rubocop"
 gem "rubocop-shopify"
-gem "selenium-webdriver", "~> 4.11"
+gem "selenium-webdriver", "~> 4.12"
 gem "sprockets-rails"
 gem "sqlite3"
 gem "yard"
