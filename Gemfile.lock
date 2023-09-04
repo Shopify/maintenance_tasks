@@ -261,7 +261,7 @@ DEPENDENCIES
   rails
   rubocop
   rubocop-shopify
-  selenium-webdriver (~> 4.12)
+  selenium-webdriver
   sprockets-rails
   sqlite3
   yard
