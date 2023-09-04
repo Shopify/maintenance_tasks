@@ -87,7 +87,7 @@ module MaintenanceTasks
 
     test "`help perform` loads all tasks and displays them" do
       Task
-        .expects(:available_tasks)
+        .expects(:load_all)
         .at_least_once
         .returns([stub(name: "Task1"), stub(name: "Task2")])
 

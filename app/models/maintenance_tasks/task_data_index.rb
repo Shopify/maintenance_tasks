@@ -25,7 +25,7 @@ module MaintenanceTasks
       def available_tasks
         tasks = []
 
-        task_names = Task.available_tasks.map(&:name)
+        task_names = Task.load_all.map(&:name)
 
         active_runs = Run.with_attached_csv.active.where(task_name: task_names)
         active_runs.each do |run|

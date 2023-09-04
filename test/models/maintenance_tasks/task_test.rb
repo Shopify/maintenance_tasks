@@ -4,7 +4,7 @@ require "test_helper"
 
 module MaintenanceTasks
   class TaskTest < ActiveSupport::TestCase
-    test ".available_tasks returns list of tasks that inherit from the Task superclass" do
+    test ".load_all returns list of tasks that inherit from the Task superclass" do
       expected = [
         "Maintenance::BatchImportPostsTask",
         "Maintenance::CallbackTestTask",
@@ -23,7 +23,18 @@ module MaintenanceTasks
         "Maintenance::UpdatePostsThrottledTask",
       ]
       assert_equal expected,
-        MaintenanceTasks::Task.available_tasks.map(&:name).sort
+        MaintenanceTasks::Task.load_all.map(&:name).sort
+    end
+
+    test ".available_tasks raises a deprecation warning before calling .load_all" do
+      expected_warning =
+        "MaintenanceTasks::Task.available_tasks is deprecated and will be " \
+          "removed from maintenance-tasks 3.0.0. Use .load_all instead.\n"
+
+      Warning.expects(:warn).with(expected_warning, category: :deprecated)
+      Task.expects(:load_all)
+
+      Task.available_tasks
     end
 
     test ".named returns the task based on its name" do
