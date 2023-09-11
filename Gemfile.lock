@@ -110,7 +110,7 @@ GEM
     io-console (0.6.0)
     irb (1.6.3)
       reline (>= 0.3.0)
-    job-iteration (1.4.0)
+    job-iteration (1.4.1)
       activejob (>= 5.2)
     json (2.6.3)
     loofah (2.21.3)
