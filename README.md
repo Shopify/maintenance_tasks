@@ -2,7 +2,61 @@
 
 A Rails engine for queuing and managing maintenance tasks.
 
+By ”maintenance task”, this project means a data migration, i.e. code that
+changes data in the database, often to support schema migrations. For example,
+in order to introduce a new `NOT NULL` column, it has to be added as nullable
+first, backfilled with values, before finally being changed to `NOT NULL`.
+This engine helps with the second part of this process, backfilling.
+
+Maintenance tasks are collection-based tasks, usually using Active Record,
+that update the data in your database. They can be paused or interrupted.
+Maintenance Tasks can operate [in batches](#processing-batch-collections) and
+use [throttling](#throttling) to control the load on your database.
+
+Maintenance tasks aren't meant to happen on a regular basis. They're used as
+needed, or as one-offs. Normally maintenance tasks are ephemeral, so they are
+used briefly and then deleted.
+
+The Rails engine has a web-based UI for listing maintenance tasks, seeing
+their status, and starting, pausing and restarting them.
+
 [![Link to demo video](static/demo.png)](https://www.youtube.com/watch?v=BTuvTQxlFzs)
+
+## Should I Use Maintenance Tasks?
+
+Maintenance Tasks have a limited, specific job UI. While the engine can be
+used to provide a user interface for other data changes, such as data changes
+for support requests, we recommend you use regular application code for those
+use cases instead. These inevitably require more flexibility than this engine
+will be able to provide.
+
+If your task shouldn't run as an Active Job, it probably isn't a good match
+for Maintenance Tasks. If your task doesn't need to run in the background,
+consider a runner script instead. If your task doesn't need to be
+interruptible, consider a normal Active Job.
+
+Maintenance Tasks can be interrupted between iterations. If your task [isn't
+collection-based](#tasks-that-dont-need-a-collection) (no CSV file or database
+table) or has very large batches, it will get limited benefit from throttling
+(pausing between iterations) or interrupting. This might be fine, or the added
+complexity of Maintenance Tasks over normal Active Jobs may not be worthwhile.
+
+If your task updates your database schema instead of data, use a migration
+instead of a Maintenance Task.
+
+If your task happens regularly, consider Active Jobs with a scheduler or cron,
+[job-iteration jobs](https://github.com/shopify/job-iteration) and/or [custom
+rails_admin UIs][rails-admin-engines] instead of a Maintenance Task.
+Maintenance Tasks should be ephemeral, to suit their intentionally limited UI.
+
+To create seed data for a new application, use the provided Rails
+`db/seeds.rb` file instead.
+
+If your application can't handle a half-completed migration, Maintenance Tasks
+are probably the wrong tool. Remember that Maintenance Tasks are intentionally
+pausable and can be cancelled halfway.
+
+[rails-admin-engines]: https://www.ruby-toolbox.com/categories/rails_admin_interfaces
 
 ## Installation
 
@@ -168,6 +222,9 @@ Note that `#count` is calculated automatically based on the number of batches in
 your collection, and your Task’s progress will be displayed in terms of batches
 (not the total number of rows in your CSV).
 
+Non-batched CSV tasks will have an effective batch size of 1, which can reduce
+the efficiency of your database operations.
+
 ### Processing Batch Collections
 
 The Maintenance Tasks gem supports processing Active Records in batches. This
@@ -213,7 +270,7 @@ inside `#process`.
 ### Tasks that don’t need a Collection
 
 Sometimes, you might want to run a Task that performs a single operation, such
-as enqueuing another background job or hitting an external API. The gem supports
+as enqueuing another background job or querying an external API. The gem supports
 collection-less tasks.
 
 Generate a collection-less Task by running:
@@ -244,8 +301,10 @@ end
 
 Maintenance Tasks often modify a lot of data and can be taxing on your database.
 The gem provides a throttling mechanism that can be used to throttle a Task when
-a given condition is met. If a Task is throttled, it will be interrupted and
-retried after a backoff period has passed. The default backoff is 30 seconds.
+a given condition is met. If a Task is throttled (the throttle block returns
+true), it will be interrupted and retried after a backoff period has passed. The
+default backoff is 30 seconds.
+
 Specify the throttle condition as a block:
 
 ```ruby
@@ -277,7 +336,7 @@ Tasks can define multiple throttle conditions. Throttle conditions are inherited
 by descendants, and new conditions will be appended without impacting existing
 conditions.
 
-The backoff can also be specified as a Proc:
+The backoff can also be specified as a Proc that receives no arguments:
 
 ```ruby
 # app/tasks/maintenance/update_posts_throttled_task.rb
@@ -362,7 +421,7 @@ module Maintenance
     after_error :dangerous_notify
 
     def dangerous_notify
-      # This error is rescued in favour of the original error causing the error flow.
+      # This error is rescued and ignored in favour of the original error causing the error flow.
       raise NotDeliveredError
     end
 
@@ -398,15 +457,15 @@ depend on the queue adapter but in general, you should follow these rules:
 
 * Duration of `Task#process`: processing a single element of the collection
   should take less than 25 seconds, or the duration set as a timeout for Sidekiq
-  or the queue adapter configured in your application. It allows the Task to be
-  safely interrupted and resumed.
+  or the queue adapter configured in your application. Short batches allow the
+  Task to be safely interrupted and resumed.
 * Idempotency of `Task#process`: it should be safe to run `process` multiple
   times for the same element of the collection. Read more in [this Sidekiq best
   practice][sidekiq-idempotent]. It’s important if the Task errors and you run
-  it again, because the same element that errored the Task may well be processed
-  again. It especially matters in the situation described above, when the
-  iteration duration exceeds the timeout: if the job is re-enqueued, multiple
-  elements may be processed again.
+  it again, because the same element that caused the Task to give an error may
+  well be processed again. It especially matters in the situation described
+  above, when the iteration duration exceeds the timeout: if the job is
+  re-enqueued, multiple elements may be processed again.
 
 [sidekiq-idempotent]: https://github.com/mperham/sidekiq/wiki/Best-Practices#2-make-your-job-idempotent-and-transactional
 
@@ -636,8 +695,8 @@ re-enqueue the jobs that were in progress, the Task may be in a seemingly stuck
 situation where it appears to be running but is not. In that situation, pausing
 or cancelling it will not result in the Task being paused or cancelled, as the
 Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
-if a Task is `cancelling` for more than 5 minutes, you will be able to cancel it
-for good, which will just mark it as cancelled, allowing you to run it again.
+if a Task is `cancelling` for more than 5 minutes, you can cancel it again.
+It will then be marked as fully cancelled, allowing you to run it again.
 
 ### Configuring the gem
 
