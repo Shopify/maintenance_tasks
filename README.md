@@ -201,6 +201,37 @@ Note that `#count` is calculated automatically based on the number of batches in
 your collection, and your Task’s progress will be displayed in terms of batches
 (not the number of records in the relation).
 
+On databases with large tables, sometime using an `ActiveRecord::Relation` to define a collection will
+cause your queries to timeout. One pattern to to have performant tasks is to look up the range of IDs that
+need to be operated on, then create a collection of ranges to query your models. For example:
+
+```ruby
+module Maintenance
+  class BackfillALotOfPosts < MaintenanceTasks::Task
+    # Generates an array like
+    # [(1..1_000_000),(1_000_001..2_000_000),(2_000_001..3_000_000), ...]
+    def collection
+      ranges = []
+      100.times do |i|
+        range_start = (1_000_000 * i) + 1
+        range_end = 1_000_000 * (i + 1)
+        ranges << (range_start..range_end)
+      end
+      ranges
+    end
+
+    def process(range)
+      Post
+        .where(id: range, some_column: "Some Value")
+        .in_batches { |batch| batch.update_all(some_column: "Some New Value") }
+    end
+  end
+end
+```
+
+This pattern will keep your individual queries fast, while performing updates in small batches.
+With this approach, updating or deleteing 10s of millions of records can take under an hour.
+
 **Important!** Batches should only be used if `#process` is performing a batch
 operation such as `#update_all` or `#delete_all`. If you need to iterate over
 individual records, you should define a collection that [returns an
