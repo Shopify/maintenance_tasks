@@ -211,13 +211,11 @@ module Maintenance
     # Generates an array like
     # [(1..1_000_000),(1_000_001..2_000_000),(2_000_001..3_000_000), ...]
     def collection
-      ranges = []
-      100.times do |i|
+      100.times.map do |i|
         range_start = (1_000_000 * i) + 1
         range_end = 1_000_000 * (i + 1)
-        ranges << (range_start..range_end)
+        (range_start..range_end)
       end
-      ranges
     end
 
     def process(range)
@@ -230,7 +228,8 @@ end
 ```
 
 This pattern will keep your individual queries fast, while performing updates in small batches.
-With this approach, updating or deleteing 10s of millions of records can take under an hour.
+With this approach, updating or deleteing 10s of millions of records can take under an hour, even if
+the columns being accessed/changed are not indexed.
 
 **Important!** Batches should only be used if `#process` is performing a batch
 operation such as `#update_all` or `#delete_all`. If you need to iterate over
