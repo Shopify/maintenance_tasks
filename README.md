@@ -1,4 +1,4 @@
-# MaintenanceTasks
+# Maintenance Tasks
 
 A Rails engine for queuing and managing maintenance tasks.
 
@@ -10,7 +10,7 @@ This engine helps with the second part of this process, backfilling.
 
 Maintenance tasks are collection-based tasks, usually using Active Record,
 that update the data in your database. They can be paused or interrupted.
-Maintenance Tasks can operate [in batches](#processing-batch-collections) and
+Maintenance tasks can operate [in batches](#processing-batch-collections) and
 use [throttling](#throttling) to control the load on your database.
 
 Maintenance tasks aren't meant to happen on a regular basis. They're used as
@@ -24,36 +24,36 @@ their status, and starting, pausing and restarting them.
 
 ## Should I Use Maintenance Tasks?
 
-Maintenance Tasks have a limited, specific job UI. While the engine can be
+Maintenance tasks have a limited, specific job UI. While the engine can be
 used to provide a user interface for other data changes, such as data changes
 for support requests, we recommend you use regular application code for those
 use cases instead. These inevitably require more flexibility than this engine
 will be able to provide.
 
 If your task shouldn't run as an Active Job, it probably isn't a good match
-for Maintenance Tasks. If your task doesn't need to run in the background,
+for this gem. If your task doesn't need to run in the background,
 consider a runner script instead. If your task doesn't need to be
 interruptible, consider a normal Active Job.
 
-Maintenance Tasks can be interrupted between iterations. If your task [isn't
+Maintenance tasks can be interrupted between iterations. If your task [isn't
 collection-based](#tasks-that-dont-need-a-collection) (no CSV file or database
 table) or has very large batches, it will get limited benefit from throttling
 (pausing between iterations) or interrupting. This might be fine, or the added
-complexity of Maintenance Tasks over normal Active Jobs may not be worthwhile.
+complexity of maintenance Tasks over normal Active Jobs may not be worthwhile.
 
 If your task updates your database schema instead of data, use a migration
-instead of a Maintenance Task.
+instead of a maintenance task.
 
 If your task happens regularly, consider Active Jobs with a scheduler or cron,
 [job-iteration jobs](https://github.com/shopify/job-iteration) and/or [custom
-rails_admin UIs][rails-admin-engines] instead of a Maintenance Task.
-Maintenance Tasks should be ephemeral, to suit their intentionally limited UI.
+rails_admin UIs][rails-admin-engines] instead of the Maintenance Tasks gem.
+Maintenance tasks should be ephemeral, to suit their intentionally limited UI.
 
 To create seed data for a new application, use the provided Rails
 `db/seeds.rb` file instead.
 
-If your application can't handle a half-completed migration, Maintenance Tasks
-are probably the wrong tool. Remember that Maintenance Tasks are intentionally
+If your application can't handle a half-completed migration, maintenance tasks
+are probably the wrong tool. Remember that maintenance tasks are intentionally
 pausable and can be cancelled halfway.
 
 [rails-admin-engines]: https://www.ruby-toolbox.com/categories/rails_admin_interfaces
@@ -299,7 +299,7 @@ end
 
 ### Throttling
 
-Maintenance Tasks often modify a lot of data and can be taxing on your database.
+Maintenance tasks often modify a lot of data and can be taxing on your database.
 The gem provides a throttling mechanism that can be used to throttle a Task when
 a given condition is met. If a Task is throttled (the throttle block returns
 true), it will be interrupted and retried after a backoff period has passed. The
@@ -451,7 +451,7 @@ end
 
 ### Considerations when writing Tasks
 
-MaintenanceTasks relies on the queue adapter configured for your application to
+Maintenance Tasks relies on the queue adapter configured for your application to
 run the job which is processing your Task. The guidelines for writing Task may
 depend on the queue adapter but in general, you should follow these rules:
 
