@@ -257,7 +257,6 @@ DEPENDENCIES
   debug
   maintenance_tasks!
   mocha
-  net-smtp
   puma
   rails
   rubocop

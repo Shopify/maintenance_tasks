@@ -8,7 +8,6 @@ gem "better_html"
 gem "capybara"
 gem "debug"
 gem "mocha"
-gem "net-smtp" # mail is missing a dependency on net-smtp https://github.com/mikel/mail/pull/1439
 gem "puma"
 if defined?(@rails_gem_requirement) && @rails_gem_requirement
   # causes Dependabot to ignore the next line and update the next gem "rails"
