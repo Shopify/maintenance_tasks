@@ -131,8 +131,6 @@ GEM
     minitest (5.20.0)
     mocha (2.1.0)
       ruby2_keywords (>= 0.0.5)
-    net-http (0.3.2)
-      uri
     net-imap (0.3.7)
       date
       net-protocol
@@ -238,7 +236,6 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
-    uri (0.12.2)
     websocket (1.2.9)
     websocket-driver (0.7.6)
       websocket-extensions (>= 0.1.0)
@@ -260,7 +257,6 @@ DEPENDENCIES
   debug
   maintenance_tasks!
   mocha
-  net-http
   net-smtp
   puma
   rails
