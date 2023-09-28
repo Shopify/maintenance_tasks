@@ -900,7 +900,7 @@ or email of the user who performed the maintenance task.
 ```ruby
 # config/initializers/maintenance_tasks.rb
 MaintenanceTasks.metadata = ->() do
- { user_email: current_user.email }
+  { user_email: current_user.email }
 end
 ```
 
