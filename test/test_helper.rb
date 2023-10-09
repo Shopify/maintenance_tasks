@@ -43,6 +43,8 @@ require "csv"
 module Warning
   class << self
     def warn(message)
+      return super if message.start_with?("Rack::Handler is deprecated")
+
       raise message.to_s
     end
   end
