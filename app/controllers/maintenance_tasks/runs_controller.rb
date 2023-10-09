@@ -13,7 +13,7 @@ module MaintenanceTasks
       task = Runner.run(
         name: params.fetch(:task_id),
         csv_file: params[:csv_file],
-        arguments: params.fetch(:task_arguments, {}).permit!.to_h,
+        arguments: params.fetch(:task, {}).permit!.to_h,
         metadata: instance_exec(&MaintenanceTasks.metadata || -> {}),
         &block
       )
