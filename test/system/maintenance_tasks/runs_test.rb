@@ -58,10 +58,10 @@ module MaintenanceTasks
 
       click_on("Maintenance::ParamsTask")
       post_id = Post.first.id
-      fill_in("_task_arguments_post_ids", with: post_id.to_s)
+      fill_in("task[post_ids]", with: post_id.to_s)
 
       click_on "Run"
-      fill_in("_task_arguments_post_ids", with: "42")
+      fill_in("task[post_ids]", with: "42")
       perform_enqueued_jobs
 
       assert_title "Maintenance::ParamsTask"
@@ -72,14 +72,14 @@ module MaintenanceTasks
         table.assert_text("post_ids")
         table.assert_text(post_id.to_s)
       end
-      assert has_field?("_task_arguments_post_ids", with: "42")
+      assert has_field?("task[post_ids]", with: "42")
     end
 
     test "errors for Task with invalid arguments shown" do
       visit maintenance_tasks_path
 
       click_on("Maintenance::ParamsTask")
-      fill_in("_task_arguments_post_ids", with: "xyz")
+      fill_in("task[post_ids]", with: "xyz")
       click_on "Run"
 
       assert_text "Validation failed: Arguments are invalid: :post_ids is invalid"

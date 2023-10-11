@@ -73,9 +73,9 @@ module MaintenanceTasks
 
       click_on("Maintenance::ParamsTask")
 
-      content_text = page.find_field("[task_arguments][content]").text
+      content_text = page.find_field("task[content]").text
       assert_equal("default content", content_text)
-      integer_attr_val = page.find_field("[task_arguments][integer_attr]").value
+      integer_attr_val = page.find_field("task[integer_attr]").value
       assert_equal("111222333", integer_attr_val)
     end
 
@@ -84,34 +84,34 @@ module MaintenanceTasks
 
       click_on("Maintenance::ParamsTask")
 
-      content_field = page.find_field("[task_arguments][content]")
+      content_field = page.find_field("task[content]")
       assert_equal("textarea", content_field.tag_name)
-      integer_field = page.find_field("[task_arguments][integer_attr]")
+      integer_field = page.find_field("task[integer_attr]")
       assert_equal("input", integer_field.tag_name)
       assert_equal("number", integer_field[:type])
       assert_empty(integer_field[:step])
-      big_integer_field = page.find_field("[task_arguments][big_integer_attr]")
+      big_integer_field = page.find_field("task[big_integer_attr]")
       assert_equal("input", big_integer_field.tag_name)
       assert_equal("number", big_integer_field[:type])
       assert_empty(big_integer_field[:step])
-      float_field = page.find_field("[task_arguments][float_attr]")
+      float_field = page.find_field("task[float_attr]")
       assert_equal("input", float_field.tag_name)
       assert_equal("number", float_field[:type])
       assert_equal("any", float_field[:step])
-      decimal_field = page.find_field("[task_arguments][decimal_attr]")
+      decimal_field = page.find_field("task[decimal_attr]")
       assert_equal("input", decimal_field.tag_name)
       assert_equal("number", decimal_field[:type])
       assert_equal("any", decimal_field[:step])
-      datetime_field = page.find_field("[task_arguments][datetime_attr]")
+      datetime_field = page.find_field("task[datetime_attr]")
       assert_equal("input", datetime_field.tag_name)
       assert_equal("datetime-local", datetime_field[:type])
-      date_field = page.find_field("[task_arguments][date_attr]")
+      date_field = page.find_field("task[date_attr]")
       assert_equal("input", date_field.tag_name)
       assert_equal("date", date_field[:type])
-      time_field = page.find_field("[task_arguments][time_attr]")
+      time_field = page.find_field("task[time_attr]")
       assert_equal("input", time_field.tag_name)
       assert_equal("time", time_field[:type])
-      boolean_field = page.find_field("[task_arguments][boolean_attr]")
+      boolean_field = page.find_field("task[boolean_attr]")
       assert_equal("input", boolean_field.tag_name)
       assert_equal("checkbox", boolean_field[:type])
     end
