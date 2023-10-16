@@ -47,7 +47,7 @@ instead of a maintenance task.
 If your task happens regularly, consider Active Jobs with a scheduler or cron,
 [job-iteration jobs](https://github.com/shopify/job-iteration) and/or [custom
 rails_admin UIs][rails-admin-engines] instead of the Maintenance Tasks gem.
-Maintenance tasks should be ephemeral, to suit their intentionally limited UI.
+Maintenance tasks should be ephemeral, to suit their intentionally limited UI. They should not repeat.
 
 To create seed data for a new application, use the provided Rails
 `db/seeds.rb` file instead.
@@ -671,7 +671,7 @@ tweaked in an initializer if necessary.
 [max-job-runtime]: https://github.com/Shopify/job-iteration/blob/-/guides/best-practices.md#max-job-runtime
 
 Running tasks will also be interrupted and re-enqueued when needed. For example
-[when Sidekiq workers shuts down for a deploy][sidekiq-deploy]:
+[when Sidekiq workers shut down for a deploy][sidekiq-deploy]:
 
 [sidekiq-deploy]: https://github.com/mperham/sidekiq/wiki/Deployment
 
@@ -687,9 +687,11 @@ forcefully terminating them (this is the default but can be configured with the
 to re-enqueue the job so your Task will be resumed. However, the position in
 the collection won’t be persisted so at least one iteration may run again.
 
+Job queues other than Sidekiq may handle this in different ways.
+
 #### Help! My Task is stuck
 
-Finally, if the queue adapter configured for your application doesn’t have this
+If the queue adapter configured for your application doesn’t have this
 property, or if Sidekiq crashes, is forcefully terminated, or is unable to
 re-enqueue the jobs that were in progress, the Task may be in a seemingly stuck
 situation where it appears to be running but is not. In that situation, pausing
