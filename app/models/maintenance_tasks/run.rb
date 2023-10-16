@@ -241,7 +241,7 @@ module MaintenanceTasks
     def running
       if locking_enabled?
         begin
-          running! unless stopping?
+          running! if !stopping? || stuck?
         rescue ActiveRecord::StaleObjectError
           reload_status
           retry

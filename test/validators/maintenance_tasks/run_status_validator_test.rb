@@ -18,7 +18,7 @@ module MaintenanceTasks
 
       assert interrupted_run.valid?
 
-      assert_no_invalid_transitions([:enqueued, :interrupted], :running)
+      assert_no_invalid_transitions([:enqueued, :interrupted, :cancelling], :running)
     end
 
     test "run can go from paused to enqueued" do

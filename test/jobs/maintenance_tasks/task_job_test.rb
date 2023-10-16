@@ -45,6 +45,19 @@ module MaintenanceTasks
       end
     end
 
+    test ".perform will run a force-cancellable job that isn't cancelled" do
+      freeze_time
+      TaskJob.perform_later(@run)
+      @run.cancel
+      travel Run::STUCK_TASK_TIMEOUT
+      @run.running
+      Maintenance::TestTask.any_instance.expects(:process).at_least_once
+
+      assert_nothing_raised do
+        perform_enqueued_jobs
+      end
+    end
+
     test ".perform_now persists ended_at when the Run is cancelled" do
       freeze_time
       Maintenance::TestTask.any_instance.expects(:process).once.with do

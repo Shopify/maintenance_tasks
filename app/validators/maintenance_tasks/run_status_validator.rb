@@ -32,7 +32,9 @@ module MaintenanceTasks
       #   being cancelled. See description for pausing -> succeeded.
       # cancelling -> errored occurs when the job raises an exception after the
       #   user has cancelled it.
-      "cancelling" => ["cancelled", "succeeded", "errored"],
+      # cancelling -> running occurs when a stuck job is run without an explicit
+      #   force-cancel
+      "cancelling" => ["cancelled", "succeeded", "errored", "running"],
       # running -> succeeded occurs when the task completes successfully.
       # running -> pausing occurs when a user pauses the task as
       #   it's performing.
