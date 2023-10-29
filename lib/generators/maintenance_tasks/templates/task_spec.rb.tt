@@ -6,10 +6,14 @@ module <%= tasks_module %>
 <% module_namespacing do -%>
   RSpec.describe <%= class_name %>Task do
     describe "#process" do
+      <%- if no_collection? -%>
+      subject(:process) { described_class.process }
+      <%- else -%>
       subject(:process) { described_class.process(element) }
       let(:element) {
         # Object to be processed in a single iteration of this task
       }
+      <%- end -%>
       pending "add some examples to (or delete) #{__FILE__}"
     end
   end
