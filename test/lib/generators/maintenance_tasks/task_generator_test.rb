@@ -25,10 +25,8 @@ module MaintenanceTasks
       end
       assert_file "test/tasks/maintenance/sleepy_task_test.rb" do |task_test|
         assert_match(/module Maintenance/, task_test)
-        assert_match(
-          /class SleepyTaskTest < ActiveSupport::TestCase/,
-          task_test,
-        )
+        assert_match(/class SleepyTaskTest < ActiveSupport::TestCase/, task_test)
+        assert_match(/Maintenance::SleepyTask\.process\(element\)/, task_test)
       end
     end
 
@@ -42,6 +40,7 @@ module MaintenanceTasks
       assert_file("spec/tasks/maintenance/sleepy_task_spec.rb") do |task_spec|
         assert_match(/module Maintenance/, task_spec)
         assert_match(/RSpec.describe SleepyTask/, task_spec)
+        assert_match(/subject\(:process\) \{ described_class.process\(element\) \}/, task_spec)
       end
     ensure
       generators_config.options[:rails][:test_framework] = old_test_framework
@@ -89,6 +88,26 @@ module MaintenanceTasks
         assert_match(/no_collection/, task)
         assert_match(/def process/, task)
       end
+    end
+
+    test "generator creates a collection-less task test if the --no-collection option is supplied" do
+      run_generator(["sleepy", "--no-collection"])
+      assert_file("test/tasks/maintenance/sleepy_task_test.rb") do |task_test|
+        assert_match(/Maintenance::SleepyTask\.process$/, task_test)
+      end
+    end
+
+    test "generator creates a collection-less task spec if the --no-collection option is supplied and the application is using RSpec" do
+      generators_config = Rails.application.config.generators
+      old_test_framework = generators_config.options[:rails][:test_framework]
+      generators_config.options[:rails][:test_framework] = :rspec
+
+      run_generator(["sleepy", "--no-collection"])
+      assert_file("spec/tasks/maintenance/sleepy_task_spec.rb") do |task_spec|
+        assert_match(/subject\(:process\) \{ described_class.process \}/, task_spec)
+      end
+    ensure
+      generators_config.options[:rails][:test_framework] = old_test_framework
     end
 
     test "generator raises if multiple collection options provided" do
