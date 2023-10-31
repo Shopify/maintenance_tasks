@@ -3,6 +3,9 @@
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
 
+# Don't wrap output in tests
+ENV["THOR_COLUMNS"] = "200"
+
 require_relative "../test/dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths =
   [File.expand_path("../test/dummy/db/migrate", __dir__)]
