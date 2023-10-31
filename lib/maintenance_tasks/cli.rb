@@ -56,6 +56,8 @@ module MaintenanceTasks
       LONGDESC
     end
 
+    commands["perform"].wrap_long_description = true if commands["perform"].respond_to?(:wrap_long_description=)
+
     private
 
     def csv_file
