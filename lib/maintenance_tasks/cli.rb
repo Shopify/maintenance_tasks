@@ -15,6 +15,12 @@ module MaintenanceTasks
     end
 
     desc "perform [TASK NAME]", "Runs the given Maintenance Task"
+    long_desc <<~DESC
+      `maintenance_tasks perform` will run the Maintenance Task specified by
+      the [TASK NAME] argument.
+
+      Use `maintenance_tasks list` to get a list of all available tasks.
+    DESC
 
     # Specify the CSV file to process for CSV Tasks
     desc = "Supply a CSV file to be processed by a CSV Task, "\
@@ -41,19 +47,14 @@ module MaintenanceTasks
       say_status(:error, error.message, :red)
     end
 
-    # `long_desc` only allows us to use a static string as "long description".
-    # By redefining the `#long_description` method on the "perform" Command
-    # object instead, we make it dynamic, thus delaying the task loading
-    # process until it's actually required.
-    commands["perform"].define_singleton_method(:long_description) do
-      <<~LONGDESC
-        `maintenance_tasks perform` will run the Maintenance Task specified by
-        the [TASK NAME] argument.
+    desc "list", "Load and list all available tasks."
 
-        Available Tasks:
-
-        #{Task.load_all.map(&:name).sort.join("\n\n")}
-      LONGDESC
+    # Command to list all available Tasks.
+    #
+    # It needs to use `Task.load_all` in order to load all the tasks available
+    # in the project before displaying them.
+    def list
+      say(Task.load_all.map(&:name).sort.join("\n"))
     end
 
     private
