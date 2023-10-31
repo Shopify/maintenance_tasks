@@ -102,7 +102,6 @@ module MaintenanceTasks
       OUTPUT
 
       assert_output(Regexp.union(expected_output)) do
-        Thor::Base.shell.any_instance.stubs(:terminal_width).returns(200)
         CLI.start(["help", "perform"])
       end
     end
