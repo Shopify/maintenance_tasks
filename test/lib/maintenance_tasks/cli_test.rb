@@ -86,17 +86,14 @@ module MaintenanceTasks
     end
 
     test "`list` loads all tasks and displays them" do
-      Task
-        .expects(:load_all)
-        .at_least_once
-        .returns([stub(name: "Task1"), stub(name: "Task2")])
+      Task.expects(:load_all).returns([stub(name: "Task1"), stub(name: "Task2")])
 
       expected_output = <<~OUTPUT
         Task1
         Task2
       OUTPUT
 
-      assert_output(Regexp.union(expected_output)) do
+      assert_output(expected_output) do
         CLI.start(["list"])
       end
     end
