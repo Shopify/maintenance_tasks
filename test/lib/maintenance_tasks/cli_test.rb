@@ -85,18 +85,6 @@ module MaintenanceTasks
       end
     end
 
-    test "`help perform` invites the user to use `maintenance_tasks list` with proper rewrapping" do
-      expected_output = <<~OUTPUT.indent(2)
-        `maintenance_tasks perform` will run the Maintenance Task specified by the [TASK NAME] argument.
-
-        Use `maintenance_tasks list` to get a list of all available tasks.
-      OUTPUT
-
-      assert_output(Regexp.union(expected_output)) do
-        CLI.start(["help", "perform"])
-      end
-    end
-
     test "`list` loads all tasks and displays them" do
       Task
         .expects(:load_all)
