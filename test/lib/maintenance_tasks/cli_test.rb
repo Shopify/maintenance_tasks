@@ -85,25 +85,16 @@ module MaintenanceTasks
       end
     end
 
-    test "`help perform` loads all tasks and displays them" do
-      Task
-        .expects(:load_all)
-        .at_least_once
-        .returns([stub(name: "Task1"), stub(name: "Task2")])
+    test "`list` loads all tasks and displays them" do
+      Task.expects(:load_all).returns([stub(name: "Task1"), stub(name: "Task2")])
 
-      expected_output = <<~OUTPUT.indent(2)
-        `maintenance_tasks perform` will run the Maintenance Task specified by the [TASK NAME] argument.
-
-        Available Tasks:
-
+      expected_output = <<~OUTPUT
         Task1
-
         Task2
       OUTPUT
 
-      assert_output(Regexp.union(expected_output)) do
-        Thor::Base.shell.any_instance.stubs(:terminal_width).returns(200)
-        CLI.start(["help", "perform"])
+      assert_output(expected_output) do
+        CLI.start(["list"])
       end
     end
   end

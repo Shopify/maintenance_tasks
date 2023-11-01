@@ -3,6 +3,10 @@
 # Configure Rails Environment
 ENV["RAILS_ENV"] = "test"
 
+# Force Thor CLI to output on 200 columns, ignoring
+# the size of the actual terminal running the tests.
+ENV["THOR_COLUMNS"] = "200"
+
 require_relative "../test/dummy/config/environment"
 ActiveRecord::Migrator.migrations_paths =
   [File.expand_path("../test/dummy/db/migrate", __dir__)]
