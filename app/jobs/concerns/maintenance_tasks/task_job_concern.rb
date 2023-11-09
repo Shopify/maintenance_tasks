@@ -9,6 +9,8 @@ module MaintenanceTasks
     include JobIteration::Iteration
 
     included do
+      self.job_iteration_max_job_runtime = JobIteration.max_job_runtime || 5.minutes
+
       before_perform(:before_perform)
 
       on_start(:on_start)

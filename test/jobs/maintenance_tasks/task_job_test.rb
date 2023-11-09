@@ -617,5 +617,9 @@ module MaintenanceTasks
 
       assert_equal 2, @run.reload.tick_total
     end
+
+    test "job_iteration_max_job_runtime defaults to 5 minutes" do
+      assert_equal 5.minutes, MaintenanceTasks::TaskJob.job_iteration_max_job_runtime
+    end
   end
 end
