@@ -917,7 +917,7 @@ bin/rails generate maintenance_tasks:install
 
 This ensures that new migrations are installed and run as well.
 
-**What if I’ve deleted my previous Maintenance Task migrations?**
+### What if I’ve deleted my previous Maintenance Task migrations?
 
 The install command will attempt to reinstall these old migrations and migrating
 the database will cause problems. Use `bin/rails
