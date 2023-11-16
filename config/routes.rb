@@ -7,6 +7,7 @@ MaintenanceTasks::Engine.routes.draw do
         put "pause"
         put "cancel"
         put "resume"
+        put "force_pause"
       end
     end
   end
