@@ -559,7 +559,7 @@ module Maintenance
 
     test "#process performs a task iteration" do
       assert_difference -> { Post.first.content } do
-        task.process(Post.first)
+        @task.process(Post.first)
       end
     end
   end
