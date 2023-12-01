@@ -320,10 +320,19 @@ module MaintenanceTasks
 
     # Marks a Run as pausing.
     #
+    # If the Run has been stuck on pausing for more than 5 minutes, it forces
+    # the transition to paused. The ended_at timestamp will be updated.
+    #
     # Rescues and retries status transition if an ActiveRecord::StaleObjectError
     # is encountered.
-    def pausing!
-      super
+    def pause
+      if stuck_on_pausing?
+        self.status = :paused
+        self.ended_at = Time.now
+        persist_transition
+      else
+        pausing!
+      end
     rescue ActiveRecord::StaleObjectError
       reload_status
       retry
@@ -335,6 +344,14 @@ module MaintenanceTasks
     # @return [Boolean] whether the Run is stuck.
     def stuck?
       cancelling? && updated_at <= STUCK_TASK_TIMEOUT.ago
+    end
+
+    # Returns whether a Run is stuck, which is defined as having a status of
+    # cancelling, and not having been updated in the last 5 minutes.
+    #
+    # @return [Boolean] whether the Run is stuck.
+    def stuck_on_pausing?
+      pausing? && updated_at <= STUCK_TASK_TIMEOUT.ago
     end
 
     # Performs validation on the task_name attribute.

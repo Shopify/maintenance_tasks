@@ -29,15 +29,7 @@ module MaintenanceTasks
 
     # Updates a Run status to paused.
     def pause
-      @run.pausing!
-      redirect_to(task_path(@run.task_name))
-    rescue ActiveRecord::RecordInvalid => error
-      redirect_to(task_path(@run.task_name), alert: error.message)
-    end
-
-    # Forces paused state to be set, used if stuck
-    def force_pause
-      @run.paused!
+      @run.pause
       redirect_to(task_path(@run.task_name))
     rescue ActiveRecord::RecordInvalid => error
       redirect_to(task_path(@run.task_name), alert: error.message)

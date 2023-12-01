@@ -624,15 +624,32 @@ module MaintenanceTasks
       assert_predicate run, :cancelling?
     end
 
-    test "#pausing! rescues and retries ActiveRecord::StaleObjectError" do
+    test "#pause rescues and retries ActiveRecord::StaleObjectError" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
       Run.find(run.id).running!
 
       assert_nothing_raised do
-        run.pausing!
+        run.pause
       end
 
       assert_predicate run, :pausing?
+    end
+
+    test "#pause transitions from pausing to paused if it has not been updated in more than 5 minutes" do
+      freeze_time
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :pausing,
+      )
+
+      run.pause
+      assert_predicate run, :pausing?
+      assert_nil run.ended_at
+
+      travel Run::STUCK_TASK_TIMEOUT
+      run.pause
+      assert_predicate run, :paused?
+      assert_equal Time.now, run.ended_at
     end
 
     test "#persist_error rescues and retries ActiveRecord::StaleObjectError" do
