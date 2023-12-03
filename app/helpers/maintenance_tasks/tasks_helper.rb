@@ -103,6 +103,16 @@ module MaintenanceTasks
 
     # Return the appropriate field tag for the parameter
     def parameter_field(form_builder, parameter_name)
+      # If the parameter has a `validates_inclusion_in` parameter,
+      # generate a dropdown list of options
+      inclusion_validator = form_builder.object.class.validators_on(parameter_name).find do |validator|
+        validator.instance_of?(ActiveModel::Validations::InclusionValidator)
+      end
+
+      return form_builder.select(
+        parameter_name, inclusion_validator.options[:in], prompt: 'Select a value'
+      ) if inclusion_validator
+
       case form_builder.object.class.attribute_types[parameter_name]
       when ActiveModel::Type::Integer
         form_builder.number_field(parameter_name)
