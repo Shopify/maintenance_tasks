@@ -430,6 +430,7 @@ module MaintenanceTasks
     def task
       @task ||= begin
         task = Task.named(task_name).new
+        task.run = self if task.respond_to?(:run=)
         if task.attribute_names.any? && arguments.present?
           task.assign_attributes(arguments)
         end
