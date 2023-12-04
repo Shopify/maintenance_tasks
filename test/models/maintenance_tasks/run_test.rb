@@ -533,7 +533,7 @@ module MaintenanceTasks
 
     test "#stuck? does not return true for other statuses" do
       freeze_time
-      Run.statuses.except("cancelling").each_key do |status|
+      Run.statuses.except("cancelling", "pausing").each_key do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
           status: status,
