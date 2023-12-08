@@ -649,7 +649,6 @@ module MaintenanceTasks
       travel Run::STUCK_TASK_TIMEOUT
       run.pause
       assert_predicate run, :paused?
-      assert_equal Time.now, run.ended_at
     end
 
     test "#persist_error rescues and retries ActiveRecord::StaleObjectError" do

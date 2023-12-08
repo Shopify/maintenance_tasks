@@ -328,7 +328,6 @@ module MaintenanceTasks
     def pause
       if stuck?
         self.status = :paused
-        self.ended_at = Time.now
         persist_transition
       else
         pausing!
