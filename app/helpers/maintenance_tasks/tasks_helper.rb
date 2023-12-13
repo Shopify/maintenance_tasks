@@ -106,11 +106,11 @@ module MaintenanceTasks
       # If the parameter has a `validates_inclusion_in` parameter,
       # generate a dropdown list of options
       inclusion_validator = form_builder.object.class.validators_on(parameter_name).find do |validator|
-        validator.instance_of?(ActiveModel::Validations::InclusionValidator)
+        validator.kind == :inclusion
       end
 
       return form_builder.select(
-        parameter_name, inclusion_validator.options[:in], prompt: 'Select a value'
+        parameter_name, inclusion_validator.options[:in], prompt: "Select a value"
       ) if inclusion_validator
 
       case form_builder.object.class.attribute_types[parameter_name]
