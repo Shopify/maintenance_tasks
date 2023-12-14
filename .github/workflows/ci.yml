@@ -9,13 +9,18 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_6_1.gemfile, gemfiles/rails_7_0.gemfile, gemfiles/rails_edge.gemfile]
+        gemfile:
+        - gemfiles/rails_6_0.gemfile
+        - gemfiles/rails_6_1.gemfile
+        - gemfiles/rails_7_0.gemfile
+        - gemfiles/rails_7_1.gemfile
+        - gemfiles/rails_edge.gemfile
         ruby: ["3.0", "3.1", "3.2"]
         database: [sqlite]
         include:
-          - gemfile: "gemfiles/postgresql.gemfile"
-            ruby: 3.2
-            database: postgres
+        - gemfile: "gemfiles/postgresql.gemfile"
+          ruby: 3.2
+          database: postgres
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
       DB: ${{ matrix.database }}
