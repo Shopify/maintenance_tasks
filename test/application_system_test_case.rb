@@ -22,14 +22,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   driven_by :selenium, using: :headless_chrome do |options|
     options.add_argument("--disable-dev-shm-usage")
-    options.add_preference(
-      :download,
-      default_directory: "test/dummy/tmp/downloads",
-    )
+    options.add_argument("--headless=new")
   end
 
   setup do
     travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
+    page.driver.browser.download_path = "test/dummy/tmp/downloads"
   end
 
   teardown do
