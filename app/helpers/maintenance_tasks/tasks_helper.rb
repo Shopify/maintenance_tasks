@@ -101,10 +101,9 @@ module MaintenanceTasks
       )
     end
 
-    # Return the appropriate field tag for the parameter
+    # Return the appropriate field tag for the parameter, based on its type.
+    # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
     def parameter_field(form_builder, parameter_name)
-      # If the parameter has a `validates_inclusion_in` parameter,
-      # generate a dropdown list of options
       inclusion_validator = form_builder.object.class.validators_on(parameter_name).find do |validator|
         validator.kind == :inclusion
       end
