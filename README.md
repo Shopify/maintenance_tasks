@@ -700,6 +700,9 @@ Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
 if a Task is `cancelling` for more than 5 minutes, you can cancel it again.
 It will then be marked as fully cancelled, allowing you to run it again.
 
+If you are stuck in `pausing` and wish to preserve your tasks's position (instead of
+cancelling and rerunning), you may click "Force pause".
+
 ### Configuring the gem
 
 There are a few configurable options for the gem. Custom configurations should

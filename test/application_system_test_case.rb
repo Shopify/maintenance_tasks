@@ -13,6 +13,11 @@ Capybara::Selenium::Driver.load_selenium
 
 if Rails::VERSION::MAJOR < 7
   Selenium::WebDriver.logger.ignore(:browser_options)
+  if Rails::VERSION::MINOR < 1
+    require "action_dispatch/system_testing/browser"
+    # prevent Rails from adding --headless at the end of the arguments, overriding --headless=new
+    ActionDispatch::SystemTesting::Browser.redefine_method(:options) { capabilities }
+  end
 elsif Rails.gem_version < Gem::Version.new("7.1")
   Selenium::WebDriver.logger.ignore(:capabilities)
 end
@@ -22,14 +27,12 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
 
   driven_by :selenium, using: :headless_chrome do |options|
     options.add_argument("--disable-dev-shm-usage")
-    options.add_preference(
-      :download,
-      default_directory: "test/dummy/tmp/downloads",
-    )
+    options.add_argument("--headless=new")
   end
 
   setup do
     travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
+    page.driver.browser.download_path = "test/dummy/tmp/downloads"
   end
 
   teardown do

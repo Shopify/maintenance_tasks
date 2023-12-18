@@ -128,7 +128,7 @@ module MaintenanceTasks
       # Time.zone_default
       Time.use_zone(now.utc_offset + 2.hour * sign) do # a timezone that is not the system timezone
         with_zone_default(Time.find_zone!(now.utc_offset + 1.hour * sign)) do # another non-system timezone
-          value = ActiveModel::Type::DateTime.new.cast("2023-06-01T12:00:00") # a local ISO8601 time (no timezone)
+          value = ActiveModel::Type::DateTime.new.cast(now.strftime("%FT%T")) # a local ISO8601 time (no timezone)
           refute_predicate(value, :utc?)
           assert_equal(now.utc_offset, value.utc_offset) # uses system time zone
         end
