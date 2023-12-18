@@ -1,6 +1,10 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron: "42 23 * * 0" # Run CI before the work week starts
 
 jobs:
   build:
