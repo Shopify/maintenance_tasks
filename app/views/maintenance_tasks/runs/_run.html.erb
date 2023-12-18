@@ -29,6 +29,9 @@
     <% elsif run.pausing? %>
       <%= button_to 'Pausing', pause_task_run_path(@task, run), method: :put, class: 'button is-warning', disabled: true %>
       <%= button_to 'Cancel', cancel_task_run_path(@task, run), method: :put, class: 'button is-danger' %>
+      <% if run.stuck? %>
+        <%= button_to 'Force pause', pause_task_run_path(@task, run), method: :put, class: 'button is-danger', disabled: @task.deleted? %>
+      <% end %>
     <% elsif run.active? %>
       <%= button_to 'Pause', pause_task_run_path(@task, run), method: :put, class: 'button is-warning', disabled: @task.deleted? %>
       <%= button_to 'Cancel', cancel_task_run_path(@task, run), method: :put, class: 'button is-danger' %>
