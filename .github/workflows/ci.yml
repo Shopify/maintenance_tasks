@@ -52,3 +52,4 @@ jobs:
       with:
         name: screenshots
         path: test/dummy/tmp/screenshots
+        if-no-files-found: ignore
