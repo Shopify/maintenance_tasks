@@ -187,13 +187,7 @@ module MaintenanceTasks
         namespace = MaintenanceTasks.tasks_module.safe_constantize
         return unless namespace
 
-        load_const = lambda do |root|
-          root.constants.each do |name|
-            object = root.const_get(name)
-            load_const.call(object) if object.instance_of?(Module)
-          end
-        end
-        load_const.call(namespace)
+        Rails.autoloaders.main.eager_load_namespace(namespace)
       end
     end
 

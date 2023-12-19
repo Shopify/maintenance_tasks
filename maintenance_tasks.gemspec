@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency("activerecord", ">= 6.0")
   spec.add_dependency("job-iteration", ">= 1.3.6")
   spec.add_dependency("railties", ">= 6.0")
+  spec.add_dependency("zeitwerk", ">= 2.6.2")
 end
