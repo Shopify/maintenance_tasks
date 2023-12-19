@@ -6,6 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }} / ${{ matrix.database }}
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
