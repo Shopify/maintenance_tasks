@@ -5,35 +5,35 @@ A Rails engine for queuing and managing maintenance tasks.
 By ”maintenance task”, this project means a data migration, i.e. code that
 changes data in the database, often to support schema migrations. For example,
 in order to introduce a new `NOT NULL` column, it has to be added as nullable
-first, backfilled with values, before finally being changed to `NOT NULL`.
-This engine helps with the second part of this process, backfilling.
+first, backfilled with values, before finally being changed to `NOT NULL`. This
+engine helps with the second part of this process, backfilling.
 
-Maintenance tasks are collection-based tasks, usually using Active Record,
-that update the data in your database. They can be paused or interrupted.
-Maintenance tasks can operate [in batches](#processing-batch-collections) and
-use [throttling](#throttling) to control the load on your database.
+Maintenance tasks are collection-based tasks, usually using Active Record, that
+update the data in your database. They can be paused or interrupted. Maintenance
+tasks can operate [in batches](#processing-batch-collections) and use
+[throttling](#throttling) to control the load on your database.
 
 Maintenance tasks aren't meant to happen on a regular basis. They're used as
 needed, or as one-offs. Normally maintenance tasks are ephemeral, so they are
 used briefly and then deleted.
 
-The Rails engine has a web-based UI for listing maintenance tasks, seeing
-their status, and starting, pausing and restarting them.
+The Rails engine has a web-based UI for listing maintenance tasks, seeing their
+status, and starting, pausing and restarting them.
 
 [![Link to demo video](static/demo.png)](https://www.youtube.com/watch?v=BTuvTQxlFzs)
 
 ## Should I Use Maintenance Tasks?
 
-Maintenance tasks have a limited, specific job UI. While the engine can be
-used to provide a user interface for other data changes, such as data changes
-for support requests, we recommend you use regular application code for those
-use cases instead. These inevitably require more flexibility than this engine
-will be able to provide.
+Maintenance tasks have a limited, specific job UI. While the engine can be used
+to provide a user interface for other data changes, such as data changes for
+support requests, we recommend you use regular application code for those use
+cases instead. These inevitably require more flexibility than this engine will
+be able to provide.
 
-If your task shouldn't run as an Active Job, it probably isn't a good match
-for this gem. If your task doesn't need to run in the background,
-consider a runner script instead. If your task doesn't need to be
-interruptible, consider a normal Active Job.
+If your task shouldn't run as an Active Job, it probably isn't a good match for
+this gem. If your task doesn't need to run in the background, consider a runner
+script instead. If your task doesn't need to be interruptible, consider a normal
+Active Job.
 
 Maintenance tasks can be interrupted between iterations. If your task [isn't
 collection-based](#tasks-that-dont-need-a-collection) (no CSV file or database
@@ -47,10 +47,11 @@ instead of a maintenance task.
 If your task happens regularly, consider Active Jobs with a scheduler or cron,
 [job-iteration jobs](https://github.com/shopify/job-iteration) and/or [custom
 rails_admin UIs][rails-admin-engines] instead of the Maintenance Tasks gem.
-Maintenance tasks should be ephemeral, to suit their intentionally limited UI. They should not repeat.
+Maintenance tasks should be ephemeral, to suit their intentionally limited UI.
+They should not repeat.
 
-To create seed data for a new application, use the provided Rails
-`db/seeds.rb` file instead.
+To create seed data for a new application, use the provided Rails `db/seeds.rb`
+file instead.
 
 If your application can't handle a half-completed migration, maintenance tasks
 are probably the wrong tool. Remember that maintenance tasks are intentionally
@@ -99,7 +100,8 @@ constants](https://guides.rubyonrails.org/autoloading_and_reloading_constants.ht
 
 The typical Maintenance Tasks workflow is as follows:
 
-1. [Generate a class describing the Task](#creating-a-task) and the work to be done.
+1. [Generate a class describing the Task](#creating-a-task) and the work to be
+   done.
 2. Run the Task
     - either by [using the included web UI](#running-a-task-from-the-web-ui),
     - or by [using the command line](#running-a-task-from-the-command-line),
@@ -191,9 +193,9 @@ title,content
 My Title,Hello World!
 ```
 
-The files uploaded to your Active Storage service provider will be renamed
-to include an ISO 8601 timestamp and the Task name in snake case format.
-The CSV is expected to have a trailing newline at the end of the file.
+The files uploaded to your Active Storage service provider will be renamed to
+include an ISO 8601 timestamp and the Task name in snake case format. The CSV is
+expected to have a trailing newline at the end of the file.
 
 #### Batch CSV Tasks
 
@@ -270,8 +272,8 @@ inside `#process`.
 ### Tasks that don’t need a Collection
 
 Sometimes, you might want to run a Task that performs a single operation, such
-as enqueuing another background job or querying an external API. The gem supports
-collection-less tasks.
+as enqueuing another background job or querying an external API. The gem
+supports collection-less tasks.
 
 Generate a collection-less Task by running:
 
@@ -409,10 +411,9 @@ module Maintenance
 end
 ```
 
-Note: The `after_error` callback is guaranteed to complete,
-so any exceptions raised in your callback code are ignored.
-If your `after_error` callback code can raise an exception,
-you’ll need to rescue it and handle it appropriately
+Note: The `after_error` callback is guaranteed to complete, so any exceptions
+raised in your callback code are ignored. If your `after_error` callback code
+can raise an exception, you’ll need to rescue it and handle it appropriately
 within the callback.
 
 ```ruby
@@ -430,9 +431,8 @@ module Maintenance
 end
 ```
 
-If any of the other callbacks cause an exception,
-it will be handled by the error handler,
-and will cause the task to stop running.
+If any of the other callbacks cause an exception, it will be handled by the
+error handler, and will cause the task to stop running.
 
 Callback behaviour can be shared across all tasks using an initializer.
 
@@ -474,14 +474,14 @@ depend on the queue adapter but in general, you should follow these rules:
 When the Task runs or resumes, the Runner enqueues a job, which processes the
 Task. That job will instantiate a Task object which will live for the duration
 of the job. The first time the job runs, it will call `count`. Every time a job
-runs, it will call `collection` on the Task object, and then `process`
-for each item in the collection, until the job stops. The job stops when either the
+runs, it will call `collection` on the Task object, and then `process` for each
+item in the collection, until the job stops. The job stops when either the
 collection is finished processing or after the maximum job runtime has expired.
 
 This means memoization can be misleading within `process`, since the memoized
 values will be available for subsequent calls to `process` within the same job.
-Still, memoization can be used for throttling or reporting, and you can use [Task
-callbacks](#using-task-callbacks) to persist or log a report for example.
+Still, memoization can be used for throttling or reporting, and you can use
+[Task callbacks](#using-task-callbacks) to persist or log a report for example.
 
 ### Writing tests for a Task
 
@@ -684,24 +684,24 @@ Running tasks will also be interrupted and re-enqueued when needed. For example
 When Sidekiq is stopping, it will give workers 25 seconds to finish before
 forcefully terminating them (this is the default but can be configured with the
 `--timeout` option). Before the worker threads are terminated, Sidekiq will try
-to re-enqueue the job so your Task will be resumed. However, the position in
-the collection won’t be persisted so at least one iteration may run again.
+to re-enqueue the job so your Task will be resumed. However, the position in the
+collection won’t be persisted so at least one iteration may run again.
 
 Job queues other than Sidekiq may handle this in different ways.
 
 #### Help! My Task is stuck
 
-If the queue adapter configured for your application doesn’t have this
-property, or if Sidekiq crashes, is forcefully terminated, or is unable to
-re-enqueue the jobs that were in progress, the Task may be in a seemingly stuck
-situation where it appears to be running but is not. In that situation, pausing
-or cancelling it will not result in the Task being paused or cancelled, as the
-Task will get stuck in a state of `pausing` or `cancelling`. As a work-around,
-if a Task is `cancelling` for more than 5 minutes, you can cancel it again.
-It will then be marked as fully cancelled, allowing you to run it again.
+If the queue adapter configured for your application doesn’t have this property,
+or if Sidekiq crashes, is forcefully terminated, or is unable to re-enqueue the
+jobs that were in progress, the Task may be in a seemingly stuck situation where
+it appears to be running but is not. In that situation, pausing or cancelling it
+will not result in the Task being paused or cancelled, as the Task will get
+stuck in a state of `pausing` or `cancelling`. As a work-around, if a Task is
+`cancelling` for more than 5 minutes, you can cancel it again. It will then be
+marked as fully cancelled, allowing you to run it again.
 
-If you are stuck in `pausing` and wish to preserve your tasks's position (instead of
-cancelling and rerunning), you may click "Force pause".
+If you are stuck in `pausing` and wish to preserve your tasks's position
+(instead of cancelling and rerunning), you may click "Force pause".
 
 ### Configuring the gem
 
@@ -762,9 +762,10 @@ If no value is specified, it will default to `Maintenance`.
 
 #### Organizing tasks using namespaces
 
-Tasks may be nested arbitrarily deeply under `app/tasks/maintenance`, for example given a
-task file `app/tasks/maintenance/team_name/service_name/update_posts_task.rb` we
-can define the task as:
+Tasks may be nested arbitrarily deeply under `app/tasks/maintenance`, for
+example given a task file
+`app/tasks/maintenance/team_name/service_name/update_posts_task.rb` we can
+define the task as:
 
 ```ruby
 module Maintenance
@@ -853,8 +854,8 @@ default.
 #### Customizing the backtrace cleaner
 
 `MaintenanceTasks.backtrace_cleaner` can be configured to specify a backtrace
-cleaner to use when a Task errors and the backtrace is cleaned and persisted.
-An `ActiveSupport::BacktraceCleaner` should be used.
+cleaner to use when a Task errors and the backtrace is cleaned and persisted. An
+`ActiveSupport::BacktraceCleaner` should be used.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
@@ -870,8 +871,8 @@ clean backtraces.
 
 #### Customizing the parent controller for the web UI
 
-`MaintenanceTasks.parent_controller` can be configured to specify a controller class for all of the web UI engine's
-controllers to inherit from.
+`MaintenanceTasks.parent_controller` can be configured to specify a controller
+class for all of the web UI engine's controllers to inherit from.
 
 This allows applications with common logic in their `ApplicationController` (or
 any other controller) to optionally configure the web UI to inherit that logic
@@ -898,9 +899,10 @@ If no value is specified, it will default to `"ActionController::Base"`.
 
 ### Metadata
 
-`MaintenanceTasks.metadata` can be configured to specify a proc from which to get extra information about the run.
-Since this proc will be ran in the context of the `MaintenanceTasks.parent_controller`, it can be used to keep the id
-or email of the user who performed the maintenance task.
+`MaintenanceTasks.metadata` can be configured to specify a proc from which to
+get extra information about the run. Since this proc will be ran in the context
+of the `MaintenanceTasks.parent_controller`, it can be used to keep the id or
+email of the user who performed the maintenance task.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb

@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    maintenance_tasks (2.3.3)
+    maintenance_tasks (2.4.0)
       actionpack (>= 6.0)
       activejob (>= 6.0)
       activerecord (>= 6.0)
