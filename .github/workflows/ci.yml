@@ -6,6 +6,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: Ruby ${{ matrix.ruby }} / ${{ matrix.gemfile }} / ${{ matrix.database }}
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -50,5 +51,6 @@ jobs:
       uses: actions/upload-artifact@v4
       if: failure()
       with:
-        name: screenshots
+        name: screenshots-${{ strategy.job-index }}
         path: test/dummy/tmp/screenshots
+        if-no-files-found: ignore

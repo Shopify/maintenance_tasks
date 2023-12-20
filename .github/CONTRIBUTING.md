@@ -14,7 +14,7 @@ Before engaging with this community, please read and understand our
 ## Setting up development environment
 
 * The gem follows standard Rails practices:
-  * `bundle install` to install dependencies
+  * `bin/setup` to install dependencies
   * `bin/rails server` to start the server
   * `bin/rails test` to run tests
   * `bin/rails test:system` to run system tests
