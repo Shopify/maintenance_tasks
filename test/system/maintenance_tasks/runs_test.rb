@@ -32,11 +32,30 @@ module MaintenanceTasks
         assert_title("Maintenance::UpdatePostsTask")
         assert_text("Enqueued")
         assert_text("Waiting to start.")
+        assert_text("Metadata")
+        assert_table do |table|
+          table.assert_text("user_email")
+          table.assert_text("michael.elfassy@shopify.com")
+        end
       end
       run = Run.last
       assert_equal("michael.elfassy@shopify.com", run.metadata["user_email"])
       assert_equal("Maintenance::UpdatePostsTask", run.task_name)
       assert_equal("enqueued", run.status)
+    ensure
+      MaintenanceTasks.metadata = nil
+    end
+
+    test "metadata can be non-hash" do
+      MaintenanceTasks.metadata = -> { "hello metadata" }
+      visit(maintenance_tasks_path)
+
+      assert_difference("Run.count") do
+        click_on("Maintenance::UpdatePostsTask")
+        click_on("Run")
+
+        assert_text("hello metadata")
+      end
     ensure
       MaintenanceTasks.metadata = nil
     end

@@ -1,0 +1,26 @@
+<% if serializable.present? %>
+  <% case serializable %>
+  <% when Hash %>
+    <div class="table-container">
+      <table class="table">
+        <tbody>
+          <% serializable.transform_values(&:to_s).each do |key, value| %>
+            <tr>
+              <td class="is-family-monospace"><%= key %></td>
+              <td>
+                <% next if value.empty? %>
+                <% if value.include?("\n") %>
+                  <pre><%= value %></pre>
+                <% else %>
+                  <code><%= value %></code>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% else %>
+    <code><%= serializable.inspect %></code>
+  <% end %>
+<% end %>
