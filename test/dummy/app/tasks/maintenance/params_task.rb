@@ -17,6 +17,9 @@ module Maintenance
     attribute :date_attr, :date
     attribute :time_attr, :time
     attribute :boolean_attr, :boolean
+    attribute :enum_attr, :integer
+
+    validates_inclusion_of :enum_attr, in: [100, 200, 300], allow_nil: true
 
     class << self
       attr_accessor :fast_task

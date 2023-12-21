@@ -87,6 +87,7 @@ module MaintenanceTasks
           "date_attr",
           "time_attr",
           "boolean_attr",
+          "enum_attr",
         ],
         TaskDataShow.new("Maintenance::ParamsTask").parameter_names,
       )

@@ -114,6 +114,10 @@ module MaintenanceTasks
       boolean_field = page.find_field("task[boolean_attr]")
       assert_equal("input", boolean_field.tag_name)
       assert_equal("checkbox", boolean_field[:type])
+      enum_field = page.find_field("task[enum_attr]")
+      assert_equal("select", enum_field.tag_name)
+      enum_field_options = enum_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "100", "200", "300"], enum_field_options)
     end
 
     test "view a Task with multiple pages of Runs" do
