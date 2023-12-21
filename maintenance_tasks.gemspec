@@ -2,7 +2,7 @@
 
 Gem::Specification.new do |spec|
   spec.name = "maintenance_tasks"
-  spec.version = "2.3.3"
+  spec.version = "2.4.0"
   spec.author = "Shopify Engineering"
   spec.email = "gems@shopify.com"
   spec.homepage = "https://github.com/Shopify/maintenance_tasks"
@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_dependency("activerecord", ">= 6.0")
   spec.add_dependency("job-iteration", ">= 1.3.6")
   spec.add_dependency("railties", ">= 6.0")
+  spec.add_dependency("zeitwerk", ">= 2.6.2")
 end
