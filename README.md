@@ -897,6 +897,15 @@ controller class which **must inherit** from `ActionController::Base`.
 
 If no value is specified, it will default to `"ActionController::Base"`.
 
+#### Configure time after which the task will be considered stuck
+
+To specify a time duration after which a task is considered stuck if it has not been updated,
+you can configure `MaintenanceTasks.stuck_task_duration`. This duration should account for
+job infrastructure events that may prevent the maintenance tasks job from being executed and cancelling the task.
+
+The value for `MaintenanceTasks.stuck_task_duration` must be an `ActiveSupport::Duration`.
+If no value is specified, it will default to 5 minutes.
+
 ### Metadata
 
 `MaintenanceTasks.metadata` can be configured to specify a proc from which to

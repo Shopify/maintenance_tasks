@@ -32,7 +32,6 @@ module MaintenanceTasks
       :cancelled,
     ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
-    STUCK_TASK_TIMEOUT = 5.minutes
 
     enum status: STATUSES.to_h { |status| [status, status.to_s] }
 
@@ -342,7 +341,7 @@ module MaintenanceTasks
     #
     # @return [Boolean] whether the Run is stuck.
     def stuck?
-      (cancelling? || pausing?) && updated_at <= STUCK_TASK_TIMEOUT.ago
+      (cancelling? || pausing?) && updated_at <= MaintenanceTasks.stuck_task_duration.ago
     end
 
     # Performs validation on the task_name attribute.

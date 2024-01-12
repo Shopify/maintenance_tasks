@@ -35,7 +35,7 @@ module MaintenanceTasks
       freeze_time
       TaskJob.perform_later(@run)
       @run.cancel
-      travel Run::STUCK_TASK_TIMEOUT
+      travel MaintenanceTasks.stuck_task_duration
       @run.cancel # force cancel the Run
       assert_predicate @run, :cancelled?
       Maintenance::TestTask.any_instance.expects(:process).never
