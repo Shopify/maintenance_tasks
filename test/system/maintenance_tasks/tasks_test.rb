@@ -63,9 +63,8 @@ module MaintenanceTasks
       assert_text "Paused"
 
       assert_equal ["Active Runs", "Previous Runs"], page.all("h4").map(&:text)
-      runs = page.all("h5").map(&:text)
-      assert_includes runs, "July 18, 2022 11:05\nPaused"
-      assert_includes runs, "January 01, 2020 01:00\nSucceeded"
+      assert_text(/July 18, 2022 11:05\nPaused\n#\d/)
+      assert_text(/January 01, 2020 01:00\nSucceeded\n#\d/)
     end
 
     test "task with attributes renders default values on the form" do
