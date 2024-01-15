@@ -89,4 +89,11 @@ module MaintenanceTasks
   #
   #   @return [Proc] generates a hash containing the metadata to be stored on the Run
   mattr_accessor :metadata, default: nil
+
+  # @!attribute stuck_task_duration
+  #  @scope class
+  #  The duration after which a task is considered stuck and can be force cancelled.
+  #
+  #  @return [ActiveSupport::Duration] the threshold in seconds after which a task is considered stuck.
+  mattr_accessor :stuck_task_duration, default: 5.minutes
 end
