@@ -1,0 +1,21 @@
+name: "Close stale issues"
+on:
+  schedule:
+    - cron: "30 1 * * *""
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-issue-stale: 60
+          exempt-issue-labels: "Blocked"
+          days-before-issue-close: 14
+          stale-issue-label: "stale"
+          stale-issue-message: >
+            This issue has been marked as stale because it has not been commented on in two months.
+
+            Please reply in order to keep the issue open. Otherwise, it will close in 14 days.
+
+            Thank you for contributing!
+
