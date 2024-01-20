@@ -747,6 +747,9 @@ The error handler should be a lambda that accepts three arguments:
   hand, are converted to strings and passed raw to Bugsnag, so make sure to
   filter any personal data from these objects before adding them to a report.
 
+The error handler is called within the context of the `TaskJob`, 
+allowing you to access detailed information about the task.
+
 #### Customizing the maintenance tasks module
 
 `MaintenanceTasks.tasks_module` can be configured to define the module in which
