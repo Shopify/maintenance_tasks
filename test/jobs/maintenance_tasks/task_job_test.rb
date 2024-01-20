@@ -337,13 +337,13 @@ module MaintenanceTasks
       handled_error = nil
       handled_task_context = nil
       handled_errored_element = nil
-      handled_self_klass = nil
+      handled_task_job_klass = nil
 
-      MaintenanceTasks.error_handler = ->(error, task_context, errored_el) do
+      MaintenanceTasks.error_handler = ->(error, task_context, errored_el, task_job) do
         handled_error = error
         handled_task_context = task_context
         handled_errored_element = errored_el
-        handled_self_klass = self.class
+        handled_task_job_klass = task_job.class
       end
 
       run = Run.create!(task_name: "Maintenance::ErrorTask")
@@ -353,7 +353,7 @@ module MaintenanceTasks
       assert_equal(ArgumentError, handled_error.class)
       assert_equal("Maintenance::ErrorTask", handled_task_context[:task_name])
       assert_equal(2, handled_errored_element)
-      assert_equal(TaskJob, handled_self_klass)
+      assert_equal(TaskJob, handled_task_job_klass)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
@@ -378,11 +378,9 @@ module MaintenanceTasks
       error_handler_before = MaintenanceTasks.error_handler
       handled_error = nil
       handled_task_context = nil
-      handled_self_klass = nil
       MaintenanceTasks.error_handler = ->(error, task_context, _errored_el) do
         handled_error = error
         handled_task_context = task_context
-        handled_self_klass = self.class
       end
 
       RaisingTaskJob = Class.new(TaskJob) do
@@ -393,7 +391,6 @@ module MaintenanceTasks
 
       assert_equal("Uh oh!", handled_error.message)
       assert_empty(handled_task_context)
-      assert_equal(RaisingTaskJob, handled_self_klass)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end

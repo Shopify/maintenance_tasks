@@ -719,14 +719,14 @@ you can define an error handler:
 ```ruby
 # config/initializers/maintenance_tasks.rb
 
-MaintenanceTasks.error_handler = ->(error, task_context, _errored_element) do
+MaintenanceTasks.error_handler = ->(error, task_context, errored_element, task_job) do
   Bugsnag.notify(error) do |notification|
     notification.add_metadata(:task, task_context)
   end
 end
 ```
 
-The error handler should be a lambda that accepts three arguments:
+The error handler should be a lambda that accepts four arguments:
 
 * `error`: The exception that was raised.
 * `task_context`: A hash with additional information about the Task and the
@@ -746,9 +746,8 @@ The error handler should be a lambda that accepts three arguments:
   Record objects in order to protect sensitive data. CSV rows, on the other
   hand, are converted to strings and passed raw to Bugsnag, so make sure to
   filter any personal data from these objects before adding them to a report.
-
-The error handler is called within the context of the `TaskJob`, 
-allowing you to access detailed information about the task.
+* `task_job`: The instance of `TaskJob` that was being executed. This allows you to
+  access detailed information about the task.
 
 #### Customizing the maintenance tasks module
 

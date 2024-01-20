@@ -149,6 +149,7 @@ module MaintenanceTasks
       HEREDOC
       raise error_message
     end
+
     def reenqueue_iteration_job(should_ignore: true)
       super() unless should_ignore
       @reenqueue_iteration_job = true
@@ -177,7 +178,13 @@ module MaintenanceTasks
       end
       errored_element = @errored_element if defined?(@errored_element)
     ensure
-      instance_exec(error, task_context, errored_element, &MaintenanceTasks.error_handler)
+      error_handler = MaintenanceTasks.error_handler
+      if error_handler.arity == 4
+        error_handler.call(error, task_context, errored_element, self)
+      else
+        # For backwards compatibility. In older versions, the error_handler only took three arguments.
+        error_handler.call(error, task_context, errored_element)
+      end
     end
   end
 end
