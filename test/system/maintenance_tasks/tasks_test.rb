@@ -25,6 +25,7 @@ module MaintenanceTasks
         "Maintenance::BatchImportPostsTask\nNew",
         "Maintenance::CallbackTestTask\nNew",
         "Maintenance::CancelledEnqueueTask\nNew",
+        "Maintenance::CustomEnumeratingTask\nNew",
         "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
         "Maintenance::Nested::NestedMore::NestedMoreTask\nNew",
