@@ -158,14 +158,15 @@ module MaintenanceTasks
       freeze_time
       run = Run.create!(task_name: "Maintenance::ErrorTask")
 
-      run.expects(:persist_error).with do |exception|
-        assert_kind_of ArgumentError, exception
-        assert_equal "Something went wrong", exception.message
-        expected = "app/tasks/maintenance/error_task.rb:10:in `process'"
-        assert_match expected, exception.backtrace.first
-      end
-
       TaskJob.perform_now(run)
+      run.reload
+
+      assert_equal "ArgumentError", run.error_class
+      assert_equal "Something went wrong", run.error_message
+      expected_backtrace = "app/tasks/maintenance/error_task.rb:10:in `process'"
+      assert_match expected_backtrace, run.backtrace.first
+      assert_equal Time.now, run.ended_at
+      assert_equal "1", run.cursor
     end
 
     test ".perform_now handles when the Task cannot be found" do
@@ -350,7 +351,7 @@ module MaintenanceTasks
 
       assert_equal(ArgumentError, handled_error.class)
       assert_equal("Maintenance::ErrorTask", handled_task_context[:task_name])
-      assert_equal(2, handled_errored_element)
+      assert_equal(3, handled_errored_element)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
@@ -366,7 +367,7 @@ module MaintenanceTasks
       run.reload
 
       assert_predicate(run, :errored?)
-      assert_equal(1, run.tick_count)
+      assert_equal(2, run.tick_count)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
     end
