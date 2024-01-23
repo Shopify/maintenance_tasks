@@ -127,6 +127,7 @@ module MaintenanceTasks
       @ticker.persist if defined?(@ticker)
 
       if defined?(@run)
+        @run.cursor = cursor_position
         @run.persist_error(error)
 
         task_context = {
