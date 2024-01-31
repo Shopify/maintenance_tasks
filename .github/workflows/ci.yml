@@ -1,6 +1,14 @@
 name: CI
 
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+  schedule:
+  - cron: "42 23 * * 0" # Run CI on Sundays at 23:42 UTC
+
+permissions:
+  contents: read # actions/checkout
+  issues: write # Create issue
 
 jobs:
   build:
@@ -10,16 +18,21 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gemfile: [Gemfile, gemfiles/rails_6_0.gemfile, gemfiles/rails_6_1.gemfile, gemfiles/rails_7_0.gemfile, gemfiles/rails_edge.gemfile]
+        gemfile:
+        - Gemfile
+        - gemfiles/rails_6_0.gemfile
+        - gemfiles/rails_6_1.gemfile
+        - gemfiles/rails_7_0.gemfile
+        - gemfiles/rails_edge.gemfile
         ruby: ["3.0", "3.1", "3.2", "3.3"]
         database: [sqlite]
         include:
-          - gemfile: "gemfiles/postgresql.gemfile"
-            ruby: 3.2
-            database: postgres
+        - gemfile: "gemfiles/postgresql.gemfile"
+          ruby: 3.2
+          database: postgres
         exclude:
-          - gemfile: "gemfiles/rails_edge.gemfile"
-            ruby: 3.0
+        - gemfile: "gemfiles/rails_edge.gemfile"
+          ruby: 3.0
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
       DB: ${{ matrix.database }}
@@ -57,3 +70,11 @@ jobs:
         name: screenshots-${{ strategy.job-index }}
         path: test/dummy/tmp/screenshots
         if-no-files-found: ignore
+    - name: Create issue
+      if: failure() && github.event.schedule
+      run: |
+        gh issue create --repo "$GITHUB_REPOSITORY" \
+          --title "Weekly CI run failed" \
+          --body "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
