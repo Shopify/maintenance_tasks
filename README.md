@@ -449,6 +449,40 @@ module Maintenance
     def process(post)
       post.update!(content: "updated content")
     end
+
+### Subscribing to instrumentation events
+
+If you are interested in actioning a specific task event, please refer to the `Task Callbacks` section below. However, if you want to subscribe to all events, irrespective of the task, you can use the following Active Support notifications:
+
+```ruby
+maintenance_tasks.enqueued    # This event is published when a task has been enqueued by the user.
+maintenance_tasks.succeeded   # This event is published when a task has finished without any errors.
+maintenance_tasks.cancelled   # This event is published when the user explicitly halts the execution of a task.
+maintenance_tasks.paused      # This event is published when a task is paused by the user in the middle of its run.
+maintenance_tasks.errored     # This event is published when the task's code produces an unhandled exception.
+```
+
+These notifications offer a way to monitor the lifecycle of maintenance tasks in your application.
+
+Usage example:
+
+ ```ruby
+ ActiveSupport::Notifications.subscribe("maintenance_tasks.enqueued") do |*args|
+  payload = args.last
+  run = payload[:run]
+  run.task_name
+  run.arguments
+  run.metadata
+end
+
+# or
+
+class MaintenanceTasksInstrumenter < ActiveSupport::Subscriber
+  attach_to :maintenance_tasks
+
+  def enqueued(event)
+    run = event.payload[:run]
+    SlackNotifier.broadcast(SLACK_CHANNEL, "Job #{run.task_name} was started by #{run.metadata[:user_email]}} with arguments #{run.arguments.to_s.truncate(255)}")
   end
 end
 ```

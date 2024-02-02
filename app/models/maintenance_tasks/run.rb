@@ -39,6 +39,8 @@ module MaintenanceTasks
       enum status: STATUSES.to_h { |status| [status, status.to_s] }
     end
 
+    after_save :instrument_status_change
+
     validate :task_name_belongs_to_a_valid_task, on: :create
     validate :csv_attachment_presence, on: :create
     validate :csv_content_type, on: :create
@@ -451,6 +453,14 @@ module MaintenanceTasks
     end
 
     private
+
+    def instrument_status_change
+      return if status.nil? || !status_previously_changed?
+
+      ActiveSupport::Notifications.instrument("maintenance_tasks.#{status}", run: self)
+    rescue
+      nil
+    end
 
     def run_task_callbacks(callback)
       task.run_callbacks(callback)
