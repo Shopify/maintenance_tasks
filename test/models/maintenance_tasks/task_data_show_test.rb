@@ -87,7 +87,11 @@ module MaintenanceTasks
           "date_attr",
           "time_attr",
           "boolean_attr",
-          "enum_attr",
+          "integer_dropdown_attr",
+          "boolean_dropdown_attr",
+          "text_integer_attr",
+          "text_integer_attr2",
+          "text_integer_attr3",
         ],
         TaskDataShow.new("Maintenance::ParamsTask").parameter_names,
       )
