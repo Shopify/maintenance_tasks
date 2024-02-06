@@ -74,9 +74,7 @@ module MaintenanceTasks
       )
       run.status = :interrupted
       run.task.expects(:after_interrupt_callback)
-      assert_notification_for("interrupted", run: run) do
-        run.persist_transition
-      end
+      run.persist_transition
     end
 
     test "#persist_transition calls the complete callback" do
@@ -712,7 +710,6 @@ module MaintenanceTasks
       end
       yield
       ActiveSupport::Notifications.unsubscribe(notification)
-
       assert_equal(expected_payload, payload)
     end
 

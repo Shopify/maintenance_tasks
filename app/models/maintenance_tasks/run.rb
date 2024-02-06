@@ -456,6 +456,7 @@ module MaintenanceTasks
 
     def instrument_status_change
       return if status.nil? || !status_previously_changed?
+      return if running? || pausing? || cancelling? || interrupted?
 
       ActiveSupport::Notifications.instrument("maintenance_tasks.#{status}", run: self)
     rescue
