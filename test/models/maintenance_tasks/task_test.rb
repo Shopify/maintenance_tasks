@@ -109,5 +109,10 @@ module MaintenanceTasks
     ensure
       Maintenance::TestTask.throttle_conditions = []
     end
+
+    test ".cursor_columns returns nil" do
+      task = Task.new
+      assert_nil task.cursor_columns
+    end
   end
 end
