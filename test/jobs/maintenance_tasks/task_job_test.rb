@@ -609,6 +609,38 @@ module MaintenanceTasks
       assert_equal 2, run.reload.tick_total
     end
 
+    test "MaintenanceTasks::TaskJobConcern#build_enumerator provides cursor_columns as the column argument to active_record_on_records" do
+      cursor_columns = [:created_at, :id]
+
+      Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      JobIteration::EnumeratorBuilder
+        .any_instance
+        .expects(:active_record_on_records)
+        .with(anything, has_entry(columns: [:created_at, :id]))
+        .returns(NullCollectionBuilder.new)
+
+      TaskJob.perform_now(run)
+    end
+
+    test "MaintenanceTasks::TaskJobConcern#build_enumerator provides cursor_columns as the column argument to active_record_on_batch_relations" do
+      cursor_columns = [:created_at, :id]
+
+      Maintenance::UpdatePostsInBatchesTask.any_instance.stubs(cursor_columns: cursor_columns)
+
+      run = Run.new(task_name: "Maintenance::UpdatePostsInBatchesTask")
+
+      JobIteration::EnumeratorBuilder
+        .any_instance
+        .expects(:active_record_on_batch_relations)
+        .with(anything, has_entry(columns: [:created_at, :id]))
+        .returns(NullCollectionBuilder.new)
+
+      TaskJob.perform_now(run)
+    end
+
     test "array-based tasks have their count calculated implicitly" do
       Maintenance::TestTask.any_instance.expects(:process).once.with do
         @run.cancelling!

@@ -413,6 +413,37 @@ to run. Since arguments are specified in the user interface via text area
 inputs, it’s important to check that they conform to the format your Task
 expects, and to sanitize any inputs if necessary.
 
+### Custom cursor columns to improve performance
+
+The [job-iteration gem](https://www.rubydoc.info/gems/job-iteration), on which this gem depends, adds an `order by`
+clause to the relation returned by the `collection` method, in order to
+iterate through records. It defaults to order on the `id` column.
+
+The [job-iteration gem](https://www.rubydoc.info/gems/job-iteration) supports configuring which columns are used to order the cursor,
+as documented in [JobIteration::EnumeratorBuilder.build_active_record_enumerator_on_records](https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method).
+
+The `maintenance-tasks` gem exposes the ability that `job-iteration` provides to control the cursor columns, through the `cursor_columns` method in the `MaintenanceTasks::Task` class.
+If the `cursor_columns` method returns `nil`, the query is ordered by the primary key.
+If cursor columns values change during an iteration, records may be skipped or yielded multiple times.
+
+```ruby
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    def cursor_columns
+      [:created_at, :id]
+    end
+
+    def collection
+      Post.where(created_at: 2.days.ago...1.hour.ago)
+    end
+    
+    def process(post)
+      post.update!(content: "updated content")
+    end
+  end
+end
+```
+
 ### Using Task Callbacks
 
 The Task provides callbacks that hook into its life cycle.

@@ -230,6 +230,18 @@ module MaintenanceTasks
       self.class.collection_builder_strategy.collection(self)
     end
 
+    # The columns used to build the `ORDER BY` clause of the query for iteration.
+    #
+    # If cursor_columns returns nil, the query is ordered by the primary key.
+    # If cursor columns values change during an iteration, records may be skipped or yielded multiple times.
+    # More details in the documentation of JobIteration::EnumeratorBuilder.build_active_record_enumerator_on_records:
+    # https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method
+    #
+    # @return the cursor_columns.
+    def cursor_columns
+      nil
+    end
+
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
     #
@@ -264,7 +276,7 @@ module MaintenanceTasks
       when :no_collection
         job_iteration_builder.build_once_enumerator(cursor: nil)
       when ActiveRecord::Relation
-        job_iteration_builder.active_record_on_records(collection, cursor: cursor)
+        job_iteration_builder.active_record_on_records(collection, cursor: cursor, columns: cursor_columns)
       when ActiveRecord::Batches::BatchEnumerator
         if collection.start || collection.finish
           raise ArgumentError, <<~MSG.squish
@@ -279,6 +291,7 @@ module MaintenanceTasks
           collection.relation,
           cursor: cursor,
           batch_size: collection.batch_size,
+          columns: cursor_columns,
         )
       when Array
         job_iteration_builder.build_array_enumerator(collection, cursor: cursor&.to_i)
