@@ -101,16 +101,31 @@ module MaintenanceTasks
       )
     end
 
+    # Resolves values covered by the inclusion validator for a task attribute.
+    # Only Arrays are supported, option types such as:
+    # Procs, lambdas, symbols, and Range are not supported and return nil.
+    #
+    # Returned values are used to populate a dropdown list of options.
+    #
+    # @param task_class [Class<Task>] The task class for which the value needs to be resolved.
+    # @param parameter_name [String] The parameter name.
+    #
+    # @return [Array] value of the resolved inclusion option.
+    def resolve_inclusion_value(task_class, parameter_name)
+      inclusion_validator = task_class.validators_on(parameter_name).find do |validator|
+        validator.kind == :inclusion
+      end
+      return unless inclusion_validator
+
+      in_option = inclusion_validator.options[:in] || inclusion_validator.options[:within]
+      in_option if in_option.is_a?(Array)
+    end
+
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
     def parameter_field(form_builder, parameter_name)
-      inclusion_validator = form_builder.object.class.validators_on(parameter_name).find do |validator|
-        validator.kind == :inclusion
-      end
-
-      return form_builder.select(
-        parameter_name, inclusion_validator.options[:in], prompt: "Select a value"
-      ) if inclusion_validator
+      inclusion_values = resolve_inclusion_value(form_builder.object.class, parameter_name)
+      return form_builder.select(parameter_name, inclusion_values, prompt: "Select a value") if inclusion_values
 
       case form_builder.object.class.attribute_types[parameter_name]
       when ActiveModel::Type::Integer

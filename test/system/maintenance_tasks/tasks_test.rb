@@ -114,10 +114,25 @@ module MaintenanceTasks
       boolean_field = page.find_field("task[boolean_attr]")
       assert_equal("input", boolean_field.tag_name)
       assert_equal("checkbox", boolean_field[:type])
-      enum_field = page.find_field("task[enum_attr]")
-      assert_equal("select", enum_field.tag_name)
-      enum_field_options = enum_field.find_all("option").map { |option| option[:value] }
-      assert_equal(["", "100", "200", "300"], enum_field_options)
+
+      integer_dropdown_field = page.find_field("task[integer_dropdown_attr]")
+      assert_equal("select", integer_dropdown_field.tag_name)
+      assert_equal("select-one", integer_dropdown_field[:type])
+      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
+
+      boolean_dropdown_field = page.find_field("task[boolean_dropdown_attr]")
+      assert_equal("select", boolean_dropdown_field.tag_name)
+      assert_equal("select-one", boolean_dropdown_field[:type])
+      boolean_dropdown_field_options = boolean_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "true", "false"], boolean_dropdown_field_options)
+
+      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
+        text_integer_dropdown_field = page.find_field("task[#{text_integer_attr}]")
+        assert_equal("input", text_integer_dropdown_field.tag_name)
+        assert_equal("number", text_integer_dropdown_field[:type])
+        assert_empty(text_integer_dropdown_field[:step])
+      end
     end
 
     test "view a Task with multiple pages of Runs" do
