@@ -12,7 +12,8 @@ module Maintenance
       3
     end
 
-    def process(_)
+    def process(letter)
+      Rails.logger.debug("letter: #{letter}")
     end
   end
 end

@@ -260,7 +260,7 @@ module MaintenanceTasks
       self.class.collection_builder_strategy.count(self)
     end
 
-    # Default enumeration builder. You may override this method to return any
+    # Default enumerator builder. You may override this method to return any
     # Enumerator yielding pairs of `[item, item_cursor]`.
     #
     # @param cursor [String, nil] cursor position to resume from, or nil on
@@ -268,47 +268,7 @@ module MaintenanceTasks
     #
     # @return [Enumerator]
     def enumerator_builder(cursor:)
-      collection = self.collection
-
-      job_iteration_builder = JobIteration::EnumeratorBuilder.new(nil)
-
-      case collection
-      when :no_collection
-        job_iteration_builder.build_once_enumerator(cursor: nil)
-      when ActiveRecord::Relation
-        job_iteration_builder.active_record_on_records(collection, cursor: cursor, columns: cursor_columns)
-      when ActiveRecord::Batches::BatchEnumerator
-        if collection.start || collection.finish
-          raise ArgumentError, <<~MSG.squish
-            #{self.class.name}#collection cannot support
-            a batch enumerator with the "start" or "finish" options.
-          MSG
-        end
-
-        # For now, only support automatic count based on the enumerator for
-        # batches
-        job_iteration_builder.active_record_on_batch_relations(
-          collection.relation,
-          cursor: cursor,
-          batch_size: collection.batch_size,
-          columns: cursor_columns,
-        )
-      when Array
-        job_iteration_builder.build_array_enumerator(collection, cursor: cursor&.to_i)
-      when BatchCsvCollectionBuilder::BatchCsv
-        JobIteration::CsvEnumerator.new(collection.csv).batches(
-          batch_size: collection.batch_size,
-          cursor: cursor&.to_i,
-        )
-      when CSV
-        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor&.to_i)
-      else
-        raise ArgumentError, <<~MSG.squish
-          #{self.class.name}#collection must be either an
-          Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
-          Array, or CSV.
-        MSG
-      end
+      nil
     end
   end
 end
