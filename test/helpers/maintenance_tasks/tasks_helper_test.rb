@@ -91,14 +91,19 @@ module MaintenanceTasks
         csv_file_download_path(run)
     end
 
+    test "#resolve_inclusion_value resolves inclusion validator for task attributes" do
+      assert_match "Select a value", markup("integer_dropdown_attr").squish
+
+      assert_match "Select a value", markup("boolean_dropdown_attr").squish
+
+      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
+        refute_match "Select a value", markup(text_integer_attr).squish
+      end
+    end
+
     test "#parameter_field adds information about datetime fields when Time.zone_default is not set" do
       with_zone_default(nil) do
-        markup = render(inline: <<~TEMPLATE)
-          <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
-            <%= parameter_field(form, 'datetime_attr') %>
-          <% end %>
-        TEMPLATE
-        assert_match "UTC", markup
+        assert_match "UTC", markup("datetime_attr")
       end
     end
 
@@ -111,12 +116,7 @@ module MaintenanceTasks
 
     test "#parameter_field adds information about datetime fields when Time.zone_default is set" do
       with_zone_default(Time.find_zone!("EST")) do # ignored
-        markup = render(inline: <<~TEMPLATE)
-          <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
-            <%= parameter_field(form, 'datetime_attr') %>
-          <% end %>
-        TEMPLATE
-        assert_match Time.now.zone.to_s, markup
+        assert_match Time.now.zone.to_s, markup("datetime_attr")
       end
     end
 
@@ -143,6 +143,14 @@ module MaintenanceTasks
       yield
     ensure
       Time.zone_default = zone
+    end
+
+    def markup(attribute)
+      render(inline: <<~TEMPLATE)
+        <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
+          <%= parameter_field(form, '#{attribute}') %>
+        <% end %>
+      TEMPLATE
     end
   end
 end
