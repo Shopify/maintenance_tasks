@@ -33,6 +33,45 @@ module MaintenanceTasks
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
       @collection_enum = @task.enumerator_builder(cursor: cursor)
+
+      @collection_enum ||= case (collection = @task.collection)
+      when :no_collection
+        enumerator_builder.build_once_enumerator(cursor: nil)
+      when ActiveRecord::Relation
+        enumerator_builder.active_record_on_records(collection, cursor: cursor, columns: @task.cursor_columns)
+      when ActiveRecord::Batches::BatchEnumerator
+        if collection.start || collection.finish
+          raise ArgumentError, <<~MSG.squish
+            #{@task.class.name}#collection cannot support
+            a batch enumerator with the "start" or "finish" options.
+          MSG
+        end
+
+        # For now, only support automatic count based on the enumerator for
+        # batches
+        enumerator_builder.active_record_on_batch_relations(
+          collection.relation,
+          cursor: cursor,
+          batch_size: collection.batch_size,
+          columns: @task.cursor_columns,
+        )
+      when Array
+        enumerator_builder.build_array_enumerator(collection, cursor: cursor&.to_i)
+      when BatchCsvCollectionBuilder::BatchCsv
+        JobIteration::CsvEnumerator.new(collection.csv).batches(
+          batch_size: collection.batch_size,
+          cursor: cursor&.to_i,
+        )
+      when CSV
+        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor&.to_i)
+      else
+        raise ArgumentError, <<~MSG.squish
+          #{@task.class.name}#collection must be either an
+          Active Record Relation, ActiveRecord::Batches::BatchEnumerator,
+          Array, or CSV.
+        MSG
+      end
+
       throttle_enumerator(@collection_enum)
     end
 

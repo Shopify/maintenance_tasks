@@ -436,7 +436,7 @@ module Maintenance
     def collection
       Post.where(created_at: 2.days.ago...1.hour.ago)
     end
-    
+
     def process(post)
       post.update!(content: "updated content")
     end
@@ -621,6 +621,42 @@ module Maintenance
       assert_difference -> { Post.first.content } do
         @task.process(Post.first)
       end
+    end
+  end
+end
+```
+
+### Writing tests for a Task that uses a custom enumerator
+
+Tests for tasks that use custom enumerators need to instantiate the task class
+in order to call `#build_enumerator`. Once the task instance is set up, validate
+that `#build_enumerator` returns an enumerator yielding pairs of [item, cursor]
+as expected.
+
+```ruby
+# test/tasks/maintenance/custom_enumerating_task.rb
+
+require "test_helper"
+
+module Maintenance
+  class CustomEnumeratingTaskTest < ActiveSupport::TestCase
+    setup do
+      @task = CustomEnumeratingTask.new
+    end
+
+    test "#build_enumerator returns enumerator yielding pairs of [item, cursor]" do
+      enum = @task.build_enumerator(cursor: 0)
+      expected_items = [:b, :c]
+
+      assert_equal 2, enum.size
+
+      enum.each_with_index do |item, cursor|
+        assert_equal expected_items[cursor], item
+      end
+    end
+
+    test "#process performs a task iteration" do
+      ...
     end
   end
 end
