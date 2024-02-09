@@ -10,8 +10,8 @@ engine helps with the second part of this process, backfilling.
 
 Maintenance tasks are collection-based tasks, usually using Active Record, that
 update the data in your database. They can be paused or interrupted. Maintenance
-tasks can operate [in batches](#processing-batch-collections) and use
-[throttling](#throttling) to control the load on your database.
+tasks can operate [in batches][#processing-batch-collections] and use
+[throttling][#throttling] to control the load on your database.
 
 Maintenance tasks aren't meant to happen on a regular basis. They're used as
 needed, or as one-offs. Normally maintenance tasks are ephemeral, so they are
@@ -45,10 +45,12 @@ If your task updates your database schema instead of data, use a migration
 instead of a maintenance task.
 
 If your task happens regularly, consider Active Jobs with a scheduler or cron,
-[job-iteration jobs](https://github.com/shopify/job-iteration) and/or [custom
-rails_admin UIs][rails-admin-engines] instead of the Maintenance Tasks gem.
-Maintenance tasks should be ephemeral, to suit their intentionally limited UI.
-They should not repeat.
+[job-iteration jobs][job-iteration] and/or [custom rails_admin
+UIs][rails-admin-engines] instead of the Maintenance Tasks gem. Maintenance
+tasks should be ephemeral, to suit their intentionally limited UI. They should
+not repeat.
+
+[job-iteration]: https://github.com/shopify/job-iteration
 
 To create seed data for a new application, use the provided Rails `db/seeds.rb`
 file instead.
@@ -91,10 +93,12 @@ take a look at the [Active Job documentation][active-job-docs].
 ### Autoloading
 
 The Maintenance Tasks framework does not support autoloading in `:classic` mode.
-Please ensure your application is using
-[Zeitwerk](https://github.com/fxn/zeitwerk) to load your code.  For more
+Please ensure your application is using [Zeitwerk][] to load your code. For more
 information, please consult the [Rails guides on autoloading and reloading
-constants](https://guides.rubyonrails.org/autoloading_and_reloading_constants.html).
+constants][autoloading].
+
+[Zeitwerk]: https://github.com/fxn/zeitwerk
+[autoloading]: https://guides.rubyonrails.org/autoloading_and_reloading_constants.html
 
 ## Usage
 
@@ -305,11 +309,11 @@ If you have a special use case requiring iteration over an unsupported
 collection type, such as external resources fetched from some API, you can
 implement the `enumerator_builder(cursor:)` method in your task.
 
-This method should return an `Enumerator`, yielding pairs of
-`[item, cursor]`. Maintenance Tasks takes care of persisting the current
-cursor position and will provide it as the `cursor` argument if your task is
-interrupted or resumed. The `cursor` is stored as a `String`, so your custom
-enumerator should handle serializing/deserializing the value if required.
+This method should return an `Enumerator`, yielding pairs of `[item, cursor]`.
+Maintenance Tasks takes care of persisting the current cursor position and will
+provide it as the `cursor` argument if your task is interrupted or resumed. The
+`cursor` is stored as a `String`, so your custom enumerator should handle
+serializing/deserializing the value if required.
 
 ```ruby
 # app/tasks/maintenance/custom_enumerator_task.rb
@@ -377,7 +381,7 @@ module Maintenance
     throttle_on(backoff: -> { RandomBackoffGenerator.generate_duration } ) do
       DatabaseStatus.unhealthy?
     end
-    ...
+    # ...
   end
 end
 ```
@@ -415,16 +419,21 @@ expects, and to sanitize any inputs if necessary.
 
 ### Custom cursor columns to improve performance
 
-The [job-iteration gem](https://www.rubydoc.info/gems/job-iteration), on which this gem depends, adds an `order by`
-clause to the relation returned by the `collection` method, in order to
-iterate through records. It defaults to order on the `id` column.
+The [job-iteration gem][job-iteration], on which this gem depends, adds an
+`order by` clause to the relation returned by the `collection` method, in order
+to iterate through records. It defaults to order on the `id` column.
 
-The [job-iteration gem](https://www.rubydoc.info/gems/job-iteration) supports configuring which columns are used to order the cursor,
-as documented in [JobIteration::EnumeratorBuilder.build_active_record_enumerator_on_records](https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method).
+The [job-iteration gem][job-iteration] supports configuring which columns are
+used to order the cursor, as documented in
+[`build_active_record_enumerator_on_records`][ji-ar-enumerator-doc].
 
-The `maintenance-tasks` gem exposes the ability that `job-iteration` provides to control the cursor columns, through the `cursor_columns` method in the `MaintenanceTasks::Task` class.
-If the `cursor_columns` method returns `nil`, the query is ordered by the primary key.
-If cursor columns values change during an iteration, records may be skipped or yielded multiple times.
+[ji-ar-enumerator-doc]: https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method
+
+The `maintenance-tasks` gem exposes the ability that `job-iteration` provides to
+control the cursor columns, through the `cursor_columns` method in the
+`MaintenanceTasks::Task` class. If the `cursor_columns` method returns `nil`,
+the query is ordered by the primary key. If cursor columns values change during
+an iteration, records may be skipped or yielded multiple times.
 
 ```ruby
 module Maintenance
@@ -656,7 +665,7 @@ module Maintenance
     end
 
     test "#process performs a task iteration" do
-      ...
+      # ...
     end
   end
 end
@@ -984,7 +993,7 @@ MaintenanceTasks.parent_controller = "Services::CustomController"
 class Services::CustomController < ActionController::Base
   include CustomSecurityThings
   include CustomLoggingThings
-  ...
+  # ...
 end
 ```
 
@@ -995,12 +1004,14 @@ If no value is specified, it will default to `"ActionController::Base"`.
 
 #### Configure time after which the task will be considered stuck
 
-To specify a time duration after which a task is considered stuck if it has not been updated,
-you can configure `MaintenanceTasks.stuck_task_duration`. This duration should account for
-job infrastructure events that may prevent the maintenance tasks job from being executed and cancelling the task.
+To specify a time duration after which a task is considered stuck if it has not
+been updated, you can configure `MaintenanceTasks.stuck_task_duration`. This
+duration should account for job infrastructure events that may prevent the
+maintenance tasks job from being executed and cancelling the task.
 
-The value for `MaintenanceTasks.stuck_task_duration` must be an `ActiveSupport::Duration`.
-If no value is specified, it will default to 5 minutes.
+The value for `MaintenanceTasks.stuck_task_duration` must be an
+`ActiveSupport::Duration`. If no value is specified, it will default to 5
+minutes.
 
 ### Metadata
 
