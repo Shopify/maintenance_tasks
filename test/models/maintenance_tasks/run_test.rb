@@ -81,7 +81,7 @@ module MaintenanceTasks
       run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "running")
       run.status = :succeeded
       run.task.expects(:after_complete_callback)
-      assert_notification_for("succeeded", run: run) do
+      assert_notification_for("maintenance_tasks.succeeded", run: run) do
         run.persist_transition
       end
     end
@@ -93,7 +93,7 @@ module MaintenanceTasks
       )
       run.status = :cancelled
       run.task.expects(:after_cancel_callback)
-      assert_notification_for("cancelled", run: run) do
+      assert_notification_for("maintenance_tasks.cancelled", run: run) do
         run.persist_transition
       end
     end
@@ -102,7 +102,7 @@ module MaintenanceTasks
       run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "pausing")
       run.status = :paused
       run.task.expects(:after_pause_callback)
-      assert_notification_for("paused", run: run) do
+      assert_notification_for("maintenance_tasks.paused", run: run) do
         run.persist_transition
       end
     end
@@ -115,7 +115,7 @@ module MaintenanceTasks
       run.task.expects(:after_cancel_callback)
 
       run.status = :interrupted
-      assert_notification_for("cancelled", run: run) do
+      assert_notification_for("maintenance_tasks.cancelled", run: run) do
         run.persist_transition
       end
       assert_predicate run.reload, :cancelled?
@@ -129,7 +129,7 @@ module MaintenanceTasks
       run.task.expects(:after_complete_callback)
 
       run.status = :succeeded
-      assert_notification_for("succeeded", run: run) do
+      assert_notification_for("maintenance_tasks.succeeded", run: run) do
         run.persist_transition
       end
       assert_predicate run.reload, :succeeded?
@@ -181,7 +181,7 @@ module MaintenanceTasks
       error = ArgumentError.new("Something went wrong")
       error.set_backtrace(["lib/foo.rb:42:in `bar'"])
       run.task.expects(:after_error_callback)
-      assert_notification_for("errored", run: run) do
+      assert_notification_for("maintenance_tasks.errored", run: run) do
         run.persist_error(error)
       end
     end
@@ -702,14 +702,9 @@ module MaintenanceTasks
 
     private
 
-    def assert_notification_for(name, expected_payload)
+    def assert_notification_for(name, expected_payload, &block)
       payload = nil
-
-      notification = ActiveSupport::Notifications.subscribe("maintenance_tasks.#{name}") do |*args|
-        payload = args.last
-      end
-      yield
-      ActiveSupport::Notifications.unsubscribe(notification)
+      ActiveSupport::Notifications.subscribed(->(*args) { payload = args.last }, name, &block)
       assert_equal(expected_payload, payload)
     end
 
