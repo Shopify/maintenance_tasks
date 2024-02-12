@@ -33,7 +33,11 @@ module MaintenanceTasks
     ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
 
-    enum status: STATUSES.to_h { |status| [status, status.to_s] }
+    if Rails.gem_version >= Gem::Version.new("7.0.alpha")
+      enum :status, STATUSES.to_h { |status| [status, status.to_s] }
+    else
+      enum status: STATUSES.to_h { |status| [status, status.to_s] }
+    end
 
     validate :task_name_belongs_to_a_valid_task, on: :create
     validate :csv_attachment_presence, on: :create
