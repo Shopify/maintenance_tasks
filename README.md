@@ -537,21 +537,6 @@ end
 If any of the other callbacks cause an exception, it will be handled by the
 error handler, and will cause the task to stop running.
 
-Callback behaviour can be shared across all tasks using an initializer.
-
-```ruby
-# config/initializer/maintenance_tasks.rb
-Rails.autoloaders.main.on_load("MaintenanceTasks::Task") do
-  MaintenanceTasks::Task.class_eval do
-    after_start(:notify)
-
-    private
-
-    def notify; end
-  end
-end
-```
-
 ### Considerations when writing Tasks
 
 Maintenance Tasks relies on the queue adapter configured for your application to
