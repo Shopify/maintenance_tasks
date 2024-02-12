@@ -73,8 +73,10 @@ jobs:
     - name: Create issue
       if: failure() && github.event.schedule
       run: |
-        gh issue create --repo "$GITHUB_REPOSITORY" \
-          --title "Weekly CI run failed" \
-          --body "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        if [ "$(gh issue list --state=open --author='github-actions[bot]' | wc -l)" = 0 ]; then
+          gh issue create --repo "$GITHUB_REPOSITORY" \
+            --title "Weekly CI run failed" \
+            --body "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+        fi
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
