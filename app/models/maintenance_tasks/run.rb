@@ -458,7 +458,24 @@ module MaintenanceTasks
       return if status.nil? || !status_previously_changed?
       return if running? || pausing? || cancelling? || interrupted?
 
-      ActiveSupport::Notifications.instrument("maintenance_tasks.#{status}", run: self)
+      attr = {
+        run_id: id,
+        job_id: job_id,
+        task_name: task_name,
+        arguments: arguments,
+        metadata: metadata,
+        time_running: time_running,
+        started_at: started_at,
+        ended_at: ended_at,
+      }
+
+      attr[:error] = {
+        message: error_message,
+        class: error_class,
+        backtrace: backtrace,
+      } if errored?
+
+      ActiveSupport::Notifications.instrument("maintenance_tasks.#{status}", attr)
     rescue
       nil
     end
