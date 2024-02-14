@@ -3,6 +3,30 @@
 require "test_helper"
 
 module MaintenanceTasks
+  class Notifier < ActiveSupport::Subscriber
+    NOTIFICATIONS = [
+      :enqueued,
+      :succeeded,
+      :paused,
+      :cancelled,
+      :errored,
+    ].freeze
+
+    attach_to :maintenance_tasks
+
+    class << self
+      def payload
+        Thread.current[:payload] ||= {}
+      end
+    end
+
+    NOTIFICATIONS.each do |notification|
+      define_method(notification) do |event|
+        self.class.payload.merge!("#{notification}.maintenance_tasks" => event.payload)
+      end
+    end
+  end
+
   class RunTest < ActiveSupport::TestCase
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: "Maintenance::DoesNotExist")
@@ -82,10 +106,8 @@ module MaintenanceTasks
       run.status = :succeeded
       run.task.expects(:after_complete_callback)
 
-      payload = subscribe_to_notification("maintenance_tasks.succeeded") do
-        run.persist_transition
-      end
-      assert_equal(expected_notification(run), payload)
+      run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("succeeded.maintenance_tasks"))
     end
 
     test "#persist_transition calls the cancel callback" do
@@ -95,20 +117,16 @@ module MaintenanceTasks
       )
       run.status = :cancelled
       run.task.expects(:after_cancel_callback)
-      payload = subscribe_to_notification("maintenance_tasks.cancelled") do
-        run.persist_transition
-      end
-      assert_equal(expected_notification(run), payload)
+      run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("cancelled.maintenance_tasks"))
     end
 
     test "#persist_transition calls the pause callback" do
       run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "pausing")
       run.status = :paused
       run.task.expects(:after_pause_callback)
-      payload = subscribe_to_notification("maintenance_tasks.paused") do
-        run.persist_transition
-      end
-      assert_equal(expected_notification(run), payload)
+      run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("paused.maintenance_tasks"))
     end
 
     test "#persist_transition with a race condition moves the run to the proper status and calls the right callback" do
@@ -119,10 +137,8 @@ module MaintenanceTasks
       run.task.expects(:after_cancel_callback)
 
       run.status = :interrupted
-      payload = subscribe_to_notification("maintenance_tasks.cancelled") do
-        run.persist_transition
-      end
-      assert_equal(expected_notification(run), payload)
+      run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("cancelled.maintenance_tasks"))
       assert_predicate run.reload, :cancelled?
     end
 
@@ -134,10 +150,8 @@ module MaintenanceTasks
       run.task.expects(:after_complete_callback)
 
       run.status = :succeeded
-      payload = subscribe_to_notification("maintenance_tasks.succeeded") do
-        run.persist_transition
-      end
-      assert_equal(expected_notification(run), payload)
+      run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("succeeded.maintenance_tasks"))
       assert_predicate run.reload, :succeeded?
     end
 
@@ -187,10 +201,9 @@ module MaintenanceTasks
       error = ArgumentError.new("Something went wrong")
       error.set_backtrace(["lib/foo.rb:42:in `bar'"])
       run.task.expects(:after_error_callback)
-      payload = subscribe_to_notification("maintenance_tasks.errored") do
-        run.persist_error(error)
-      end
+      run.persist_error(error)
 
+      payload = Notifier.payload.fetch("errored.maintenance_tasks")
       error = payload.delete(:error)
       assert_equal(expected_notification(run), payload)
       assert_equal "ArgumentError", error[:class]
@@ -713,13 +726,6 @@ module MaintenanceTasks
     end
 
     private
-
-    def subscribe_to_notification(name, &block)
-      payload = nil
-      ActiveSupport::Notifications.subscribed(->(*args) { payload = args.last }, name, &block)
-
-      payload
-    end
 
     def expected_notification(run)
       {

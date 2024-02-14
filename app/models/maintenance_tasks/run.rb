@@ -475,7 +475,7 @@ module MaintenanceTasks
         backtrace: backtrace,
       } if errored?
 
-      ActiveSupport::Notifications.instrument("maintenance_tasks.#{status}", attr)
+      ActiveSupport::Notifications.instrument("#{status}.maintenance_tasks", attr)
     rescue
       nil
     end
