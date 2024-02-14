@@ -467,8 +467,7 @@ These notifications offer a way to monitor the lifecycle of maintenance tasks in
 Usage example:
 
  ```ruby
- ActiveSupport::Notifications.subscribe("maintenance_tasks.enqueued") do |*args|
-  payload = args.last
+ ActiveSupport::Notifications.subscribe("maintenance_tasks.enqueued") do |*, payload|
   run = payload[:run]
   run.task_name
   run.arguments
