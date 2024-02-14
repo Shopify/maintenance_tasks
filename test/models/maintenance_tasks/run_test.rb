@@ -81,9 +81,11 @@ module MaintenanceTasks
       run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "running")
       run.status = :succeeded
       run.task.expects(:after_complete_callback)
-      assert_notification_for("maintenance_tasks.succeeded", run: run) do
+
+      payload = subscribe_to_notification("maintenance_tasks.succeeded") do
         run.persist_transition
       end
+      assert_equal(expected_notification(run), payload)
     end
 
     test "#persist_transition calls the cancel callback" do
@@ -93,18 +95,20 @@ module MaintenanceTasks
       )
       run.status = :cancelled
       run.task.expects(:after_cancel_callback)
-      assert_notification_for("maintenance_tasks.cancelled", run: run) do
+      payload = subscribe_to_notification("maintenance_tasks.cancelled") do
         run.persist_transition
       end
+      assert_equal(expected_notification(run), payload)
     end
 
     test "#persist_transition calls the pause callback" do
       run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "pausing")
       run.status = :paused
       run.task.expects(:after_pause_callback)
-      assert_notification_for("maintenance_tasks.paused", run: run) do
+      payload = subscribe_to_notification("maintenance_tasks.paused") do
         run.persist_transition
       end
+      assert_equal(expected_notification(run), payload)
     end
 
     test "#persist_transition with a race condition moves the run to the proper status and calls the right callback" do
@@ -115,9 +119,10 @@ module MaintenanceTasks
       run.task.expects(:after_cancel_callback)
 
       run.status = :interrupted
-      assert_notification_for("maintenance_tasks.cancelled", run: run) do
+      payload = subscribe_to_notification("maintenance_tasks.cancelled") do
         run.persist_transition
       end
+      assert_equal(expected_notification(run), payload)
       assert_predicate run.reload, :cancelled?
     end
 
@@ -129,9 +134,10 @@ module MaintenanceTasks
       run.task.expects(:after_complete_callback)
 
       run.status = :succeeded
-      assert_notification_for("maintenance_tasks.succeeded", run: run) do
+      payload = subscribe_to_notification("maintenance_tasks.succeeded") do
         run.persist_transition
       end
+      assert_equal(expected_notification(run), payload)
       assert_predicate run.reload, :succeeded?
     end
 
@@ -181,9 +187,15 @@ module MaintenanceTasks
       error = ArgumentError.new("Something went wrong")
       error.set_backtrace(["lib/foo.rb:42:in `bar'"])
       run.task.expects(:after_error_callback)
-      assert_notification_for("maintenance_tasks.errored", run: run) do
+      payload = subscribe_to_notification("maintenance_tasks.errored") do
         run.persist_error(error)
       end
+
+      error = payload.delete(:error)
+      assert_equal(expected_notification(run), payload)
+      assert_equal "ArgumentError", error[:class]
+      assert_equal "Something went wrong", error[:message]
+      assert_equal ["lib/foo.rb:42:in `bar'"], error[:backtrace]
     end
 
     test "#persist_error can handle error callback raising" do
@@ -702,10 +714,24 @@ module MaintenanceTasks
 
     private
 
-    def assert_notification_for(name, expected_payload, &block)
+    def subscribe_to_notification(name, &block)
       payload = nil
       ActiveSupport::Notifications.subscribed(->(*args) { payload = args.last }, name, &block)
-      assert_equal(expected_payload, payload)
+
+      payload
+    end
+
+    def expected_notification(run)
+      {
+        run_id: run.id,
+        job_id: run.job_id,
+        task_name: run.task_name,
+        arguments: run.arguments,
+        metadata: run.metadata,
+        time_running: run.time_running,
+        started_at: run.started_at,
+        ended_at: run.ended_at,
+      }
     end
 
     def count_uncached_queries(&block)

@@ -467,11 +467,15 @@ These notifications offer a way to monitor the lifecycle of maintenance tasks in
 Usage example:
 
  ```ruby
- ActiveSupport::Notifications.subscribe("maintenance_tasks.enqueued") do |*, payload|
-  run = payload[:run]
-  run.task_name
-  run.arguments
-  run.metadata
+ ActiveSupport::Notifications.subscribe("maintenance_tasks.succeeded") do |*, payload|
+  task_name = payload[:task_name]
+  arguments = payload[:arguments]
+  metadata = payload[:metadata]
+  job_id = payload[:job_id]
+  run_id = payload[:run_id]
+  time_running = payload[:time_running]
+  started_at = payload[:started_at]
+  ended_at = payload[:ended_at]
 end
 
 # or
@@ -480,8 +484,12 @@ class MaintenanceTasksInstrumenter < ActiveSupport::Subscriber
   attach_to :maintenance_tasks
 
   def enqueued(event)
-    run = event.payload[:run]
-    SlackNotifier.broadcast(SLACK_CHANNEL, "Job #{run.task_name} was started by #{run.metadata[:user_email]}} with arguments #{run.arguments.to_s.truncate(255)}")
+    task_name = event.payload[:task_name]
+    arguments = event.payload[:arguments]
+    metadata = event.payload[:metadata]
+
+    SlackNotifier.broadcast(SLACK_CHANNEL,
+      "Job #{task_name} was started by #{metadata[:user_email]}} with arguments #{arguments.to_s.truncate(255)}")
   end
 end
 ```
