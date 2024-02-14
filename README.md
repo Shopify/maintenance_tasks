@@ -458,11 +458,11 @@ end
 If you are interested in actioning a specific task event, please refer to the [Using Task Callbacks](#using-task-callbacks) section below. However, if you want to subscribe to all events, irrespective of the task, you can use the following Active Support notifications:
 
 ```ruby
-maintenance_tasks.enqueued    # This event is published when a task has been enqueued by the user.
-maintenance_tasks.succeeded   # This event is published when a task has finished without any errors.
-maintenance_tasks.cancelled   # This event is published when the user explicitly halts the execution of a task.
-maintenance_tasks.paused      # This event is published when a task is paused by the user in the middle of its run.
-maintenance_tasks.errored     # This event is published when the task's code produces an unhandled exception.
+enqueued.maintenance_tasks    # This event is published when a task has been enqueued by the user.
+succeeded.maintenance_tasks   # This event is published when a task has finished without any errors.
+cancelled.maintenance_tasks   # This event is published when the user explicitly halts the execution of a task.
+paused.maintenance_tasks      # This event is published when a task is paused by the user in the middle of its run.
+errored.maintenance_tasks     # This event is published when the task's code produces an unhandled exception.
 ```
 
 These notifications offer a way to monitor the lifecycle of maintenance tasks in your application.
@@ -470,7 +470,7 @@ These notifications offer a way to monitor the lifecycle of maintenance tasks in
 Usage example:
 
  ```ruby
- ActiveSupport::Notifications.subscribe("maintenance_tasks.succeeded") do |*, payload|
+ ActiveSupport::Notifications.subscribe("succeeded.maintenance_tasks") do |*, payload|
   task_name = payload[:task_name]
   arguments = payload[:arguments]
   metadata = payload[:metadata]
@@ -481,7 +481,7 @@ Usage example:
   ended_at = payload[:ended_at]
 end
 
-ActiveSupport::Notifications.subscribe("maintenance_tasks.errored") do |*, payload|
+ActiveSupport::Notifications.subscribe("errored.maintenance_tasks") do |*, payload|
   task_name = payload[:task_name]
   error = payload[:error]
   error_message = error[:message]
