@@ -449,10 +449,13 @@ module Maintenance
     def process(post)
       post.update!(content: "updated content")
     end
+  end
+end
+```
 
 ### Subscribing to instrumentation events
 
-If you are interested in actioning a specific task event, please refer to the `Task Callbacks` section below. However, if you want to subscribe to all events, irrespective of the task, you can use the following Active Support notifications:
+If you are interested in actioning a specific task event, please refer to the [Using Task Callbacks](#using-task-callbacks) section below. However, if you want to subscribe to all events, irrespective of the task, you can use the following Active Support notifications:
 
 ```ruby
 maintenance_tasks.enqueued    # This event is published when a task has been enqueued by the user.
@@ -476,6 +479,14 @@ Usage example:
   time_running = payload[:time_running]
   started_at = payload[:started_at]
   ended_at = payload[:ended_at]
+end
+
+ActiveSupport::Notifications.subscribe("maintenance_tasks.errored") do |*, payload|
+  task_name = payload[:task_name]
+  error = payload[:error]
+  error_message = error[:message]
+  error_class = error[:class]
+  error_backtrace = error[:backtrace]
 end
 
 # or
