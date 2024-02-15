@@ -620,6 +620,12 @@ module MaintenanceTasks
       end
     end
 
+    test "#create defaults to the enqueued status" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      assert_predicate(run, :enqueued?)
+      assert_equal(expected_notification(run), Notifier.payload.fetch("enqueued.maintenance_tasks"))
+    end
+
     test "#task returns Task instance for Run" do
       run = Run.new(task_name: "Maintenance::UpdatePostsTask")
       assert_kind_of Maintenance::UpdatePostsTask, run.task

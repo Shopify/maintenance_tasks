@@ -455,7 +455,7 @@ module MaintenanceTasks
     private
 
     def instrument_status_change
-      return if status.nil? || !status_previously_changed?
+      return unless status_previously_changed? || id_previously_changed?
       return if running? || pausing? || cancelling? || interrupted?
 
       attr = {
