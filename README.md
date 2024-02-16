@@ -479,6 +479,8 @@ Usage example:
   time_running = payload[:time_running]
   started_at = payload[:started_at]
   ended_at = payload[:ended_at]
+rescue => e
+  Rails.logger.error(e)
 end
 
 ActiveSupport::Notifications.subscribe("errored.maintenance_tasks") do |*, payload|
@@ -487,6 +489,8 @@ ActiveSupport::Notifications.subscribe("errored.maintenance_tasks") do |*, paylo
   error_message = error[:message]
   error_class = error[:class]
   error_backtrace = error[:backtrace]
+rescue => e
+  Rails.logger.error(e)
 end
 
 # or
@@ -501,6 +505,8 @@ class MaintenanceTasksInstrumenter < ActiveSupport::Subscriber
 
     SlackNotifier.broadcast(SLACK_CHANNEL,
       "Job #{task_name} was started by #{metadata[:user_email]}} with arguments #{arguments.to_s.truncate(255)}")
+  rescue => e
+    Rails.logger.error(e)
   end
 end
 ```
