@@ -476,8 +476,6 @@ module MaintenanceTasks
       } if errored?
 
       ActiveSupport::Notifications.instrument("#{status}.maintenance_tasks", attr)
-    rescue
-      nil
     end
 
     def run_task_callbacks(callback)

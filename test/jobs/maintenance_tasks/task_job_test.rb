@@ -499,7 +499,9 @@ module MaintenanceTasks
       JobIteration.stubs(interruption_adapter: -> { true })
 
       # Simulate cancel happening after we've already checked @run.cancelling?
-      @run.expects(:cancelling?).twice.with do
+      @run.expects(:cancelling?).at_least(2).with do
+        next true if caller.any?(/`instrument_status_change'\z/) # avoid endless loop
+
         Run.find(@run.id).cancel
       end.returns(false).then.returns(true)
 
@@ -512,7 +514,9 @@ module MaintenanceTasks
       JobIteration.stubs(interruption_adapter: -> { true })
 
       # Simulate pause happening after we've already checked @run.pausing?
-      @run.expects(:pausing?).twice.with do
+      @run.expects(:pausing?).at_least(2).with do
+        next true if caller.any?(/`instrument_status_change'\z/) # avoid endless loop
+
         Run.find(@run.id).pausing!
       end.returns(false).then.returns(true)
 
