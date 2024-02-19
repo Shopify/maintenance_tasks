@@ -23,11 +23,11 @@ module MaintenanceTasks
     DESC
 
     # Specify the CSV file to process for CSV Tasks
-    desc = "Supply a CSV file to be processed by a CSV Task, "\
+    desc = "Supply a CSV file to be processed by a CSV Task, " \
       "--csv path/to/csv/file.csv"
     option :csv, lazy_default: :stdin, desc: desc
     # Specify arguments to supply to a Task supporting parameters
-    desc = "Supply arguments for a Task that accepts parameters as a set of "\
+    desc = "Supply arguments for a Task that accepts parameters as a set of " \
       "<key>:<value> pairs."
     option :arguments, type: :hash, desc: desc
 

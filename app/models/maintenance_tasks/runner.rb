@@ -74,7 +74,7 @@ module MaintenanceTasks
 
     def enqueue(run, job)
       unless job.enqueue
-        raise "The job to perform #{run.task_name} could not be enqueued. "\
+        raise "The job to perform #{run.task_name} could not be enqueued. " \
           "Enqueuing has been prevented by a callback."
       end
     rescue => error

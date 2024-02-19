@@ -27,8 +27,8 @@ module MaintenanceTasks
         mock(value: 42, max: 84, text: "Almost there!"),
       )
 
-      expected = '<div class="block"><progress value="42" max="84" '\
-        'class="progress is-primary is-light"></progress>'\
+      expected = '<div class="block"><progress value="42" max="84" ' \
+        'class="progress is-primary is-light"></progress>' \
         "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
@@ -43,8 +43,8 @@ module MaintenanceTasks
         mock(value: nil, max: 84, text: "Almost there!"),
       )
 
-      expected = '<div class="block"><progress max="84" '\
-        'class="progress is-primary is-light"></progress>'\
+      expected = '<div class="block"><progress max="84" ' \
+        'class="progress is-primary is-light"></progress>' \
         "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
@@ -72,10 +72,10 @@ module MaintenanceTasks
     end
 
     test "#highlight_code does not wrap whitespace" do
-      assert_equal '<span class="ruby-int">1</span>' + "\n"\
+      assert_equal '<span class="ruby-int">1</span>' + "\n" \
         '<span class="ruby-int">2</span>',
         highlight_code("1\n2")
-      assert_equal '<span class="ruby-int">1</span>' + " "\
+      assert_equal '<span class="ruby-int">1</span>' + " " \
         '<span class="ruby-int">2</span>',
         highlight_code("1 2")
       assert_equal "\n", highlight_code("\n")

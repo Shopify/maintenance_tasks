@@ -71,7 +71,7 @@ module MaintenanceTasks
       # collection and count method are implemented.
       def csv_collection(in_batches: nil)
         unless defined?(ActiveStorage)
-          raise NotImplementedError, "Active Storage needs to be installed\n"\
+          raise NotImplementedError, "Active Storage needs to be installed\n" \
             "To resolve this issue run: bin/rails active_storage:install"
         end
 
