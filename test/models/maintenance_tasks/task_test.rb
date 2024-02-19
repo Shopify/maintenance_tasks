@@ -29,7 +29,7 @@ module MaintenanceTasks
 
     test ".available_tasks raises a deprecation warning before calling .load_all" do
       expected_warning =
-        "MaintenanceTasks::Task.available_tasks is deprecated and will be " \
+        "MaintenanceTasks::Task.available_tasks is deprecated and will be" \
           "removed from maintenance-tasks 3.0.0. Use .load_all instead.\n"
 
       Warning.expects(:warn).with(expected_warning, category: :deprecated)

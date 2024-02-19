@@ -6,7 +6,7 @@ module MaintenanceTasks
   # @api private
   class TaskGenerator < Rails::Generators::NamedBase
     source_root File.expand_path("templates", __dir__)
-    desc "This generator creates a task file at app/tasks and a corresponding "\
+    desc "This generator creates a task file at app/tasks and a corresponding" \
       "test."
 
     class_option :csv,
@@ -24,7 +24,7 @@ module MaintenanceTasks
     # Creates the Task file.
     def create_task_file
       if options[:csv] && options[:no_collection]
-        raise "Multiple Task type options provided. Please use either "\
+        raise "Multiple Task type options provided. Please use either" \
           "--csv or --no-collection."
       end
       template_file = File.join(

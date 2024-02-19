@@ -252,7 +252,7 @@ module MaintenanceTasks
       click_on "Maintenance::CancelledEnqueueTask"
       click_on "Run"
       assert_text "The job to perform Maintenance::CancelledEnqueueTask could not be enqueued"
-      assert_text "The job to perform Maintenance::CancelledEnqueueTask "\
+      assert_text "The job to perform Maintenance::CancelledEnqueueTask" \
         "could not be enqueued. Enqueuing has been prevented by a callback."
     end
 

@@ -75,7 +75,7 @@ module MaintenanceTasks
         end
 
         assert_equal(
-          "The job to perform Maintenance::EnqueueErrorTask "\
+          "The job to perform Maintenance::EnqueueErrorTask" \
             "could not be enqueued",
           error.message,
         )
@@ -91,14 +91,14 @@ module MaintenanceTasks
         end
 
         assert_equal(
-          "The job to perform Maintenance::CancelledEnqueueTask "\
+          "The job to perform Maintenance::CancelledEnqueueTask" \
             "could not be enqueued",
           error.message,
         )
         assert_kind_of RuntimeError, error.cause
         assert_equal(
-          "The job to perform Maintenance::CancelledEnqueueTask "\
-            "could not be enqueued. "\
+          "The job to perform Maintenance::CancelledEnqueueTask" \
+            "could not be enqueued." \
             "Enqueuing has been prevented by a callback.",
           error.cause.message,
         )
