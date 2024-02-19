@@ -115,7 +115,7 @@ module MaintenanceTasks
         run_generator(["sleepy", "--csv", "--no-collection"])
       end
 
-      expected = "Multiple Task type options provided. "\
+      expected = "Multiple Task type options provided. " \
         "Please use either --csv or --no-collection."
       assert_equal(expected, error.message)
     end

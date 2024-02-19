@@ -8,7 +8,7 @@ module MaintenanceTasks
       travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
       time = Time.zone.local(2020, 1, 1, 1, 0, 0)
 
-      expected = '<time datetime="2020-01-01T01:00:00Z" '\
+      expected = '<time datetime="2020-01-01T01:00:00Z" ' \
         'title="2020-01-01T01:00:00Z" class="is-clickable">8 days ago</time>'
       assert_equal expected, time_ago(time)
     end

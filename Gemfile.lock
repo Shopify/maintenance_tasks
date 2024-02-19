@@ -233,7 +233,7 @@ GEM
       unicode-display_width (>= 2.4.0, < 3.0)
     rubocop-ast (1.30.0)
       parser (>= 3.2.1.0)
-    rubocop-shopify (2.14.0)
+    rubocop-shopify (2.15.1)
       rubocop (~> 1.51)
     ruby-progressbar (1.13.0)
     ruby2_keywords (0.0.5)
