@@ -3,6 +3,30 @@
 require "test_helper"
 
 module MaintenanceTasks
+  class Notifier < ActiveSupport::Subscriber
+    NOTIFICATIONS = [
+      :enqueued,
+      :succeeded,
+      :paused,
+      :cancelled,
+      :errored,
+    ].freeze
+
+    attach_to :maintenance_tasks
+
+    class << self
+      def payload
+        Thread.current[:payload] ||= {}
+      end
+    end
+
+    NOTIFICATIONS.each do |notification|
+      define_method(notification) do |event|
+        self.class.payload.merge!("#{notification}.maintenance_tasks" => event.payload)
+      end
+    end
+  end
+
   class RunTest < ActiveSupport::TestCase
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: "Maintenance::DoesNotExist")
@@ -81,7 +105,9 @@ module MaintenanceTasks
       run = Run.create!(task_name: "Maintenance::CallbackTestTask", status: "running")
       run.status = :succeeded
       run.task.expects(:after_complete_callback)
+
       run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("succeeded.maintenance_tasks"))
     end
 
     test "#persist_transition calls the cancel callback" do
@@ -92,6 +118,7 @@ module MaintenanceTasks
       run.status = :cancelled
       run.task.expects(:after_cancel_callback)
       run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("cancelled.maintenance_tasks"))
     end
 
     test "#persist_transition calls the pause callback" do
@@ -99,6 +126,7 @@ module MaintenanceTasks
       run.status = :paused
       run.task.expects(:after_pause_callback)
       run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("paused.maintenance_tasks"))
     end
 
     test "#persist_transition with a race condition moves the run to the proper status and calls the right callback" do
@@ -110,6 +138,7 @@ module MaintenanceTasks
 
       run.status = :interrupted
       run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("cancelled.maintenance_tasks"))
       assert_predicate run.reload, :cancelled?
     end
 
@@ -122,6 +151,7 @@ module MaintenanceTasks
 
       run.status = :succeeded
       run.persist_transition
+      assert_equal(expected_notification(run), Notifier.payload.fetch("succeeded.maintenance_tasks"))
       assert_predicate run.reload, :succeeded?
     end
 
@@ -172,6 +202,13 @@ module MaintenanceTasks
       error.set_backtrace(["lib/foo.rb:42:in `bar'"])
       run.task.expects(:after_error_callback)
       run.persist_error(error)
+
+      payload = Notifier.payload.fetch("errored.maintenance_tasks")
+      error = payload.delete(:error)
+      assert_equal(expected_notification(run), payload)
+      assert_equal "ArgumentError", error[:class]
+      assert_equal "Something went wrong", error[:message]
+      assert_equal ["lib/foo.rb:42:in `bar'"], error[:backtrace]
     end
 
     test "#persist_error can handle error callback raising" do
@@ -583,6 +620,12 @@ module MaintenanceTasks
       end
     end
 
+    test "#create defaults to the enqueued status" do
+      run = Run.create!(task_name: "Maintenance::CallbackTestTask")
+      assert_predicate(run, :enqueued?)
+      assert_equal(expected_notification(run), Notifier.payload.fetch("enqueued.maintenance_tasks"))
+    end
+
     test "#task returns Task instance for Run" do
       run = Run.new(task_name: "Maintenance::UpdatePostsTask")
       assert_kind_of Maintenance::UpdatePostsTask, run.task
@@ -689,6 +732,19 @@ module MaintenanceTasks
     end
 
     private
+
+    def expected_notification(run)
+      {
+        run_id: run.id,
+        job_id: run.job_id,
+        task_name: run.task_name,
+        arguments: run.arguments,
+        metadata: run.metadata,
+        time_running: run.time_running,
+        started_at: run.started_at,
+        ended_at: run.ended_at,
+      }
+    end
 
     def count_uncached_queries(&block)
       count = 0

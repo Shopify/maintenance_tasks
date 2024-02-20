@@ -39,6 +39,8 @@ module MaintenanceTasks
       enum status: STATUSES.to_h { |status| [status, status.to_s] }
     end
 
+    after_save :instrument_status_change
+
     validate :task_name_belongs_to_a_valid_task, on: :create
     validate :csv_attachment_presence, on: :create
     validate :csv_content_type, on: :create
@@ -451,6 +453,30 @@ module MaintenanceTasks
     end
 
     private
+
+    def instrument_status_change
+      return unless status_previously_changed? || id_previously_changed?
+      return if running? || pausing? || cancelling? || interrupted?
+
+      attr = {
+        run_id: id,
+        job_id: job_id,
+        task_name: task_name,
+        arguments: arguments,
+        metadata: metadata,
+        time_running: time_running,
+        started_at: started_at,
+        ended_at: ended_at,
+      }
+
+      attr[:error] = {
+        message: error_message,
+        class: error_class,
+        backtrace: backtrace,
+      } if errored?
+
+      ActiveSupport::Notifications.instrument("#{status}.maintenance_tasks", attr)
+    end
 
     def run_task_callbacks(callback)
       task.run_callbacks(callback)

@@ -453,6 +453,64 @@ module Maintenance
 end
 ```
 
+### Subscribing to instrumentation events
+
+If you are interested in actioning a specific task event, please refer to the [Using Task Callbacks](#using-task-callbacks) section below. However, if you want to subscribe to all events, irrespective of the task, you can use the following Active Support notifications:
+
+```ruby
+enqueued.maintenance_tasks    # This event is published when a task has been enqueued by the user.
+succeeded.maintenance_tasks   # This event is published when a task has finished without any errors.
+cancelled.maintenance_tasks   # This event is published when the user explicitly halts the execution of a task.
+paused.maintenance_tasks      # This event is published when a task is paused by the user in the middle of its run.
+errored.maintenance_tasks     # This event is published when the task's code produces an unhandled exception.
+```
+
+These notifications offer a way to monitor the lifecycle of maintenance tasks in your application.
+
+Usage example:
+
+ ```ruby
+ ActiveSupport::Notifications.subscribe("succeeded.maintenance_tasks") do |*, payload|
+  task_name = payload[:task_name]
+  arguments = payload[:arguments]
+  metadata = payload[:metadata]
+  job_id = payload[:job_id]
+  run_id = payload[:run_id]
+  time_running = payload[:time_running]
+  started_at = payload[:started_at]
+  ended_at = payload[:ended_at]
+rescue => e
+  Rails.logger.error(e)
+end
+
+ActiveSupport::Notifications.subscribe("errored.maintenance_tasks") do |*, payload|
+  task_name = payload[:task_name]
+  error = payload[:error]
+  error_message = error[:message]
+  error_class = error[:class]
+  error_backtrace = error[:backtrace]
+rescue => e
+  Rails.logger.error(e)
+end
+
+# or
+
+class MaintenanceTasksInstrumenter < ActiveSupport::Subscriber
+  attach_to :maintenance_tasks
+
+  def enqueued(event)
+    task_name = event.payload[:task_name]
+    arguments = event.payload[:arguments]
+    metadata = event.payload[:metadata]
+
+    SlackNotifier.broadcast(SLACK_CHANNEL,
+      "Job #{task_name} was started by #{metadata[:user_email]}} with arguments #{arguments.to_s.truncate(255)}")
+  rescue => e
+    Rails.logger.error(e)
+  end
+end
+```
+
 ### Using Task Callbacks
 
 The Task provides callbacks that hook into its life cycle.
@@ -502,21 +560,6 @@ end
 
 If any of the other callbacks cause an exception, it will be handled by the
 error handler, and will cause the task to stop running.
-
-Callback behaviour can be shared across all tasks using an initializer.
-
-```ruby
-# config/initializer/maintenance_tasks.rb
-Rails.autoloaders.main.on_load("MaintenanceTasks::Task") do
-  MaintenanceTasks::Task.class_eval do
-    after_start(:notify)
-
-    private
-
-    def notify; end
-  end
-end
-```
 
 ### Considerations when writing Tasks
 
