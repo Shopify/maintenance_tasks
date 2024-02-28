@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-@rails_gem_requirement = { github: "rails/rails" }
+@rails_gem_requirement = { github: "rails/rails", ref: "a518b5a" }
 
 eval_gemfile "../Gemfile"
 gem "rack", "< 3"
