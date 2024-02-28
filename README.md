@@ -10,8 +10,8 @@ engine helps with the second part of this process, backfilling.
 
 Maintenance tasks are collection-based tasks, usually using Active Record, that
 update the data in your database. They can be paused or interrupted. Maintenance
-tasks can operate [in batches][#processing-batch-collections] and use
-[throttling][#throttling] to control the load on your database.
+tasks can operate [in batches](#processing-batch-collections) and use
+[throttling](#throttling) to control the load on your database.
 
 Maintenance tasks aren't meant to happen on a regular basis. They're used as
 needed, or as one-offs. Normally maintenance tasks are ephemeral, so they are
