@@ -201,6 +201,16 @@ The files uploaded to your Active Storage service provider will be renamed to
 include an ISO 8601 timestamp and the Task name in snake case format. The CSV is
 expected to have a trailing newline at the end of the file.
 
+The `#count` load and parse the entire file to know the accurate number of rows.
+With files with millions of rows, it take several seconds to process. You might
+consider to skip the count or use an approximative approach, eg: count the
+number of new lines:
+```ruby
+def count(task)
+  task.csv_content.count("\n") - 1
+end
+```
+
 #### Batch CSV Tasks
 
 Tasks can process CSVs in batches. Add the `in_batches` option to your task’s
