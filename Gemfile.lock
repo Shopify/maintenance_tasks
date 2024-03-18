@@ -278,7 +278,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  better_html
+  better_html (< 2.1.0)
   capybara
   debug
   maintenance_tasks!
