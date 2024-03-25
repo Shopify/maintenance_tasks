@@ -16,9 +16,8 @@ module MaintenanceTasks
     end
 
     # The number of rows to be processed. Excludes the header row from the
-    # count and use the CSV library for an accurate row count.
-    # Note that the entire file is loaded. Files with millions of rows, it will
-    # take several seconds.
+    # count and uses the CSV library for an accurate row count.
+    # Note that the entire file is loaded. It will take several seconds with files with millions of rows.
     #
     # @return [Integer] the approximate number of rows to process.
     def count(task)
