@@ -4,7 +4,7 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "better_html", "< 2.1.0"
+gem "better_html", "< 2.2.0"
 gem "capybara"
 gem "debug"
 gem "mocha"
