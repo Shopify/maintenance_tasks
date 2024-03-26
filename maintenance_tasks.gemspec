@@ -15,6 +15,7 @@ Gem::Specification.new do |spec|
     "source_code_uri" =>
       "https://github.com/Shopify/maintenance_tasks/tree/v#{spec.version}",
     "allowed_push_host" => "https://rubygems.org",
+    "changelog_uri" => "https://github.com/Shopify/maintenance_tasks/blob/main/CHANGELOG.html",
   }
 
   spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE.md", "README.md"]
