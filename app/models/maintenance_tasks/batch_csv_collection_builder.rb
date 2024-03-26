@@ -12,16 +12,17 @@ module MaintenanceTasks
     # Initialize a BatchCsvCollectionBuilder with a batch size.
     #
     # @param batch_size [Integer] the number of CSV rows in a batch.
-    def initialize(batch_size)
+    # @param csv_options [Hash] options to pass to the CSV parser.
+    def initialize(batch_size, **csv_options)
       @batch_size = batch_size
-      super()
+      super(**csv_options)
     end
 
     # Defines the collection to be iterated over, based on the provided CSV.
     # Includes the CSV and the batch size.
     def collection(task)
       BatchCsv.new(
-        csv: CSV.new(task.csv_content, headers: true),
+        csv: CSV.new(task.csv_content, **@csv_options),
         batch_size: @batch_size,
       )
     end

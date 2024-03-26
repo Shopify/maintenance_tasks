@@ -191,8 +191,8 @@ module Maintenance
 end
 ```
 
+`posts.csv`:
 ```csv
-# posts.csv
 title,content
 My Title,Hello World!
 ```
@@ -209,6 +209,38 @@ seconds to process. Consider skipping the count (defining a `count` that returns
 def count(task)
   task.csv_content.count("\n") - 1
 end
+```
+
+#### CSV options
+
+Tasks can pass [options for Ruby's CSV parser][csv-parse-options] by adding
+keyword arguments to `csv_collection`:
+
+[csv-parse-options]: https://ruby-doc.org/3.3.0/stdlibs/csv/CSV.html#class-CSV-label-Options+for+Parsing
+
+```ruby
+# app/tasks/maintenance/import_posts_task.rb
+
+module Maintenance
+  class ImportPosts
+    csv_collection(skip_lines: /^#/, converters: ->(field) { field.strip })
+
+    def process(row)
+      Post.create!(title: row["title"], content: row["content"])
+    end
+  end
+end
+```
+
+These options instruct Ruby's CSV parser to skip lines that start with a `#`,
+and removes the leading and trailing spaces from any field, so that the
+following file will be processed identically as the previous example:
+
+`posts.csv`:
+```csv
+# A comment
+title,content
+ My Title ,Hello World!
 ```
 
 #### Batch CSV Tasks
