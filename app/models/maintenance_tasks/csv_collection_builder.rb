@@ -15,14 +15,13 @@ module MaintenanceTasks
       CSV.new(task.csv_content, headers: true)
     end
 
-    # The number of rows to be processed. Excludes the header row from the
-    # count and assumes a trailing newline is at the end of the CSV file.
-    # Note that this number is an approximation based on the number of
-    # newlines.
+    # The number of rows to be processed.
+    # It uses the CSV library for an accurate row count.
+    # Note that the entire file is loaded. It will take several seconds with files with millions of rows.
     #
     # @return [Integer] the approximate number of rows to process.
     def count(task)
-      task.csv_content.count("\n") - 1
+      CSV.new(task.csv_content, headers: true).count
     end
 
     # Return that the Task processes CSV content.
