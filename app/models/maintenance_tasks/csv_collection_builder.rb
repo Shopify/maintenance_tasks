@@ -7,12 +7,17 @@ module MaintenanceTasks
   #
   # @api private
   class CsvCollectionBuilder
+    def initialize(**csv_options)
+      @csv_options = csv_options
+    end
+
     # Defines the collection to be iterated over, based on the provided CSV.
     #
+    # @param csv_options [Hash] options to pass to the CSV parser.
     # @return [CSV] the CSV object constructed from the specified CSV content,
     #   with headers.
     def collection(task)
-      CSV.new(task.csv_content, headers: true)
+      CSV.new(task.csv_content, **@csv_options)
     end
 
     # The number of rows to be processed. Excludes the header row from the
