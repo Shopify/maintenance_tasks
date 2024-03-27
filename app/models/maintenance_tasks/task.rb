@@ -66,19 +66,22 @@ module MaintenanceTasks
       #
       # @param in_batches [Integer] optionally, supply a batch size if the CSV
       # should be processed in batches.
+      # @param csv_options [Hash] optionally, supply options for the CSV parser.
+      # @see https://ruby-doc.org/3.3.0/stdlibs/csv/CSV.html#class-CSV-label-Options+for+Parsing
       #
       # An input to upload a CSV will be added in the form to start a Run. The
       # collection and count method are implemented.
-      def csv_collection(in_batches: nil)
+      def csv_collection(in_batches: nil, **csv_options)
         unless defined?(ActiveStorage)
           raise NotImplementedError, "Active Storage needs to be installed\n" \
             "To resolve this issue run: bin/rails active_storage:install"
         end
 
+        csv_options[:headers] = true unless csv_options.key?(:headers)
         self.collection_builder_strategy = if in_batches
-          BatchCsvCollectionBuilder.new(in_batches)
+          BatchCsvCollectionBuilder.new(in_batches, **csv_options)
         else
-          CsvCollectionBuilder.new
+          CsvCollectionBuilder.new(**csv_options)
         end
       end
 
