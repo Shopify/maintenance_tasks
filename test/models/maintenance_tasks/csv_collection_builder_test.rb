@@ -26,7 +26,7 @@ module MaintenanceTasks
         3
       CSV
 
-      assert_equal(3, @builder.count(@task))
+      assert_equal(4, @builder.count(@task))
     end
 
     test "#has_csv_content?" do

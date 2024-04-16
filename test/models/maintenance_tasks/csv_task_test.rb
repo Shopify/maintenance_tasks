@@ -19,6 +19,27 @@ module MaintenanceTasks
       assert_equal "Hello World 1!", first_row["content"]
     end
 
+    test ".collection passes options to the CSV parser" do
+      csv_file = file_fixture("sample.csv")
+      csv = csv_file.read
+      csv.prepend("# Comment\n")
+      csv.concat("# Another comment\n")
+
+      csv_task = Maintenance::ImportPostsWithOptionsTask.new
+      csv_task.csv_content = csv
+      collection = csv_task.collection
+
+      assert CSV, collection.class
+      assert collection.headers
+
+      all_rows = collection.to_a
+      assert_equal 5, all_rows.count
+
+      first_row = all_rows.first
+      assert_equal "MY TITLE 1", first_row["title"]
+      assert_equal "HELLO WORLD 1!", first_row["content"]
+    end
+
     test ".count returns the number of rows to process, excluding headers and assuming a trailing newline" do
       csv_file = file_fixture("sample.csv")
 
