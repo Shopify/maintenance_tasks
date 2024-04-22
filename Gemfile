@@ -9,7 +9,7 @@ gem "capybara"
 gem "debug"
 gem "mocha"
 gem "puma"
-if defined?(@rails_gem_requirement) && @rails_gem_requirement
+if @rails_gem_requirement
   # causes Dependabot to ignore the next line and update the next gem "rails"
   rails = "rails"
   gem rails, @rails_gem_requirement
@@ -20,5 +20,11 @@ gem "rubocop"
 gem "rubocop-shopify"
 gem "selenium-webdriver"
 gem "sprockets-rails"
-gem "sqlite3"
+if @sqlite3_requirement
+  # causes Dependabot to ignore the next line and update the next gem "sqlite3"
+  sqlite3 = "sqlite3"
+  gem sqlite3, @sqlite3_requirement
+else
+  gem "sqlite3"
+end
 gem "yard"
