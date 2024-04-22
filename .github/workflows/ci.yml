@@ -28,7 +28,7 @@ jobs:
         database: [sqlite]
         include:
         - gemfile: "gemfiles/postgresql.gemfile"
-          ruby: 3.2
+          ruby: 3.3
           database: postgres
         exclude:
         - gemfile: "gemfiles/rails_edge.gemfile"
