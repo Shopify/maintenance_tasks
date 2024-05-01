@@ -24,6 +24,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency("actionpack", ">= 6.0")
   spec.add_dependency("activejob", ">= 6.0")
   spec.add_dependency("activerecord", ">= 6.0")
+  spec.add_dependency("csv", ">= 3.3")
   spec.add_dependency("job-iteration", ">= 1.3.6")
   spec.add_dependency("railties", ">= 6.0")
   spec.add_dependency("zeitwerk", ">= 2.6.2")
