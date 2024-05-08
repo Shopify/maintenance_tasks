@@ -9,7 +9,7 @@ ActionDispatch::SystemTesting::Server.silence_puma = true
 # Selenium::WebDriver::Logger before it is instantiated in
 # Selenium::WebDriver.logger to prevent an uninitialized instance variable
 # warning in Ruby 2.7.
-# Capybara::Selenium::Driver.load_selenium
+Capybara::Selenium::Driver.load_selenium
 
 if Rails::VERSION::MAJOR < 7
   Selenium::WebDriver.logger.ignore(:browser_options)
