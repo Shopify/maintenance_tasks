@@ -28,6 +28,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   driven_by :selenium, using: :headless_chrome do |options|
     options.add_argument("--disable-dev-shm-usage")
     options.add_argument("--headless=new")
+    options.add_argument("--disable-gpu")
   end
 
   setup do
