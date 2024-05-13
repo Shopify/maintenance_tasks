@@ -156,6 +156,31 @@ module Maintenance
 end
 ```
 
+#### Customizing the Batch Size
+
+When processing records from an Active Record Relation, records are fetched in
+batches internally, and then each record is passed to the `#process` method.
+Maintenance Tasks will query the database to fetch records in batches of 100 by
+default, but the batch size can be modified using the `collection_batch_size` macro:
+
+```ruby
+# app/tasks/maintenance/update_posts_task.rb
+
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    # Fetch records in batches of 1000
+    collection_batch_size(1000)
+
+    def collection
+      Post.all
+    end
+
+    def process(post)
+      post.update!(content: "New content!")
+    end
+  end
+end
+
 ### Creating a CSV Task
 
 You can also write a Task that iterates on a CSV file. Note that writing CSV

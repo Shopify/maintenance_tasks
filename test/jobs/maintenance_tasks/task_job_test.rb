@@ -613,6 +613,17 @@ module MaintenanceTasks
       assert_equal 2, run.reload.tick_total
     end
 
+    test "Active Record Relation tasks can specify a relation batch size" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      JobIteration::EnumeratorBuilder
+        .any_instance
+        .expects(:active_record_on_records)
+        .with(anything, has_entry(batch_size: 1000))
+
+      TaskJob.perform_now(run)
+    end
+
     test "MaintenanceTasks::TaskJobConcern#build_enumerator provides cursor_columns as the column argument to active_record_on_records" do
       cursor_columns = [:created_at, :id]
 

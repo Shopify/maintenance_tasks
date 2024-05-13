@@ -18,6 +18,12 @@ module MaintenanceTasks
     # @api private
     class_attribute :throttle_conditions, default: []
 
+    # The number of active records to fetch in a single query when iterating
+    # over an Active Record collection task.
+    #
+    # @api private
+    class_attribute :active_record_enumerator_batch_size
+
     # @api private
     class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
@@ -135,6 +141,14 @@ module MaintenanceTasks
         backoff_as_proc = -> { backoff } unless backoff.respond_to?(:call)
 
         self.throttle_conditions += [{ throttle_on: condition, backoff: backoff_as_proc }]
+      end
+
+      # Limit the number of records that will be fetched in a single query when
+      # iterating over an Active Record collection task.
+      #
+      # @param size [Integer] the number of records to fetch in a single query.
+      def collection_batch_size(size)
+        self.active_record_enumerator_batch_size = size
       end
 
       # Initialize a callback to run after the task starts.
