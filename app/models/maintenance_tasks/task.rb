@@ -191,6 +191,9 @@ module MaintenanceTasks
       end
     end
 
+    # The Run that is currently being executed.
+    attr_accessor :run
+
     # The contents of a CSV file to be processed by a Task.
     #
     # @return [String] the content of the CSV file to process.

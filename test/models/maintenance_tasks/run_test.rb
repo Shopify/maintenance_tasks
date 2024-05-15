@@ -631,6 +631,11 @@ module MaintenanceTasks
       assert_kind_of Maintenance::UpdatePostsTask, run.task
     end
 
+    test "#task sets run on the Task instance" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
+      assert_equal(run, run.task.run)
+    end
+
     test "#validate_task_arguments instantiates Task and assigns arguments if Task has parameters" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",
