@@ -1,14 +1,13 @@
 version: 2
-
 updates:
+- package-ecosystem: bundler
+  directory: '/'
+  versioning-strategy: increase
+  schedule:
+    interval: weekly
+  open-pull-requests-limit: 100
 
-  - package-ecosystem: bundler
-    directory: '/'
-    versioning-strategy: increase
-    schedule:
-      interval: weekly
-
-  - package-ecosystem: github-actions
-    directory: '/'
-    schedule:
-      interval: daily
+- package-ecosystem: github-actions
+  directory: '/'
+  schedule:
+    interval: daily
