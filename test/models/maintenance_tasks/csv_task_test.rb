@@ -47,5 +47,39 @@ module MaintenanceTasks
       csv_task.csv_content = csv_file.read
       assert_equal 5, csv_task.count
     end
+
+    test ".collection opens CSV with provided encoding" do
+      csv_file = file_fixture("sample.csv")
+      csv = csv_file.read
+      csv.concat("あ,い\n") # Japanese characters: "a" and "i"
+
+      csv_task = Maintenance::ImportPostsWithEncodingTask.new
+      csv_task.csv_content = csv
+      collection = csv_task.collection
+
+      assert_raises(CSV::InvalidEncodingError) do
+        collection.to_a
+      end
+    end
+
+    test ".collection opens CSV with default encoding" do
+      csv_file = file_fixture("sample.csv")
+      csv = csv_file.read
+      csv.concat("あ,い\n") # Japanese characters: "a" and "i"
+
+      # Assuming UTF_8 is set as default in test
+      original_encoding = Encoding.default_external
+      Encoding.default_external = Encoding::UTF_8
+
+      csv_task = Maintenance::ImportPostsTask.new
+      csv_task.csv_content = csv
+      collection = csv_task.collection
+
+      entry = collection.to_a.last
+      assert_equal("あ", entry["title"])
+      assert_equal("い", entry["content"])
+    ensure
+      Encoding.default_external = original_encoding
+    end
   end
 end

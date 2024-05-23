@@ -79,6 +79,7 @@ module MaintenanceTasks
         end
 
         csv_options[:headers] = true unless csv_options.key?(:headers)
+        csv_options[:encoding] = Encoding.default_external unless csv_options.key?(:encoding)
         self.collection_builder_strategy = if in_batches
           BatchCsvCollectionBuilder.new(in_batches, **csv_options)
         else
