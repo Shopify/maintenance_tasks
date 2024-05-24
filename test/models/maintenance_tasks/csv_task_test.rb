@@ -14,9 +14,12 @@ module MaintenanceTasks
       assert CSV, collection.class
       assert collection.headers
 
-      first_row = collection.first
+      enum = collection.each
+      first_row = enum.next
       assert_equal "My Title 1 あ", first_row["title"]
       assert_equal "Héllo World 1! い", first_row["content"]
+      csv_task.process(first_row)
+      csv_task.process(enum.next)
     end
 
     test ".collection passes options to the CSV parser" do
