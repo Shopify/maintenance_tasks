@@ -28,6 +28,7 @@ module MaintenanceTasks
         "Maintenance::CustomEnumeratingTask\nNew",
         "Maintenance::EnqueueErrorTask\nNew",
         "Maintenance::ErrorTask\nNew",
+        "Maintenance::ImportPostsWithEncodingTask\nNew",
         "Maintenance::ImportPostsWithOptionsTask\nNew",
         "Maintenance::Nested::NestedMore::NestedMoreTask\nNew",
         "Maintenance::Nested::NestedTask\nNew",
