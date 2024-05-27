@@ -14,12 +14,10 @@ module MaintenanceTasks
       assert CSV, collection.class
       assert collection.headers
 
-      enum = collection.each
-      first_row = enum.next
+      first_row = collection.first
       assert_equal "My Title 1 あ", first_row["title"]
       assert_equal "Héllo World 1! い", first_row["content"]
       csv_task.process(first_row)
-      csv_task.process(enum.next)
     end
 
     test ".collection passes options to the CSV parser" do
@@ -53,10 +51,8 @@ module MaintenanceTasks
 
     test ".collection opens CSV with provided encoding" do
       csv_file = file_fixture("sample.csv")
-      csv = csv_file.binread
-
       csv_task = Maintenance::ImportPostsWithEncodingTask.new
-      csv_task.csv_content = csv
+      csv_task.csv_content = csv_file.binread
       collection = csv_task.collection
 
       assert_raises(CSV::InvalidEncodingError) do
@@ -66,10 +62,8 @@ module MaintenanceTasks
 
     test ".collection opens CSV with default encoding" do
       csv_file = file_fixture("sample.csv")
-      csv = csv_file.binread
-
       csv_task = Maintenance::ImportPostsTask.new
-      csv_task.csv_content = csv
+      csv_task.csv_content = csv_file.binread
       collection = csv_task.collection
 
       entry = collection.to_a.first
