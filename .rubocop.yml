@@ -7,6 +7,7 @@ AllCops:
     - vendor/**/*
   SuggestExtensions: false
   NewCops: disable
+  ActiveSupportExtensionsEnabled: true
 
 Bundler/OrderedGems:
   Enabled: true
