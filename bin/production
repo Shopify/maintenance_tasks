@@ -3,7 +3,7 @@
 set -ex
 
 export RAILS_ENV=production
-SECRET_KEY_BASE="$(bin/rails app:secret)"
+SECRET_KEY_BASE="$(bin/rails secret)"
 export SECRET_KEY_BASE
 
 bin/rails app:assets:precompile
