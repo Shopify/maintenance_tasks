@@ -60,16 +60,42 @@ module MaintenanceTasks
       MaintenanceTasks.metadata = nil
     end
 
-    test "run a CSV Task" do
-      visit maintenance_tasks_path
+    test "run a CSV Task without direct upload" do
+      with_direct_upload(false) do
+        visit maintenance_tasks_path
 
-      click_on("Maintenance::ImportPostsTask")
-      attach_file("csv_file", "test/fixtures/files/sample.csv")
-      click_on "Run"
+        click_on("Maintenance::ImportPostsTask")
 
-      assert_title "Maintenance::ImportPostsTask"
-      assert_text "Enqueued"
-      assert_text "Waiting to start."
+        assert_selector("input[type=file]") do |input|
+          assert_nil(input["data-direct-upload-url"])
+        end
+
+        attach_file("csv_file", "test/fixtures/files/sample.csv")
+        click_on "Run"
+
+        assert_title "Maintenance::ImportPostsTask"
+        assert_text "Enqueued"
+        assert_text "Waiting to start."
+      end
+    end
+
+    test "run a CSV Task with direct upload" do
+      with_direct_upload(true) do
+        visit maintenance_tasks_path
+
+        click_on("Maintenance::ImportPostsTask")
+
+        assert_selector("input[type=file]") do |input|
+          assert_equal(input["data-direct-upload-url"], rails_direct_uploads_url)
+        end
+
+        attach_file("csv_file", "test/fixtures/files/sample.csv")
+        click_on "Run"
+
+        assert_title "Maintenance::ImportPostsTask"
+        assert_text "Enqueued"
+        assert_text "Waiting to start."
+      end
     end
 
     test "run a Task that accepts parameters" do
@@ -271,6 +297,16 @@ module MaintenanceTasks
       click_on "Pause"
 
       assert_text "Validation failed: Status Cannot transition run from status cancelling to pausing"
+    end
+
+    private
+
+    def with_direct_upload(enabled)
+      previous = MaintenanceTasks.direct_upload
+      MaintenanceTasks.direct_upload = enabled
+      yield
+    ensure
+      MaintenanceTasks.direct_upload = previous
     end
   end
 end
