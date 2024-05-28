@@ -22,9 +22,6 @@ module MaintenanceTasks
     end
 
     initializer "maintenance_tasks.assets.precompile" do |app|
-      app.config.assets.paths << Engine.root.join("vendor/assets/stylesheets")
-      app.config.assets.paths << Engine.root.join("app/assets/stylesheets")
-      app.config.assets.paths << Engine.root.join("app/assets/javascripts")
       app.config.assets.precompile << "maintenance_tasks.js"
       app.config.assets.precompile << "maintenance_tasks.css"
     end
