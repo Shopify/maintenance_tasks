@@ -27,4 +27,5 @@ if @sqlite3_requirement
 else
   gem "sqlite3"
 end
+gem "importmap-rails"
 gem "yard"

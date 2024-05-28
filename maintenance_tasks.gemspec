@@ -17,7 +17,7 @@ Gem::Specification.new do |spec|
     "allowed_push_host" => "https://rubygems.org",
   }
 
-  spec.files = Dir["{app,config,db,lib}/**/*", "LICENSE.md", "README.md"]
+  spec.files = Dir["{app,config,db,lib,vendor}/**/*", "LICENSE.md", "README.md"]
   spec.bindir = "exe"
   spec.executables = ["maintenance_tasks"]
 
