@@ -215,6 +215,24 @@ module MaintenanceTasks
 
       assert_text "Enqueued"
       assert_text "Waiting to start."
+
+      perform_enqueued_jobs
+
+      page.refresh
+
+      assert_text "Errored"
+      assert_text "Processed 2 out of 5 items (40%)."
+
+      assert_equal "1", Run.last.cursor
+
+      perform_enqueued_jobs do
+        click_on "Resume"
+      end
+
+      page.refresh
+
+      assert_text "Errored"
+      assert_text "Processed 2 out of 5 items (40%)."
     end
 
     test "errors for double enqueue are shown" do

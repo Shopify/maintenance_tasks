@@ -65,6 +65,7 @@ module MaintenanceTasks
     # @raise [EnqueuingError] if an error occurs while enqueuing the Run.
     def resume(run)
       job = instantiate_job(run)
+      job.cursor_position = run.cursor
       run.job_id = job.job_id
       run.enqueued!
       enqueue(run, job)
