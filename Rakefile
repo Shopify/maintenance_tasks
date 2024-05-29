@@ -30,27 +30,3 @@ end
 task(test: "app:test")
 task("test:system" => "app:test:system")
 task(default: ["db:test:prepare", "test", "test:system", "rubocop"])
-
-namespace :vendor do
-  task :bulma do
-    require "importmap-rails"
-    require "importmap/packager"
-
-    packager = Importmap::Packager.new(vendor_path: "vendor/assets/stylesheets")
-    package, url = packager.import("bulma@0.9.4", from: "unpkg").first
-    filename = "#{package}.min.css"
-    source_url = File.dirname(url) + "/css/#{filename}"
-    target_file = "#{packager.vendor_path}/#{filename}"
-
-    puts %(Vendoring #{source_url} to #{target_file})
-
-    response = Net::HTTP.get_response(URI(source_url))
-    if response.code == "200"
-      File.open(target_file, "w+") do |file|
-        file.write(response.body)
-      end
-    else
-      raise "Unexpected response code (#{response.code})"
-    end
-  end
-end
