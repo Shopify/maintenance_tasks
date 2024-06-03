@@ -32,6 +32,7 @@ module MaintenanceTasks
 
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
+      self.cursor_position = cursor
       @collection_enum = @task.enumerator_builder(cursor: cursor)
 
       @collection_enum ||= case (collection = @task.collection)
