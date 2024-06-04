@@ -237,6 +237,17 @@ module MaintenanceTasks
       assert_equal "0", @run.reload.cursor
     end
 
+    test ".perform_now persists cursor when there's an error" do
+      run = Run.create!(task_name: "Maintenance::ErrorTask")
+
+      TaskJob.perform_now(run)
+      assert_equal "1", run.reload.cursor
+
+      run.enqueued!
+      TaskJob.perform_now(run)
+      assert_equal "1", run.reload.cursor
+    end
+
     test ".perform_now starts job from cursor position when job resumes" do
       @run.update!(cursor: "0")
 
