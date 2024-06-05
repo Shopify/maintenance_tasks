@@ -1,3 +1,4 @@
+//= require activestorage
 //= require_self
 
 function refresh() {

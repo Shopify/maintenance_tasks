@@ -96,4 +96,11 @@ module MaintenanceTasks
   #
   #  @return [ActiveSupport::Duration] the threshold in seconds after which a task is considered stuck.
   mattr_accessor :stuck_task_duration, default: 5.minutes
+
+  # @!attribute direct_upload
+  #  @scope class
+  #  Controls direct upload support for CSV files.
+  #
+  #  @return [Boolean] whether to enable direct upload for CSV files.
+  mattr_accessor :direct_upload, default: false
 end
