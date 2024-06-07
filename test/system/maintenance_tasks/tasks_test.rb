@@ -129,7 +129,10 @@ module MaintenanceTasks
       boolean_dropdown_field_options = boolean_dropdown_field.find_all("option").map { |option| option[:value] }
       assert_equal(["", "true", "false"], boolean_dropdown_field_options)
 
-      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
+      [
+        "text_integer_attr_proc_no_arg",
+        "text_integer_attr_unbounded_range",
+      ].each do |text_integer_attr|
         text_integer_dropdown_field = page.find_field("task[#{text_integer_attr}]")
         assert_equal("input", text_integer_dropdown_field.tag_name)
         assert_equal("number", text_integer_dropdown_field[:type])
