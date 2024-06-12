@@ -120,7 +120,7 @@ module MaintenanceTasks
 
       run = Run.last
       assert_predicate run.csv_file, :attached?
-      assert_equal File.read(@csv), run.csv_file.download
+      assert_equal File.binread(@csv), run.csv_file.download
     end
 
     test "#run raises if CSV file is provided but Task does not process CSVs" do
