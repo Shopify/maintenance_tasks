@@ -497,7 +497,10 @@ end
 
 ### Subscribing to instrumentation events
 
-If you are interested in actioning a specific task event, please refer to the [Using Task Callbacks](#using-task-callbacks) section below. However, if you want to subscribe to all events, irrespective of the task, you can use the following Active Support notifications:
+If you are interested in actioning a specific task event, please refer to the
+[Using Task Callbacks](#using-task-callbacks) section below. However, if you
+want to subscribe to all events, irrespective of the task, you can use the
+following Active Support notifications:
 
 ```ruby
 enqueued.maintenance_tasks    # This event is published when a task has been enqueued by the user.
@@ -507,7 +510,8 @@ paused.maintenance_tasks      # This event is published when a task is paused by
 errored.maintenance_tasks     # This event is published when the task's code produces an unhandled exception.
 ```
 
-These notifications offer a way to monitor the lifecycle of maintenance tasks in your application.
+These notifications offer a way to monitor the lifecycle of maintenance tasks in
+your application.
 
 Usage example:
 
