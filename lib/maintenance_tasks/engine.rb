@@ -21,11 +21,6 @@ module MaintenanceTasks
       MaintenanceTasks.backtrace_cleaner = Rails.backtrace_cleaner
     end
 
-    initializer "maintenance_tasks.assets.precompile" do |app|
-      app.config.assets.precompile << "maintenance_tasks.js"
-      app.config.assets.precompile << "maintenance_tasks.css"
-    end
-
     config.to_prepare do
       _ = TaskJobConcern # load this for JobIteration compatibility check
     end
