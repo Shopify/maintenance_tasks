@@ -6,6 +6,8 @@ module Maintenance
       attr_accessor :fast_task
     end
 
+    collection_batch_size 1000
+
     def collection
       Post.all
     end
