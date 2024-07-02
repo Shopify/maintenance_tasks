@@ -123,13 +123,35 @@ module MaintenanceTasks
       integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
       assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
 
+      integer_dropdown_field = page.find_field("task[text_integer_attr_proc_no_arg]")
+      assert_equal("select", integer_dropdown_field.tag_name)
+      assert_equal("select-one", integer_dropdown_field[:type])
+      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
+
+      integer_dropdown_field = page.find_field("task[text_integer_attr_bounded_range]")
+      assert_equal("select", integer_dropdown_field.tag_name)
+      assert_equal("select-one", integer_dropdown_field[:type])
+      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal([""] + (100..120).to_a.map(&:to_s), integer_dropdown_field_options)
+
+      integer_dropdown_field = page.find_field("task[text_integer_attr_enumerable]")
+      assert_equal("select", integer_dropdown_field.tag_name)
+      assert_equal("select-one", integer_dropdown_field[:type])
+      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "100", "105", "110", "115", "120"], integer_dropdown_field_options)
+
       boolean_dropdown_field = page.find_field("task[boolean_dropdown_attr]")
       assert_equal("select", boolean_dropdown_field.tag_name)
       assert_equal("select-one", boolean_dropdown_field[:type])
       boolean_dropdown_field_options = boolean_dropdown_field.find_all("option").map { |option| option[:value] }
       assert_equal(["", "true", "false"], boolean_dropdown_field_options)
 
-      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
+      [
+        "text_integer_attr_undefined_symbol",
+        "text_integer_attr_unbounded_range",
+        "text_integer_attr_proc_arg",
+      ].each do |text_integer_attr|
         text_integer_dropdown_field = page.find_field("task[#{text_integer_attr}]")
         assert_equal("input", text_integer_dropdown_field.tag_name)
         assert_equal("number", text_integer_dropdown_field[:type])

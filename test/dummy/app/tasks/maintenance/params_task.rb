@@ -26,13 +26,19 @@ module Maintenance
     validates_inclusion_of :boolean_dropdown_attr, within: [true, false], allow_nil: true
 
     # Dropdown options with unsupported scenarios
-    attribute :text_integer_attr, :integer
-    attribute :text_integer_attr2, :integer
-    attribute :text_integer_attr3, :integer
+    attribute :text_integer_attr_proc_no_arg, :integer
+    attribute :text_integer_attr_proc_arg, :integer
+    attribute :text_integer_attr_undefined_symbol, :integer
+    attribute :text_integer_attr_unbounded_range, :integer
+    attribute :text_integer_attr_bounded_range, :integer
+    attribute :text_integer_attr_enumerable, :integer
 
-    validates_inclusion_of :text_integer_attr, in: proc { [100, 200, 300] }, allow_nil: true
-    validates_inclusion_of :text_integer_attr2, in: :undefined_symbol, allow_nil: true
-    validates_inclusion_of :text_integer_attr3, in: (100..), allow_nil: true
+    validates_inclusion_of :text_integer_attr_proc_no_arg, in: proc { [100, 200, 300] }, allow_nil: true
+    validates_inclusion_of :text_integer_attr_proc_arg, in: proc { |_task| [100, 200, 300] }, allow_nil: true
+    validates_inclusion_of :text_integer_attr_undefined_symbol, in: :undefined_symbol, allow_nil: true
+    validates_inclusion_of :text_integer_attr_unbounded_range, in: (100..), allow_nil: true
+    validates_inclusion_of :text_integer_attr_bounded_range, in: (100..120), allow_nil: true
+    validates_inclusion_of :text_integer_attr_enumerable, in: (100..120).step(5), allow_nil: true
 
     class << self
       attr_accessor :fast_task
