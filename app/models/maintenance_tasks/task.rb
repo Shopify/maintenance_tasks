@@ -31,7 +31,7 @@ module MaintenanceTasks
 
     def initialize(attributes = {})
       super()
-      assign_attributes(attributes) if attributes.is_a?(Hash)
+      assign_attributes(attributes)
     end
 
     class << self
