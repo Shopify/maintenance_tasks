@@ -752,9 +752,9 @@ end
 ### Writing tests for a Task that uses a custom enumerator
 
 Tests for tasks that use custom enumerators need to instantiate the task class
-in order to call `#build_enumerator`. Once the task instance is set up, validate
-that `#build_enumerator` returns an enumerator yielding pairs of [item, cursor]
-as expected.
+in order to call `#enumerator_builder`. Once the task instance is set up,
+validate that `#enumerator_builder` returns an enumerator yielding pairs of
+`[item, cursor]` as expected.
 
 ```ruby
 # test/tasks/maintenance/custom_enumerating_task.rb
@@ -767,8 +767,8 @@ module Maintenance
       @task = CustomEnumeratingTask.new
     end
 
-    test "#build_enumerator returns enumerator yielding pairs of [item, cursor]" do
-      enum = @task.build_enumerator(cursor: 0)
+    test "#enumerator_builder returns enumerator yielding pairs of [item, cursor]" do
+      enum = @task.enumerator_builder(cursor: 0)
       expected_items = [:b, :c]
 
       assert_equal 2, enum.size
