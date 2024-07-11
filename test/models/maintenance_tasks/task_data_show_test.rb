@@ -109,5 +109,25 @@ module MaintenanceTasks
     test "#new returns nil for a deleted Task" do
       assert_nil TaskDataShow.new("Maintenance::DoesNotExist").new
     end
+
+    test "#new returns a Task instance with parameters" do
+      params = { post_ids: "123" }
+      task = TaskDataShow.new("Maintenance::ParamsTask").new(params)
+      assert_kind_of Task, task
+      assert_equal "123", task.post_ids
+    end
+
+    test "#new returns a Task instance without parameters" do
+      task = TaskDataShow.new("Maintenance::ParamsTask").new
+      assert_kind_of Task, task
+      assert_nil task.post_ids
+    end
+
+    test "#new ignores unspecified parameters" do
+      params = { post_ids: "123", unspecified_param: "value" }
+      task = TaskDataShow.new("Maintenance::ParamsTask").new(params)
+      assert_equal "123", task.post_ids
+      assert_not_respond_to task, :unspecified_param
+    end
   end
 end
