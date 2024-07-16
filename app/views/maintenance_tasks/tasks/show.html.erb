@@ -44,7 +44,7 @@
 
     <h4 class="title is-4">Active Runs</h4>
 
-    <%= render @task.active_runs %>
+    <%= render partial: "maintenance_tasks/runs/run", collection: @task.active_runs %>
   <% end %>
 
   <% if @runs_page.records.present? %>
@@ -52,7 +52,7 @@
 
     <h4 class="title is-4">Previous Runs</h4>
 
-    <%= render @runs_page.records %>
+    <%= render partial: "maintenance_tasks/runs/run", collection: @runs_page.records %>
 
     <%= link_to "Next page", task_path(@task, cursor: @runs_page.next_cursor) unless @runs_page.last? %>
   <% end %>
