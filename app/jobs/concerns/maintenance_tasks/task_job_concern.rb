@@ -166,6 +166,7 @@ module MaintenanceTasks
     end
 
     def on_error(error)
+      task_context = {}
       @ticker.persist if defined?(@ticker)
 
       if defined?(@run)
@@ -177,8 +178,6 @@ module MaintenanceTasks
           started_at: @run.started_at,
           ended_at: @run.ended_at,
         }
-      else
-        task_context = {}
       end
       errored_element = @errored_element if defined?(@errored_element)
     ensure
