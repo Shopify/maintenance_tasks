@@ -27,7 +27,7 @@ module MaintenanceTasks
 
         assert_file("config/routes.rb") do |contents|
           assert_match(
-            %r{mount MaintenanceTasks::Engine => "/maintenance_tasks"},
+            %r{mount MaintenanceTasks::Engine, at: "/maintenance_tasks"},
             contents,
           )
         end
