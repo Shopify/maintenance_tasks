@@ -10,7 +10,7 @@ module MaintenanceTasks
 
     # Mounts the engine in the host application's config/routes.rb
     def mount_engine
-      route("mount MaintenanceTasks::Engine => \"/maintenance_tasks\"")
+      route("mount MaintenanceTasks::Engine, at: \"/maintenance_tasks\"")
     end
 
     # Copies engine migrations to host application and migrates the database
