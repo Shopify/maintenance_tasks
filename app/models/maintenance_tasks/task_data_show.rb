@@ -79,12 +79,23 @@ module MaintenanceTasks
       end
     end
 
+    # @param params [Hash] query parameter
+    #
     # @return [MaintenanceTasks::Task, nil] an instance of the Task class.
     # @return [nil] if the Task file was deleted.
-    def new
+    def new(params = {})
       return if deleted?
 
-      MaintenanceTasks::Task.named(name).new
+      task = MaintenanceTasks::Task.named(name).new
+      if params.present?
+        begin
+          default_parameters = params.to_h.stringify_keys.slice(*task.attributes.stringify_keys.keys)
+          task.assign_attributes(default_parameters)
+        rescue ActionController::UnfilteredParameters
+          nil
+        end
+      end
+      task
     end
 
     private
