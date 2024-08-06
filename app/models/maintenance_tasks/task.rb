@@ -29,6 +29,11 @@ module MaintenanceTasks
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
+    def initialize(attributes = {})
+      super()
+      assign_attributes(attributes)
+    end
+
     class << self
       # Finds a Task with the given name.
       #

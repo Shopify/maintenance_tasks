@@ -106,6 +106,12 @@ module MaintenanceTasks
       assert_kind_of Task, TaskDataShow.new("Maintenance::ParamsTask").new
     end
 
+    test "#new returns a Task instance with parameters" do
+      task = TaskDataShow.new("Maintenance::ParamsTask").new(post_ids: "123")
+      assert_kind_of Task, task
+      assert_equal "123", task.post_ids
+    end
+
     test "#new returns nil for a deleted Task" do
       assert_nil TaskDataShow.new("Maintenance::DoesNotExist").new
     end
