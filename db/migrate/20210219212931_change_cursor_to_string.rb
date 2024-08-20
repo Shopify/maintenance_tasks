@@ -12,7 +12,7 @@ class ChangeCursorToString < ActiveRecord::Migration[6.0]
 
   def down
     change_table(:maintenance_tasks_runs) do |t|
-      t.change(:cursor, "bigint USING cursor::bigint")
+      t.change(:cursor, "bigint USING CAST(cursor as bigint)")
     end
   end
 end
