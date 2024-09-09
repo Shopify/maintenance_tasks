@@ -72,6 +72,12 @@ module MaintenanceTasks
       assert_file "app/tasks/maintenance/sleepy_task.rb"
     end
 
+    test "generator creates a Task in the correct path if the --tasks_path option is supplied" do
+      run_generator ["sleepy", "--tasks_path", "admin"]
+
+      assert_file "app/admin/tasks/maintenance/sleepy_task.rb"
+    end
+
     test "generator creates a CSV Task if the --csv option is supplied" do
       run_generator ["sleepy", "--csv"]
       assert_file "app/tasks/maintenance/sleepy_task.rb" do |task|

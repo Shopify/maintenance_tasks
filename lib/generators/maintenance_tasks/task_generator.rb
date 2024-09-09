@@ -6,8 +6,8 @@ module MaintenanceTasks
   # @api private
   class TaskGenerator < Rails::Generators::NamedBase
     source_root File.expand_path("templates", __dir__)
-    desc "This generator creates a task file at app/tasks and a corresponding " \
-      "test."
+    desc "This generator creates a task file at app/tasks " \
+      "or the specified tasks_path and a corresponding test."
 
     class_option :csv,
       type: :boolean,
@@ -19,6 +19,11 @@ module MaintenanceTasks
       default: false,
       desc: "Generate a collection-less Task."
 
+    class_option :tasks_path,
+      type: :string,
+      default: "",
+      desc: "Specify the path where the task should be generated."
+
     check_class_collision suffix: "Task"
 
     # Creates the Task file.
@@ -28,7 +33,8 @@ module MaintenanceTasks
           "--csv or --no-collection."
       end
       template_file = File.join(
-        "app/tasks/#{tasks_module_file_path}",
+        "app",
+        module_path,
         class_path,
         "#{file_name}_task.rb",
       )
@@ -58,7 +64,8 @@ module MaintenanceTasks
 
     def create_task_test_file
       template_file = File.join(
-        "test/tasks/#{tasks_module_file_path}",
+        "test",
+        module_path,
         class_path,
         "#{file_name}_task_test.rb",
       )
@@ -67,7 +74,8 @@ module MaintenanceTasks
 
     def create_task_spec_file
       template_file = File.join(
-        "spec/tasks/#{tasks_module_file_path}",
+        "spec",
+        module_path,
         class_path,
         "#{file_name}_task_spec.rb",
       )
@@ -76,6 +84,14 @@ module MaintenanceTasks
 
     def file_name
       super.sub(/_task\z/i, "")
+    end
+
+    def module_path
+      File.join(tasks_path, tasks_module_file_path)
+    end
+
+    def tasks_path
+      File.join(options[:tasks_path], "tasks")
     end
 
     def tasks_module
