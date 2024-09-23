@@ -1,6 +1,0 @@
-# frozen_string_literal: true
-
-@rails_gem_requirement = "~> 6.0.0"
-@sqlite3_requirement = "~> 1.4"
-
-eval_gemfile "../Gemfile"
