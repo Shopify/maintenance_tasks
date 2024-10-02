@@ -156,6 +156,15 @@ module Maintenance
 end
 ```
 
+#### Customizing the Task Path
+
+When creating a task you can specify the folder in which you want the task created. 
+Generate a new task in a specific path by running:
+```sh-session
+bin/rails generate maintenance_tasks:task update_posts --tasks_path admin
+```
+This creates the task file `app/admin/tasks/maintenance/update_posts_task.rb`.
+
 #### Customizing the Batch Size
 
 When processing records from an Active Record Relation, records are fetched in
