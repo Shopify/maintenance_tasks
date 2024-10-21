@@ -92,12 +92,22 @@ module MaintenanceTasks
     end
 
     test "#resolve_inclusion_value resolves inclusion validator for task attributes" do
-      assert_match "Select a value", markup("integer_dropdown_attr").squish
+      [
+        "integer_dropdown_attr",
+        "boolean_dropdown_attr",
+        "text_integer_attr_proc_no_arg",
+        "text_integer_attr_bounded_range",
+        "text_integer_attr_enumerable",
+      ].each do |attribute|
+        assert_match "Select a value", markup(attribute).squish
+      end
 
-      assert_match "Select a value", markup("boolean_dropdown_attr").squish
-
-      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
-        refute_match "Select a value", markup(text_integer_attr).squish
+      [
+        "text_integer_attr_proc_arg",
+        "text_integer_attr_undefined_symbol",
+        "text_integer_attr_unbounded_range",
+      ].each do |attribute|
+        refute_match "Select a value", markup(attribute).squish
       end
     end
 
