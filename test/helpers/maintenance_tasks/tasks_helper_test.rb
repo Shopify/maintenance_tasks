@@ -123,7 +123,6 @@ module MaintenanceTasks
     test "#datetime_field_help_text is correct about the timezone when Time.zone_default is set" do
       now = Time.now
       sign = now.utc_offset > 0 ? -1 : 1 # make sure we don't overflow
-      sign = -1
       # Time.use_zone leaks Time.zone_default in the IsolatedExecutionState, so it needs to be called before changing
       # Time.zone_default
       Time.use_zone(now.utc_offset + 2.hour * sign) do # a timezone that is not the system timezone
