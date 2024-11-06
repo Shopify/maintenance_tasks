@@ -29,6 +29,8 @@ module MaintenanceTasks
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
+    attr_accessor :run_id
+
     class << self
       # Finds a Task with the given name.
       #
