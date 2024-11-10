@@ -20,7 +20,7 @@
             <div class="field">
               <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
               <div class="control">
-                <%= parameter_field(ff, parameter_name) %>
+                <%= parameter_field(ff, parameter_name, params[parameter_name]) %>
               </div>
             </div>
           <% end %>

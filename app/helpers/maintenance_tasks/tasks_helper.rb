@@ -147,26 +147,40 @@ module MaintenanceTasks
 
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
-    def parameter_field(form_builder, parameter_name)
+    def parameter_field(form_builder, parameter_name, value = nil)
       inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
-      return form_builder.select(parameter_name, inclusion_values, prompt: "Select a value") if inclusion_values
+      if inclusion_values
+        return form_builder.select(parameter_name, inclusion_values, field_options(
+          value, { prompt: "Select a value" }, :selected
+        ))
+      end
 
       case form_builder.object.class.attribute_types[parameter_name]
       when ActiveModel::Type::Integer
-        form_builder.number_field(parameter_name)
+        form_builder.number_field(parameter_name, field_options(value))
       when ActiveModel::Type::Decimal, ActiveModel::Type::Float
-        form_builder.number_field(parameter_name, { step: "any" })
+        form_builder.number_field(parameter_name, field_options(value, step: "any"))
       when ActiveModel::Type::DateTime
-        form_builder.datetime_field(parameter_name) + datetime_field_help_text
+        form_builder.datetime_field(parameter_name, field_options(value)) + datetime_field_help_text
       when ActiveModel::Type::Date
-        form_builder.date_field(parameter_name)
+        form_builder.date_field(parameter_name, field_options(value))
       when ActiveModel::Type::Time
-        form_builder.time_field(parameter_name)
+        form_builder.time_field(parameter_name, field_options(value))
       when ActiveModel::Type::Boolean
-        form_builder.check_box(parameter_name)
+        form_builder.check_box(parameter_name, field_options(
+          ActiveModel::Type::Boolean.new.cast(value), {}, :checked
+        ))
       else
-        form_builder.text_area(parameter_name, class: "textarea")
+        form_builder.text_area(parameter_name, field_options(value, class: "textarea"))
       end
+    end
+
+    # Only include a value if one was is provided otherwise fallback
+    # to the form object's default attributes
+    def field_options(value = nil, base_options = {}, key = :value)
+      return base_options if value.nil?
+
+      base_options.merge({ key => value })
     end
 
     # Return helper text for the datetime-local form field.

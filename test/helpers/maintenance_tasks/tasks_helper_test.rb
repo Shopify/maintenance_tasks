@@ -149,10 +149,10 @@ module MaintenanceTasks
       Time.zone_default = zone
     end
 
-    def markup(attribute)
+    def markup(attribute, default_value = nil)
       render(inline: <<~TEMPLATE)
         <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
-          <%= parameter_field(form, '#{attribute}') %>
+          <%= parameter_field(form, '#{attribute}', #{default_value ? default_value.to_s : nil}) %>
         <% end %>
       TEMPLATE
     end

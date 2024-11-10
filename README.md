@@ -485,6 +485,12 @@ to run. Since arguments are specified in the user interface via text area
 inputs, it’s important to check that they conform to the format your Task
 expects, and to sanitize any inputs if necessary.
 
+You can set values by specifying a query param with the same key as the attribute
+name. For example the `UpdatePostsViaParamsTask` task above accepts an
+`updated_content` attribute, so navigating to
+`/maintenance_tasks/tasks/Maintenance::UpdatePostsViaParamsTask?updated_content=foo`
+would prefill the text area with "foo".
+
 #### Validating Task Parameters
 
 Task attributes can be validated using Active Model Validations. Attributes are
