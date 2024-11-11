@@ -48,6 +48,9 @@ module Warning
   class << self
     def warn(message)
       return super if message.start_with?("Rack::Handler is deprecated")
+      # To be removed once warning is fixed in selenium-webdriver
+      # This is noisy, so ignoring completely for now.
+      return if message.match?("URI::RFC3986_PARSER.escape is obsoleted.")
 
       raise message.to_s
     end
