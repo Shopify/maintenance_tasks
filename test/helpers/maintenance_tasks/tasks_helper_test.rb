@@ -95,12 +95,13 @@ module MaintenanceTasks
       [
         "integer_dropdown_attr",
         "boolean_dropdown_attr",
+        "integer_dropdown_attr_proc_no_arg",
       ].each do |attribute|
         assert_match "Select a value", markup(attribute).squish
       end
 
       [
-        "text_integer_attr_proc_no_arg",
+        "text_integer_attr_proc_arg",
         "text_integer_attr_unbounded_range",
       ].each do |attribute|
         refute_match "Select a value", markup(attribute).squish

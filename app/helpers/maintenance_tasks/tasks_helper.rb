@@ -102,8 +102,10 @@ module MaintenanceTasks
     end
 
     # Resolves values covered by the inclusion validator for a task attribute.
-    # Only Arrays are supported, option types such as:
-    # Procs, lambdas, symbols, and Range are not supported and return nil.
+    # Supported option types:
+    # - Arrays
+    # - Procs and lambdas that take no arguments and return an Array
+    # Other types are not supported and will return nil.
     #
     # Returned values are used to populate a dropdown list of options.
     #
@@ -118,6 +120,7 @@ module MaintenanceTasks
       return unless inclusion_validator
 
       in_option = inclusion_validator.options[:in] || inclusion_validator.options[:within]
+      in_option = in_option.call if in_option.is_a?(Proc) && in_option.arity.zero?
       in_option if in_option.is_a?(Array)
     end
 
