@@ -541,8 +541,8 @@ your application.
 
 Usage example:
 
- ```ruby
- ActiveSupport::Notifications.subscribe("succeeded.maintenance_tasks") do |*, payload|
+```ruby
+ActiveSupport::Notifications.subscribe("succeeded.maintenance_tasks") do |*, payload|
   task_name = payload[:task_name]
   arguments = payload[:arguments]
   metadata = payload[:metadata]
