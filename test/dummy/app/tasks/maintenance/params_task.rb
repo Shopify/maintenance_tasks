@@ -31,7 +31,7 @@ module Maintenance
     attribute :text_integer_attr3, :integer
 
     validates_inclusion_of :text_integer_attr, in: proc { [100, 200, 300] }, allow_nil: true
-    validates_inclusion_of :text_integer_attr2, in: :undefined_symbol, allow_nil: true
+    validates_inclusion_of :text_integer_attr2, in: :some_method, allow_nil: true
     validates_inclusion_of :text_integer_attr3, in: (100..), allow_nil: true
 
     class << self
@@ -49,6 +49,10 @@ module Maintenance
     end
 
     private
+
+    def some_method
+      [100, 200, 300]
+    end
 
     def post_ids_array
       post_ids.split(",")
