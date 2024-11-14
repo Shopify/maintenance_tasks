@@ -4,6 +4,23 @@ require "test_helper"
 
 module MaintenanceTasks
   class TaskDataShowTest < ActiveSupport::TestCase
+    test ".prepare returns a TaskDataShow with active_runs loaded" do
+      task_data = TaskDataShow.prepare("Maintenance::UpdatePostsTask")
+      assert_predicate task_data.active_runs, :loaded?
+    end
+
+    test ".prepare raises if the task doesn't exist and doesn't have runs" do
+      assert_raises Task::NotFoundError do
+        TaskDataShow.prepare("Maintenance::DoesNotExist")
+      end
+    end
+
+    test ".prepare doesn't raise if the task was deleted (doesn't exist but has runs)" do
+      assert_nothing_raised do
+        TaskDataShow.prepare("Maintenance::DeletedTask")
+      end
+    end
+
     test "#code returns the code source of the Task" do
       task_data = TaskDataShow.new("Maintenance::UpdatePostsTask")
 
@@ -72,6 +89,20 @@ module MaintenanceTasks
 
     test "#csv_task? returns false if the Task is deleted" do
       refute_predicate TaskDataShow.new("Maintenance::DoesNotExist"), :csv_task?
+    end
+
+    test "#refresh? returns true if there are active runs" do
+      assert_predicate TaskDataShow.new("Maintenance::UpdatePostsTask"), :refresh?
+    end
+
+    test "#refresh? returns false if there are no active runs" do
+      refute_predicate TaskDataShow.new("Maintenance::DoesNotExist"), :refresh?
+    end
+
+    test "#runs_page returns a RunsPage with the cursor set" do
+      runs_page = TaskDataShow.new("MaintenanceTasks::UpdatePostsTask", runs_cursor: 42).runs_page
+      assert_kind_of RunsPage, runs_page
+      assert_equal 42, runs_page.cursor
     end
 
     test "#parameter_names returns list of parameter names for Tasks supporting parameters" do

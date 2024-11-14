@@ -21,6 +21,9 @@ module MaintenanceTasks
       @cursor = cursor
     end
 
+    # @return [String, nil] the cursor for the page of Runs.
+    attr_reader :cursor
+
     # Returns the records for a Page, taking into account the cursor if one is
     # present. Limits the number of records to 20.
     #

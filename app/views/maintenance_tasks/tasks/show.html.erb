@@ -38,7 +38,7 @@
   <pre><code><%= highlight_code(code) %></code></pre>
 <% end %>
 
-<%= tag.div(data: { refresh: (defined?(@refresh) && @refresh) || "" }) do %>
+<%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
   <% if @task.active_runs.any? %>
     <hr/>
 
@@ -47,13 +47,13 @@
     <%= render partial: "maintenance_tasks/runs/run", collection: @task.active_runs %>
   <% end %>
 
-  <% if @runs_page.records.present? %>
+  <% if @task.runs_page.records.present? %>
     <hr/>
 
     <h4 class="title is-4">Previous Runs</h4>
 
-    <%= render partial: "maintenance_tasks/runs/run", collection: @runs_page.records %>
+    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
 
-    <%= link_to "Next page", task_path(@task, cursor: @runs_page.next_cursor) unless @runs_page.last? %>
+    <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
   <% end %>
 <% end %>
