@@ -6,6 +6,7 @@ module MaintenanceTasks
   #
   # @api private
   class RunsController < ApplicationController
+    helper TasksHelper
     before_action :set_run, except: :create
 
     # Creates a Run for a given Task and redirects to the Task page.
@@ -19,7 +20,9 @@ module MaintenanceTasks
       )
       redirect_to(task_path(task))
     rescue ActiveRecord::RecordInvalid => error
-      redirect_to(task_path(error.record.task_name), alert: error.message)
+      flash.now.alert = error.message
+      @task = TaskDataShow.prepare(error.record.task_name, arguments: error.record.arguments)
+      render(template: "maintenance_tasks/tasks/show")
     rescue ActiveRecord::ValueTooLong => error
       task_name = params.fetch(:task_id)
       redirect_to(task_path(task_name), alert: error.message)
