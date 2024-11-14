@@ -105,6 +105,7 @@ module MaintenanceTasks
     # Supported option types:
     # - Arrays
     # - Procs and lambdas that take no arguments and return an Array
+    # - Methods that take no arguments and return an Array. The method is called on the task instance.
     # Other types are not supported and will return nil.
     #
     # Returned values are used to populate a dropdown list of options.
@@ -113,7 +114,8 @@ module MaintenanceTasks
     # @param parameter_name [String] The parameter name.
     #
     # @return [Array] value of the resolved inclusion option.
-    def resolve_inclusion_value(task_class, parameter_name)
+    def resolve_inclusion_value(task, parameter_name)
+      task_class = task.class
       inclusion_validator = task_class.validators_on(parameter_name).find do |validator|
         validator.kind == :inclusion
       end
@@ -121,13 +123,19 @@ module MaintenanceTasks
 
       in_option = inclusion_validator.options[:in] || inclusion_validator.options[:within]
       in_option = in_option.call if in_option.is_a?(Proc) && in_option.arity.zero?
+
+      if in_option.is_a?(Symbol) && task.respond_to?(in_option)
+        method = task.method(in_option)
+        in_option = method.call if method.arity.zero?
+      end
+
       in_option if in_option.is_a?(Array)
     end
 
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
     def parameter_field(form_builder, parameter_name)
-      inclusion_values = resolve_inclusion_value(form_builder.object.class, parameter_name)
+      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
       return form_builder.select(parameter_name, inclusion_values, prompt: "Select a value") if inclusion_values
 
       case form_builder.object.class.attribute_types[parameter_name]

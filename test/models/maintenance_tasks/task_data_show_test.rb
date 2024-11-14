@@ -89,6 +89,7 @@ module MaintenanceTasks
           "boolean_attr",
           "integer_dropdown_attr",
           "integer_dropdown_attr_proc_no_arg",
+          "integer_dropdown_attr_from_method",
           "boolean_dropdown_attr",
           "text_integer_attr_proc_arg",
           "text_integer_attr_unbounded_range",

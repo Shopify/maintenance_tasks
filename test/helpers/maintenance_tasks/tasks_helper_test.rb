@@ -96,6 +96,7 @@ module MaintenanceTasks
         "integer_dropdown_attr",
         "boolean_dropdown_attr",
         "integer_dropdown_attr_proc_no_arg",
+        "integer_dropdown_attr_from_method",
       ].each do |attribute|
         assert_match "Select a value", markup(attribute).squish
       end

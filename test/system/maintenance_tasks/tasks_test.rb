@@ -129,6 +129,12 @@ module MaintenanceTasks
       integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
       assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
 
+      integer_dropdown_field = page.find_field("task[integer_dropdown_attr_from_method]")
+      assert_equal("select", integer_dropdown_field.tag_name)
+      assert_equal("select-one", integer_dropdown_field[:type])
+      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
+
       boolean_dropdown_field = page.find_field("task[boolean_dropdown_attr]")
       assert_equal("select", boolean_dropdown_field.tag_name)
       assert_equal("select-one", boolean_dropdown_field[:type])
