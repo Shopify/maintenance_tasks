@@ -104,8 +104,10 @@ module MaintenanceTasks
     # Resolves values covered by the inclusion validator for a task attribute.
     # Supported option types:
     # - Arrays
-    # - Procs and lambdas that take no arguments and return an Array
-    # - Methods that take no arguments and return an Array. The method is called on the task instance.
+    # - Procs and lambdas that optionally accept the Task instance, and return an Array.
+    # - Callable objects that receive one argument, the Task instance, and return an Array.
+    # - Methods that return an Array, called on the Task instance.
+    #
     # Other types are not supported and will return nil.
     #
     # Returned values are used to populate a dropdown list of options.
@@ -122,14 +124,25 @@ module MaintenanceTasks
       return unless inclusion_validator
 
       in_option = inclusion_validator.options[:in] || inclusion_validator.options[:within]
-      in_option = in_option.call if in_option.is_a?(Proc) && in_option.arity.zero?
-
-      if in_option.is_a?(Symbol) && task.respond_to?(in_option)
+      resolved_in_option = case in_option
+      when Proc
+        if in_option.arity == 0
+          in_option.call
+        else
+          in_option.call(task)
+        end
+      when Symbol
         method = task.method(in_option)
-        in_option = method.call if method.arity.zero?
+        method.call if method.arity.zero?
+      else
+        if in_option.respond_to?(:call)
+          in_option.call(task)
+        else
+          in_option
+        end
       end
 
-      in_option if in_option.is_a?(Array)
+      resolved_in_option if resolved_in_option.is_a?(Array)
     end
 
     # Return the appropriate field tag for the parameter, based on its type.

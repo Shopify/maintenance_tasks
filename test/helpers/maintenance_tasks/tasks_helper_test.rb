@@ -96,17 +96,14 @@ module MaintenanceTasks
         "integer_dropdown_attr",
         "boolean_dropdown_attr",
         "integer_dropdown_attr_proc_no_arg",
+        "integer_dropdown_attr_proc_arg",
         "integer_dropdown_attr_from_method",
+        "integer_dropdown_attr_callable",
       ].each do |attribute|
         assert_match "Select a value", markup(attribute).squish
       end
 
-      [
-        "text_integer_attr_proc_arg",
-        "text_integer_attr_unbounded_range",
-      ].each do |attribute|
-        refute_match "Select a value", markup(attribute).squish
-      end
+      refute_match "Select a value", markup("text_integer_attr_unbounded_range").squish
     end
 
     test "#parameter_field adds information about datetime fields when Time.zone_default is not set" do

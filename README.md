@@ -495,8 +495,9 @@ set of values will be used to populate a dropdown in the user interface. The
 following types are supported:
 
 * Arrays
-* Procs and lambdas that return an Array.
-* Methods that return an Array. The method is called on the task instance.
+* Procs and lambdas that optionally accept the Task instance, and return an Array.
+* Callable objects that receive one argument, the Task instance, and return an Array.
+* Methods that return an Array, called on the Task instance.
 
 For enumerables that don't match the supported types, a text field will be
 rendered instead.
