@@ -142,5 +142,15 @@ module MaintenanceTasks
     test "#new returns nil for a deleted Task" do
       assert_nil TaskDataShow.new("Maintenance::DoesNotExist").new
     end
+
+    test "#new returns a Task prefilled with arguments" do
+      task_data = TaskDataShow.prepare("Maintenance::ParamsTask", arguments: { content: "super content" })
+      assert_equal "super content", task_data.new.content
+    end
+
+    test "#new ignores unknown arguments" do
+      task_data = TaskDataShow.prepare("Maintenance::ParamsTask", arguments: { unknown: nil })
+      assert_nothing_raised { task_data.new }
+    end
   end
 end

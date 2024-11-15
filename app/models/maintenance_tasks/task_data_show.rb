@@ -15,8 +15,10 @@ module MaintenanceTasks
     #
     # @param name [String] the name of the Task subclass.
     # @param runs_cursor [String, nil] the cursor for the runs page.
-    def initialize(name, runs_cursor: nil)
+    # @param arguments [Hash, nil] the Task arguments.
+    def initialize(name, runs_cursor: nil, arguments: nil)
       @name = name
+      @arguments = arguments
       @runs_page = RunsPage.new(completed_runs, runs_cursor)
     end
 
@@ -25,9 +27,10 @@ module MaintenanceTasks
       #
       # @param name [String] the name of the Task subclass.
       # @param runs_cursor [String, nil] the cursor for the runs page.
+      # @param arguments [Hash, nil] the Task arguments.
       # @raise [Task::NotFoundError] if the Task doesn't have runs (for the given cursor) and doesn't exist.
-      def prepare(name, runs_cursor: nil)
-        new(name, runs_cursor:)
+      def prepare(name, runs_cursor: nil, arguments: nil)
+        new(name, runs_cursor:, arguments:)
           .load_active_runs
           .ensure_task_exists
       end
@@ -103,12 +106,18 @@ module MaintenanceTasks
       end
     end
 
-    # @return [MaintenanceTasks::Task, nil] an instance of the Task class.
+    # @return [MaintenanceTasks::Task] an instance of the Task class.
     # @return [nil] if the Task file was deleted.
     def new
       return if deleted?
 
-      MaintenanceTasks::Task.named(name).new
+      task = MaintenanceTasks::Task.named(name).new
+      begin
+        task.assign_attributes(@arguments) if @arguments
+      rescue ActiveModel::UnknownAttributeError
+        # nothing to do
+      end
+      task
     end
 
     # Preloads the records from the active_runs ActiveRecord::Relation
