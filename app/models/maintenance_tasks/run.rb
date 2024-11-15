@@ -386,40 +386,20 @@ module MaintenanceTasks
       nil
     end
 
-    # Support iterating over ActiveModel::Errors in Rails 6.0 and Rails 6.1+.
-    # To be removed when Rails 6.0 is no longer supported.
-    if Rails::VERSION::STRING.match?(/^6.0/)
-      # Performs validation on the arguments to use for the Task. If the Task is
-      # invalid, the errors are added to the Run.
-      def validate_task_arguments
-        arguments_match_task_attributes if arguments.present?
-        if task.invalid?
-          error_messages = task.errors
-            .map { |attribute, message| "#{attribute.inspect} #{message}" }
-          errors.add(
-            :arguments,
-            "are invalid: #{error_messages.join("; ")}",
-          )
-        end
-      rescue Task::NotFoundError
-        nil
+    # Performs validation on the arguments to use for the Task. If the Task is
+    # invalid, the errors are added to the Run.
+    def validate_task_arguments
+      arguments_match_task_attributes if arguments.present?
+      if task.invalid?
+        error_messages = task.errors
+          .map { |error| "#{error.attribute.inspect} #{error.message}" }
+        errors.add(
+          :arguments,
+          "are invalid: #{error_messages.join("; ")}",
+        )
       end
-    else
-      # Performs validation on the arguments to use for the Task. If the Task is
-      # invalid, the errors are added to the Run.
-      def validate_task_arguments
-        arguments_match_task_attributes if arguments.present?
-        if task.invalid?
-          error_messages = task.errors
-            .map { |error| "#{error.attribute.inspect} #{error.message}" }
-          errors.add(
-            :arguments,
-            "are invalid: #{error_messages.join("; ")}",
-          )
-        end
-      rescue Task::NotFoundError
-        nil
-      end
+    rescue Task::NotFoundError
+      nil
     end
 
     # Fetches the attached ActiveStorage CSV file for the run. Checks first

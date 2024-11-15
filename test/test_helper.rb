@@ -40,14 +40,9 @@ elsif ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixtures(:all)
 end
 
-# CSV 3.2.1 changes $stderr to see if $INPUT_RECORD_SEPARATOR is deprecated, so
-# we require it before to avoid that deprecation from raising.
-require "csv"
-
 module Warning
   class << self
     def warn(message)
-      return super if message.start_with?("Rack::Handler is deprecated")
       # To be removed once warnings are fixed in selenium-webdriver and sprockets.
       # This is noisy, so ignoring completely for now.
       return if message.match?("URI::RFC3986_PARSER.(un)?escape is obsolete.")
