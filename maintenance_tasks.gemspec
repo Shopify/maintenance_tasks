@@ -21,11 +21,12 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = ["maintenance_tasks"]
 
-  spec.add_dependency("actionpack", ">= 6.0")
-  spec.add_dependency("activejob", ">= 6.0")
-  spec.add_dependency("activerecord", ">= 6.0")
+  minimum_rails_version = "6.1"
+  spec.add_dependency("actionpack", ">= #{minimum_rails_version}")
+  spec.add_dependency("activejob", ">= #{minimum_rails_version}")
+  spec.add_dependency("activerecord", ">= #{minimum_rails_version}")
   spec.add_dependency("csv")
   spec.add_dependency("job-iteration", ">= 1.3.6")
-  spec.add_dependency("railties", ">= 6.0")
+  spec.add_dependency("railties", ">= #{minimum_rails_version}")
   spec.add_dependency("zeitwerk", ">= 2.6.2")
 end
