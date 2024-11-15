@@ -40,10 +40,6 @@ elsif ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixtures(:all)
 end
 
-# CSV 3.2.1 changes $stderr to see if $INPUT_RECORD_SEPARATOR is deprecated, so
-# we require it before to avoid that deprecation from raising.
-require "csv"
-
 module Warning
   class << self
     def warn(message)
