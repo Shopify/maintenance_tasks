@@ -102,8 +102,13 @@ module MaintenanceTasks
     end
 
     # Resolves values covered by the inclusion validator for a task attribute.
-    # Only Arrays are supported, option types such as:
-    # Procs, lambdas, symbols, and Range are not supported and return nil.
+    # Supported option types:
+    # - Arrays
+    # - Procs and lambdas that optionally accept the Task instance, and return an Array.
+    # - Callable objects that receive one argument, the Task instance, and return an Array.
+    # - Methods that return an Array, called on the Task instance.
+    #
+    # Other types are not supported and will return nil.
     #
     # Returned values are used to populate a dropdown list of options.
     #
@@ -111,20 +116,39 @@ module MaintenanceTasks
     # @param parameter_name [String] The parameter name.
     #
     # @return [Array] value of the resolved inclusion option.
-    def resolve_inclusion_value(task_class, parameter_name)
+    def resolve_inclusion_value(task, parameter_name)
+      task_class = task.class
       inclusion_validator = task_class.validators_on(parameter_name).find do |validator|
         validator.kind == :inclusion
       end
       return unless inclusion_validator
 
       in_option = inclusion_validator.options[:in] || inclusion_validator.options[:within]
-      in_option if in_option.is_a?(Array)
+      resolved_in_option = case in_option
+      when Proc
+        if in_option.arity == 0
+          in_option.call
+        else
+          in_option.call(task)
+        end
+      when Symbol
+        method = task.method(in_option)
+        method.call if method.arity.zero?
+      else
+        if in_option.respond_to?(:call)
+          in_option.call(task)
+        else
+          in_option
+        end
+      end
+
+      resolved_in_option if resolved_in_option.is_a?(Array)
     end
 
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
     def parameter_field(form_builder, parameter_name)
-      inclusion_values = resolve_inclusion_value(form_builder.object.class, parameter_name)
+      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
       return form_builder.select(parameter_name, inclusion_values, prompt: "Select a value") if inclusion_values
 
       case form_builder.object.class.attribute_types[parameter_name]

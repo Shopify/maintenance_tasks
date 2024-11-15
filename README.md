@@ -485,6 +485,23 @@ to run. Since arguments are specified in the user interface via text area
 inputs, it’s important to check that they conform to the format your Task
 expects, and to sanitize any inputs if necessary.
 
+#### Validating Task Parameters
+
+Task attributes can be validated using Active Model Validations. Attributes are
+validated before a Task is enqueued.
+
+If an attribute uses an inclusion validator with a supported `in:` option, the
+set of values will be used to populate a dropdown in the user interface. The
+following types are supported:
+
+* Arrays
+* Procs and lambdas that optionally accept the Task instance, and return an Array.
+* Callable objects that receive one argument, the Task instance, and return an Array.
+* Methods that return an Array, called on the Task instance.
+
+For enumerables that don't match the supported types, a text field will be
+rendered instead.
+
 ### Custom cursor columns to improve performance
 
 The [job-iteration gem][job-iteration], on which this gem depends, adds an

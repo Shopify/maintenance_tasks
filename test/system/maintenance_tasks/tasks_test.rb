@@ -117,24 +117,24 @@ module MaintenanceTasks
       assert_equal("input", boolean_field.tag_name)
       assert_equal("checkbox", boolean_field[:type])
 
-      integer_dropdown_field = page.find_field("task[integer_dropdown_attr]")
-      assert_equal("select", integer_dropdown_field.tag_name)
-      assert_equal("select-one", integer_dropdown_field[:type])
-      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
-      assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
-
-      boolean_dropdown_field = page.find_field("task[boolean_dropdown_attr]")
-      assert_equal("select", boolean_dropdown_field.tag_name)
-      assert_equal("select-one", boolean_dropdown_field[:type])
-      boolean_dropdown_field_options = boolean_dropdown_field.find_all("option").map { |option| option[:value] }
-      assert_equal(["", "true", "false"], boolean_dropdown_field_options)
-
-      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
-        text_integer_dropdown_field = page.find_field("task[#{text_integer_attr}]")
-        assert_equal("input", text_integer_dropdown_field.tag_name)
-        assert_equal("number", text_integer_dropdown_field[:type])
-        assert_empty(text_integer_dropdown_field[:step])
+      [
+        "integer_dropdown_attr",
+        "integer_dropdown_attr_proc_no_arg",
+        "integer_dropdown_attr_proc_arg",
+        "integer_dropdown_attr_from_method",
+        "integer_dropdown_attr_callable",
+      ].each do |dropdown_integer_attr|
+        integer_dropdown_field = page.find_field("task[#{dropdown_integer_attr}]")
+        assert_equal("select", integer_dropdown_field.tag_name)
+        assert_equal("select-one", integer_dropdown_field[:type])
+        integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+        assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
       end
+
+      text_integer_field = page.find_field("task[text_integer_attr_unbounded_range]")
+      assert_equal("input", text_integer_field.tag_name)
+      assert_equal("number", text_integer_field[:type])
+      assert_empty(text_integer_field[:step])
     end
 
     test "view a Task with multiple pages of Runs" do

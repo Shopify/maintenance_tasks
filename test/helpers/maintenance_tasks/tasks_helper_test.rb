@@ -92,13 +92,18 @@ module MaintenanceTasks
     end
 
     test "#resolve_inclusion_value resolves inclusion validator for task attributes" do
-      assert_match "Select a value", markup("integer_dropdown_attr").squish
-
-      assert_match "Select a value", markup("boolean_dropdown_attr").squish
-
-      ["text_integer_attr", "text_integer_attr2", "text_integer_attr3"].each do |text_integer_attr|
-        refute_match "Select a value", markup(text_integer_attr).squish
+      [
+        "integer_dropdown_attr",
+        "boolean_dropdown_attr",
+        "integer_dropdown_attr_proc_no_arg",
+        "integer_dropdown_attr_proc_arg",
+        "integer_dropdown_attr_from_method",
+        "integer_dropdown_attr_callable",
+      ].each do |attribute|
+        assert_match "Select a value", markup(attribute).squish
       end
+
+      refute_match "Select a value", markup("text_integer_attr_unbounded_range").squish
     end
 
     test "#parameter_field adds information about datetime fields when Time.zone_default is not set" do
