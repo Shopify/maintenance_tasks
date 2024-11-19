@@ -60,10 +60,34 @@ module MaintenanceTasks
       MaintenanceTasks.metadata = nil
     end
 
-    test "run a CSV Task" do
+    test "run a CSV Task without direct upload" do
+      Rails.application.config.stubs(:respond_to?).with(:assets).returns(false)
       visit maintenance_tasks_path
 
       click_on("Maintenance::ImportPostsTask")
+
+      assert_selector("input[type=file]") do |input|
+        assert_nil(input["data-direct-upload-url"])
+      end
+
+      attach_file("csv_file", "test/fixtures/files/sample.csv")
+      click_on "Run"
+
+      assert_title "Maintenance::ImportPostsTask"
+      assert_text "Enqueued"
+      assert_text "Waiting to start."
+    end
+
+    test "run a CSV Task with direct upload" do
+      Rails.application.config.stubs(:respond_to?).with(:assets).returns(true)
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ImportPostsTask")
+
+      assert_selector("input[type=file]") do |input|
+        assert_equal(input["data-direct-upload-url"], rails_direct_uploads_url)
+      end
+
       attach_file("csv_file", "test/fixtures/files/sample.csv")
       click_on "Run"
 
@@ -105,6 +129,7 @@ module MaintenanceTasks
     end
 
     test "download the CSV attached to a run for a CSV Task" do
+      Rails.application.config.stubs(:respond_to?).with(:assets).returns(false)
       visit(maintenance_tasks_path)
 
       click_on("Maintenance::ImportPostsTask")
