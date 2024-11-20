@@ -9,6 +9,7 @@ MaintenanceTasks::Engine.routes.draw do
         put "resume"
       end
     end
+    get :runs, to: redirect("tasks/%{task_id}")
   end
 
   root to: "tasks#index"
