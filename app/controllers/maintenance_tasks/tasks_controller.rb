@@ -18,7 +18,11 @@ module MaintenanceTasks
     # Renders the page responsible for providing Task actions to users.
     # Shows running and completed instances of the Task.
     def show
-      @task = TaskDataShow.prepare(params.fetch(:id), runs_cursor: params[:cursor])
+      @task = TaskDataShow.prepare(
+        params.fetch(:id),
+        runs_cursor: params[:cursor],
+        arguments: params.except(:id, :controller, :action).permit!,
+      )
     end
 
     private
