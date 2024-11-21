@@ -11,16 +11,38 @@ module MaintenanceTasks
   #
   # @api private
   class TaskDataShow
-    # Initializes a Task Data with a name and optionally a related run.
+    # Initializes a Task Data with a name.
     #
     # @param name [String] the name of the Task subclass.
-    def initialize(name)
+    # @param runs_cursor [String, nil] the cursor for the runs page.
+    # @param arguments [Hash, nil] the Task arguments.
+    def initialize(name, runs_cursor: nil, arguments: nil)
       @name = name
+      @arguments = arguments
+      @runs_page = RunsPage.new(completed_runs, runs_cursor)
+    end
+
+    class << self
+      # Prepares a Task Data from a task name.
+      #
+      # @param name [String] the name of the Task subclass.
+      # @param runs_cursor [String, nil] the cursor for the runs page.
+      # @param arguments [Hash, nil] the Task arguments.
+      # @raise [Task::NotFoundError] if the Task doesn't have runs (for the given cursor) and doesn't exist.
+      def prepare(name, runs_cursor: nil, arguments: nil)
+        new(name, runs_cursor:, arguments:)
+          .load_active_runs
+          .ensure_task_exists
+      end
     end
 
     # @return [String] the name of the Task.
     attr_reader :name
     alias_method :to_s, :name
+
+    # @return [RunsPage] the current page of completed runs, based on the cursor
+    #   passed in initialize.
+    attr_reader :runs_page
 
     # The Task's source code.
     #
@@ -36,6 +58,11 @@ module MaintenanceTasks
         task.instance_method(:process).source_location.first
       end
       File.read(file)
+    end
+
+    # @return [Boolean] whether the task data needs to be refreshed.
+    def refresh?
+      active_runs.any?
     end
 
     # Returns the set of currently active Run records associated with the Task.
@@ -79,12 +106,34 @@ module MaintenanceTasks
       end
     end
 
-    # @return [MaintenanceTasks::Task, nil] an instance of the Task class.
+    # @return [MaintenanceTasks::Task] an instance of the Task class.
     # @return [nil] if the Task file was deleted.
     def new
       return if deleted?
 
-      MaintenanceTasks::Task.named(name).new
+      task = MaintenanceTasks::Task.named(name).new
+      begin
+        task.assign_attributes(@arguments) if @arguments
+      rescue ActiveModel::UnknownAttributeError
+        # nothing to do
+      end
+      task
+    end
+
+    # Preloads the records from the active_runs ActiveRecord::Relation
+    # @return [self]
+    def load_active_runs
+      active_runs.load
+      self
+    end
+
+    # @raise [Task::NotFoundError] if the Task doesn't have Runs (for the given cursor) and doesn't exist.
+    # @return [self]
+    def ensure_task_exists
+      if active_runs.none? && runs_page.records.none?
+        Task.named(name)
+      end
+      self
     end
 
     private

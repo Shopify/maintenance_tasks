@@ -99,9 +99,11 @@ module MaintenanceTasks
 
       click_on("Maintenance::ParamsTask")
       fill_in("task[post_ids]", with: "xyz")
+      fill_in("task[content]", with: "super content")
       click_on "Run"
 
       assert_text "Validation failed: Arguments are invalid: :post_ids is invalid"
+      assert_field "task[content]", with: "super content"
     end
 
     test "download the CSV attached to a run for a CSV Task" do

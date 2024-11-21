@@ -18,14 +18,7 @@ module MaintenanceTasks
     # Renders the page responsible for providing Task actions to users.
     # Shows running and completed instances of the Task.
     def show
-      task_name = params.fetch(:id)
-      @task = TaskDataShow.new(task_name)
-      @task.active_runs.load
-      set_refresh if @task.active_runs.any?
-      @runs_page = RunsPage.new(@task.completed_runs, params[:cursor])
-      if @task.active_runs.none? && @runs_page.records.none?
-        Task.named(task_name)
-      end
+      @task = TaskDataShow.prepare(params.fetch(:id), runs_cursor: params[:cursor])
     end
 
     private
