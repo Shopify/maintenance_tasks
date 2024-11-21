@@ -88,34 +88,43 @@ module MaintenanceTasks
 
       content_field = page.find_field("task[content]")
       assert_equal("textarea", content_field.tag_name)
+      assert_equal("default content", content_field.value)
       integer_field = page.find_field("task[integer_attr]")
       assert_equal("input", integer_field.tag_name)
       assert_equal("number", integer_field[:type])
       assert_empty(integer_field[:step])
+      assert_equal("111222333", integer_field.value)
       big_integer_field = page.find_field("task[big_integer_attr]")
       assert_equal("input", big_integer_field.tag_name)
       assert_equal("number", big_integer_field[:type])
       assert_empty(big_integer_field[:step])
+      assert_equal("111222333", big_integer_field.value)
       float_field = page.find_field("task[float_attr]")
       assert_equal("input", float_field.tag_name)
       assert_equal("number", float_field[:type])
       assert_equal("any", float_field[:step])
+      assert_equal("12.34", float_field.value)
       decimal_field = page.find_field("task[decimal_attr]")
       assert_equal("input", decimal_field.tag_name)
       assert_equal("number", decimal_field[:type])
       assert_equal("any", decimal_field[:step])
+      assert_equal("12.34", decimal_field.value)
       datetime_field = page.find_field("task[datetime_attr]")
       assert_equal("input", datetime_field.tag_name)
       assert_equal("datetime-local", datetime_field[:type])
+      assert_equal("", datetime_field.value)
       date_field = page.find_field("task[date_attr]")
       assert_equal("input", date_field.tag_name)
       assert_equal("date", date_field[:type])
+      assert_equal("", date_field.value)
       time_field = page.find_field("task[time_attr]")
       assert_equal("input", time_field.tag_name)
       assert_equal("time", time_field[:type])
+      assert_equal("", time_field.value)
       boolean_field = page.find_field("task[boolean_attr]")
       assert_equal("input", boolean_field.tag_name)
       assert_equal("checkbox", boolean_field[:type])
+      assert_nil(boolean_field[:checked])
 
       [
         "integer_dropdown_attr",
@@ -135,6 +144,77 @@ module MaintenanceTasks
       assert_equal("input", text_integer_field.tag_name)
       assert_equal("number", text_integer_field[:type])
       assert_empty(text_integer_field[:step])
+      assert_equal("", text_integer_field.value)
+    end
+
+    test "task with attributes renders correct field tags on the form with values from query params" do
+      visit maintenance_tasks.task_path("Maintenance::ParamsTask", params: {
+        content: "string content",
+        integer_attr: 12,
+        big_integer_attr: 123456789,
+        float_attr: 12.34,
+        decimal_attr: 43.21,
+        datetime_attr: "1984-01-01T12:34:56",
+        date_attr: "1984-01-01",
+        time_attr: "12:34:56",
+        boolean_attr: "true",
+        integer_dropdown_attr: "200",
+        boolean_dropdown_attr: "false",
+      })
+
+      content_field = page.find_field("task[content]")
+      assert_equal("textarea", content_field.tag_name)
+      assert_equal("string content", content_field.value)
+      integer_field = page.find_field("task[integer_attr]")
+      assert_equal("input", integer_field.tag_name)
+      assert_equal("number", integer_field[:type])
+      assert_empty(integer_field[:step])
+      assert_equal("12", integer_field.value)
+      big_integer_field = page.find_field("task[big_integer_attr]")
+      assert_equal("input", big_integer_field.tag_name)
+      assert_equal("number", big_integer_field[:type])
+      assert_empty(big_integer_field[:step])
+      assert_equal("123456789", big_integer_field.value)
+      float_field = page.find_field("task[float_attr]")
+      assert_equal("input", float_field.tag_name)
+      assert_equal("number", float_field[:type])
+      assert_equal("any", float_field[:step])
+      assert_equal("12.34", float_field.value)
+      decimal_field = page.find_field("task[decimal_attr]")
+      assert_equal("input", decimal_field.tag_name)
+      assert_equal("number", decimal_field[:type])
+      assert_equal("any", decimal_field[:step])
+      assert_equal("43.21", decimal_field.value)
+      datetime_field = page.find_field("task[datetime_attr]")
+      assert_equal("input", datetime_field.tag_name)
+      assert_equal("datetime-local", datetime_field[:type])
+      assert_equal("1984-01-01T12:34:56", datetime_field.value)
+      date_field = page.find_field("task[date_attr]")
+      assert_equal("input", date_field.tag_name)
+      assert_equal("date", date_field[:type])
+      assert_equal("1984-01-01", date_field.value)
+      time_field = page.find_field("task[time_attr]")
+      assert_equal("input", time_field.tag_name)
+      assert_equal("time", time_field[:type])
+      assert_equal("12:34:56.000", time_field.value)
+      boolean_field = page.find_field("task[boolean_attr]")
+      assert_equal("input", boolean_field.tag_name)
+      assert_equal("checkbox", boolean_field[:type])
+      assert_equal("true", boolean_field[:checked])
+
+      integer_dropdown_field = page.find_field("task[integer_dropdown_attr]")
+      assert_equal("select", integer_dropdown_field.tag_name)
+      assert_equal("select-one", integer_dropdown_field[:type])
+      assert_equal("200", integer_dropdown_field.value)
+      integer_dropdown_field_options = integer_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["100", "200", "300"], integer_dropdown_field_options)
+
+      boolean_dropdown_field = page.find_field("task[boolean_dropdown_attr]")
+      assert_equal("select", boolean_dropdown_field.tag_name)
+      assert_equal("select-one", boolean_dropdown_field[:type])
+      assert_equal("false", boolean_dropdown_field.value)
+      boolean_dropdown_field_options = boolean_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["", "true", "false"], boolean_dropdown_field_options)
     end
 
     test "view a Task with multiple pages of Runs" do
