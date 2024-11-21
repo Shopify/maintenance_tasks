@@ -9,12 +9,12 @@ gem "capybara"
 gem "debug"
 gem "mocha"
 gem "puma"
-if @rails_gem_requirement
+if !@rails_gem_requirement
+  gem "rails"
+else
   # causes Dependabot to ignore the next line and update the next gem "rails"
   rails = "rails"
   gem rails, @rails_gem_requirement
-else
-  gem "rails"
 end
 gem "rubocop"
 gem "rubocop-shopify"
