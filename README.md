@@ -90,6 +90,13 @@ take a look at the [Active Job documentation][active-job-docs].
 [async-adapter]: https://api.rubyonrails.org/classes/ActiveJob/QueueAdapters/AsyncAdapter.html
 [active-job-docs]: https://guides.rubyonrails.org/active_job_basics.html#setting-the-backend
 
+### Action Controller & Action View Dependency
+
+The Maintenance Tasks framework relies on Action Controller and Action View to
+render the UI. If you're using Rails in API-only mode, see [Using Maintenance
+Tasks in API-only
+applications](#using-maintenance-tasks-in-api-only-applications).
+
 ### Autoloading
 
 The Maintenance Tasks framework does not support autoloading in `:classic` mode.
@@ -888,6 +895,42 @@ a Task can be in:
 * **succeeded**: A Task that finished successfully.
 * **errored**: A Task that encountered an unhandled exception while performing.
 
+### Using Maintenance Tasks in API-only applications
+
+The Maintenance Tasks engine uses Rails sessions for flash messages and storing
+the CSRF token. For the engine to work in an API-only Rails application, you
+need to add a [session middleware][] and the `ActionDispatch::Flash`
+middleware. The engine also defines a strict [Content Security Policy][], make
+sure to include `ActionDispatch::ContentSecurityPolicy::Middleware` in your
+app's middleware stack to ensure the CSP is delivered to the user's browser.
+
+[session middleware]: https://guides.rubyonrails.org/api_app.html#using-session-middlewares
+[Content Security Policy]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
+
+Configuring Rails applications is beyond the scope of this documentation, but
+one way to do this is to add these lines to your application configuration:
+
+```ruby
+# config/application.rb
+module YourApplication
+  class Application < Rails::Application
+    # ...
+    config.api_only = true
+
+    config.middleware.insert_before ::Rack::Head, ::ActionDispatch::Flash
+    config.middleware.insert_before ::Rack::Head, ::ActionDispatch::ContentSecurityPolicy::Middleware
+    config.session_store :cookie_store, key: "_#{railtie_name.chomp("_application")}_session", secure: true
+    config.middleware.insert_before ::ActionDispatch::Flash, config.session_store, config.session_options
+    config.middleware.insert_before config.session_store, ActionDispatch::Cookies
+  end
+end
+```
+
+You can read more in the [Using Rails for API-only Applications][rails api] Rails
+guide.
+
+[rails api]: https://guides.rubyonrails.org/api_app.html
+
 ### How Maintenance Tasks runs a Task
 
 Maintenance tasks can be running for a long time, and the purpose of the gem is
@@ -1145,7 +1188,7 @@ The value for `MaintenanceTasks.stuck_task_duration` must be an
 `ActiveSupport::Duration`. If no value is specified, it will default to 5
 minutes.
 
-### Metadata
+#### Metadata
 
 `MaintenanceTasks.metadata` can be configured to specify a proc from which to
 get extra information about the run. Since this proc will be ran in the context
