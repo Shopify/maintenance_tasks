@@ -68,6 +68,13 @@ module MaintenanceTasks
       with_attached_csv_file if ActiveStorage::Attachment.table_exists?
     end
 
+    scope :last_completed_per_task, -> do
+      subquery = completed
+                   .select('task_name, MAX(ended_at) AS latest_ended_at')
+                   .group(:task_name)
+      joins("INNER JOIN (#{subquery.to_sql}) latest_runs ON latest_runs.task_name = maintenance_tasks_runs.task_name AND latest_runs.latest_ended_at = maintenance_tasks_runs.ended_at")
+    end
+
     validates_with RunStatusValidator, on: :update
 
     if MaintenanceTasks.active_storage_service.present?
