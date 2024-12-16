@@ -33,6 +33,7 @@ module MaintenanceTasks
     def build_enumerator(_run, cursor:)
       cursor ||= @run.cursor
       self.cursor_position = cursor
+      enumerator_builder = self.enumerator_builder
       @collection_enum = @task.enumerator_builder(cursor: cursor)
 
       @collection_enum ||= case (collection = @task.collection)
@@ -75,6 +76,9 @@ module MaintenanceTasks
         MSG
       end
 
+      unless @collection_enum.is_a?(JobIteration.enumerator_builder::Wrapper)
+        @collection_enum = enumerator_builder.wrap(enumerator_builder, @collection_enum)
+      end
       throttle_enumerator(@collection_enum)
     end
 
