@@ -40,8 +40,6 @@ elsif ActiveSupport::TestCase.respond_to?(:fixture_path=)
   ActiveSupport::TestCase.fixtures(:all)
 end
 
-JobIteration::Deprecation.behavior = :silence
-
 module Warning
   class << self
     def warn(message)
