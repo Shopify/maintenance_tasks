@@ -31,6 +31,12 @@ module MaintenanceTasks
       assert_no_enqueued_jobs
     end
 
+    test ".perform sets the run_id on the task instance" do
+      TaskJob.perform_now(@run)
+
+      assert_equal @run.id, @run.task.run_id
+    end
+
     test ".perform doesn't run a cancelled job" do
       freeze_time
       TaskJob.perform_later(@run)
