@@ -163,7 +163,7 @@ module MaintenanceTasks
 
       assert_equal "ArgumentError", run.error_class
       assert_equal "Something went wrong", run.error_message
-      expected_backtrace = "app/tasks/maintenance/error_task.rb:10:in `process'"
+      expected_backtrace = %r{app/tasks/maintenance/error_task\.rb:10:in ('Maintenance::ErrorTask#|`)process'}
       assert_match expected_backtrace, run.backtrace.first
       assert_equal Time.now, run.ended_at
       assert_equal "1", run.cursor
@@ -511,7 +511,7 @@ module MaintenanceTasks
 
       # Simulate cancel happening after we've already checked @run.cancelling?
       @run.expects(:cancelling?).at_least(2).with do
-        next true if caller.any?(/`instrument_status_change'\z/) # avoid endless loop
+        next true if caller.any?(/\binstrument_status_change'\z/) # avoid endless loop
 
         Run.find(@run.id).cancel
       end.returns(false).then.returns(true)
@@ -526,7 +526,7 @@ module MaintenanceTasks
 
       # Simulate pause happening after we've already checked @run.pausing?
       @run.expects(:pausing?).at_least(2).with do
-        next true if caller.any?(/`instrument_status_change'\z/) # avoid endless loop
+        next true if caller.any?(/\binstrument_status_change'\z/) # avoid endless loop
 
         Run.find(@run.id).pausing!
       end.returns(false).then.returns(true)

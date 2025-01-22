@@ -4,3 +4,6 @@
 @sqlite3_requirement = "~> 1.4"
 
 eval_gemfile "../Gemfile"
+gem "bigdecimal"
+gem "drb"
+gem "mutex_m"
