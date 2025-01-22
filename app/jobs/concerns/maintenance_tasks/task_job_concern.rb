@@ -112,7 +112,7 @@ module MaintenanceTasks
       end
     rescue => error
       @errored_element = input
-      raise error
+      raise error unless @task.rescue_with_handler(error)
     end
 
     def before_perform
