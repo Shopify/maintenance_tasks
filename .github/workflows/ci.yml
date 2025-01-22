@@ -24,11 +24,11 @@ jobs:
         - gemfiles/rails_7_2.gemfile
         - Gemfile # current minor release
         - gemfiles/rails_main.gemfile
-        ruby: ["3.1", "3.2", "3.3"]
+        ruby: ["3.1", "3.2", "3.3", "3.4"]
         database: [sqlite]
         include:
         - gemfile: "gemfiles/postgresql.gemfile"
-          ruby: 3.3
+          ruby: 3.4
           database: postgres
         exclude:
         - gemfile: Gemfile
