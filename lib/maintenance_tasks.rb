@@ -61,16 +61,6 @@ module MaintenanceTasks
   #     use when cleaning a Run's backtrace.
   mattr_accessor :backtrace_cleaner
 
-  # @!attribute error_handler
-  #   @scope class
-  #
-  #   The callback to perform when an error occurs in the Task.  See the
-  #   {file:README#label-Customizing+the+error+handler} for details.
-  #
-  #   @return [Proc] the callback to perform when an error occurs in the Task.
-  mattr_accessor :error_handler, default:
-    ->(_error, _task_context, _errored_element) {}
-
   # @!attribute parent_controller
   #   @scope class
   #
@@ -94,4 +84,30 @@ module MaintenanceTasks
   #
   #  @return [ActiveSupport::Duration] the threshold in seconds after which a task is considered stuck.
   mattr_accessor :stuck_task_duration, default: 5.minutes
+
+  class << self
+    DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
+      "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe" \
+      "to the error reporter instead."
+    private_constant :DEPRECATION_MESSAGE
+
+    # @deprecated
+    def error_handler
+      deprecator.warn(DEPRECATION_MESSAGE)
+
+      @error_handler
+    end
+
+    # @deprecated
+    def error_handler=(proc)
+      deprecator.warn(DEPRECATION_MESSAGE)
+
+      @error_handler = proc
+    end
+
+    # @api-private
+    def deprecator
+      @deprecator ||= ActiveSupport::Deprecation.new("3.0", "MaintenanceTasks")
+    end
+  end
 end

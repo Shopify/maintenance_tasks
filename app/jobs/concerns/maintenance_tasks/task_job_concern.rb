@@ -181,11 +181,20 @@ module MaintenanceTasks
           task_name: @run.task_name,
           started_at: @run.started_at,
           ended_at: @run.ended_at,
+          run_id: @run.id,
+          tick_count: @run.tick_count,
         }
       end
-      errored_element = @errored_element if defined?(@errored_element)
+      task_context[:errored_element] = @errored_element if defined?(@errored_element)
     ensure
-      MaintenanceTasks.error_handler.call(error, task_context, errored_element)
+      if MaintenanceTasks.instance_variable_get(:@error_handler)
+        errored_element = task_context.delete(:errored_element)
+        MaintenanceTasks.error_handler.call(error, task_context.except(:run_id, :tick_count), errored_element)
+      elsif Rails.gem_version >= Gem::Version.new("7.1")
+        Rails.error.report(error, context: task_context, source: "maintenance-tasks")
+      else
+        Rails.error.report(error, handled: true, context: task_context)
+      end
     end
   end
 end

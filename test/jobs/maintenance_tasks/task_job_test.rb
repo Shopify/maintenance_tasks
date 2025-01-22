@@ -344,7 +344,9 @@ module MaintenanceTasks
       end
     end
 
-    test ".perform_now calls the error handler when there was an Error" do
+    test ".perform_now calls the error handler if one is set" do
+      @old_behavior = MaintenanceTasks.deprecator.behavior
+      MaintenanceTasks.deprecator.behavior = :silence
       error_handler_before = MaintenanceTasks.error_handler
       handled_error = nil
       handled_task_context = nil
@@ -365,9 +367,12 @@ module MaintenanceTasks
       assert_equal(3, handled_errored_element)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
+      MaintenanceTasks.deprecator.behavior = @old_behavior
     end
 
     test ".perform_now still persists the error properly if the error handler raises" do
+      @old_behavior = MaintenanceTasks.deprecator.behavior
+      MaintenanceTasks.deprecator.behavior = :silence
       error_handler_before = MaintenanceTasks.error_handler
       MaintenanceTasks.error_handler = ->(error, _task_context, _errored_el) do
         raise error
@@ -381,27 +386,33 @@ module MaintenanceTasks
       assert_equal(2, run.tick_count)
     ensure
       MaintenanceTasks.error_handler = error_handler_before
+      MaintenanceTasks.deprecator.behavior = @old_behavior
     end
 
-    test ".perform_now handles case where run is not set and calls error handler" do
-      error_handler_before = MaintenanceTasks.error_handler
-      handled_error = nil
-      handled_task_context = nil
-      MaintenanceTasks.error_handler = ->(error, task_context, _errored_el) do
-        handled_error = error
-        handled_task_context = task_context
-      end
+    test ".perform_now reports errors raised by the task" do
+      run = Run.create!(task_name: "Maintenance::ErrorTask")
 
+      report = assert_error_reported(ArgumentError) do
+        TaskJob.perform_now(run)
+      end
+      run.reload
+
+      assert_predicate run, :errored?
+      assert_equal 2, run.tick_count
+      assert_equal "Maintenance::ErrorTask", report.dig(:context, :task_name)
+      assert_equal run.id, report.dig(:context, :run_id)
+      assert_equal 0, report.dig(:context, :tick_count)
+    end
+
+    test ".perform_now handles case where run is not set and reports error" do
+      TaskError = Class.new(StandardError)
       RaisingTaskJob = Class.new(TaskJob) do
-        before_perform(prepend: true) { raise "Uh oh!" }
+        before_perform(prepend: true) { raise TaskError }
       end
 
-      RaisingTaskJob.perform_now(@run)
-
-      assert_equal("Uh oh!", handled_error.message)
-      assert_empty(handled_task_context)
-    ensure
-      MaintenanceTasks.error_handler = error_handler_before
+      assert_error_reported(TaskError) do
+        RaisingTaskJob.perform_now(@run)
+      end
     end
 
     test ".perform_now throttles when running Task that uses throttle_on" do
@@ -706,6 +717,37 @@ module MaintenanceTasks
       end
 
       TaskJob.perform_now(run)
+    end
+
+    private
+
+    if Rails.gem_version < Gem::Version.new("7.1.0")
+      def assert_error_reported(error = nil, &block)
+        reporter = Class.new do
+          def reports
+            @reports ||= []
+          end
+
+          def report(exception, context: {}, **_)
+            reports << { exception:, context: }
+          end
+        end.new
+
+        Rails.error.subscribe(reporter)
+
+        yield
+
+        if error
+          report = reporter.reports.detect { |report| report[:exception].is_a?(error) }
+          assert(report, "No #{error} reported!")
+          report
+        else
+          assert_not_empty(reporter.reports, "No errors reported!")
+          reporter.reports.first
+        end
+      ensure
+        Rails.error.instance_variable_get(:@subscribers).delete(reporter)
+      end
     end
   end
 end
