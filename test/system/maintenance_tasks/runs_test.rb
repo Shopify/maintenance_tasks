@@ -211,7 +211,7 @@ module MaintenanceTasks
       assert_text "Ran for less than 5 seconds until an error happened less than a minute ago."
       assert_text "ArgumentError"
       assert_text "Something went wrong"
-      assert_text "app/tasks/maintenance/error_task.rb:10:in `process'"
+      assert_text %r{app/tasks/maintenance/error_task\.rb:10:in ('Maintenance::ErrorTask#|`)process'}
 
       click_on "Resume"
 
