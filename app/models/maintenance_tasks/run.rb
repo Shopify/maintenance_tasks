@@ -33,11 +33,7 @@ module MaintenanceTasks
     ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
 
-    if Rails.gem_version >= Gem::Version.new("7.0.alpha")
-      enum :status, STATUSES.to_h { |status| [status, status.to_s] }
-    else
-      enum status: STATUSES.to_h { |status| [status, status.to_s] }
-    end
+    enum :status, STATUSES.to_h { |status| [status, status.to_s] }
 
     after_save :instrument_status_change
 

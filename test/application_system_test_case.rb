@@ -11,14 +11,7 @@ ActionDispatch::SystemTesting::Server.silence_puma = true
 # warning in Ruby 2.7.
 Capybara::Selenium::Driver.load_selenium
 
-if Rails::VERSION::MAJOR < 7
-  Selenium::WebDriver.logger.ignore(:browser_options)
-  if Rails::VERSION::MINOR < 1
-    require "action_dispatch/system_testing/browser"
-    # prevent Rails from adding --headless at the end of the arguments, overriding --headless=new
-    ActionDispatch::SystemTesting::Browser.redefine_method(:options) { capabilities }
-  end
-elsif Rails.gem_version < Gem::Version.new("7.1")
+if Rails.gem_version < Gem::Version.new("7.1")
   Selenium::WebDriver.logger.ignore(:capabilities)
 end
 

@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.bindir = "exe"
   spec.executables = ["maintenance_tasks"]
 
-  minimum_rails_version = "6.1"
+  minimum_rails_version = "7.0"
   spec.add_dependency("actionpack", ">= #{minimum_rails_version}")
   spec.add_dependency("activejob", ">= #{minimum_rails_version}")
   spec.add_dependency("activerecord", ">= #{minimum_rails_version}")
