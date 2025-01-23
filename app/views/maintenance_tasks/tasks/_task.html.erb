@@ -6,7 +6,7 @@
 
   <% if (run = task.related_run) %>
     <h5 class="title is-5">
-      <%= time_tag run.created_at, title: run.created_at %>
+      <%= time_tag run.created_at, title: run.created_at.utc %>
     </h5>
 
     <%= progress run %>
