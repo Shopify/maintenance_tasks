@@ -10,7 +10,7 @@ class DocumentationTest < ActiveSupport::TestCase
 
   test "documentation is correctly written" do
     output = %x(bundle exec yard --no-save --no-output --no-stats)
-    warnings = output.scan(/\[warn\]: .*\n\n/m).reject { |warning| warning_ignored?(warning) }
+    warnings = output.lines.slice_before(/^\[warn\]:/).map(&:join).reject { |warning| warning_ignored?(warning) }
     assert_empty warnings
   end
 
