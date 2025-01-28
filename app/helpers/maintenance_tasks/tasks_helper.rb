@@ -101,7 +101,7 @@ module MaintenanceTasks
       )
     end
 
-    # Resolves values covered by the inclusion validator for a task attribute.
+    # Resolves values covered by the inclusion validator for a Task attribute.
     # Supported option types:
     # - Arrays
     # - Procs and lambdas that optionally accept the Task instance, and return an Array.
@@ -112,7 +112,7 @@ module MaintenanceTasks
     #
     # Returned values are used to populate a dropdown list of options.
     #
-    # @param task_class [Class<Task>] The task class for which the value needs to be resolved.
+    # @param task [Task] The Task for which the value needs to be resolved.
     # @param parameter_name [String] The parameter name.
     #
     # @return [Array] value of the resolved inclusion option.
