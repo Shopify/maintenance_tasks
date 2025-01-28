@@ -8,6 +8,7 @@ module MaintenanceTasks
     include ActiveModel::Attributes
     include ActiveModel::AttributeAssignment
     include ActiveModel::Validations
+    include ActiveSupport::Rescuable
 
     class NotFoundError < NameError; end
 
@@ -198,6 +199,20 @@ module MaintenanceTasks
       #   (see https://api.rubyonrails.org/classes/ActiveSupport/Callbacks/ClassMethods.html#method-i-set_callback)
       def after_error(*filter_list, &block)
         set_callback(:error, :after, *filter_list, &block)
+      end
+
+      # Rescue listed exceptions during an iteration and report them to the error reporter, then
+      # continue iteration.
+      #
+      # @param exceptions list of exceptions to rescue and report
+      def report_on(*exceptions)
+        rescue_from(*exceptions) do |exception|
+          if Rails.gem_version >= Gem::Version.new("7.1")
+            Rails.error.report(exception, source: "maintenance_tasks")
+          else
+            Rails.error.report(exception, handled: true)
+          end
+        end
       end
 
       private

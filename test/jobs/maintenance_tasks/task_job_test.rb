@@ -719,6 +719,23 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
     end
 
+    test ".report_on reports the error" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      Maintenance::UpdatePostsTask.report_on(ActiveRecord::RecordInvalid)
+
+      Maintenance::UpdatePostsTask.any_instance.expects(:process).raises(ActiveRecord::RecordInvalid).twice
+
+      assert_error_reported(ActiveRecord::RecordInvalid) do
+        assert_nothing_raised do
+          TaskJob.perform_now(run)
+        end
+      end
+
+      assert_predicate(run.reload, :succeeded?)
+      assert_equal(run.tick_count, 2)
+    end
+
     private
 
     if Rails.gem_version < Gem::Version.new("7.1.0")

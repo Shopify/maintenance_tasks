@@ -1017,6 +1017,30 @@ Note that `context` may be empty if the Task produced an error before any
 context could be gathered (for example, if deserializing the job to process
 your Task failed).
 
+#### Reporting errors during iteration
+
+By default, errors raised during task iteration will be raised to the application
+and iteration will stop. However, you may want to handle some errors and continue
+iteration. `MaintenanceTasks::Task.report_on` can be used to rescue certain
+exceptions and report them to the Rails error reporter.
+
+```ruby
+class MyTask < MaintenanceTasks::Task
+  report_on(MyException)
+end
+```
+
+`MaintenanceTasks::Task` also includes `ActiveSupport::Rescuable` which you can use
+to implement custom error handling.
+
+```ruby
+class MyTask < MaintenanceTasks::Task
+  rescue_from(MyException) do |exception|
+    handle(exception)
+  end
+end
+```
+
 #### Customizing the maintenance tasks module
 
 `MaintenanceTasks.tasks_module` can be configured to define the module in which
