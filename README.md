@@ -74,9 +74,9 @@ The generator creates and runs a migration to add the necessary table to your
 database. It also mounts Maintenance Tasks in your `config/routes.rb`. By
 default the web UI can be accessed in the new `/maintenance_tasks` path.
 
-In case you use an exception reporting service (e.g. Bugsnag) you might want to
-define an error handler. See [Customizing the error
-handler](#customizing-the-error-handler) for more information.
+This gem uses the [Rails Error Reporter](https://guides.rubyonrails.org/error_reporting.html) to report errors. If you are using a bug
+tracking service you may want to subscribe to the reporter. See [Reporting Errors](#reporting-errors)
+for more information.
 
 ### Active Job Dependency
 
@@ -988,44 +988,34 @@ If you are stuck in `pausing` and wish to preserve your tasks's position
 There are a few configurable options for the gem. Custom configurations should
 be placed in a `maintenance_tasks.rb` initializer.
 
-#### Customizing the error handler
+#### Reporting errors
 
 Exceptions raised while a Task is performing are rescued and information about
 the error is persisted and visible in the UI.
 
-If you want to integrate with an exception monitoring service (e.g. Bugsnag),
-you can define an error handler:
+Errors are also sent to the `Rails.error.reporter`, which can be configured by your
+application. See the [Error Reporting in Rails Applications](https://guides.rubyonrails.org/error_reporting.html) guide for more details.
 
-```ruby
-# config/initializers/maintenance_tasks.rb
-
-MaintenanceTasks.error_handler = ->(error, task_context, _errored_element) do
-  Bugsnag.notify(error) do |notification|
-    notification.add_metadata(:task, task_context)
-  end
-end
-```
-
-The error handler should be a lambda that accepts three arguments:
+Reports to the error reporter will contain the following data:
 
 * `error`: The exception that was raised.
-* `task_context`: A hash with additional information about the Task and the
+* `context`: A hash with additional information about the Task and the
   error:
   * `task_name`: The name of the Task that errored
   * `started_at`: The time the Task started
   * `ended_at`: The time the Task errored
+  * `run_id`: The id of the errored Task run
+  * `tick_count`: The tick count at the time of the error
+  * `errored_element`: The element, if any, that was being processed when the Task
+    raised an exception. If you would like to pass this object to your exception
+    monitoring service, make sure you **sanitize the object** to avoid leaking
+    sensitive data and **convert it to a format** that is compatible with your bug
+    tracker.
+* `source`: This will be `maintenance_tasks`
 
-  Note that `task_context` may be empty if the Task produced an error before any
-  context could be gathered (for example, if deserializing the job to process
-  your Task failed).
-* `errored_element`: The element, if any, that was being processed when the Task
-  raised an exception. If you would like to pass this object to your exception
-  monitoring service, make sure you **sanitize the object** to avoid leaking
-  sensitive data and **convert it to a format** that is compatible with your bug
-  tracker. For example, Bugsnag only sends the id and class name of Active
-  Record objects in order to protect sensitive data. CSV rows, on the other
-  hand, are converted to strings and passed raw to Bugsnag, so make sure to
-  filter any personal data from these objects before adding them to a report.
+Note that `context` may be empty if the Task produced an error before any
+context could be gathered (for example, if deserializing the job to process
+your Task failed).
 
 #### Customizing the maintenance tasks module
 
