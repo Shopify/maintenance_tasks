@@ -944,7 +944,7 @@ infrastructure or code changes.
 This means a Task can safely be interrupted, re-enqueued and resumed without any
 intervention at the end of an iteration, after the `process` method returns.
 
-By default, a running Task will be interrupted after running for more 5 minutes.
+By default, a running Task will be interrupted after running for more than 5 minutes.
 This is [configured in the `job-iteration` gem][max-job-runtime] and can be
 tweaked in an initializer if necessary.
 
