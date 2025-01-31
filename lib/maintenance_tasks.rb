@@ -87,7 +87,7 @@ module MaintenanceTasks
 
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
-      "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe" \
+      "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \
       "to the error reporter instead."
     private_constant :DEPRECATION_MESSAGE
 
