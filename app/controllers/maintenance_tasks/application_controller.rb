@@ -11,11 +11,11 @@ module MaintenanceTasks
       policy.style_src(
         BULMA_CDN,
         # ruby syntax highlighting
-        "'sha256-y9V0na/WU44EUNI/HDP7kZ7mfEci4PAOIjYOOan6JMA='",
+        "'sha256-z0htrLRVYM0doCiOj4SBCY7k1tegPO2ixHnnN1u+WDY='",
       )
       policy.script_src(
         # page refresh script
-        "'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='",
+        "'sha256-ph0JAHGbHsnr8ZQBxstb/uf/D132k0DOqDll3fVPeKA='",
       )
       policy.frame_ancestors(:self)
     end

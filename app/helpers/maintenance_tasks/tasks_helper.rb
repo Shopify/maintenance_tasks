@@ -47,7 +47,7 @@ module MaintenanceTasks
       progress_bar = tag.progress(
         value: progress.value,
         max: progress.max,
-        class: ["progress"] + STATUS_COLOURS.fetch(run.status),
+        class: ["progress", "mt-4"] + STATUS_COLOURS.fetch(run.status),
       )
       progress_text = tag.p(tag.i(progress.text))
       tag.div(progress_bar + progress_text, class: "block")
@@ -60,7 +60,7 @@ module MaintenanceTasks
     # @return [String] the span element containing the status, with the
     #   appropriate tag class attached.
     def status_tag(status)
-      tag.span(status.capitalize, class: ["tag"] + STATUS_COLOURS.fetch(status))
+      tag.span(status.capitalize, class: ["tag", "is-light", "pr-2", "mr-4"] + STATUS_COLOURS.fetch(status))
     end
 
     # Reports the approximate elapsed time a Run has been processed so far based
@@ -155,9 +155,6 @@ module MaintenanceTasks
         {
           prompt: "Select a value",
         },
-        {
-          class: "select",
-        },
       ) if inclusion_values
 
       case form_builder.object.class.attribute_types[parameter_name]
@@ -172,10 +169,16 @@ module MaintenanceTasks
       when ActiveModel::Type::Time
         form_builder.time_field(parameter_name, class: "input")
       when ActiveModel::Type::Boolean
-        form_builder.check_box(parameter_name, class: "input")
+        form_builder.check_box(parameter_name, class: "checkbox")
       else
         form_builder.text_area(parameter_name, class: "textarea")
       end
+    end
+
+    # Return whether the parameter should be rendered as a dropdown list.
+    def select?(form_builder, parameter_name)
+      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
+      inclusion_values.is_a?(Array)
     end
 
     # Return helper text for the datetime-local form field.
