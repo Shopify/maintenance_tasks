@@ -177,8 +177,7 @@ module MaintenanceTasks
 
     # Return whether the parameter should be rendered as a dropdown list.
     def select?(form_builder, parameter_name)
-      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
-      inclusion_values.is_a?(Array)
+      resolve_inclusion_value(form_builder.object, parameter_name).is_a?(Array)
     end
 
     # Return helper text for the datetime-local form field.
