@@ -18,5 +18,12 @@ module MaintenanceTasks
         time_ago_in_words(datetime) + " ago"
       end
     end
+
+    def attribute_required?(task_data_show, attribute_name)
+      model_class =  task_data_show.name.constantize
+      model_class.validators_on(attribute_name).any? do |validator|
+        validator.is_a?(ActiveModel::Validations::PresenceValidator)
+      end
+    end
   end
 end

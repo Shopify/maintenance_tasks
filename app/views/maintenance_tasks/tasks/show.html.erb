@@ -18,7 +18,8 @@
         <%= fields_for :task, @task.new do |ff| %>
           <% parameter_names.each do |parameter_name| %>
             <div class="cell">
-              <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
+			  <% required_class = attribute_required?(@task, parameter_name) ? 'is-required' : '' %>
+              <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace  #{required_class}" %>
 				<div class="<%= select?(ff, parameter_name) ? "select" : "control" %>">
 					<%= parameter_field(ff, parameter_name) %>
 				</div>
