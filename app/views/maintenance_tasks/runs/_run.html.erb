@@ -1,8 +1,4 @@
-<% if run_counter == 0 %>
-	<details class="box" open>
-<% else %>
-	<details class="box">
-<% end %>
+<%= tag.details(class: "box", open: run_counter == 0 ? true : false) do %>
 	<summary class="is-flex is-justify-content-space-between is-align-items-center">
 		<div class="is-flex is-align-items-center">
 			<h5 class="title is-5 has-text-weight-medium pl-5 pr-5 mb-0">
@@ -52,4 +48,4 @@
       <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
     <% end%>
   </div>
-</details>
+<% end %>
