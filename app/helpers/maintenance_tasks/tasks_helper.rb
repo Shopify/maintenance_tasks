@@ -147,8 +147,7 @@ module MaintenanceTasks
 
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
-    def parameter_field(form_builder, parameter_name)
-      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
+    def parameter_field(form_builder, parameter_name, inclusion_values)
       return form_builder.select(
         parameter_name,
         inclusion_values,
@@ -173,11 +172,6 @@ module MaintenanceTasks
       else
         form_builder.text_area(parameter_name, class: "textarea")
       end
-    end
-
-    # Return whether the parameter should be rendered as a dropdown list.
-    def select?(form_builder, parameter_name)
-      resolve_inclusion_value(form_builder.object, parameter_name).is_a?(Array)
     end
 
     # Return helper text for the datetime-local form field.
