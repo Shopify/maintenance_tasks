@@ -510,7 +510,7 @@ For enumerables that don't match the supported types, a text field will be
 rendered instead.
 
 ### Masking Task Parameters
-Task parameters can be masked in the UI by adding `mask_attribute` class method in the
+Task attributes can be masked in the UI by adding `mask_attribute` class method in the
 task class.
 This will replace the value in the arguments list with `[FILTERED]` in the UI.
 
@@ -518,7 +518,7 @@ This will replace the value in the arguments list with `[FILTERED]` in the UI.
 # app/tasks/maintenance/sensitive_params_task.rb
 
 module Maintenance
-  class UpdatePostsViaParamsTask < MaintenanceTasks::Task
+  class SensitiveParamsTask < MaintenanceTasks::Task
     attribute :sensitive_content, :string
     
     mask_attribute :sensitive_content
