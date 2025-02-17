@@ -509,6 +509,31 @@ following types are supported:
 For enumerables that don't match the supported types, a text field will be
 rendered instead.
 
+### Masking Task Parameters
+Task parameters can be masked in the UI by adding `mask_attribute` class method in the
+task class.
+This will replace the value in the arguments list with `[FILTERED]` in the UI.
+
+```ruby
+# app/tasks/maintenance/sensitive_params_task.rb
+
+module Maintenance
+  class UpdatePostsViaParamsTask < MaintenanceTasks::Task
+    attribute :sensitive_content, :string
+    
+    mask_attribute :sensitive_content
+  end
+end
+```
+
+If you have any filtered parameters in the global rails parameter filter, they will be
+automatically taken into account when masking the parameters, which means that you can mask parameters
+across all tasks by adding them to the global rails parameters filter.
+
+```ruby
+Rails.application.config.filter_parameters += %i[token]
+```
+
 ### Custom cursor columns to improve performance
 
 The [job-iteration gem][job-iteration], on which this gem depends, adds an

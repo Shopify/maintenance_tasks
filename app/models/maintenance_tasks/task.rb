@@ -28,6 +28,11 @@ module MaintenanceTasks
     # @api private
     class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
+    # the sensitive attributes that will be filtered when fetching a run.
+    #
+    # @api private
+    class_attribute :masked_arguments, default: []
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     class << self
@@ -151,6 +156,13 @@ module MaintenanceTasks
       # @param size [Integer] the number of records to fetch in a single query.
       def collection_batch_size(size)
         self.active_record_enumerator_batch_size = size
+      end
+
+      # Adds attribute names to sensitive arguments list.
+      #
+      # @param attributes [Array<Symbol>] the attribute names to filter.
+      def mask_attribute(*attributes)
+        self.masked_arguments += attributes
       end
 
       # Initialize a callback to run after the task starts.

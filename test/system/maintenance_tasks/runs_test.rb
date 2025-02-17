@@ -94,6 +94,28 @@ module MaintenanceTasks
       assert has_field?("task[post_ids]", with: "42")
     end
 
+    test "run a Task that accepts masked parameters" do
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ParamsTask")
+      post_id = Post.first.id
+      fill_in("task[post_ids]", with: post_id.to_s)
+
+      click_on "Run"
+      fill_in("task[post_ids]", with: "42")
+      perform_enqueued_jobs
+
+      assert_title "Maintenance::ParamsTask"
+      assert_text "Succeeded", wait: 3 # refreshes every 3 seconds
+      assert_text "Processed 1 out of 1 item (100%)."
+      assert_text "Arguments"
+      assert_table do |table|
+        table.assert_text("sensitive_content")
+        table.assert_text("[FILTERED]")
+      end
+      assert has_field?("task[sensitive_content]", with: "default sensitive content")
+    end
+
     test "errors for Task with invalid arguments shown" do
       visit maintenance_tasks_path
 

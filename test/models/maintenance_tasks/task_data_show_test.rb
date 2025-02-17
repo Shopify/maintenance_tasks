@@ -110,6 +110,7 @@ module MaintenanceTasks
         [
           "post_ids",
           "content",
+          "sensitive_content",
           "integer_attr",
           "big_integer_attr",
           "float_attr",
