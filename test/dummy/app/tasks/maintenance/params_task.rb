@@ -17,6 +17,7 @@ module Maintenance
       format: { with: /\A(\s?\d+(,\s?\d+\s?)*)\z/, allow_blank: true }
 
     attribute :content, :string, default: "default content"
+    attribute :sensitive_content, :string, default: "default sensitive content"
     attribute :integer_attr, :integer, default: 111_222_333
     attribute :big_integer_attr, :big_integer, default: 111_222_333
     attribute :float_attr, :float, default: 12.34
@@ -33,6 +34,8 @@ module Maintenance
     attribute :integer_dropdown_attr_from_method, :integer
     attribute :integer_dropdown_attr_callable, :integer
     attribute :boolean_dropdown_attr, :boolean
+
+    mask_attribute :sensitive_content
 
     validates_inclusion_of :integer_dropdown_attr, in: [100, 200, 300], allow_nil: true
     validates_inclusion_of :integer_dropdown_attr_proc_no_arg, in: proc { [100, 200, 300] }, allow_nil: true
