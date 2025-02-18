@@ -19,10 +19,10 @@
           <% parameter_names.each do |parameter_name| %>
             <div class="cell">
               <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
-			  <% inclusion_values = resolve_inclusion_value(ff.object, parameter_name) %>
-				<div class="<%= inclusion_values.is_a?(Array) ? "select" : "control" %>">
-					<%= parameter_field(ff, parameter_name, inclusion_values) %>
-				</div>
+              <% inclusion_values = resolve_inclusion_value(ff.object, parameter_name) %>
+              <div class="<%= inclusion_values.is_a?(Array) ? "select" : "control" %>">
+                <%= parameter_field(ff, parameter_name, inclusion_values) %>
+              </div>
             </div>
           <% end %>
         <% end %>
@@ -39,7 +39,7 @@
 
 <details class="box">
   <summary class="is-size-5 is-flex is-align-items-center">
-	<h5 class="pl-5">Source code</h5>
+    <h5 class="pl-5">Source code</h5>
   </summary>
   <pre><code><%= highlight_code(code) %></code></pre>
 </details>
