@@ -28,7 +28,7 @@ module MaintenanceTasks
     # @api private
     class_attribute :collection_builder_strategy, default: NullCollectionBuilder.new
 
-    # the sensitive attributes that will be filtered when fetching a run.
+    # The sensitive attributes that will be filtered when fetching a run.
     #
     # @api private
     class_attribute :masked_arguments, default: []

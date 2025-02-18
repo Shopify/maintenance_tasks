@@ -526,7 +526,7 @@ module Maintenance
 end
 ```
 
-If you have any filtered parameters in the global rails parameter filter, they will be
+If you have any filtered parameters in the global [rails parameter filter](https://guides.rubyonrails.org/configuring.html#config-filter-parameters), they will be
 automatically taken into account when masking the parameters, which means that you can mask parameters
 across all tasks by adding them to the global rails parameters filter.
 
