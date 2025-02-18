@@ -428,6 +428,15 @@ module MaintenanceTasks
       end
     end
 
+    # Returns all the run arguments with sensitive information masked.
+    #
+    # @return [Hash] The masked arguments.
+    def masked_arguments
+      return unless arguments.present?
+
+      argument_filter.filter(arguments)
+    end
+
     private
 
     def instrument_status_change
@@ -481,6 +490,12 @@ module MaintenanceTasks
       return value unless limit
 
       value&.first(limit)
+    end
+
+    def argument_filter
+      @argument_filter ||= ActiveSupport::ParameterFilter.new(
+        Rails.application.config.filter_parameters + task.masked_arguments,
+      )
     end
   end
 end

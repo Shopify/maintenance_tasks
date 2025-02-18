@@ -182,18 +182,5 @@ module MaintenanceTasks
         class: "content is-small",
       )
     end
-
-    # Mask sensitive information from the arguments of a task.
-    #
-    # @param run [Run] the Run that contains the arguments to be masked.
-    def mask_arguments(run)
-      return unless run.arguments.present?
-
-      task = Task.named(run.task_name)
-
-      ActiveSupport::ParameterFilter.new(
-        Rails.application.config.filter_parameters + task.masked_arguments,
-      ).filter(run.arguments)
-    end
   end
 end
