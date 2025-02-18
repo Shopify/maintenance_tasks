@@ -1011,7 +1011,7 @@ Reports to the error reporter will contain the following data:
     monitoring service, make sure you **sanitize the object** to avoid leaking
     sensitive data and **convert it to a format** that is compatible with your bug
     tracker.
-* `source`: This will be `maintenance_tasks`
+* `source`: This will be `maintenance-tasks`
 
 Note that `context` may be empty if the Task produced an error before any
 context could be gathered (for example, if deserializing the job to process
