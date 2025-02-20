@@ -11,7 +11,7 @@ module MaintenanceTasks
       policy.style_src(
         BULMA_CDN,
         # ruby syntax highlighting
-        "'sha256-y9V0na/WU44EUNI/HDP7kZ7mfEci4PAOIjYOOan6JMA='",
+        "'sha256-QtP2qP+dJCeaFDLQCxROBput/LJ6cK0378xnhwpLjVE='",
       )
       policy.script_src(
         # page refresh script
