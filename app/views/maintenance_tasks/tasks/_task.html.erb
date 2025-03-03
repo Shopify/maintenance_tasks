@@ -1,11 +1,11 @@
-<div class="box">
-  <h3 class="title is-3">
+<div class="cell box">
+  <h3 class="title is-5 has-text-weight-medium">
     <%= link_to task, task_path(task) %>
     <%= status_tag(task.status) %>
   </h3>
 
   <% if (run = task.related_run) %>
-    <h5 class="title is-5">
+    <h5 class="title is-5 has-text-weight-medium">
       <%= time_tag run.created_at, title: run.created_at.utc %>
     </h5>
 
@@ -21,7 +21,7 @@
 
     <%= render "maintenance_tasks/runs/csv", run: run %>
     <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
-    <%= render "maintenance_tasks/runs/arguments", arguments: run.arguments %>
+    <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments %>
     <%= tag.hr if run.csv_file.present? || run.arguments.present? && run.metadata.present? %>
     <%= render "maintenance_tasks/runs/metadata", metadata: run.metadata %>
   <% end %>

@@ -47,7 +47,7 @@ module MaintenanceTasks
       progress_bar = tag.progress(
         value: progress.value,
         max: progress.max,
-        class: ["progress"] + STATUS_COLOURS.fetch(run.status),
+        class: ["progress", "mt-4"] + STATUS_COLOURS.fetch(run.status),
       )
       progress_text = tag.p(tag.i(progress.text))
       tag.div(progress_bar + progress_text, class: "block")
@@ -60,7 +60,10 @@ module MaintenanceTasks
     # @return [String] the span element containing the status, with the
     #   appropriate tag class attached.
     def status_tag(status)
-      tag.span(status.capitalize, class: ["tag"] + STATUS_COLOURS.fetch(status))
+      tag.span(
+        status.capitalize,
+        class: ["tag", "has-text-weight-medium", "pr-2", "mr-4"] + STATUS_COLOURS.fetch(status),
+      )
     end
 
     # Reports the approximate elapsed time a Run has been processed so far based
@@ -147,23 +150,28 @@ module MaintenanceTasks
 
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
-    def parameter_field(form_builder, parameter_name)
-      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
-      return form_builder.select(parameter_name, inclusion_values, prompt: "Select a value") if inclusion_values
+    def parameter_field(form_builder, parameter_name, inclusion_values)
+      return form_builder.select(
+        parameter_name,
+        inclusion_values,
+        {
+          prompt: "Select a value",
+        },
+      ) if inclusion_values
 
       case form_builder.object.class.attribute_types[parameter_name]
       when ActiveModel::Type::Integer
-        form_builder.number_field(parameter_name)
+        form_builder.number_field(parameter_name, class: "input")
       when ActiveModel::Type::Decimal, ActiveModel::Type::Float
-        form_builder.number_field(parameter_name, { step: "any" })
+        form_builder.number_field(parameter_name, { step: "any", class: "input" })
       when ActiveModel::Type::DateTime
-        form_builder.datetime_field(parameter_name) + datetime_field_help_text
+        form_builder.datetime_field(parameter_name, class: "input") + datetime_field_help_text
       when ActiveModel::Type::Date
-        form_builder.date_field(parameter_name)
+        form_builder.date_field(parameter_name, class: "input")
       when ActiveModel::Type::Time
-        form_builder.time_field(parameter_name)
+        form_builder.time_field(parameter_name, class: "input")
       when ActiveModel::Type::Boolean
-        form_builder.check_box(parameter_name)
+        form_builder.check_box(parameter_name, class: "checkbox")
       else
         form_builder.text_area(parameter_name, class: "textarea")
       end
