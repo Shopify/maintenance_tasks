@@ -2,7 +2,7 @@
   <h5 class="title is-5">
     <%= time_tag run.created_at, title: run.created_at.utc %>
     <%= status_tag run.status %>
-    <span class="is-pulled-right" title="Run ID">#<%= run.id %></span>
+    <a href="#run_<%= run.id %>" class="is-pulled-right" title="Run ID">#<%= run.id %></a>
   </h5>
 
   <%= progress run %>
