@@ -28,7 +28,7 @@ module MaintenanceTasks
       )
 
       expected = '<div class="block"><progress value="42" max="84" ' \
-        'class="progress is-primary is-light"></progress>' \
+        'class="progress mt-4 is-primary is-light"></progress>' \
         "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
@@ -44,13 +44,13 @@ module MaintenanceTasks
       )
 
       expected = '<div class="block"><progress max="84" ' \
-        'class="progress is-primary is-light"></progress>' \
+        'class="progress mt-4 is-primary is-light"></progress>' \
         "<p><i>Almost there!</i></p></div>"
       assert_equal expected, progress(@run)
     end
 
     test "#status_tag renders a span with the appropriate tag based on status" do
-      expected = '<span class="tag is-warning is-light">Pausing</span>'
+      expected = '<span class="tag has-text-weight-medium pr-2 mr-4 is-warning is-light">Pausing</span>'
       assert_equal expected, status_tag("pausing")
     end
 
@@ -152,7 +152,8 @@ module MaintenanceTasks
     def markup(attribute)
       render(inline: <<~TEMPLATE)
         <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
-          <%= parameter_field(form, '#{attribute}') %>
+          <% inclusion_values = resolve_inclusion_value(form.object, '#{attribute}') %>
+          <%= parameter_field(form, '#{attribute}', inclusion_values) %>
         <% end %>
       TEMPLATE
     end

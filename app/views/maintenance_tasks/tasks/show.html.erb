@@ -1,26 +1,27 @@
 <% content_for :page_title, @task %>
 
-<h1 class="title is-1">
+<h1 class="title is-3 has-text-weight-bold">
   <%= @task %>
 </h1>
 
-<div class="buttons">
+<div class="container">
   <%= form_with url: task_runs_path(@task), method: :post do |form| %>
     <% if @task.csv_task? %>
-      <div class="block">
-        <%= form.label :csv_file %>
+      <div class="container mb-4">
+        <%= form.label :csv_file, class: "label" %>
         <%= form.file_field :csv_file, accept: "text/csv" %>
       </div>
     <% end %>
     <% parameter_names = @task.parameter_names %>
     <% if parameter_names.any? %>
-      <div class="block">
+      <div class="grid is-col-min-15">
         <%= fields_for :task, @task.new do |ff| %>
           <% parameter_names.each do |parameter_name| %>
-            <div class="field">
+            <div class="cell">
               <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
-              <div class="control">
-                <%= parameter_field(ff, parameter_name) %>
+              <% inclusion_values = resolve_inclusion_value(ff.object, parameter_name) %>
+              <div class="<%= inclusion_values.is_a?(Array) ? "select" : "control" %>">
+                <%= parameter_field(ff, parameter_name, inclusion_values) %>
               </div>
             </div>
           <% end %>
@@ -29,13 +30,19 @@
     <% end %>
     <%= render "maintenance_tasks/tasks/custom", form: form %>
     <div class="block">
-      <%= form.submit 'Run', class: "button is-success", disabled: @task.deleted? %>
+      <%= form.submit 'Run', class: "button is-success is-rounded mb-4 has-text-white-ter", disabled: @task.deleted? %>
     </div>
   <% end %>
 </div>
 
 <% if (code = @task.code) %>
+
+<details class="box">
+  <summary class="is-size-5 is-flex is-align-items-center">
+    <h5 class="pl-5">Source code</h5>
+  </summary>
   <pre><code><%= highlight_code(code) %></code></pre>
+</details>
 <% end %>
 
 <%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
@@ -50,9 +57,9 @@
   <% if @task.runs_page.records.present? %>
     <hr/>
 
-    <h4 class="title is-4">Previous Runs</h4>
+    <h4 class="title is-5 has-text-weight-bold">Previous Runs</h4>
 
-    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
+    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records, as: :run %>
 
     <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
   <% end %>

@@ -9,15 +9,17 @@
     </div>
   <% else %>
     <% if active_tasks = @available_tasks[:active] %>
-      <h3 class="title is-3">Active Tasks</h3>
+      <h3 class="title is-4 has-text-weight-bold">Active Tasks</h3>
       <%= render partial: 'task', collection: active_tasks %>
     <% end %>
     <% if new_tasks = @available_tasks[:new] %>
-      <h3 class="title is-3">New Tasks</h3>
-      <%= render partial: 'task', collection: new_tasks %>
+      <h3 class="title is-4 has-text-weight-bold">New Tasks</h3>
+	  <div class="grid is-col-min-20">
+        <%= render partial: 'task', collection: new_tasks %>
+	  </div>
     <% end %>
     <% if completed_tasks = @available_tasks[:completed] %>
-      <h3 class="title is-3">Completed Tasks</h3>
+      <h3 class="title is-4 has-text-weight-bold">Completed Tasks</h3>
       <%= render partial: 'task', collection: completed_tasks %>
     <% end %>
   <% end %>
