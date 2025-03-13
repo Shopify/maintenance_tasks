@@ -3,4 +3,8 @@
 set -ex
 
 bundle install
+playwright_version=$(bundle exec ruby -r playwright -e 'puts Playwright::COMPATIBLE_PLAYWRIGHT_VERSION')
+npm install --global "playwright@$playwright_version"
+playwright install
+playwright install-deps
 bin/rails db:setup

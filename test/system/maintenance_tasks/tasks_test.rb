@@ -18,27 +18,27 @@ module MaintenanceTasks
 
       expected = [
         "Active Tasks",
-        "Maintenance::NoCollectionTask\nEnqueued",
-        "Maintenance::NoCollectionTask\nPaused",
-        "Maintenance::UpdatePostsTask\nPaused",
+        "Maintenance::NoCollectionTask Enqueued",
+        "Maintenance::NoCollectionTask Paused",
+        "Maintenance::UpdatePostsTask Paused",
         "New Tasks",
-        "Maintenance::BatchImportPostsTask\nNew",
-        "Maintenance::CallbackTestTask\nNew",
-        "Maintenance::CancelledEnqueueTask\nNew",
-        "Maintenance::CustomEnumeratingTask\nNew",
-        "Maintenance::EnqueueErrorTask\nNew",
-        "Maintenance::ErrorTask\nNew",
-        "Maintenance::ImportPostsWithEncodingTask\nNew",
-        "Maintenance::ImportPostsWithOptionsTask\nNew",
-        "Maintenance::Nested::NestedMore::NestedMoreTask\nNew",
-        "Maintenance::Nested::NestedTask\nNew",
-        "Maintenance::ParamsTask\nNew",
-        "Maintenance::TestTask\nNew",
-        "Maintenance::UpdatePostsInBatchesTask\nNew",
-        "Maintenance::UpdatePostsModulePrependedTask\nNew",
-        "Maintenance::UpdatePostsThrottledTask\nNew",
+        "Maintenance::BatchImportPostsTask New",
+        "Maintenance::CallbackTestTask New",
+        "Maintenance::CancelledEnqueueTask New",
+        "Maintenance::CustomEnumeratingTask New",
+        "Maintenance::EnqueueErrorTask New",
+        "Maintenance::ErrorTask New",
+        "Maintenance::ImportPostsWithEncodingTask New",
+        "Maintenance::ImportPostsWithOptionsTask New",
+        "Maintenance::Nested::NestedMore::NestedMoreTask New",
+        "Maintenance::Nested::NestedTask New",
+        "Maintenance::ParamsTask New",
+        "Maintenance::TestTask New",
+        "Maintenance::UpdatePostsInBatchesTask New",
+        "Maintenance::UpdatePostsModulePrependedTask New",
+        "Maintenance::UpdatePostsThrottledTask New",
         "Completed Tasks",
-        "Maintenance::ImportPostsTask\nSucceeded",
+        "Maintenance::ImportPostsTask Succeeded",
       ]
 
       assert_equal expected, page.all("h3").map(&:text)
@@ -66,8 +66,8 @@ module MaintenanceTasks
       assert_text "Paused"
 
       assert_equal ["Active Runs", "Previous Runs"], page.all("h4").map(&:text)
-      assert_text(/July 18, 2022 11:05\nPaused\n#\d/)
-      assert_text(/January 01, 2020 01:00\nSucceeded\n#\d/)
+      assert_text(/July 18, 2022 11:05 Paused\n#\d/)
+      assert_text(/January 01, 2020 01:00 Succeeded\n#\d/)
     end
 
     test "task with attributes renders default values on the form" do
@@ -200,7 +200,7 @@ module MaintenanceTasks
       boolean_field = page.find_field("task[boolean_attr]")
       assert_equal("input", boolean_field.tag_name)
       assert_equal("checkbox", boolean_field[:type])
-      assert_equal("true", boolean_field[:checked])
+      assert_equal(true, boolean_field[:checked])
 
       integer_dropdown_field = page.find_field("task[integer_dropdown_attr]")
       assert_equal("select", integer_dropdown_field.tag_name)

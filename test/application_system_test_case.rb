@@ -5,32 +5,29 @@ require "action_dispatch/system_testing/server"
 
 ActionDispatch::SystemTesting::Server.silence_puma = true
 
-# Necessary so that Capybara::Selenium::DeprecationSuppressor is prepended in
-# Selenium::WebDriver::Logger before it is instantiated in
-# Selenium::WebDriver.logger to prevent an uninitialized instance variable
-# warning in Ruby 2.7.
-Capybara::Selenium::Driver.load_selenium
+Capybara.save_path = Rails.root.join("tmp/downloads").to_s
 
-if Rails.gem_version < Gem::Version.new("7.1")
-  Selenium::WebDriver.logger.ignore(:capabilities)
+module PageLogs
+  def initialize(...)
+    super
+    on("console", ->(console_message) {
+      # FIXME: we can't raise or warn because we're in a thread, and the test runner hangs if the thread dies
+      puts "Console message: #{console_message.text}"
+    })
+  end
 end
+Playwright::Page.prepend(PageLogs)
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   include ActiveJob::TestHelper
 
-  driven_by :selenium, using: :headless_chrome do |options|
-    options.add_argument("--disable-dev-shm-usage")
-    options.add_argument("--headless=new")
-    options.add_argument("--disable-gpu")
-  end
+  driven_by :playwright # TODO: handle console messages
 
   setup do
     travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
-    page.driver.browser.download_path = "test/dummy/tmp/downloads"
   end
 
   teardown do
-    assert_empty page.driver.browser.logs.get(:browser)
-    FileUtils.rm_rf("test/dummy/tmp/downloads")
+    FileUtils.rm_rf(Capybara.save_path)
   end
 end

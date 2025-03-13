@@ -6,6 +6,7 @@ gemspec
 
 gem "better_html"
 gem "capybara"
+gem "capybara-playwright-driver"
 gem "debug"
 gem "mocha"
 gem "puma"
@@ -19,7 +20,6 @@ else
 end
 gem "rubocop"
 gem "rubocop-shopify"
-gem "selenium-webdriver"
 gem "sprockets-rails"
 if @sqlite3_requirement
   # causes Dependabot to ignore the next line and update the next gem "sqlite3"
