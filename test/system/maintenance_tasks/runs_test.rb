@@ -33,10 +33,8 @@ module MaintenanceTasks
         assert_text("Enqueued")
         assert_text("Waiting to start.")
         assert_text("Metadata")
-        assert_table do |table|
-          table.assert_text("user_email")
-          table.assert_text("michael.elfassy@shopify.com")
-        end
+        assert_text("user_email")
+        assert_text("michael.elfassy@shopify.com")
       end
       run = Run.last
       assert_equal("michael.elfassy@shopify.com", run.metadata["user_email"])
@@ -87,10 +85,8 @@ module MaintenanceTasks
       assert_text "Succeeded", wait: 3 # refreshes every 3 seconds
       assert_text "Processed 1 out of 1 item (100%)."
       assert_text "Arguments"
-      assert_table do |table|
-        table.assert_text("post_ids")
-        table.assert_text(post_id.to_s)
-      end
+      assert_text("post_ids")
+      assert_text(post_id.to_s)
       assert has_field?("task[post_ids]", with: "42")
     end
 
@@ -109,10 +105,8 @@ module MaintenanceTasks
       assert_text "Succeeded", wait: 3 # refreshes every 3 seconds
       assert_text "Processed 1 out of 1 item (100%)."
       assert_text "Arguments"
-      assert_table do |table|
-        table.assert_text("sensitive_content")
-        table.assert_text("[FILTERED]")
-      end
+      assert_text("sensitive_content")
+      assert_text("[FILTERED]")
       assert has_field?("task[sensitive_content]", with: "default sensitive content")
     end
 

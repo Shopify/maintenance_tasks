@@ -1,9 +1,15 @@
-<div class="box" id="run_<%= run.id %>">
-  <h5 class="title is-5">
-    <%= time_tag run.created_at, title: run.created_at.utc %>
-    <%= status_tag run.status %>
-    <a href="#run_<%= run.id %>" class="is-pulled-right" title="Run ID">#<%= run.id %></a>
-  </h5>
+<details class="box" open>
+  <summary class="is-flex is-justify-content-space-between is-align-items-center">
+    <div class="is-flex is-align-items-center">
+      <h5 class="title is-5 has-text-weight-medium pl-5 pr-5 mb-0">
+        <%= time_tag run.created_at, title: run.created_at.utc %>
+      </h5>
+      <%= status_tag run.status %>
+    </div>
+    <div>
+      <span class="is-pulled-right" title="Run ID">#<%= run.id %></span>
+    </div>
+  </summary>
 
   <%= progress run %>
 
@@ -42,4 +48,4 @@
       <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
     <% end%>
   </div>
-</div>
+</details>

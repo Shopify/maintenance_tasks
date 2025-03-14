@@ -15,9 +15,9 @@
     <%= csrf_meta_tags %>
 
     <%=
-      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, 'npm/bulma@0.9.4/css/bulma.css'),
+      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, 'npm/bulma@1.0.3/css/versions/bulma-no-dark-mode.min.css'),
         media: :all,
-        integrity: 'sha384-qQlNh1kc0FyhUqUDXKkl5wpiiSm8PXQw2ZWhAVfU46tmdMDfq2vXG2CXWYT+Dls3',
+        integrity: 'Mzv683sNGpHoqzflgja8HtOOXwSkg0WYgbi6iV3IjnOLZAsGNzzkdXxfHmJYT5dY',
         crossorigin: 'anonymous') unless request.xhr?
     %>
 
@@ -29,6 +29,31 @@
       .ruby-ivar, .ruby-cvar, .ruby-gvar, .ruby-int, .ruby-imaginary, .ruby-float, .ruby-rational { color: #005cc5; }
       .ruby-kw { color: #d73a49; }
       .ruby-label, .ruby-tstring-beg, .ruby-tstring-content, .ruby-tstring-end { color: #032f62; }
+
+      .select, select { width: 100%; }
+      summary { cursor: pointer; }
+      input[type="datetime-local"], input[type="date"], input[type="time"] {
+        width: fit-content;
+      }
+	  details > summary {
+        list-style: none;
+      }
+      summary::-webkit-details-marker {
+        display: none
+      }
+      summary::before {
+        content: '► ';
+        position:absolute;
+        font-size: 16px
+      }
+      details[open] summary:before {
+        content: "▼ ";
+      }
+
+      .box {
+        box-shadow: 0 4px 6px -1px #0000001a,
+                    0 2px 4px -2px #0000001a;
+      }
     </style>
 
     <script>
