@@ -1,4 +1,4 @@
 <% if arguments.present? %>
   <h6 class="title is-6 has-text-weight-medium">Arguments:</h6>
-  <%= render "maintenance_tasks/runs/serializable", serializable: arguments %>
+  <%= render "maintenance_tasks/runs/serializable", serializable: arguments, run: run %>
 <% end %>

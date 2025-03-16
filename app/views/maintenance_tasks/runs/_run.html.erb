@@ -5,6 +5,12 @@
         <%= time_tag run.created_at, title: run.created_at.utc %>
       </h5>
       <%= status_tag run.status %>
+      <button 
+        class="button is-small" data-button-duplicate-id="<%= run.id %>"
+        title="Duplicate arguments for this job into the form"  
+      >
+        Duplicate arguments
+      </button>
     </div>
     <div>
       <span class="is-pulled-right" title="Run ID">#<%= run.id %></span>
@@ -23,7 +29,7 @@
 
   <%= render "maintenance_tasks/runs/csv", run: run %>
   <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
-  <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments %>
+  <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments, run: run %>
   <%= tag.hr if run.csv_file.present? || run.arguments.present? && run.metadata.present? %>
   <%= render "maintenance_tasks/runs/metadata", metadata: run.metadata %>
 

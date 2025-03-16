@@ -5,7 +5,7 @@
 </h1>
 
 <div class="container">
-  <%= form_with url: task_runs_path(@task), method: :post do |form| %>
+  <%= form_with url: task_runs_path(@task), method: :post, html: { id: "form-task"} do |form| %>
     <% if @task.csv_task? %>
       <div class="container mb-4">
         <%= form.label :csv_file, class: "label" %>
