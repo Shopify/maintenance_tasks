@@ -161,7 +161,7 @@ module MaintenanceTasks
       click_on "Pause"
       perform_enqueued_jobs
       page.refresh
-      click_on "Resume"
+      find_button("Resume", wait: 5).click
 
       assert_text "Enqueued"
       assert_text "Waiting to start."
@@ -250,10 +250,10 @@ module MaintenanceTasks
       url = page.current_url
       using_session(:other_tab) do
         visit url
-        click_on "Resume"
+        find_button("Resume", wait: 5).click
       end
 
-      click_on "Resume"
+      find_button("Resume", wait: 5).click
 
       assert_text "Validation failed: Status Cannot transition run from status enqueued to enqueued"
     end

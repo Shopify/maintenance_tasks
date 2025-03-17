@@ -10,6 +10,7 @@ ActionDispatch::SystemTesting::Server.silence_puma = true
 # Selenium::WebDriver.logger to prevent an uninitialized instance variable
 # warning in Ruby 2.7.
 Capybara::Selenium::Driver.load_selenium
+Capybara.default_max_wait_time = 5
 
 if Rails.gem_version < Gem::Version.new("7.1")
   Selenium::WebDriver.logger.ignore(:capabilities)
