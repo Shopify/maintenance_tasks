@@ -35,6 +35,9 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   setup do
     travel_to Time.zone.local(2020, 1, 9, 9, 41, 44)
     page.driver.browser.download_path = "test/dummy/tmp/downloads"
+    unless page.driver.invalid_element_errors.include?(Selenium::WebDriver::Error::UnknownError)
+      page.driver.invalid_element_errors << Selenium::WebDriver::Error::UnknownError
+    end
   end
 
   teardown do
