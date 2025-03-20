@@ -243,6 +243,20 @@ module MaintenanceTasks
       assert_text "ArgumentError"
       assert_text "Something went wrong"
       assert_text %r{app/tasks/maintenance/error_task\.rb:10:in ('Maintenance::ErrorTask#|`)process'}
+    end
+
+    test "resume an errored Task" do
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ErrorTask")
+
+      click_on "Run"
+      assert_text "Enqueued"
+
+      perform_enqueued_jobs
+      page.refresh
+
+      assert_text "Errored"
 
       click_on "Resume"
 
