@@ -287,14 +287,16 @@ module MaintenanceTasks
       assert_text "Validation failed: Status Cannot transition run from status enqueued to enqueued"
     end
 
-    test "errors when enqueuing are shown" do
+    test "enqueuing errors are shown" do
       visit maintenance_tasks_path
 
       click_on "Maintenance::EnqueueErrorTask"
       click_on "Run"
       assert_text "The job to perform Maintenance::EnqueueErrorTask could not be enqueued"
       assert_text "Error enqueuing"
+    end
 
+    test "enqueuing cancellations are shown" do
       visit maintenance_tasks_path
       click_on "Maintenance::CancelledEnqueueTask"
       click_on "Run"
