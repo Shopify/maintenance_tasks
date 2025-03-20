@@ -78,7 +78,6 @@ module MaintenanceTasks
       fill_in("task[post_ids]", with: post_id.to_s)
 
       click_on "Run"
-      fill_in("task[post_ids]", with: "42")
       perform_enqueued_jobs
 
       assert_title "Maintenance::ParamsTask"
@@ -87,7 +86,24 @@ module MaintenanceTasks
       assert_text "Arguments"
       assert_text("post_ids")
       assert_text(post_id.to_s)
-      assert has_field?("task[post_ids]", with: "42")
+    end
+
+    test "parameters are preserved from the refresh" do
+      visit maintenance_tasks_path
+
+      click_on("Maintenance::ParamsTask")
+      post_id = Post.first.id
+      fill_in("task[post_ids]", with: post_id.to_s)
+
+      click_on "Run"
+      assert_text "Enqueued"
+      fill_in("task[post_ids]", with: 42)
+
+      perform_enqueued_jobs
+      # no refresh to test the fields are preserved
+
+      assert_text "Succeeded", wait: 3 # auto-refreshes every 3 seconds
+      assert_text(post_id.to_s)
     end
 
     test "run a Task that accepts masked parameters" do
@@ -98,7 +114,6 @@ module MaintenanceTasks
       fill_in("task[post_ids]", with: post_id.to_s)
 
       click_on "Run"
-      fill_in("task[post_ids]", with: "42")
       perform_enqueued_jobs
 
       assert_title "Maintenance::ParamsTask"
