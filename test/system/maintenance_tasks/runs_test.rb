@@ -51,6 +51,7 @@ module MaintenanceTasks
       assert_difference("Run.count") do
         click_on("Maintenance::UpdatePostsTask")
         click_on("Run")
+        assert_text("Enqueued")
 
         assert_text("hello metadata")
       end
@@ -78,10 +79,13 @@ module MaintenanceTasks
       fill_in("task[post_ids]", with: post_id.to_s)
 
       click_on "Run"
+      assert_text "Enqueued"
+
       perform_enqueued_jobs
+      refresh
 
       assert_title "Maintenance::ParamsTask"
-      assert_text "Succeeded", wait: 3 # refreshes every 3 seconds
+      assert_text "Succeeded"
       assert_text "Processed 1 out of 1 item (100%)."
       assert_text "Arguments"
       assert_text("post_ids")
@@ -114,10 +118,13 @@ module MaintenanceTasks
       fill_in("task[post_ids]", with: post_id.to_s)
 
       click_on "Run"
+      assert_text "Enqueued"
+
       perform_enqueued_jobs
+      refresh
 
       assert_title "Maintenance::ParamsTask"
-      assert_text "Succeeded", wait: 3 # refreshes every 3 seconds
+      assert_text "Succeeded"
       assert_text "Processed 1 out of 1 item (100%)."
       assert_text "Arguments"
       assert_text("sensitive_content")
@@ -143,9 +150,10 @@ module MaintenanceTasks
       click_on("Maintenance::ImportPostsTask")
       attach_file("csv_file", "test/fixtures/files/sample.csv")
       click_on("Run")
+      assert_text "Enqueued"
 
       perform_enqueued_jobs
-      page.refresh
+      refresh
 
       click_on("Download CSV")
 
@@ -162,8 +170,9 @@ module MaintenanceTasks
 
       click_on("Maintenance::UpdatePostsTask")
       click_on "Run"
-      click_on "Pause"
+      assert_text "Enqueued"
 
+      click_on "Pause"
       assert_text "Pausing"
       assert_text "Pausing…"
     end
@@ -173,9 +182,13 @@ module MaintenanceTasks
 
       click_on("Maintenance::UpdatePostsInBatchesTask")
       click_on "Run"
+      assert_text "Enqueued"
+
       click_on "Pause"
+      assert_text "Pausing" # ensure page loaded
+
       perform_enqueued_jobs
-      page.refresh
+      refresh
       click_on "Resume"
 
       assert_text "Enqueued"
@@ -187,6 +200,7 @@ module MaintenanceTasks
 
       click_on("Maintenance::UpdatePostsInBatchesTask")
       click_on "Run"
+      assert_text "Enqueued"
       click_on "Cancel"
 
       assert_text "Cancelling"
@@ -198,6 +212,7 @@ module MaintenanceTasks
 
       click_on("Maintenance::UpdatePostsInBatchesTask")
       click_on "Run"
+      assert_text "Enqueued"
       click_on "Pause"
       assert_text "Pausing"
 
@@ -210,9 +225,11 @@ module MaintenanceTasks
 
       click_on("Maintenance::UpdatePostsInBatchesTask")
       click_on "Run"
-      click_on "Cancel"
+      assert_text "Enqueued"
 
+      click_on "Cancel"
       assert_text "Cancelling…"
+
       refute_button "Cancel"
 
       travel MaintenanceTasks.stuck_task_duration
@@ -234,9 +251,11 @@ module MaintenanceTasks
 
       click_on("Maintenance::ErrorTask")
 
-      perform_enqueued_jobs do
-        click_on "Run"
-      end
+      click_on "Run"
+      assert_text "Enqueued"
+
+      perform_enqueued_jobs
+      refresh
 
       assert_text "Errored"
       assert_text "Ran for less than 5 seconds until an error happened less than a minute ago."
@@ -254,7 +273,7 @@ module MaintenanceTasks
       assert_text "Enqueued"
 
       perform_enqueued_jobs
-      page.refresh
+      refresh
 
       assert_text "Errored"
 
@@ -270,11 +289,14 @@ module MaintenanceTasks
       click_on("Maintenance::UpdatePostsInBatchesTask")
 
       click_on "Run"
+      assert_text "Enqueued"
+
       click_on "Pause"
+      assert_text "Pausing"
 
       perform_enqueued_jobs
 
-      page.refresh
+      refresh
 
       url = page.current_url
       using_session(:other_tab) do
@@ -300,7 +322,9 @@ module MaintenanceTasks
       visit maintenance_tasks_path
       click_on "Maintenance::CancelledEnqueueTask"
       click_on "Run"
-      assert_text "The job to perform Maintenance::CancelledEnqueueTask could not be enqueued"
+      find(".notification") do
+        assert_text "The job to perform Maintenance::CancelledEnqueueTask could not be enqueued"
+      end
       assert_text "The job to perform Maintenance::CancelledEnqueueTask " \
         "could not be enqueued. Enqueuing has been prevented by a callback."
     end
@@ -311,6 +335,7 @@ module MaintenanceTasks
 
       url = page.current_url
       click_on "Run"
+      assert_text "Enqueued"
 
       using_session(:other_tab) do
         visit url
