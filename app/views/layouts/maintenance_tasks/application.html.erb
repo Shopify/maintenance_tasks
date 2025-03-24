@@ -58,26 +58,158 @@
 
     <script>
       function refresh() {
-        const target = document.querySelector("[data-refresh]")
-        if (!target || !target.dataset.refresh) return
+        const target = document.querySelector("[data-refresh]");
+        
+        if (!target || !target.dataset.refresh) {
+          return;
+        } 
+
         window.setTimeout(() => {
-          document.body.style.cursor = "wait"
-          fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } }).then(
-            async response => {
-              const text = await response.text()
-              const newDocument = new DOMParser().parseFromString(text, "text/html")
-              const newTarget = newDocument.querySelector("[data-refresh]")
-              if (newTarget) {
-                target.replaceWith(newTarget)
-              }
-              document.body.style.cursor = ""
-              refresh()
+          document.body.style.cursor = "wait";
+          fetch(document.location, {
+            headers: {
+              "X-Requested-With": "XMLHttpRequest",
             },
-            error => location.reload()
-          )
-        }, 3000)
+          }).then(
+            async (response) => {
+              const text = await response.text();
+              const newDocument = new DOMParser().parseFromString(text, "text/html");
+              const newTarget = newDocument.querySelector("[data-refresh]");
+              if (newTarget) {
+                target.replaceWith(newTarget);
+              }
+              document.body.style.cursor = "";
+              refresh();
+            },
+            (error) => location.reload(),
+          );
+        }, 3000);
       }
-      document.addEventListener('DOMContentLoaded', refresh)
+
+      // Function to add click listeners to all duplicate buttons
+      function initializeDuplicateButtons() {
+        const duplicateButtons = document.querySelectorAll(
+          "button[data-button-duplicate-id]",
+        );
+
+        // Add click listener to each button
+        duplicateButtons.forEach((button) => {
+          button.addEventListener("click", function (event) {
+            // Prevent default button behavior
+            event.preventDefault();
+
+            const runId = this.getAttribute("data-button-duplicate-id");
+
+            if (runId) {
+              // Call the duplicate arguments function
+              duplicateArguments(runId);
+            }
+          });
+        });
+      }
+
+      function duplicateArguments(runId) {
+        if (runId === undefined) {
+          return;
+        }
+
+        const rows = document.querySelectorAll(
+          `.arguments-container-${runId} div.cell`,
+        );
+
+        // Iterate through each row
+        rows.forEach((row) => {
+          // Get the field name from the first cell
+          const fieldName = row
+            .querySelector("div.is-family-monospace")
+            ?.textContent.trim();
+
+          // Get the value from the code element if it exists
+          const codeElement = row.querySelector("code");
+          const value = codeElement?.textContent.trim() || "";
+
+          if (fieldName) {
+            // Try different possible input selectors
+            const possibleSelectors = [
+              `input[name="task[${fieldName}]"]`,
+              `select[name="task[${fieldName}]"]`,
+              `textarea[name="task[${fieldName}]"]`,
+            ];
+
+            // Find the first matching input element
+            const input = possibleSelectors
+              .map((selector) => document.querySelector(selector))
+              .find((element) => element !== null);
+
+            if (input) {
+              // Handle different input types
+              switch (input.type) {
+                case "hidden":
+                case "checkbox":
+                  document
+                    .querySelectorAll(`input[name="task[${fieldName}]`)
+                    .forEach((checkbox) => {
+                      checkbox.checked =
+                        value === "1" || value.toLowerCase() === "true";
+                    });
+                  break;
+
+                case "number":
+                  // Convert value to number format
+                  if (value && !isNaN(value)) {
+                    input.value = parseFloat(value);
+                  } else {
+                    input.value = null;
+                  }
+                  break;
+
+                case "date":
+                  // Convert value to date format
+                  if (value && !isNaN(Date.parse(value))) {
+                    input.value = new Date(value).toISOString().split("T")[0];
+                  } else {
+                    input.value = null;
+                  }
+                  break;
+                case "datetime-local":
+                  // Convert value to date format
+                  if (value && !isNaN(Date.parse(value))) {
+                    input.value = new Date(value).toISOString().replace("Z", "");
+                  } else {
+                    input.value = null;
+                  }
+                  break;
+                default:
+                  input.value = value;
+              }
+
+              // Trigger change event
+              input.dispatchEvent(
+                new Event("change", {
+                  bubbles: true,
+                }),
+              );
+            }
+          }
+        });
+        scrollToForm();
+      }
+
+      function scrollToForm() {
+        const form = document.getElementById("form-task");
+        if (form) {
+          form.scrollIntoView({
+            behavior: "smooth",
+          });
+        }
+      }
+
+      // Initialize when DOM is ready
+      document.addEventListener("DOMContentLoaded", () => {
+        refresh();
+        // Set up initial buttons
+        initializeDuplicateButtons();
+      });
     </script>
   </head>
 
