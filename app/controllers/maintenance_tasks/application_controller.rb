@@ -7,16 +7,15 @@ module MaintenanceTasks
   class ApplicationController < MaintenanceTasks.parent_controller.constantize
     BULMA_CDN = "https://cdn.jsdelivr.net"
 
+    ruby_syntax_highlighting_checksum = "'sha256-2AM66zjeDBmWDHyVQs45fGjYfGmjoZBwkyy5tNwIWG0='"
+    page_refresh_script_checksum = "'sha256-2AM66zjeDBmWDHyVQs45fGjYfGmjoZBwkyy5tNwIWG0='"
     content_security_policy do |policy|
       policy.style_src(
         BULMA_CDN,
-        # ruby syntax highlighting
-        "'sha256-2AM66zjeDBmWDHyVQs45fGjYfGmjoZBwkyy5tNwIWG0='",
+        ruby_syntax_highlighting_checksum,
       )
-      policy.script_src(
-        # page refresh script
-        "'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='",
-      )
+      policy.script_src(page_refresh_script_checksum)
+      policy.script_src_elem(page_refresh_script_checksum)
       policy.frame_ancestors(:self)
     end
 
