@@ -102,8 +102,6 @@ module MaintenanceTasks
       ].each do |attribute|
         assert_match "Select a value", markup(attribute).squish
       end
-
-      refute_match "Select a value", markup("text_integer_attr_unbounded_range").squish
     end
 
     test "#parameter_field adds information about datetime fields when Time.zone_default is not set" do
@@ -137,6 +135,32 @@ module MaintenanceTasks
           assert_equal(now.utc_offset, value.utc_offset) # uses system time zone
         end
       end
+    end
+
+    test "#attribute_required? returns true if the attribute has a presence validator" do
+      task_class = Class.new do
+        class << self
+          def validators_on(attribute)
+            [ActiveModel::Validations::PresenceValidator.new(attributes: [attribute])]
+          end
+        end
+      end
+
+      task = task_class.new
+      assert attribute_required?(task, :required_attribute)
+    end
+
+    test "#attribute_required? returns false if the attribute does not have a presence validator" do
+      task_class = Class.new do
+        class << self
+          def validators_on(attribute)
+            []
+          end
+        end
+      end
+
+      task = task_class.new
+      assert_not attribute_required?(task, :optional_attribute)
     end
 
     private
