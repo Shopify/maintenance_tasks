@@ -7,11 +7,9 @@
 # https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Security-Policy
 
 Rails.application.config.content_security_policy do |policy|
-  policy.base_uri(:none)
-  policy.default_src(:self)
-  policy.object_src(:none)
-  policy.script_src(:none)
-  policy.frame_ancestors(:none)
+  policy.default_src(:none)
+  policy.style_src_elem(:self)
+  policy.frame_src(:self)
 
   policy.block_all_mixed_content
 

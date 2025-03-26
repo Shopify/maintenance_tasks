@@ -7,16 +7,15 @@ module MaintenanceTasks
   class ApplicationController < MaintenanceTasks.parent_controller.constantize
     BULMA_CDN = "https://cdn.jsdelivr.net"
 
-    ruby_syntax_highlighting_checksum = "'sha256-2AM66zjeDBmWDHyVQs45fGjYfGmjoZBwkyy5tNwIWG0='"
-    page_refresh_script_checksum = "'sha256-2AM66zjeDBmWDHyVQs45fGjYfGmjoZBwkyy5tNwIWG0='"
     content_security_policy do |policy|
-      policy.style_src(
+      policy.style_src_elem(
         BULMA_CDN,
-        ruby_syntax_highlighting_checksum,
+        "'sha256-2AM66zjeDBmWDHyVQs45fGjYfGmjoZBwkyy5tNwIWG0='",
       )
-      policy.script_src(page_refresh_script_checksum)
-      policy.script_src_elem(page_refresh_script_checksum)
+      policy.script_src_elem("'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='")
       policy.frame_ancestors(:self)
+      policy.frame_src(:self)
+      policy.connect_src(:self)
     end
 
     protect_from_forgery with: :exception
