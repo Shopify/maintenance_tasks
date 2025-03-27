@@ -13,9 +13,10 @@ module MaintenanceTasks
     content_security_policy do |policy|
       policy.style_src_elem(BULMA_CDN, RUBY_SYNTAX_HIGHLIGHTING)
       policy.script_src_elem(PAGE_REFRESH_SCRIPT)
+
       policy.frame_ancestors(:self)
-      policy.frame_src(:self)
       policy.connect_src(:self)
+      policy.form_action(:self)
     end
 
     protect_from_forgery with: :exception
