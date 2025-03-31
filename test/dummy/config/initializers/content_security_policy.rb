@@ -20,8 +20,8 @@ Rails.application.config.content_security_policy do |policy|
   policy.manifest_src(:none)
   policy.media_src(:none)
   policy.object_src(:none)
-  # policy.prefetch_src(:none) # Unsupported in Selenium
-  # policy.require_trusted_types_for(:none) # Unsupported in Selenium
+  # policy.prefetch_src(:none) # deprecated
+  policy.require_trusted_types_for("'script'")
   policy.script_src(:none)
   policy.script_src_attr(:none)
   policy.script_src_elem(:none)
@@ -31,8 +31,10 @@ Rails.application.config.content_security_policy do |policy|
   policy.trusted_types(:none)
   policy.worker_src(:none)
 
-  # Required configuration for iframing maintenance-tasks
+  # The dummy app has a stylesheet_link_tag
   policy.style_src_elem(:self)
+
+  # Required configuration for iframing maintenance-tasks
   policy.frame_src(:self)
 
   policy.block_all_mixed_content
