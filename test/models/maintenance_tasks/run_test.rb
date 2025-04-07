@@ -631,6 +631,11 @@ module MaintenanceTasks
       assert_kind_of Maintenance::UpdatePostsTask, run.task
     end
 
+    test "#task sets the metadata on the Task" do
+      run = Run.new(task_name: "Maintenance::TestTask", metadata: { foo: "bar" })
+      assert_equal({ "foo" => "bar" }, run.task.metadata)
+    end
+
     test "#validate_task_arguments instantiates Task and assigns arguments if Task has parameters" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",
