@@ -422,6 +422,8 @@ module MaintenanceTasks
         if task.attribute_names.any? && arguments.present?
           task.assign_attributes(arguments)
         end
+
+        task.metadata = metadata
         task
       rescue ActiveModel::UnknownAttributeError
         task
