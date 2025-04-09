@@ -722,11 +722,15 @@ module MaintenanceTasks
     test ".report_on reports the error" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
 
-      Maintenance::UpdatePostsTask.report_on(ActiveRecord::RecordInvalid)
+      Maintenance::UpdatePostsTask.report_on(
+        ActiveRecord::RecordInvalid,
+        severity: :info,
+        context: { more: true },
+      )
 
       Maintenance::UpdatePostsTask.any_instance.expects(:process).raises(ActiveRecord::RecordInvalid).twice
 
-      assert_error_reported(ActiveRecord::RecordInvalid) do
+      report = assert_error_reported(ActiveRecord::RecordInvalid) do
         assert_nothing_raised do
           TaskJob.perform_now(run)
         end
@@ -734,19 +738,24 @@ module MaintenanceTasks
 
       assert_predicate(run.reload, :succeeded?)
       assert_equal(run.tick_count, 2)
+
+      assert_equal(report.context.slice(:more), { more: true })
+      assert_equal(report.severity, :info)
     end
 
     private
 
     if Rails.gem_version < Gem::Version.new("7.1.0")
+      Report = Struct.new(:exception, :handled, :severity, :context, :source, keyword_init: true)
+
       def assert_error_reported(error = nil, &block)
         reporter = Class.new do
           def reports
             @reports ||= []
           end
 
-          def report(exception, context: {}, **_)
-            reports << { exception:, context: }
+          def report(exception, **kwargs)
+            reports << Report.new(exception: exception, **kwargs)
           end
         end.new
 
@@ -755,7 +764,7 @@ module MaintenanceTasks
         yield
 
         if error
-          report = reporter.reports.detect { |report| report[:exception].is_a?(error) }
+          report = reporter.reports.detect { |report| report.exception.is_a?(error) }
           assert(report, "No #{error} reported!")
           report
         else
