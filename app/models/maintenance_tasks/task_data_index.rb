@@ -34,7 +34,8 @@ module MaintenanceTasks
         end
 
         completed_runs = Run.completed.where(task_name: task_names)
-        last_runs = Run.with_attached_csv.where(id: completed_runs.select("MAX(id) as id").group(:task_name))
+        last_runs = Run.with_attached_csv
+          .where(created_at: completed_runs.select("MAX(created_at) as created_at").group(:task_name))
         task_names.map do |task_name|
           last_run = last_runs.find { |run| run.task_name == task_name }
           tasks << TaskDataIndex.new(task_name, last_run)
