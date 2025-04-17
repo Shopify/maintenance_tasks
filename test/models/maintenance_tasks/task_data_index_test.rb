@@ -26,6 +26,7 @@ module MaintenanceTasks
         "Maintenance::UpdatePostsModulePrependedTask",
         "Maintenance::UpdatePostsTask",
         "Maintenance::UpdatePostsThrottledTask",
+        "MaintenanceTasks::TasksHelperTest::RequiredAttributeTask",
       ]
       assert_equal expected, TaskDataIndex.available_tasks.map(&:name)
     end
