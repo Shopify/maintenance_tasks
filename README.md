@@ -472,7 +472,7 @@ accessible to any of Task’s methods: `#collection`, `#count`, or `#process`.
 
 module Maintenance
   class UpdatePostsViaParamsTask < MaintenanceTasks::Task
-    attribute :updated_content, :string
+    attribute :updated_content, :string, description: "Content to update posts with"
     validates :updated_content, presence: true
 
     def collection
@@ -485,6 +485,8 @@ module Maintenance
   end
 end
 ```
+
+The optional `description` parameter provides additional context about the attribute in the UI, helping users understand the purpose of each parameter.
 
 Tasks can leverage Active Model Validations when defining parameters. Arguments
 supplied to a Task accepting parameters will be validated before the Task starts

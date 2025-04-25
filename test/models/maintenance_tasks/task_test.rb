@@ -116,5 +116,40 @@ module MaintenanceTasks
       task = Task.new
       assert_nil task.cursor_columns
     end
+    
+    test ".attribute with description option sets attribute_descriptions" do
+      test_class = Class.new(Task) do
+        attribute :test_param, :string, description: "This is a test parameter"
+      end
+      
+      assert_equal "This is a test parameter", test_class.attribute_descriptions[:test_param]
+    end
+    
+    test ".attribute without description option doesn't add to attribute_descriptions" do
+      test_class = Class.new(Task) do
+        attribute :test_param, :string
+      end
+      
+      assert_nil test_class.attribute_descriptions[:test_param]
+    end
+    
+    test "attribute_descriptions properly stores multiple descriptions" do
+      test_class = Class.new(Task) do
+        attribute :param1, :string, description: "First parameter"
+        attribute :param2, :integer, description: "Second parameter" 
+        attribute :param3, :boolean
+      end
+      
+      assert_equal "First parameter", test_class.attribute_descriptions[:param1]
+      assert_equal "Second parameter", test_class.attribute_descriptions[:param2]
+      assert_nil test_class.attribute_descriptions[:param3]
+    end
+    
+    test "ParamsTask has descriptions for parameters" do
+      assert_equal "Comma-separated list of post IDs to process", 
+        Maintenance::ParamsTask.attribute_descriptions[:post_ids]
+      assert_equal "Content to set on the posts",
+        Maintenance::ParamsTask.attribute_descriptions[:content]
+    end
   end
 end

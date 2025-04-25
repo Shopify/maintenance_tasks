@@ -23,6 +23,9 @@
               <div class="<%= inclusion_values.is_a?(Array) ? "select" : "control" %>">
                 <%= parameter_field(ff, parameter_name, inclusion_values) %>
               </div>
+              <% if description = ff.object.class.attribute_descriptions[parameter_name.to_sym] %>
+                <p class="help"><%= description %></p>
+              <% end %>
             </div>
           <% end %>
         <% end %>

@@ -1,6 +1,20 @@
 # frozen_string_literal: true
 
 module MaintenanceTasks
+  # Extension for ActiveModel::Attributes to support descriptions
+  module AttributesWithDescription
+    def attribute(name, type = ActiveModel::Type::Value.new, **options)
+      description = options.delete(:description)
+      result = super(name, type, **options)
+      
+      if description.present?
+        self.attribute_descriptions = attribute_descriptions.merge(name => description)
+      end
+      
+      result
+    end
+  end
+
   # Base class that is inherited by the host application's task classes.
   class Task
     extend ActiveSupport::DescendantsTracker
@@ -9,6 +23,12 @@ module MaintenanceTasks
     include ActiveModel::AttributeAssignment
     include ActiveModel::Validations
     include ActiveSupport::Rescuable
+
+    # Stores attribute descriptions
+    class_attribute :attribute_descriptions, instance_writer: false, default: {}
+    
+    # Extend the class with attribute description support
+    singleton_class.prepend(AttributesWithDescription)
 
     class NotFoundError < NameError; end
 
@@ -165,6 +185,22 @@ module MaintenanceTasks
       # @param attributes [Array<Symbol>] the attribute names to filter.
       def mask_attribute(*attributes)
         self.masked_arguments += attributes
+      end
+
+      # Stores descriptions for attributes.
+      #
+      # @api private
+      class_attribute :attribute_descriptions, default: {}
+
+      # Adds a description for an attribute.
+      #
+      # @param attribute [Symbol] the attribute to describe.
+      # @param description [String] the description for the attribute.
+      #
+      # @note You can also use the description option directly in the attribute definition:
+      #   attribute :your_parameter, :string, description: "This is a description of the parameter"
+      def self.attribute_description(attribute, description)
+        self.attribute_descriptions = attribute_descriptions.merge(attribute => description)
       end
 
       # Initialize a callback to run after the task starts.

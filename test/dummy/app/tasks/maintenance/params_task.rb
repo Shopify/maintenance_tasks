@@ -10,13 +10,13 @@ module Maintenance
   end
 
   class ParamsTask < MaintenanceTasks::Task
-    attribute :post_ids, :string
+    attribute :post_ids, :string, description: "Comma-separated list of post IDs to process"
 
     validates :post_ids,
       presence: true,
       format: { with: /\A(\s?\d+(,\s?\d+\s?)*)\z/, allow_blank: true }
 
-    attribute :content, :string, default: "default content"
+    attribute :content, :string, default: "default content", description: "Content to set on the posts"
     attribute :sensitive_content, :string, default: "default sensitive content"
     attribute :integer_attr, :integer, default: 111_222_333
     attribute :big_integer_attr, :big_integer, default: 111_222_333

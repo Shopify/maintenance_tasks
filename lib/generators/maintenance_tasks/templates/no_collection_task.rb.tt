@@ -5,6 +5,9 @@ module <%= tasks_module %>
   class <%= class_name %>Task < MaintenanceTasks::Task
     no_collection
 
+    # Example of defining an input parameter with a description
+    # attribute :your_parameter, :string, description: "Detailed description of how this parameter should be used"
+
     def process
       # The work to be done
     end
