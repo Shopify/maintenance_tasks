@@ -140,23 +140,13 @@ module MaintenanceTasks
     end
 
     test "#attribute_required? returns true if the attribute has a presence validator" do
-      class RequiredAttributeTask < MaintenanceTasks::Task
-        validates :required_attribute, presence: true
-      end
-      task_class = RequiredAttributeTask
-
-      task = task_class.new
-      assert attribute_required?(task, :required_attribute)
+      task = Maintenance::ParamsTask.new
+      assert attribute_required?(task, :post_ids)
     end
 
     test "#attribute_required? returns false if the attribute does not have a presence validator" do
-      class RequiredAttributeTask < MaintenanceTasks::Task
-        validates :required_attribute, presence: true
-      end
-      task_class = RequiredAttributeTask
-
-      task = task_class.new
-      assert_not attribute_required?(task, :optional_attribute)
+      task = Maintenance::ParamsTask.new
+      assert_not attribute_required?(task, :content)
     end
 
     private
