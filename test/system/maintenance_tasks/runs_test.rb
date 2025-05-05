@@ -115,6 +115,7 @@ module MaintenanceTasks
 
       click_on("Maintenance::ParamsTask")
       post_id = Post.first.id
+      assert_title "Maintenance::ParamsTask"
       fill_in("task[post_ids]", with: post_id.to_s)
 
       click_on "Run"
