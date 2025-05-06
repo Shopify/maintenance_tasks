@@ -56,7 +56,7 @@
 
     <h4 class="title is-5 has-text-weight-bold">Previous Runs</h4>
 
-    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records, as: :run %>
+    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
 
     <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
   <% end %>
