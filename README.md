@@ -74,9 +74,11 @@ The generator creates and runs a migration to add the necessary table to your
 database. It also mounts Maintenance Tasks in your `config/routes.rb`. By
 default the web UI can be accessed in the new `/maintenance_tasks` path.
 
-This gem uses the [Rails Error Reporter](https://guides.rubyonrails.org/error_reporting.html) to report errors. If you are using a bug
-tracking service you may want to subscribe to the reporter. See [Reporting Errors](#reporting-errors)
-for more information.
+This gem uses the [Rails Error Reporter][rails-error-reporting] to report errors.
+If you are using a bug tracking service you may want to subscribe to the
+reporter. See [Reporting Errors](#reporting-errors) for more information.
+
+[rails-error-reporting]: https://guides.rubyonrails.org/error_reporting.html
 
 ### Active Job Dependency
 
@@ -114,12 +116,12 @@ The typical Maintenance Tasks workflow is as follows:
 1. [Generate a class describing the Task](#creating-a-task) and the work to be
    done.
 2. Run the Task
-    - either by [using the included web UI](#running-a-task-from-the-web-ui),
-    - or by [using the command line](#running-a-task-from-the-command-line),
-    - or by [using Ruby](#running-a-task-from-ruby).
+   - either by [using the included web UI](#running-a-task-from-the-web-ui),
+   - or by [using the command line](#running-a-task-from-the-command-line),
+   - or by [using Ruby](#running-a-task-from-ruby).
 3. [Monitor the Task](#monitoring-your-tasks-status)
-    - either by using the included web UI,
-    - or by manually checking your task’s run’s status in your database.
+   - either by using the included web UI,
+   - or by manually checking your task’s run’s status in your database.
 4. Optionally, delete the Task code if you no longer need it.
 
 ### Creating a Task
@@ -168,7 +170,8 @@ end
 When processing records from an Active Record Relation, records are fetched in
 batches internally, and then each record is passed to the `#process` method.
 Maintenance Tasks will query the database to fetch records in batches of 100 by
-default, but the batch size can be modified using the `collection_batch_size` macro:
+default, but the batch size can be modified using the `collection_batch_size`
+macro:
 
 ```ruby
 # app/tasks/maintenance/update_posts_task.rb
@@ -502,17 +505,20 @@ set of values will be used to populate a dropdown in the user interface. The
 following types are supported:
 
 * Arrays
-* Procs and lambdas that optionally accept the Task instance, and return an Array.
-* Callable objects that receive one argument, the Task instance, and return an Array.
+* Procs and lambdas that optionally accept the Task instance, and return an
+  Array.
+* Callable objects that receive one argument, the Task instance, and return an
+  Array.
 * Methods that return an Array, called on the Task instance.
 
 For enumerables that don't match the supported types, a text field will be
 rendered instead.
 
 ### Masking Task Parameters
-Task attributes can be masked in the UI by adding `mask_attribute` class method in the
-task class.
-This will replace the value in the arguments list with `[FILTERED]` in the UI.
+
+Task attributes can be masked in the UI by adding `mask_attribute` class method
+in the task class. This will replace the value in the arguments list with
+`[FILTERED]` in the UI.
 
 ```ruby
 # app/tasks/maintenance/sensitive_params_task.rb
@@ -520,15 +526,18 @@ This will replace the value in the arguments list with `[FILTERED]` in the UI.
 module Maintenance
   class SensitiveParamsTask < MaintenanceTasks::Task
     attribute :sensitive_content, :string
-    
+
     mask_attribute :sensitive_content
   end
 end
 ```
 
-If you have any filtered parameters in the global [rails parameter filter](https://guides.rubyonrails.org/configuring.html#config-filter-parameters), they will be
-automatically taken into account when masking the parameters, which means that you can mask parameters
-across all tasks by adding them to the global rails parameters filter.
+If you have any filtered parameters in the global [Rails parameter
+filter][rails-parameter-filter], they will be automatically taken into account
+when masking the parameters, which means that you can mask parameters across all
+tasks by adding them to the global rails parameters filter.
+
+[rails-parameter-filter]:https://guides.rubyonrails.org/configuring.html#config-filter-parameters
 
 ```ruby
 Rails.application.config.filter_parameters += %i[token]
@@ -924,10 +933,10 @@ a Task can be in:
 
 The Maintenance Tasks engine uses Rails sessions for flash messages and storing
 the CSRF token. For the engine to work in an API-only Rails application, you
-need to add a [session middleware][] and the `ActionDispatch::Flash`
-middleware. The engine also defines a strict [Content Security Policy][], make
-sure to include `ActionDispatch::ContentSecurityPolicy::Middleware` in your
-app's middleware stack to ensure the CSP is delivered to the user's browser.
+need to add a [session middleware][] and the `ActionDispatch::Flash` middleware.
+The engine also defines a strict [Content Security Policy][], make sure to
+include `ActionDispatch::ContentSecurityPolicy::Middleware` in your app's
+middleware stack to ensure the CSP is delivered to the user's browser.
 
 [session middleware]: https://guides.rubyonrails.org/api_app.html#using-session-middlewares
 [Content Security Policy]: https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP
@@ -951,8 +960,8 @@ module YourApplication
 end
 ```
 
-You can read more in the [Using Rails for API-only Applications][rails api] Rails
-guide.
+You can read more in the [Using Rails for API-only Applications][rails api]
+Rails guide.
 
 [rails api]: https://guides.rubyonrails.org/api_app.html
 
@@ -969,9 +978,9 @@ infrastructure or code changes.
 This means a Task can safely be interrupted, re-enqueued and resumed without any
 intervention at the end of an iteration, after the `process` method returns.
 
-By default, a running Task will be interrupted after running for more than 5 minutes.
-This is [configured in the `job-iteration` gem][max-job-runtime] and can be
-tweaked in an initializer if necessary.
+By default, a running Task will be interrupted after running for more than 5
+minutes. This is [configured in the `job-iteration` gem][max-job-runtime] and
+can be tweaked in an initializer if necessary.
 
 [max-job-runtime]: https://github.com/Shopify/job-iteration/blob/-/guides/best-practices.md#max-job-runtime
 
@@ -1018,36 +1027,36 @@ be placed in a `maintenance_tasks.rb` initializer.
 Exceptions raised while a Task is performing are rescued and information about
 the error is persisted and visible in the UI.
 
-Errors are also sent to the `Rails.error.reporter`, which can be configured by your
-application. See the [Error Reporting in Rails Applications](https://guides.rubyonrails.org/error_reporting.html) guide for more details.
+Errors are also sent to the `Rails.error.reporter`, which can be configured by
+your application. See the [Error Reporting in Rails
+Applications][rails-error-reporting] guide for more details.
 
 Reports to the error reporter will contain the following data:
 
 * `error`: The exception that was raised.
-* `context`: A hash with additional information about the Task and the
-  error:
-  * `task_name`: The name of the Task that errored
-  * `started_at`: The time the Task started
-  * `ended_at`: The time the Task errored
-  * `run_id`: The id of the errored Task run
-  * `tick_count`: The tick count at the time of the error
-  * `errored_element`: The element, if any, that was being processed when the Task
-    raised an exception. If you would like to pass this object to your exception
-    monitoring service, make sure you **sanitize the object** to avoid leaking
-    sensitive data and **convert it to a format** that is compatible with your bug
-    tracker.
+* `context`: A hash with additional information about the Task and the error:
+   * `task_name`: The name of the Task that errored
+   * `started_at`: The time the Task started
+   * `ended_at`: The time the Task errored
+   * `run_id`: The id of the errored Task run
+   * `tick_count`: The tick count at the time of the error
+   * `errored_element`: The element, if any, that was being processed when the
 * `source`: This will be `maintenance-tasks`
 
 Note that `context` may be empty if the Task produced an error before any
-context could be gathered (for example, if deserializing the job to process
-your Task failed).
+context could be gathered (for example, if deserializing the job to process your
+Task failed).
 
 #### Reporting errors during iteration
 
-By default, errors raised during task iteration will be raised to the application
-and iteration will stop. However, you may want to handle some errors and continue
-iteration. `MaintenanceTasks::Task.report_on` can be used to rescue certain
-exceptions and report them to the Rails error reporter. Any keyword arguments are passed to [report](https://api.rubyonrails.org/classes/ActiveSupport/ErrorReporter.html#method-i-report):
+By default, errors raised during task iteration will be raised to the
+application and iteration will stop. However, you may want to handle some errors
+and continue iteration. `MaintenanceTasks::Task.report_on` can be used to rescue
+certain exceptions and report them to the Rails error reporter. Any keyword
+arguments are passed to
+[ActiveSupport::ErrorReporter#report][as-error-reporter-report]:
+
+[as-error-reporter-report]: https://api.rubyonrails.org/classes/ActiveSupport/ErrorReporter.html#method-i-report
 
 ```ruby
 class MyTask < MaintenanceTasks::Task
@@ -1055,8 +1064,8 @@ class MyTask < MaintenanceTasks::Task
 end
 ```
 
-`MaintenanceTasks::Task` also includes `ActiveSupport::Rescuable` which you can use
-to implement custom error handling.
+`MaintenanceTasks::Task` also includes `ActiveSupport::Rescuable` which you can
+use to implement custom error handling.
 
 ```ruby
 class MyTask < MaintenanceTasks::Task
