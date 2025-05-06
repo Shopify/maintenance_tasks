@@ -139,6 +139,16 @@ module MaintenanceTasks
       end
     end
 
+    test "#attribute_required? returns true if the attribute has a presence validator" do
+      task = Maintenance::ParamsTask.new
+      assert attribute_required?(task, :post_ids)
+    end
+
+    test "#attribute_required? returns false if the attribute does not have a presence validator" do
+      task = Maintenance::ParamsTask.new
+      assert_not attribute_required?(task, :content)
+    end
+
     private
 
     def with_zone_default(new_zone)
