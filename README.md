@@ -1047,11 +1047,11 @@ your Task failed).
 By default, errors raised during task iteration will be raised to the application
 and iteration will stop. However, you may want to handle some errors and continue
 iteration. `MaintenanceTasks::Task.report_on` can be used to rescue certain
-exceptions and report them to the Rails error reporter.
+exceptions and report them to the Rails error reporter. Any keyword arguments are passed to [report](https://api.rubyonrails.org/classes/ActiveSupport/ErrorReporter.html#method-i-report):
 
 ```ruby
 class MyTask < MaintenanceTasks::Task
-  report_on(MyException)
+  report_on(MyException, OtherException, severity: :info, context: {task_name: "my_task"})
 end
 ```
 

@@ -190,5 +190,16 @@ module MaintenanceTasks
         class: "content is-small",
       )
     end
+
+    # Checks if an attribute is required for a given Task.
+    #
+    # @param task [MaintenanceTasks::TaskDataShow] The TaskDataShow instance.
+    # @param parameter_name [Symbol] The name of the attribute to check.
+    # @return [Boolean] Whether the attribute is required.
+    def attribute_required?(task, parameter_name)
+      task.class.validators_on(parameter_name).any? do |validator|
+        validator.kind == :presence
+      end
+    end
   end
 end

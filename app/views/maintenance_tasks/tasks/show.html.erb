@@ -18,7 +18,7 @@
         <%= fields_for :task, @task.new do |ff| %>
           <% parameter_names.each do |parameter_name| %>
             <div class="cell">
-              <%= ff.label parameter_name, parameter_name, class: "label is-family-monospace" %>
+              <%= ff.label parameter_name, parameter_name, class: ["label", "is-family-monospace", { "is-required": attribute_required?(ff.object, parameter_name) }] %>
               <% inclusion_values = resolve_inclusion_value(ff.object, parameter_name) %>
               <div class="<%= inclusion_values.is_a?(Array) ? "select" : "control" %>">
                 <%= parameter_field(ff, parameter_name, inclusion_values) %>

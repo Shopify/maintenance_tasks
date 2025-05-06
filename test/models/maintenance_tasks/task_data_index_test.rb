@@ -30,6 +30,13 @@ module MaintenanceTasks
       assert_equal expected, TaskDataIndex.available_tasks.map(&:name)
     end
 
+    test ".available_tasks assigns related run by most recent created completed run" do
+      tasks = TaskDataIndex.available_tasks
+      task = tasks.find { |task| task.name == "Maintenance::ImportPostsTask" }
+
+      assert_equal maintenance_tasks_runs(:import_posts_task_succeeded), task.related_run
+    end
+
     test "#new sets last_run if one is passed as an argument" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
       task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask", run)
