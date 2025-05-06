@@ -162,8 +162,7 @@ module MaintenanceTasks
     def markup(attribute)
       render(inline: <<~TEMPLATE)
         <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
-          <% inclusion_values = resolve_inclusion_value(form.object, '#{attribute}') %>
-          <%= parameter_field(form, '#{attribute}', inclusion_values) %>
+          <%= parameter_field(form, '#{attribute}') %>
         <% end %>
       TEMPLATE
     end
