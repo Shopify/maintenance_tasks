@@ -21,7 +21,7 @@
 
     <%= render "maintenance_tasks/runs/csv", run: run %>
     <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
-    <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments %>
+    <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments, run: run %>
     <%= tag.hr if run.csv_file.present? || run.arguments.present? && run.metadata.present? %>
     <%= render "maintenance_tasks/runs/metadata", metadata: run.metadata %>
   <% end %>
