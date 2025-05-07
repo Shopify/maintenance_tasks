@@ -150,14 +150,11 @@ module MaintenanceTasks
 
     # Return the appropriate field tag for the parameter, based on its type.
     # If the parameter has a `validates_inclusion_of` validator, return a dropdown list of options instead.
-    def parameter_field(form_builder, parameter_name, inclusion_values)
-      return form_builder.select(
-        parameter_name,
-        inclusion_values,
-        {
-          prompt: "Select a value",
-        },
-      ) if inclusion_values
+    def parameter_field(form_builder, parameter_name)
+      inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
+      if inclusion_values
+        return tag.div(form_builder.select(parameter_name, inclusion_values, prompt: "Select a value"), class: "select")
+      end
 
       case form_builder.object.class.attribute_types[parameter_name]
       when ActiveModel::Type::Integer
@@ -175,6 +172,7 @@ module MaintenanceTasks
       else
         form_builder.text_area(parameter_name, class: "textarea")
       end
+        .then { |input| tag.div(input, class: "control") }
     end
 
     # Return helper text for the datetime-local form field.

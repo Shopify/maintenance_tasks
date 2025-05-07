@@ -15,10 +15,10 @@
     <%= csrf_meta_tags %>
 
     <%=
-      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, 'npm/bulma@1.0.3/css/versions/bulma-no-dark-mode.min.css'),
+      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, "npm/bulma@1.0.3/css/versions/bulma-no-dark-mode.min.css"),
         media: :all,
-        integrity: 'Mzv683sNGpHoqzflgja8HtOOXwSkg0WYgbi6iV3IjnOLZAsGNzzkdXxfHmJYT5dY',
-        crossorigin: 'anonymous') unless request.xhr?
+        integrity: "sha256-HCNMQcqH/4MnGR0EYg2S3/BXYMM1z9lrFV10ANRd79o",
+        crossorigin: "anonymous") unless request.xhr?
     %>
 
     <style>

@@ -19,10 +19,7 @@
           <% parameter_names.each do |parameter_name| %>
             <div class="cell">
               <%= ff.label parameter_name, parameter_name, class: ["label", "is-family-monospace", { "is-required": attribute_required?(ff.object, parameter_name) }] %>
-              <% inclusion_values = resolve_inclusion_value(ff.object, parameter_name) %>
-              <div class="<%= inclusion_values.is_a?(Array) ? "select" : "control" %>">
-                <%= parameter_field(ff, parameter_name, inclusion_values) %>
-              </div>
+              <%= parameter_field(ff, parameter_name) %>
             </div>
           <% end %>
         <% end %>
@@ -59,7 +56,7 @@
 
     <h4 class="title is-5 has-text-weight-bold">Previous Runs</h4>
 
-    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records, as: :run %>
+    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
 
     <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
   <% end %>
