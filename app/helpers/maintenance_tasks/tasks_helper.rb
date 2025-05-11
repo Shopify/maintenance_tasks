@@ -199,5 +199,14 @@ module MaintenanceTasks
         validator.kind == :presence
       end
     end
+
+    # Returns the description for a given attribute
+    #
+    # @param task [MaintenanceTasks::TaskDataShow] The TaskDataShow instance.
+    # @param parameter_name [Symbol] The name of the attribute to check.
+    # @return [String, nil] the description of the attribute, if any
+    def attribute_description(task, parameter_name)
+      task.class.attribute_description(parameter_name)
+    end
   end
 end

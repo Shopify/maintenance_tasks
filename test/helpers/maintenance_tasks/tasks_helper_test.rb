@@ -149,6 +149,11 @@ module MaintenanceTasks
       assert_not attribute_required?(task, :content)
     end
 
+    test "#attribute_description returns the description for a given attribute" do
+      task = Maintenance::ParamsTask.new
+      assert_equal "The IDs of the posts to update", attribute_description(task, :post_ids)
+    end
+
     private
 
     def with_zone_default(new_zone)
