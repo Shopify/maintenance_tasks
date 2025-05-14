@@ -65,6 +65,7 @@
       function refresh() {
         const target = document.querySelector("[data-refresh]")
         if (!target || !target.dataset.refresh) return
+        const interval = parseInt(target.dataset.interval)
         window.setTimeout(() => {
           document.body.style.cursor = "wait"
           fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } }).then(
@@ -80,7 +81,7 @@
             },
             error => location.reload()
           )
-        }, <%= MaintenanceTasks.default_refresh_rate.in_seconds * 1000 %>)
+        }, interval)
       }
       document.addEventListener('DOMContentLoaded', refresh)
     </script>

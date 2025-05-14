@@ -1,4 +1,4 @@
-<%= tag.div(data: { refresh: (defined?(@refresh) && @refresh) || "" }) do %>
+<%= tag.div(data: { refresh: (defined?(@refresh) && @refresh) || "", interval: @refresh_interval }) do %>
   <% if @available_tasks.empty? %>
     <div class="content is-large">
       <h3 class="title is-3"> The MaintenanceTasks gem has been successfully installed! </h3>
