@@ -80,7 +80,7 @@
             },
             error => location.reload()
           )
-        }, 3000)
+        }, <%= MaintenanceTasks.default_refresh_rate.in_seconds * 1000 %>)
       }
       document.addEventListener('DOMContentLoaded', refresh)
     </script>

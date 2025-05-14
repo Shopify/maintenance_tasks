@@ -85,6 +85,13 @@ module MaintenanceTasks
   #  @return [ActiveSupport::Duration] the threshold in seconds after which a task is considered stuck.
   mattr_accessor :stuck_task_duration, default: 5.minutes
 
+  # @!attribute default_refresh_rate
+  #  @scope class
+  #  The duration after which the maintance tasks layout will refresh. Defaults to 3 seconds.
+  #
+  #  @return [ActiveSupport::Duration] the interval in seconds after which the page is triggered to refresh.
+  mattr_accessor :default_refresh_rate, default: 3.seconds
+
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
       "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \
