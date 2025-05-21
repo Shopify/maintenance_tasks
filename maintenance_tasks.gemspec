@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.summary = "A Rails engine for queuing and managing maintenance tasks"
   spec.license = "MIT"
 
-  spec.required_ruby_version = ">= 3.1"
+  spec.required_ruby_version = ">= 3.2"
 
   spec.metadata = {
     "source_code_uri" =>
