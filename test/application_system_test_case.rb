@@ -5,12 +5,6 @@ require "action_dispatch/system_testing/server"
 
 ActionDispatch::SystemTesting::Server.silence_puma = true
 
-# Necessary so that Capybara::Selenium::DeprecationSuppressor is prepended in
-# Selenium::WebDriver::Logger before it is instantiated in
-# Selenium::WebDriver.logger to prevent an uninitialized instance variable
-# warning in Ruby 2.7.
-Capybara::Selenium::Driver.load_selenium
-
 Capybara.configure do |config|
   # This causes flakiness when we're navigating pages because Capybara goes back to the browser to check for the
   # visibility of the node, which doesn't exist anymore:
