@@ -220,14 +220,10 @@ module MaintenanceTasks
       #
       # @param exceptions list of exceptions to rescue and report
       # @param report_options [Hash] optionally, supply additional options for `Rails.error.report`.
-      #   By default: <code>{ source: "maintenance_tasks" }</code> or (Rails <v7.1) <code>{ handled: true }</code>.
+      #   By default: <code>{ source: "maintenance_tasks" }</code>.
       def report_on(*exceptions, **report_options)
         rescue_from(*exceptions) do |exception|
-          if Rails.gem_version >= Gem::Version.new("7.1")
-            Rails.error.report(exception, source: "maintenance_tasks", **report_options)
-          else
-            Rails.error.report(exception, handled: true, **report_options)
-          end
+          Rails.error.report(exception, source: "maintenance_tasks", **report_options)
         end
       end
 

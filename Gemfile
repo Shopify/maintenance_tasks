@@ -10,7 +10,7 @@ gem "debug"
 gem "mocha"
 gem "puma"
 if !@rails_gem_requirement
-  gem "rails", ">= 7.0"
+  gem "rails", ">= 7.1"
   ruby ">= 3.2.0"
 else
   # causes Dependabot to ignore the next line and update the previous gem "rails"
@@ -21,11 +21,5 @@ gem "rubocop"
 gem "rubocop-shopify"
 gem "selenium-webdriver"
 gem "sprockets-rails"
-if @sqlite3_requirement
-  # causes Dependabot to ignore the next line and update the next gem "sqlite3"
-  sqlite3 = "sqlite3"
-  gem sqlite3, @sqlite3_requirement
-else
-  gem "sqlite3"
-end
+gem "sqlite3"
 gem "yard"

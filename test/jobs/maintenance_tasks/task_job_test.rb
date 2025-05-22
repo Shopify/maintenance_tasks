@@ -742,38 +742,5 @@ module MaintenanceTasks
       assert_equal(report.context.slice(:more), { more: true })
       assert_equal(report.severity, :info)
     end
-
-    private
-
-    if Rails.gem_version < Gem::Version.new("7.1.0")
-      Report = Struct.new(:exception, :handled, :severity, :context, :source, keyword_init: true)
-
-      def assert_error_reported(error = nil, &block)
-        reporter = Class.new do
-          def reports
-            @reports ||= []
-          end
-
-          def report(exception, **kwargs)
-            reports << Report.new(exception: exception, **kwargs)
-          end
-        end.new
-
-        Rails.error.subscribe(reporter)
-
-        yield
-
-        if error
-          report = reporter.reports.detect { |report| report.exception.is_a?(error) }
-          assert(report, "No #{error} reported!")
-          report
-        else
-          assert_not_empty(reporter.reports, "No errors reported!")
-          reporter.reports.first
-        end
-      ensure
-        Rails.error.instance_variable_get(:@subscribers).delete(reporter)
-      end
-    end
   end
 end

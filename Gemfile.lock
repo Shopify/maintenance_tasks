@@ -314,7 +314,7 @@ DEPENDENCIES
   maintenance_tasks!
   mocha
   puma
-  rails (>= 7.0)
+  rails (>= 7.1)
   rubocop
   rubocop-shopify
   selenium-webdriver
