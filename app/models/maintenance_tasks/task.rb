@@ -33,6 +33,11 @@ module MaintenanceTasks
     # @api private
     class_attribute :masked_arguments, default: []
 
+    # The descriptions for task attributes
+    #
+    # @api private
+    class_attribute :attribute_descriptions, default: {}
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     attr_accessor :metadata
@@ -53,6 +58,23 @@ module MaintenanceTasks
         end
 
         task
+      end
+
+      # Override the attribute method to support descriptions
+      def attribute(name, type = ActiveModel::Type::Value.new, **options)
+        super(name, type, **options.except(:description))
+        
+        if options[:description].present?
+          self.attribute_descriptions = attribute_descriptions.merge(name.to_s => options[:description])
+        end
+      end
+
+      # Returns the description for a given attribute
+      #
+      # @param name [String, Symbol] the name of the attribute
+      # @return [String, nil] the description of the attribute, if any
+      def attribute_description(name)
+        attribute_descriptions[name.to_s]
       end
 
       # Loads and returns a list of concrete classes that inherit
