@@ -1047,6 +1047,25 @@ Note that `context` may be empty if the Task produced an error before any
 context could be gathered (for example, if deserializing the job to process your
 Task failed).
 
+Here's an example custom subscriber to the Rails error reporter for integrating
+with an exception monitoring service (Bugsnag):
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+
+class MaintenanceTasksErrorSubscriber
+  def report(error, handled:, severity:, context:, source: nil)
+    return unless source == "maintenance-tasks"
+
+    Bugsnag.notify(error) do |notification|
+      notification.add_metadata(:task, context)
+    end
+  end
+end
+
+Rails.error.subscribe(MaintenanceTasksErrorSubscriber.new)
+```
+
 #### Reporting errors during iteration
 
 By default, errors raised during task iteration will be raised to the
