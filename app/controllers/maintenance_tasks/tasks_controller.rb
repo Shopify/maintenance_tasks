@@ -29,6 +29,7 @@ module MaintenanceTasks
 
     def set_refresh
       @refresh = true
+      @refresh_interval = MaintenanceTasks.default_refresh_rate.in_seconds * 1000
     end
   end
 end
