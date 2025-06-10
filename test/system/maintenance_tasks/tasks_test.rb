@@ -84,7 +84,8 @@ module MaintenanceTasks
     test "task with attributes renders correct field tags on the form" do
       visit maintenance_tasks_path
 
-      click_on("Maintenance::ParamsTask")
+      click_on "Maintenance::ParamsTask"
+      assert_title "Maintenance::ParamsTask"
 
       content_field = page.find_field("task[content]")
       assert_equal("textarea", content_field.tag_name)
