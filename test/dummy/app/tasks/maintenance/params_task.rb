@@ -10,7 +10,7 @@ module Maintenance
   end
 
   class ParamsTask < MaintenanceTasks::Task
-    attribute :post_ids, :string
+    attribute :post_ids, :string, description: "The IDs of the posts to update"
 
     validates :post_ids,
       presence: true,
