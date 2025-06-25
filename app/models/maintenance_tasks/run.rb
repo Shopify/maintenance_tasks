@@ -79,11 +79,10 @@ module MaintenanceTasks
     # Rescues and retries status transition if an ActiveRecord::StaleObjectError
     # is encountered.
     def enqueued!
-      status_will_change!
-      super
-    rescue ActiveRecord::StaleObjectError
-      reload_status
-      retry
+      with_stale_object_retry do
+        status_will_change!
+        super
+      end
     end
 
     CALLBACKS_TRANSITION = {
@@ -92,23 +91,37 @@ module MaintenanceTasks
       paused: :pause,
       succeeded: :complete,
     }.transform_keys(&:to_s)
-    private_constant :CALLBACKS_TRANSITION
+    MAX_STALE_OBJECT_RETRIES = 5
+    BASE_RETRY_DELAY = 0.1
+    MAX_RETRY_DELAY = 2.0
+    private_constant :CALLBACKS_TRANSITION, :MAX_STALE_OBJECT_RETRIES, :BASE_RETRY_DELAY, :MAX_RETRY_DELAY
 
     # Saves the run, persisting the transition of its status, and all other
     # changes to the object.
     def persist_transition
-      save!
-      callback = CALLBACKS_TRANSITION[status]
-      run_task_callbacks(callback) if callback
-    rescue ActiveRecord::StaleObjectError
-      success = succeeded?
-      reload_status
-      if success
-        self.status = :succeeded
-      else
-        job_shutdown
+      attempt = 1
+      begin
+        save!
+        callback = CALLBACKS_TRANSITION[status]
+        run_task_callbacks(callback) if callback
+      rescue ActiveRecord::StaleObjectError
+        if attempt <= MAX_STALE_OBJECT_RETRIES
+          sleep(stale_object_retry_delay(attempt))
+          attempt += 1
+
+          success = succeeded?
+          reload_status
+          if success
+            self.status = :succeeded
+          else
+            job_shutdown
+          end
+
+          retry
+        else
+          raise
+        end
       end
-      retry
     end
 
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
@@ -137,18 +150,17 @@ module MaintenanceTasks
     #
     # @param error [StandardError] the Error being persisted.
     def persist_error(error)
-      self.started_at ||= Time.now
-      update!(
-        status: :errored,
-        error_class: truncate(:error_class, error.class.name),
-        error_message: truncate(:error_message, error.message),
-        backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
-        ended_at: Time.now,
-      )
-      run_error_callback
-    rescue ActiveRecord::StaleObjectError
-      reload_status
-      retry
+      with_stale_object_retry do
+        self.started_at ||= Time.now
+        update!(
+          status: :errored,
+          error_class: truncate(:error_class, error.class.name),
+          error_message: truncate(:error_message, error.message),
+          backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
+          ended_at: Time.now,
+        )
+        run_error_callback
+      end
     end
 
     # Refreshes the status and lock version attributes on the Active Record
@@ -241,11 +253,8 @@ module MaintenanceTasks
     # is encountered.
     def running
       if locking_enabled?
-        begin
+        with_stale_object_retry do
           running! unless stopping?
-        rescue ActiveRecord::StaleObjectError
-          reload_status
-          retry
         end
       else
         # Preserve swap-and-replace solution for data races until users
@@ -268,11 +277,10 @@ module MaintenanceTasks
     # @param count [Integer] the total iterations to be performed, as
     #   specified by the Task.
     def start(count)
-      update!(started_at: Time.now, tick_total: count)
-      task.run_callbacks(:start)
-    rescue ActiveRecord::StaleObjectError
-      reload_status
-      retry
+      with_stale_object_retry do
+        update!(started_at: Time.now, tick_total: count)
+        task.run_callbacks(:start)
+      end
     end
 
     # Handles transitioning the status on a Run when the job shuts down.
@@ -307,16 +315,15 @@ module MaintenanceTasks
     # minutes ago, it will transition to cancelled, and the ended_at timestamp
     # will be updated.
     def cancel
-      if paused? || stuck?
-        self.status = :cancelled
-        self.ended_at = Time.now
-        persist_transition
-      else
-        cancelling!
+      with_stale_object_retry do
+        if paused? || stuck?
+          self.status = :cancelled
+          self.ended_at = Time.now
+          persist_transition
+        else
+          cancelling!
+        end
       end
-    rescue ActiveRecord::StaleObjectError
-      reload_status
-      retry
     end
 
     # Marks a Run as pausing.
@@ -327,15 +334,14 @@ module MaintenanceTasks
     # Rescues and retries status transition if an ActiveRecord::StaleObjectError
     # is encountered.
     def pause
-      if stuck?
-        self.status = :paused
-        persist_transition
-      else
-        pausing!
+      with_stale_object_retry do
+        if stuck?
+          self.status = :paused
+          persist_transition
+        else
+          pausing!
+        end
       end
-    rescue ActiveRecord::StaleObjectError
-      reload_status
-      retry
     end
 
     # Returns whether a Run is stuck, which is defined as having a status of
@@ -498,6 +504,31 @@ module MaintenanceTasks
       @argument_filter ||= ActiveSupport::ParameterFilter.new(
         Rails.application.config.filter_parameters + task.masked_arguments,
       )
+    end
+
+    def with_stale_object_retry(max_retries = MAX_STALE_OBJECT_RETRIES)
+      attempt = 1
+      begin
+        yield
+      rescue ActiveRecord::StaleObjectError
+        if attempt <= max_retries
+          sleep(stale_object_retry_delay(attempt))
+          attempt += 1
+          reload_status
+
+          retry
+        else
+          raise
+        end
+      end
+    end
+
+    def stale_object_retry_delay(attempt)
+      delay = BASE_RETRY_DELAY * (2**(attempt - 1))
+      delay = [delay, MAX_RETRY_DELAY].min
+      # Add jitter (±25% randomization) to prevent thundering herd
+      jitter = delay * 0.25
+      delay + (rand * 2 - 1) * jitter
     end
   end
 end
