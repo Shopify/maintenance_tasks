@@ -176,8 +176,8 @@ module MaintenanceTasks
       # Configure how frequently the run status should be reloaded during iteration.
       # Use this to reduce database queries when processing large collections.
       #
-      # @param frequency [Integer] reload status every N iterations (default: 1).
-      #   Setting this to 10 means status will be reloaded every 10 iterations.
+      # @param frequency [ActiveSupport::Duration, Numeric] reload status every N seconds (default: 1 second).
+      #   Setting this to 10.seconds means status will be reloaded every 10 seconds.
       def reload_status_every(frequency)
         self.status_reload_frequency = frequency
       end
@@ -307,7 +307,7 @@ module MaintenanceTasks
 
     # Returns the configured status reload frequency, falling back to the global default.
     #
-    # @return [Integer] the frequency at which to reload status during iteration.
+    # @return [ActiveSupport::Duration, Numeric] the time interval between status reloads.
     def status_reload_frequency
       self.class.status_reload_frequency || MaintenanceTasks.status_reload_frequency
     end

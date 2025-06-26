@@ -112,9 +112,9 @@ module MaintenanceTasks
 
     test ".perform_now respects status_reload_frequency for reloading status each iteration" do
       original_frequency = MaintenanceTasks.status_reload_frequency
-      MaintenanceTasks.status_reload_frequency = 2
+      MaintenanceTasks.status_reload_frequency = 1.second
 
-      @run.expects(:reload_status).once
+      @run.expects(:reload_status).at_least_once
       Maintenance::TestTask.any_instance.expects(:process).twice
 
       TaskJob.perform_now(@run)

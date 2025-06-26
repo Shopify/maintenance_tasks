@@ -520,7 +520,7 @@ This will replace the value in the arguments list with `[FILTERED]` in the UI.
 module Maintenance
   class SensitiveParamsTask < MaintenanceTasks::Task
     attribute :sensitive_content, :string
-    
+
     mask_attribute :sensitive_content
   end
 end
@@ -1231,13 +1231,12 @@ minutes.
 
 `MaintenanceTasks.status_reload_frequency` can be configured to specify how often
 the run status should be reloaded during iteration. By default, the status is
-reloaded on every iteration (frequency of 1), but this can be reduced to
-improve performance. Note that decreasing the reload frequency impacts how quickly
+reloaded every second, but this can be increased to improve performance. Note that increasing the reload interval impacts how quickly
 your task will stop if it is paused or interrupted.
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
-MaintenanceTasks.status_reload_frequency = 10  # Reload status every 10 iterations
+MaintenanceTasks.status_reload_frequency = 10.seconds  # Reload status every 10 seconds
 ```
 
 Individual tasks can also override this setting using the `reload_status_every` method:
@@ -1247,8 +1246,8 @@ Individual tasks can also override this setting using the `reload_status_every` 
 
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
-    # Reload status every 10 iterations instead of the global default
-    reload_status_every(10)
+    # Reload status every 5 seconds instead of the global default
+    reload_status_every(5.seconds)
 
     def collection
       Post.all

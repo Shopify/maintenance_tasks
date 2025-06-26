@@ -88,10 +88,10 @@ module MaintenanceTasks
   # @!attribute status_reload_frequency
   #  @scope class
   #  The frequency at which to reload the run status during iteration.
-  #  Defaults to 1, meaning reload status on every iteration.
+  #  Defaults to 1 second, meaning reload status every second.
   #
-  #  @return [Integer] the number of iterations between status reloads.
-  mattr_accessor :status_reload_frequency, default: 1
+  #  @return [ActiveSupport::Duration, Numeric] the time interval between status reloads.
+  mattr_accessor :status_reload_frequency, default: 1.second
 
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \

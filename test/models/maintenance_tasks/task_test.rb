@@ -123,20 +123,20 @@ module MaintenanceTasks
     end
 
     test ".status_reload_frequency uses task-level override when configured" do
-      Maintenance::TestTask.reload_status_every(5)
+      Maintenance::TestTask.reload_status_every(5.seconds)
       task = Maintenance::TestTask.new
-      assert_equal(5, task.status_reload_frequency)
+      assert_equal(5.seconds, task.status_reload_frequency)
     ensure
       Maintenance::TestTask.status_reload_frequency = nil
     end
 
     test ".status_reload_frequency falls back to global when not configured at task level" do
       original_global = MaintenanceTasks.status_reload_frequency
-      MaintenanceTasks.status_reload_frequency = 7
+      MaintenanceTasks.status_reload_frequency = 7.seconds
 
       Maintenance::TestTask.status_reload_frequency = nil
       task = Maintenance::TestTask.new
-      assert_equal(7, task.status_reload_frequency)
+      assert_equal(7.seconds, task.status_reload_frequency)
     ensure
       MaintenanceTasks.status_reload_frequency = original_global
       Maintenance::TestTask.status_reload_frequency = nil
