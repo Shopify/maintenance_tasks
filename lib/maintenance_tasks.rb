@@ -85,6 +85,14 @@ module MaintenanceTasks
   #  @return [ActiveSupport::Duration] the threshold in seconds after which a task is considered stuck.
   mattr_accessor :stuck_task_duration, default: 5.minutes
 
+  # @!attribute status_reload_frequency
+  #  @scope class
+  #  The frequency at which to reload the run status during iteration.
+  #  Defaults to 1, meaning reload status on every iteration.
+  #
+  #  @return [Integer] the number of iterations between status reloads.
+  mattr_accessor :status_reload_frequency, default: 1
+
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
       "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \

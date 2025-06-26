@@ -101,7 +101,7 @@ module MaintenanceTasks
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
       task_iteration(input)
       @ticker.tick
-      @run.reload_status
+      @run.reload_status if @run.tick_count % @task.status_reload_frequency == 0
     end
 
     def task_iteration(input)
