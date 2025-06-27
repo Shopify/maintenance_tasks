@@ -91,23 +91,22 @@ module MaintenanceTasks
       paused: :pause,
       succeeded: :complete,
     }.transform_keys(&:to_s)
-    MAX_STALE_OBJECT_RETRIES = 5
-    BASE_RETRY_DELAY = 0.1
-    MAX_RETRY_DELAY = 2.0
-    private_constant :CALLBACKS_TRANSITION, :MAX_STALE_OBJECT_RETRIES, :BASE_RETRY_DELAY, :MAX_RETRY_DELAY
+
+    DELAYS_PER_ATTEMPT = [0.1, 0.2, 0.4, 0.8, 1.6]
+    MAX_RETRIES = DELAYS_PER_ATTEMPT.size
+
+    private_constant :CALLBACKS_TRANSITION, :DELAYS_PER_ATTEMPT, :MAX_RETRIES
 
     # Saves the run, persisting the transition of its status, and all other
     # changes to the object.
     def persist_transition
-      attempt = 1
+      retry_count = 0
       begin
         save!
-        callback = CALLBACKS_TRANSITION[status]
-        run_task_callbacks(callback) if callback
       rescue ActiveRecord::StaleObjectError
-        if attempt <= MAX_STALE_OBJECT_RETRIES
-          sleep(stale_object_retry_delay(attempt))
-          attempt += 1
+        if retry_count < MAX_RETRIES
+          sleep(DELAYS_PER_ATTEMPT[retry_count])
+          retry_count += 1
 
           success = succeeded?
           reload_status
@@ -122,6 +121,9 @@ module MaintenanceTasks
           raise
         end
       end
+
+      callback = CALLBACKS_TRANSITION[status]
+      run_task_callbacks(callback) if callback
     end
 
     # Increments +tick_count+ by +number_of_ticks+ and +time_running+ by
@@ -159,8 +161,8 @@ module MaintenanceTasks
           backtrace: MaintenanceTasks.backtrace_cleaner.clean(error.backtrace),
           ended_at: Time.now,
         )
-        run_error_callback
       end
+      run_error_callback
     end
 
     # Refreshes the status and lock version attributes on the Active Record
@@ -279,8 +281,9 @@ module MaintenanceTasks
     def start(count)
       with_stale_object_retry do
         update!(started_at: Time.now, tick_total: count)
-        task.run_callbacks(:start)
       end
+
+      task.run_callbacks(:start)
     end
 
     # Handles transitioning the status on a Run when the job shuts down.
@@ -506,26 +509,22 @@ module MaintenanceTasks
       )
     end
 
-    def with_stale_object_retry(max_retries = MAX_STALE_OBJECT_RETRIES)
-      attempt = 1
-      begin
-        yield
-      rescue ActiveRecord::StaleObjectError
-        if attempt <= max_retries
-          sleep(stale_object_retry_delay(attempt))
-          attempt += 1
-          reload_status
+    def with_stale_object_retry(retry_count = 0)
+      yield
+    rescue ActiveRecord::StaleObjectError
+      if retry_count < MAX_RETRIES
+        sleep(stale_object_retry_delay(retry_count))
+        retry_count += 1
+        reload_status
 
-          retry
-        else
-          raise
-        end
+        retry
+      else
+        raise
       end
     end
 
-    def stale_object_retry_delay(attempt)
-      delay = BASE_RETRY_DELAY * (2**(attempt - 1))
-      delay = [delay, MAX_RETRY_DELAY].min
+    def stale_object_retry_delay(retry_count)
+      delay = DELAYS_PER_ATTEMPT[retry_count]
       # Add jitter (±25% randomization) to prevent thundering herd
       jitter = delay * 0.25
       delay + (rand * 2 - 1) * jitter
