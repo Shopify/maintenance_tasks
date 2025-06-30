@@ -15,6 +15,7 @@ module MaintenanceTasks
         "Maintenance::ImportPostsTask",
         "Maintenance::ImportPostsWithEncodingTask",
         "Maintenance::ImportPostsWithOptionsTask",
+        "Maintenance::InheritFromAbstractClassTask",
         "Maintenance::Nested::NestedMore::NestedMoreTask",
         "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",

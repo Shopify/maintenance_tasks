@@ -38,6 +38,10 @@ module MaintenanceTasks
     attr_accessor :metadata
 
     class << self
+      # Set this to +true+ if this is an abstract class. This will not appear
+      # as a task in the list.
+      attr_accessor :abstract_class
+
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
@@ -61,7 +65,7 @@ module MaintenanceTasks
       # @return [Array<Class>] the list of classes.
       def load_all
         load_constants
-        descendants
+        descendants.reject(&:abstract_class)
       end
 
       # Loads and returns a list of concrete classes that inherit
