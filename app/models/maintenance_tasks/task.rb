@@ -33,6 +33,12 @@ module MaintenanceTasks
     # @api private
     class_attribute :masked_arguments, default: []
 
+    # The frequency at which to reload the run status during iteration.
+    # Defaults to the global MaintenanceTasks.status_reload_frequency setting.
+    #
+    # @api private
+    class_attribute :status_reload_frequency
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     attr_accessor :metadata
@@ -167,6 +173,15 @@ module MaintenanceTasks
         self.masked_arguments += attributes
       end
 
+      # Configure how frequently the run status should be reloaded during iteration.
+      # Use this to reduce database queries when processing large collections.
+      #
+      # @param frequency [ActiveSupport::Duration, Numeric] reload status every N seconds (default: 1 second).
+      #   Setting this to 10.seconds means status will be reloaded every 10 seconds.
+      def reload_status_every(frequency)
+        self.status_reload_frequency = frequency
+      end
+
       # Initialize a callback to run after the task starts.
       #
       # @param filter_list apply filters to the callback
@@ -290,6 +305,13 @@ module MaintenanceTasks
     # @return the cursor_columns.
     def cursor_columns
       nil
+    end
+
+    # Returns the configured status reload frequency, falling back to the global default.
+    #
+    # @return [ActiveSupport::Duration, Numeric] the time interval between status reloads.
+    def status_reload_frequency
+      self.class.status_reload_frequency || MaintenanceTasks.status_reload_frequency
     end
 
     # Placeholder method to raise in case a subclass fails to implement the

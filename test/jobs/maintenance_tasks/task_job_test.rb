@@ -110,6 +110,18 @@ module MaintenanceTasks
       assert_equal 1, @run.reload.tick_count
     end
 
+    test ".perform_now respects status_reload_frequency for reloading status each iteration" do
+      original_frequency = MaintenanceTasks.status_reload_frequency
+      MaintenanceTasks.status_reload_frequency = 1.second
+
+      @run.expects(:reload_status).at_least_once
+      Maintenance::TestTask.any_instance.expects(:process).twice
+
+      TaskJob.perform_now(@run)
+    ensure
+      MaintenanceTasks.status_reload_frequency = original_frequency
+    end
+
     test ".perform_now persists started_at when the job starts" do
       freeze_time
       Maintenance::TestTask.any_instance.expects(:process).once.with do
