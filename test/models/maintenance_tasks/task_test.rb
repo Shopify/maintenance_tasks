@@ -4,7 +4,8 @@ require "test_helper"
 
 module MaintenanceTasks
   class TaskTest < ActiveSupport::TestCase
-    test ".load_all returns list of tasks that inherit from the Task superclass" do
+    test ".load_all returns list of tasks that inherit from the Task superclass, " \
+         "excluding abstract classes, ordered alphabetically by name" do
       expected = [
         "Maintenance::BatchImportPostsTask",
         "Maintenance::CallbackTestTask",
@@ -15,6 +16,7 @@ module MaintenanceTasks
         "Maintenance::ImportPostsTask",
         "Maintenance::ImportPostsWithEncodingTask",
         "Maintenance::ImportPostsWithOptionsTask",
+        "Maintenance::InheritFromAbstractClassTask",
         "Maintenance::Nested::NestedMore::NestedMoreTask",
         "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",

@@ -1017,6 +1017,17 @@ marked as fully cancelled, allowing you to run it again.
 If you are stuck in `pausing` and wish to preserve your tasks's position
 (instead of cancelling and rerunning), you may click "Force pause".
 
+### Hide tasks
+
+If you want a task to not appear it in the list, mark it as being abstract.
+E.g.:
+
+```rb
+class ApplicationTask < MaintenanceTasks::Task
+  self.abstract_class = true
+end
+```
+
 ### Configuring the gem
 
 There are a few configurable options for the gem. Custom configurations should
