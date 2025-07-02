@@ -20,6 +20,9 @@
             <div class="cell">
               <%= ff.label parameter_name, parameter_name, class: ["label", "is-family-monospace", { "is-required": attribute_required?(ff.object, parameter_name) }] %>
               <%= parameter_field(ff, parameter_name) %>
+              <% if description = attribute_description(ff.object, parameter_name) %>
+                <p class="help is-family-monospace is-size-7"><%= description %></p>
+              <% end %>
             </div>
           <% end %>
         <% end %>
