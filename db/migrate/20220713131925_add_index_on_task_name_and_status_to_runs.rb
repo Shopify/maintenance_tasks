@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddIndexOnTaskNameAndStatusToRuns < ActiveRecord::Migration[6.0]
+class AddIndexOnTaskNameAndStatusToRuns < ActiveRecord::Migration[7.0]
   def change
     remove_index(
       :maintenance_tasks_runs,
