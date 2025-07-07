@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateMaintenanceTasksRuns < ActiveRecord::Migration[6.0]
+class CreateMaintenanceTasksRuns < ActiveRecord::Migration[7.0]
   def change
     create_table(:maintenance_tasks_runs, id: primary_key_type) do |t|
       t.string(:task_name, null: false)
