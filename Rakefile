@@ -6,9 +6,6 @@ rescue LoadError
   puts "You must `gem install bundler` and `bundle install` to run rake tasks"
 end
 
-# Only necessary for activesupport <= 7.0 and concurrent-ruby >= 1.3.5
-require "logger" # https://github.com/rails/rails/issues/54260
-
 require "rdoc/task"
 RDoc::Task.new(:rdoc) do |rdoc|
   rdoc.rdoc_dir = "rdoc"

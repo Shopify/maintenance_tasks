@@ -193,10 +193,8 @@ module MaintenanceTasks
       if MaintenanceTasks.instance_variable_get(:@error_handler)
         errored_element = task_context.delete(:errored_element)
         MaintenanceTasks.error_handler.call(error, task_context.except(:run_id, :tick_count), errored_element)
-      elsif Rails.gem_version >= Gem::Version.new("7.1")
-        Rails.error.report(error, context: task_context, source: "maintenance-tasks")
       else
-        Rails.error.report(error, handled: true, context: task_context)
+        Rails.error.report(error, context: task_context, source: "maintenance-tasks")
       end
     end
 

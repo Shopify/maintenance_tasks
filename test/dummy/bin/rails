@@ -4,7 +4,4 @@
 APP_PATH = File.expand_path("../config/application", __dir__)
 require_relative "../config/boot"
 
-# Only necessary for activesupport <= 7.0 and concurrent-ruby >= 1.3.5
-require "logger" # https://github.com/rails/rails/issues/54260
-
 require "rails/commands"
