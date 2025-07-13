@@ -19,10 +19,6 @@ Capybara.configure do |config|
   config.ignore_hidden_elements = false
 end
 
-if Rails.gem_version < Gem::Version.new("7.1")
-  Selenium::WebDriver.logger.ignore(:capabilities)
-end
-
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   include ActiveJob::TestHelper
 

@@ -46,7 +46,6 @@ module Warning
       # To be removed once warnings are fixed in selenium-webdriver and sprockets.
       # This is noisy, so ignoring completely for now.
       return if message.match?("URI::RFC3986_PARSER.(un)?escape is obsolete.")
-      return if Rails.gem_version < "7.1" && message.match?(/the block passed to .* may be ignored/)
 
       raise message.to_s
     end
