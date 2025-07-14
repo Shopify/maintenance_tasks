@@ -101,7 +101,8 @@ module MaintenanceTasks
       throw(:abort, :skip_complete_callbacks) if @run.stopping?
       task_iteration(input)
       @ticker.tick
-      @run.reload_status
+
+      reload_run_status
     end
 
     def task_iteration(input)
@@ -127,6 +128,8 @@ module MaintenanceTasks
       @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
         @run.persist_progress(ticks, duration)
       end
+
+      @last_status_reload = nil
     end
 
     def on_start
@@ -195,6 +198,20 @@ module MaintenanceTasks
       else
         Rails.error.report(error, handled: true, context: task_context)
       end
+    end
+
+    def reload_run_status
+      return unless should_reload_status?
+
+      @run.reload_status
+      @last_status_reload = Time.now
+    end
+
+    def should_reload_status?
+      return true if @last_status_reload.nil?
+
+      time_since_last_reload = Time.now - @last_status_reload
+      time_since_last_reload >= @task.status_reload_frequency
     end
   end
 end
