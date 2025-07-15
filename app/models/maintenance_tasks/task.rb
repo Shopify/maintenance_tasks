@@ -37,7 +37,7 @@ module MaintenanceTasks
     # Defaults to the global MaintenanceTasks.status_reload_frequency setting.
     #
     # @api private
-    class_attribute :status_reload_frequency
+    class_attribute :status_reload_frequency, default: MaintenanceTasks.status_reload_frequency
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
@@ -305,13 +305,6 @@ module MaintenanceTasks
     # @return the cursor_columns.
     def cursor_columns
       nil
-    end
-
-    # Returns the configured status reload frequency, falling back to the global default.
-    #
-    # @return [ActiveSupport::Duration, Numeric] the time interval between status reloads.
-    def status_reload_frequency
-      self.class.status_reload_frequency || MaintenanceTasks.status_reload_frequency
     end
 
     # Placeholder method to raise in case a subclass fails to implement the
