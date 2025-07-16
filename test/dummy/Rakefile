@@ -1,8 +1,5 @@
 # frozen_string_literal: true
 
-# Only necessary for activesupport <= 7.0 and concurrent-ruby >= 1.3.5
-require "logger" # https://github.com/rails/rails/issues/54260
-
 require_relative "config/application"
 
 Rails.application.load_tasks

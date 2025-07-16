@@ -238,11 +238,7 @@ module MaintenanceTasks
       #   By default: <code>{ source: "maintenance_tasks" }</code> or (Rails <v7.1) <code>{ handled: true }</code>.
       def report_on(*exceptions, **report_options)
         rescue_from(*exceptions) do |exception|
-          if Rails.gem_version >= Gem::Version.new("7.1")
-            Rails.error.report(exception, source: "maintenance_tasks", **report_options)
-          else
-            Rails.error.report(exception, handled: true, **report_options)
-          end
+          Rails.error.report(exception, source: "maintenance_tasks", **report_options)
         end
       end
 

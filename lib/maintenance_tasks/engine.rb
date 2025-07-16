@@ -21,10 +21,8 @@ module MaintenanceTasks
       MaintenanceTasks.backtrace_cleaner = Rails.backtrace_cleaner
     end
 
-    if Rails.gem_version >= Gem::Version.new("7.1")
-      initializer "maintenance_tasks.deprecator" do
-        Rails.application.deprecators[:maintenance_tasks] = MaintenanceTasks.deprecator
-      end
+    initializer "maintenance_tasks.deprecator" do
+      Rails.application.deprecators[:maintenance_tasks] = MaintenanceTasks.deprecator
     end
 
     config.to_prepare do
