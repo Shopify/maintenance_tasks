@@ -1255,6 +1255,42 @@ The value for `MaintenanceTasks.stuck_task_duration` must be an
 `ActiveSupport::Duration`. If no value is specified, it will default to 5
 minutes.
 
+#### Configure status reload frequency
+
+`MaintenanceTasks.status_reload_frequency` can be configured to specify how often
+the run status should be reloaded during iteration. By default, the status is
+reloaded every second, but this can be increased to improve performance. Note that increasing the reload interval impacts how quickly
+your task will stop if it is paused or interrupted.
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+MaintenanceTasks.status_reload_frequency = 10.seconds  # Reload status every 10 seconds
+```
+
+Individual tasks can also override this setting using the `reload_status_every` method:
+
+```ruby
+# app/tasks/maintenance/update_posts_task.rb
+
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    # Reload status every 5 seconds instead of the global default
+    reload_status_every(5.seconds)
+
+    def collection
+      Post.all
+    end
+
+    def process(post)
+      post.update!(content: "New content!")
+    end
+  end
+end
+```
+
+This optimization can significantly reduce database queries, especially for short iterations.
+This is especially useful if the task doesn't need to check for cancellation/pausing very often.
+
 #### Metadata
 
 `MaintenanceTasks.metadata` can be configured to specify a proc from which to

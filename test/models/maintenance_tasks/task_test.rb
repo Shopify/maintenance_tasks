@@ -116,5 +116,20 @@ module MaintenanceTasks
       task = Task.new
       assert_nil task.cursor_columns
     end
+
+    test ".status_reload_frequency defaults to global configuration" do
+      task = Task.new
+      assert_equal MaintenanceTasks.status_reload_frequency, task.status_reload_frequency
+    end
+
+    test ".status_reload_frequency uses task-level override when configured" do
+      original_reload_frequency = Maintenance::TestTask.status_reload_frequency
+      Maintenance::TestTask.reload_status_every(5.seconds)
+      task = Maintenance::TestTask.new
+
+      assert_equal(5.seconds, task.status_reload_frequency)
+    ensure
+      Maintenance::TestTask.status_reload_frequency = original_reload_frequency
+    end
   end
 end

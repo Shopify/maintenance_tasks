@@ -110,6 +110,38 @@ module MaintenanceTasks
       assert_equal 1, @run.reload.tick_count
     end
 
+    test ".perform_now respects status_reload_frequency for reloading status each iteration" do
+      freeze_time
+
+      original_frequency = MaintenanceTasks.status_reload_frequency
+      MaintenanceTasks.status_reload_frequency = 1.second
+
+      # Total of 3 posts
+      Post.create!(title: "Hello World!", content: "Something")
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      reload_status_call_count = 0
+      original_reload_status = run.method(:reload_status)
+      run.expects(:reload_status).twice.with do
+        reload_status_call_count += 1
+        original_reload_status.call
+      end
+
+      Maintenance::UpdatePostsTask.any_instance.expects(:process).times(3).with do
+        travel(0.5)
+        true
+      end
+
+      TaskJob.perform_now(run)
+
+      # We iterated 3 times, but only 2 reloads were needed because the second
+      # iteration was within the status_reload_frequency
+      assert_equal(2, reload_status_call_count)
+    ensure
+      MaintenanceTasks.status_reload_frequency = original_frequency
+    end
+
     test ".perform_now persists started_at when the job starts" do
       freeze_time
       Maintenance::TestTask.any_instance.expects(:process).once.with do
