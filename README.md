@@ -579,6 +579,49 @@ module Maintenance
 end
 ```
 
+### Task Output
+
+Maintenance tasks can log output during execution, which is displayed in the web UI.
+
+To use this feature:
+
+1. Run the migration to add the `output` column to your database:
+   ```bash
+   rails generate migration AddOutputToMaintenanceTasksRuns output:text
+   rails db:migrate
+   ```
+
+2. Use the `log_output` method in your task's `process` method:
+
+```ruby
+module Maintenance
+  class DataCleanupTask < MaintenanceTasks::Task
+    def collection
+      User.where(last_sign_in_at: nil)
+    end
+
+    def process(user)
+      log_output("Processing user: #{user.email} (ID: #{user.id})")
+      
+      if user.created_at < 1.year.ago
+        log_output("  -> Marking user for cleanup")
+        user.update!(cleanup_flag: true)
+        log_output("  -> Successfully processed")
+      else
+        log_output("  -> Skipping: user created recently")
+      end
+    end
+  end
+end
+```
+
+The output:
+- Is stored in the database with the run record
+- Persists permanently and can be viewed anytime
+- Is displayed in a formatted box on the run details page
+- Updates in real-time as the task executes
+
+
 ### Subscribing to instrumentation events
 
 If you are interested in actioning a specific task event, please refer to the

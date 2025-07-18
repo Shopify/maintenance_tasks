@@ -443,6 +443,20 @@ module MaintenanceTasks
       argument_filter.filter(arguments)
     end
 
+    # Appends output to the existing output in the database if the column exists.
+    #
+    # @param new_output [String] the output to append.
+    def append_output(new_output)
+      return unless self.class.column_names.include?("output")
+
+      # Reload output from database to get the latest value
+      current_output = self.class.where(id: id).pluck(:output).first || ""
+      separator = current_output.present? ? "\n" : ""
+      updated_output = current_output + separator + new_output
+
+      self.class.where(id: id).update_all(output: updated_output)
+    end
+
     private
 
     def instrument_status_change

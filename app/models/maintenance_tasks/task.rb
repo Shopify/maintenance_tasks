@@ -41,7 +41,7 @@ module MaintenanceTasks
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
-    attr_accessor :metadata
+    attr_accessor :metadata, :output
 
     class << self
       # Finds a Task with the given name.
@@ -334,6 +334,15 @@ module MaintenanceTasks
     # @return [Enumerator]
     def enumerator_builder(cursor:)
       nil
+    end
+
+    # Appends a message to the task output.
+    #
+    # @param message [String] the message to append to the output.
+    def log_output(message)
+      return unless defined?(@run) && @run
+
+      @run.append_output(message)
     end
   end
 end

@@ -32,6 +32,7 @@ module MaintenanceTasks
         "Maintenance::ImportPostsWithOptionsTask New",
         "Maintenance::Nested::NestedMore::NestedMoreTask New",
         "Maintenance::Nested::NestedTask New",
+        "Maintenance::OutputTestTask New",
         "Maintenance::ParamsTask New",
         "Maintenance::TestTask New",
         "Maintenance::UpdatePostsInBatchesTask New",
