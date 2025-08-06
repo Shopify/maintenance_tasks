@@ -165,6 +165,34 @@ module Maintenance
 end
 ```
 
+#### Customizing the parent class
+
+A custom parent class can come in handy when you need to share code between tasks:
+
+```sh-session
+bin/rails generate maintenance_tasks:task update_posts --parent post_task
+```
+
+```ruby
+# app/tasks/maintenance/update_posts_task.rb
+
+module Maintenance
+  class UpdatePostsTask < PostTask
+    ...
+  end
+end
+```
+
+A default value for this flag can be added to the generator options in Rails:
+```ruby
+# config/application.rb
+...
+    config.generators do |g|
+      g.maintenance_tasks parent: "ApplicationTask"
+    end
+...
+```
+
 #### Customizing the Batch Size
 
 When processing records from an Active Record Relation, records are fetched in

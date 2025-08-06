@@ -81,6 +81,13 @@ module MaintenanceTasks
       end
     end
 
+    test "generator uses the right superclass when --parent is provided" do
+      run_generator ["sleepy", "--parent", "application_task"]
+      assert_file "app/tasks/maintenance/sleepy_task.rb" do |task|
+        assert_match(/class SleepyTask < ApplicationTask/, task)
+      end
+    end
+
     test "generator creates a collection-less Task if the --no-collection option is supplied" do
       run_generator ["sleepy", "--no-collection"]
       assert_file "app/tasks/maintenance/sleepy_task.rb" do |task|
