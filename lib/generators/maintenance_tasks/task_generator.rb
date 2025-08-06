@@ -19,6 +19,11 @@ module MaintenanceTasks
       default: false,
       desc: "Generate a collection-less Task."
 
+    class_option :parent,
+      type: :string,
+      default: "MaintenanceTasks::Task",
+      desc: "The parent class for the generated task."
+
     check_class_collision suffix: "Task"
 
     # Creates the Task file.
@@ -92,6 +97,10 @@ module MaintenanceTasks
 
     def no_collection?
       options[:no_collection]
+    end
+
+    def parent_class_name
+      options[:parent]
     end
   end
 end
