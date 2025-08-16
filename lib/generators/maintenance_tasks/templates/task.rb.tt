@@ -2,7 +2,7 @@
 
 module <%= tasks_module %>
 <% module_namespacing do -%>
-  class <%= class_name %>Task < MaintenanceTasks::Task
+  class <%= class_name %>Task < <%= parent_class_name.classify %>
     def collection
       # Collection to be iterated over
       # Must be Active Record Relation or Array

@@ -2,7 +2,7 @@
 
 module <%= tasks_module %>
 <% module_namespacing do -%>
-  class <%= class_name %>Task < MaintenanceTasks::Task
+  class <%= class_name %>Task < <%= parent_class_name.classify %>
     no_collection
 
     def process
