@@ -119,6 +119,10 @@ module MaintenanceTasks
     def before_perform
       @run = arguments.first
       @task = @run.task
+      # Set the run as an instance variable on the task to enable features
+      # like log_output that need to write data back to the run.
+      # This creates a bidirectional reference between the Run and Task.
+      @task.instance_variable_set(:@run, @run)
       if @task.has_csv_content?
         @task.csv_content = @run.csv_file.download
       end
