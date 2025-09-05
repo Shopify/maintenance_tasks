@@ -33,6 +33,9 @@ module MaintenanceTasks
     ]
     COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
 
+    # struct to hold a subset of a Run fields
+    RunData = Struct.new(:id, :cursor, keyword_init: true)
+
     enum :status, STATUSES.to_h { |status| [status, status.to_s] }
 
     after_save :instrument_status_change
@@ -424,6 +427,8 @@ module MaintenanceTasks
         end
 
         task.metadata = metadata
+        task.run_data = RunData.new(**attributes.symbolize_keys.slice(*RunData.members))
+
         task
       rescue ActiveModel::UnknownAttributeError
         task

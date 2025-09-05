@@ -625,6 +625,14 @@ module MaintenanceTasks
       assert_equal({ "foo" => "bar" }, run.task.metadata)
     end
 
+    test "#task sets a subset of the run fields on the Task" do
+      run = Run.new(task_name: "Maintenance::TestTask", id: 999, cursor: "998")
+      task = run.task
+
+      assert_equal(task.run_data.id, 999)
+      assert_equal(task.run_data.cursor, "998")
+    end
+
     test "#validate_task_arguments instantiates Task and assigns arguments if Task has parameters" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",
