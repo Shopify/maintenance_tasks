@@ -314,6 +314,13 @@ module MaintenanceTasks
       raise NoMethodError, "#{self.class.name} must implement `process`."
     end
 
+    # Placeholder method for task output implementation.
+    #
+    # @return [String, nil]
+    def output
+      nil
+    end
+
     # Total count of iterations to be performed, delegated to the strategy.
     #
     # @return [Integer, nil]

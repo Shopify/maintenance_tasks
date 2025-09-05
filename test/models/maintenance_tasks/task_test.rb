@@ -131,5 +131,18 @@ module MaintenanceTasks
     ensure
       Maintenance::TestTask.status_reload_frequency = original_reload_frequency
     end
+
+    test "#output may contain task output" do
+      test_task = Maintenance::TestTask.new
+
+      assert_nil(test_task.output)
+
+      # redefine output method
+      test_task.class.define_method(:output) do
+        "Some task output"
+      end
+
+      assert_equal("Some task output", test_task.output)
+    end
   end
 end
