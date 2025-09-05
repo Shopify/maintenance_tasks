@@ -579,6 +579,38 @@ module Maintenance
 end
 ```
 
+### Task Output
+
+Maintenance Tasks can store and collect task outputs, which is displayed on the Web UI.
+
+How the output is stored depends entirely on the Task implementation, being it on the primary database, logs, cache, file system, etc.
+
+To use this feature, define the `output` reader and writer methods, then write the output in the `process` method or in a callback.
+
+The task methods have access to a subset of the `Run` instance information in the `run_data` method.
+
+```ruby
+module Maintenance
+  class CacheOutputTask < MaintenanceTasks::Task
+    def collection
+      [1, 2]
+    end
+
+    def process(item)
+      self.output = output.to_s + "Processing item #{item}.\n"
+    end
+
+    def output=(message)
+      SomeStorage.write("maintenance-tasks:#{run_data.id}", message)
+    end
+
+    def output
+      SomeStorage.read("maintenance-tasks:#{run_data.id}")
+    end
+  end
+end
+```
+
 ### Subscribing to instrumentation events
 
 If you are interested in actioning a specific task event, please refer to the
