@@ -19,6 +19,7 @@ module MaintenanceTasks
         "Maintenance::Nested::NestedMore::NestedMoreTask",
         "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",
+        "Maintenance::OutputTask",
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
@@ -134,14 +135,7 @@ module MaintenanceTasks
     end
 
     test "#output may contain task output" do
-      test_task = Maintenance::TestTask.new
-
-      assert_nil(test_task.output)
-
-      # redefine output method
-      test_task.class.define_method(:output) do
-        "Some task output"
-      end
+      test_task = Maintenance::OutputTask.new
 
       assert_equal("Some task output", test_task.output)
     end
