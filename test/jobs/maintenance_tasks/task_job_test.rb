@@ -757,8 +757,8 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
 
       expected = <<~EOF
-        Completed number 1 on run #{run.id}.
-        Completed number 2 on run #{run.id}.
+        Completed number 1.
+        Completed number 2.
       EOF
       assert_equal(expected, run.output)
     end

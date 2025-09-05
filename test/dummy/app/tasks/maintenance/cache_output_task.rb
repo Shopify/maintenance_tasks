@@ -2,7 +2,7 @@
 
 module Maintenance
   class CacheOutputTask < MaintenanceTasks::Task
-    @cache = ""
+    @cache = {}
 
     class << self
       attr_accessor :cache
@@ -13,15 +13,15 @@ module Maintenance
     end
 
     def process(number)
-      self.output = output.to_s + "Completed number #{number} on run #{run_data.id}.\n"
+      self.output = output.to_s + "Completed number #{number}.\n"
     end
 
     def output=(message)
-      self.class.cache = message
+      self.class.cache[run_data.id] = message
     end
 
     def output
-      self.class.cache
+      self.class.cache[run_data.id]
     end
   end
 end
