@@ -725,6 +725,21 @@ module MaintenanceTasks
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
     end
 
+    test "#output is delegated to task instance" do
+      test_task = Maintenance::TestTask.new
+      # redefine output method
+      test_task.class.define_method(:output) do
+        "Some task output"
+      end
+
+      run = Run.create!(
+        task_name: "Maintenance::TestTask",
+        status: :succeeded,
+      )
+
+      assert_equal(run.output, "Some task output")
+    end
+
     private
 
     def expected_notification(run)

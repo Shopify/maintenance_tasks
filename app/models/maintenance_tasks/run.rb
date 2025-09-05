@@ -60,6 +60,8 @@ module MaintenanceTasks
 
     validates_with RunStatusValidator, on: :update
 
+    delegate :output, to: :task
+
     if MaintenanceTasks.active_storage_service.present?
       has_one_attached :csv_file,
         service: MaintenanceTasks.active_storage_service
