@@ -7,6 +7,7 @@ module MaintenanceTasks
     test ".load_all returns list of tasks that inherit from the Task superclass" do
       expected = [
         "Maintenance::BatchImportPostsTask",
+        "Maintenance::CacheOutputTask",
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
         "Maintenance::CustomEnumeratingTask",

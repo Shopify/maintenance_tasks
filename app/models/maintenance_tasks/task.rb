@@ -41,7 +41,9 @@ module MaintenanceTasks
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
-    attr_accessor :metadata, :run_data
+    attr_accessor :metadata
+
+    attr_writer :run_data
 
     class << self
       # Finds a Task with the given name.
@@ -337,6 +339,15 @@ module MaintenanceTasks
     # @return [Enumerator]
     def enumerator_builder(cursor:)
       nil
+    end
+
+    # Call and return the @run_data proc created by the task instance
+    #
+    # @return [Run::RunData, nil]
+    def run_data
+      return @run_data.call if @run_data.respond_to?(:call)
+
+      @run_data
     end
   end
 end

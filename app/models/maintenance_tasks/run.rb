@@ -427,7 +427,7 @@ module MaintenanceTasks
         end
 
         task.metadata = metadata
-        task.run_data = RunData.new(**attributes.symbolize_keys.slice(*RunData.members))
+        task.run_data = -> { RunData.new(**attributes.symbolize_keys.slice(*RunData.members)) }
 
         task
       rescue ActiveModel::UnknownAttributeError

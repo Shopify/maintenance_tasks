@@ -745,7 +745,7 @@ module MaintenanceTasks
         status: :succeeded,
       )
 
-      assert_equal(run.output, "Some task output")
+      assert_equal("Some task output", run.output)
     end
 
     private

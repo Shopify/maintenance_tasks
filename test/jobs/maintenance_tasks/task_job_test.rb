@@ -751,6 +751,18 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
     end
 
+    test ".perform_now can store task output into cache" do
+      run = Run.create!(task_name: "Maintenance::CacheOutputTask")
+
+      TaskJob.perform_now(run)
+
+      expected = <<~EOF
+        Completed number 1 on run #{run.id}.
+        Completed number 2 on run #{run.id}.
+      EOF
+      assert_equal(expected, run.output)
+    end
+
     test ".report_on reports the error" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
 
