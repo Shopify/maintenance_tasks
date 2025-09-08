@@ -3,6 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <%= capybara_lockstep if defined?(Capybara::Lockstep) %>
 
     <title>
       <% if content_for?(:page_title) %>

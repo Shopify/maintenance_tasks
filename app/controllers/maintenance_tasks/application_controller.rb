@@ -13,9 +13,15 @@ module MaintenanceTasks
         # <style> tag in app/views/layouts/maintenance_tasks/application.html.erb
         "'sha256-WHHDQLdkleXnAN5zs0GDXC5ls41CHUaVsJtVpaNx+EM='",
       )
+      capybara_lockstep_scripts = [
+        "'sha256-1AoN3ZtJC5OvqkMgrYvhZjp4kI8QjJjO7TAyKYiDw+U='",
+        "'sha256-QVSzZi6ZsX/cu4h+hIs1iVivG1BxUmJggiEsGDIXBG0='", # with debug on
+      ] if defined?(Capybara::Lockstep)
       policy.script_src_elem(
         # <script> tag in app/views/layouts/maintenance_tasks/application.html.erb
         "'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='",
+        # <script> tag for capybara-lockstep
+        *capybara_lockstep_scripts,
       )
 
       policy.require_trusted_types_for # disable because we use new DOMParser().parseFromString
