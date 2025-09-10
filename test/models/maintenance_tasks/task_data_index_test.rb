@@ -7,6 +7,7 @@ module MaintenanceTasks
     test ".available_tasks returns a list of Tasks as TaskDataShow, ordered alphabetically by name" do
       expected = [
         "Maintenance::BatchImportPostsTask",
+        "Maintenance::CacheOutputTask",
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
         "Maintenance::CustomEnumeratingTask",
@@ -20,6 +21,7 @@ module MaintenanceTasks
         "Maintenance::NoCollectionTask",
         # duplicate due to fixtures containing two active runs of this task
         "Maintenance::NoCollectionTask",
+        "Maintenance::OutputTask",
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
