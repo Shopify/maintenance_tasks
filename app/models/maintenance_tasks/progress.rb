@@ -29,6 +29,7 @@ module MaintenanceTasks
     def value
       return 0 if @run.completed? && @run.tick_total.to_i.zero?
       return @run.tick_count if estimatable? || @run.stopped?
+
       nil
     end
 
