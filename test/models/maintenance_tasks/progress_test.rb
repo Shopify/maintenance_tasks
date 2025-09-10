@@ -18,6 +18,13 @@ module MaintenanceTasks
       assert_nil @progress.value
     end
 
+    test "#value is 0 if the Run is completed and does not have a tick total" do
+      @run.status = :succeeded
+      @run.tick_total = nil
+
+      assert_equal 0, @progress.value
+    end
+
     test "#value is the Run tick count if the Run does not have a tick total and it is stopped" do
       @run.status = :paused
       @run.tick_total = nil
