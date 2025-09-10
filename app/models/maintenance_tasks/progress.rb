@@ -50,12 +50,10 @@ module MaintenanceTasks
     #
     # @return [String] the text for the Run progress.
     def text
-      count = @run.tick_count
+      count = @run.tick_count || 0
       total = @run.tick_total
 
-      if count.nil?
-        "Processed 0 items."
-      elsif !total?
+      if !total?
         "Processed #{number_to_delimited(count)} " \
           "#{"item".pluralize(count)}."
       elsif over_total?
