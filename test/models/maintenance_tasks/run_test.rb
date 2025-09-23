@@ -625,6 +625,14 @@ module MaintenanceTasks
       assert_equal({ "foo" => "bar" }, run.task.metadata)
     end
 
+    test "#task sets a subset of the run fields on the Task" do
+      run = Run.new(task_name: "Maintenance::TestTask", id: 999, cursor: "998")
+      task = run.task
+
+      assert_equal(task.run_data.id, 999)
+      assert_equal(task.run_data.cursor, "998")
+    end
+
     test "#validate_task_arguments instantiates Task and assigns arguments if Task has parameters" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",
@@ -723,6 +731,21 @@ module MaintenanceTasks
     test "ACTIVE_STATUSES and COMPLETED_STATUSES contain all valid statuses" do
       assert Run::STATUSES.sort ==
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
+    end
+
+    test "#output is delegated to task instance" do
+      test_task = Maintenance::TestTask.new
+      # redefine output method
+      test_task.class.define_method(:output) do
+        "Some task output"
+      end
+
+      run = Run.create!(
+        task_name: "Maintenance::TestTask",
+        status: :succeeded,
+      )
+
+      assert_equal("Some task output", run.output)
     end
 
     private

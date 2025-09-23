@@ -7,6 +7,7 @@ module MaintenanceTasks
     test ".load_all returns list of tasks that inherit from the Task superclass" do
       expected = [
         "Maintenance::BatchImportPostsTask",
+        "Maintenance::CacheOutputTask",
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
         "Maintenance::CustomEnumeratingTask",
@@ -18,6 +19,7 @@ module MaintenanceTasks
         "Maintenance::Nested::NestedMore::NestedMoreTask",
         "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",
+        "Maintenance::OutputTask",
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
@@ -130,6 +132,12 @@ module MaintenanceTasks
       assert_equal(5.seconds, task.status_reload_frequency)
     ensure
       Maintenance::TestTask.status_reload_frequency = original_reload_frequency
+    end
+
+    test "#output may contain task output" do
+      test_task = Maintenance::OutputTask.new
+
+      assert_equal("Some task output", test_task.output)
     end
   end
 end
