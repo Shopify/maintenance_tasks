@@ -62,7 +62,7 @@
       }
     </style>
 
-    <script>
+    <script nonce="<%= content_security_policy_nonce %>">
       function refresh() {
         const target = document.querySelector("[data-refresh]")
         if (!target || !target.dataset.refresh) return
