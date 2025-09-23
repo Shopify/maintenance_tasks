@@ -422,6 +422,8 @@ module MaintenanceTasks
     end
 
     test ".perform_now reports errors raised by the task" do
+      @old_handled = MaintenanceTasks.report_errors_as_handled
+      MaintenanceTasks.report_errors_as_handled = false
       run = Run.create!(task_name: "Maintenance::ErrorTask")
 
       report = assert_error_reported(ArgumentError) do
@@ -429,11 +431,14 @@ module MaintenanceTasks
       end
       run.reload
 
-      assert_predicate run, :errored?
-      assert_equal 2, run.tick_count
-      assert_equal "Maintenance::ErrorTask", report.dig(:context, :task_name)
-      assert_equal run.id, report.dig(:context, :run_id)
-      assert_equal 0, report.dig(:context, :tick_count)
+      assert_predicate(run, :errored?)
+      assert_equal(2, run.tick_count)
+      assert_equal("Maintenance::ErrorTask", report.dig(:context, :task_name))
+      assert_equal(run.id, report.dig(:context, :run_id))
+      assert_equal(0, report.dig(:context, :tick_count))
+      refute_predicate(report, :handled)
+    ensure
+      MaintenanceTasks.report_errors_as_handled = @old_handled
     end
 
     test ".perform_now handles case where run is not set and reports error" do
@@ -773,6 +778,10 @@ module MaintenanceTasks
 
       assert_equal(report.context.slice(:more), { more: true })
       assert_equal(report.severity, :info)
+
+      # defaults
+      assert_predicate(report, :handled)
+      assert_equal(report.source, "maintenance-tasks")
     end
   end
 end

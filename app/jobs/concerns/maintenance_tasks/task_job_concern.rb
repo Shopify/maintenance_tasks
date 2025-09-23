@@ -194,7 +194,12 @@ module MaintenanceTasks
         errored_element = task_context.delete(:errored_element)
         MaintenanceTasks.error_handler.call(error, task_context.except(:run_id, :tick_count), errored_element)
       else
-        Rails.error.report(error, context: task_context, source: "maintenance-tasks")
+        Rails.error.report(
+          error,
+          handled: MaintenanceTasks.report_errors_as_handled,
+          context: task_context,
+          source: "maintenance-tasks",
+        )
       end
     end
 
