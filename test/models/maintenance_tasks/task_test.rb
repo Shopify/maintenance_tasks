@@ -18,12 +18,15 @@ module MaintenanceTasks
         "Maintenance::Nested::NestedMore::NestedMoreTask",
         "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",
+        "Maintenance::OutputTestTask",
         "Maintenance::ParamsTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
         "Maintenance::UpdatePostsModulePrependedTask",
         "Maintenance::UpdatePostsTask",
         "Maintenance::UpdatePostsThrottledTask",
+        "MaintenanceTasks::TaskOutputTest::NoCollectionTaskWithOutput",
+        "MaintenanceTasks::TaskOutputTest::TestTaskWithOutput",
       ]
       assert_equal expected,
         MaintenanceTasks::Task.load_all.map(&:name).sort
