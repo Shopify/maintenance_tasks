@@ -49,6 +49,20 @@ module MaintenanceTasks
       assert_equal expected, progress(@run)
     end
 
+    test "#progress returns a <div> with a <progress> with no value when Run is succeeded and tick_total is 0" do
+      @run.status = :succeeded
+      @run.started_at = Time.now
+
+      Progress.expects(:new).with(@run).returns(
+        mock(value: 0, max: nil, text: "Processed 0 items."),
+      )
+
+      expected = '<div class="block"><progress value="0" ' \
+        'class="progress mt-4 is-success"></progress>' \
+        "<p><i>Processed 0 items.</i></p></div>"
+      assert_equal expected, progress(@run)
+    end
+
     test "#status_tag renders a span with the appropriate tag based on status" do
       expected = '<span class="tag has-text-weight-medium pr-2 mr-4 is-warning is-light">Pausing</span>'
       assert_equal expected, status_tag("pausing")
