@@ -434,6 +434,7 @@ module MaintenanceTasks
       assert_equal "Maintenance::ErrorTask", report.dig(:context, :task_name)
       assert_equal run.id, report.dig(:context, :run_id)
       assert_equal 0, report.dig(:context, :tick_count)
+      refute_predicate report, :handled
     end
 
     test ".perform_now handles case where run is not set and reports error" do
@@ -773,6 +774,10 @@ module MaintenanceTasks
 
       assert_equal(report.context.slice(:more), { more: true })
       assert_equal(report.severity, :info)
+
+      # defaults
+      assert_predicate(report, :handled)
+      assert_equal(report.source, "maintenance-tasks")
     end
   end
 end
