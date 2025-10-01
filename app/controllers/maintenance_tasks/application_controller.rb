@@ -8,10 +8,14 @@ module MaintenanceTasks
     BULMA_CDN = "https://cdn.jsdelivr.net"
 
     content_security_policy do |policy|
+      policy.style_src(
+        :self,
+        BULMA_CDN,
+      )
       policy.style_src_elem(
         BULMA_CDN,
         # <style> tag in app/views/layouts/maintenance_tasks/application.html.erb
-        "'sha256-WHHDQLdkleXnAN5zs0GDXC5ls41CHUaVsJtVpaNx+EM='",
+        "'sha256-LVai3C2/+O9MPVaeiRrXbcSwDbPxqWfXI4pz487d9Js='",
       )
       capybara_lockstep_scripts = [
         "'sha256-1AoN3ZtJC5OvqkMgrYvhZjp4kI8QjJjO7TAyKYiDw+U='",
