@@ -235,10 +235,10 @@ module MaintenanceTasks
       #
       # @param exceptions list of exceptions to rescue and report
       # @param report_options [Hash] optionally, supply additional options for `Rails.error.report`.
-      #   By default: <code>{ source: "maintenance_tasks" }</code> or (Rails <v7.1) <code>{ handled: true }</code>.
+      #   By default: <code>{ handled: true, source: "maintenance-tasks" }</code>.
       def report_on(*exceptions, **report_options)
         rescue_from(*exceptions) do |exception|
-          Rails.error.report(exception, source: "maintenance_tasks", **report_options)
+          Rails.error.report(exception, source: "maintenance-tasks", **report_options)
         end
       end
 

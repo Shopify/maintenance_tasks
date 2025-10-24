@@ -93,6 +93,22 @@ module MaintenanceTasks
   #  @return [ActiveSupport::Duration, Numeric] the time interval between status reloads.
   mattr_accessor :status_reload_frequency, default: 1.second
 
+  # @!attribute report_errors_as_handled
+  #  @scope class
+  #  How unexpected errors are reported to Rails.error.report.
+  #
+  #  When an error occurs that isn't explicitly handled (e.g., via `report_on`),
+  #  it gets reported to Rails.error.report. This setting determines whether
+  #  these errors are marked as "handled" or "unhandled".
+  #
+  #  The current default of `true` is for backwards compatibility, but it prevents
+  #  error subscribers from distinguishing between expected and unexpected errors.
+  #  Setting this to `false` provides more accurate error reporting and will become the default in v3.0.
+  #
+  #  @see https://api.rubyonrails.org/classes/ActiveSupport/ErrorReporter.html#method-i-report
+  #  @return [Boolean] whether to report unexpected errors as handled (true) or unhandled (false).
+  mattr_accessor :report_errors_as_handled, default: true
+
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
       "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \

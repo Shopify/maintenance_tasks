@@ -1027,7 +1027,7 @@ be placed in a `maintenance_tasks.rb` initializer.
 Exceptions raised while a Task is performing are rescued and information about
 the error is persisted and visible in the UI.
 
-Errors are also sent to the `Rails.error.reporter`, which can be configured by
+Errors are also sent to `Rails.error.report`, which can be configured by
 your application. See the [Error Reporting in Rails
 Applications][rails-error-reporting] guide for more details.
 
@@ -1042,6 +1042,7 @@ Reports to the error reporter will contain the following data:
    * `tick_count`: The tick count at the time of the error
    * `errored_element`: The element, if any, that was being processed when the
 * `source`: This will be `maintenance-tasks`
+* `handled`: the value of `MaintenanceTasks.report_errors_as_handled` (default `true`, see below)
 
 Note that `context` may be empty if the Task produced an error before any
 context could be gathered (for example, if deserializing the job to process your
@@ -1052,19 +1053,30 @@ with an exception monitoring service (Bugsnag):
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
+MaintenanceTasks.report_errors_as_handled = false
 
 class MaintenanceTasksErrorSubscriber
   def report(error, handled:, severity:, context:, source: nil)
     return unless source == "maintenance-tasks"
 
-    Bugsnag.notify(error) do |notification|
-      notification.add_metadata(:task, context)
+    unless handled
+      Bugsnag.notify(error) do |notification|
+        notification.add_metadata(:task, context)
+      end
+    else
+      Rails.logger.info(error)
     end
   end
 end
 
 Rails.error.subscribe(MaintenanceTasksErrorSubscriber.new)
 ```
+
+`MaintenanceTasks.report_errors_as_handled` determines the value for `handled` in this example.
+By default (for backwards compatibility) this is `true`.
+Setting this to `false` provides more accurate error reporting as it allows to distinguish between
+expected (e.g., via `report_on`) and unexpected errors in error subscribers.
+`false` will be the default in v3.0.
 
 #### Reporting errors during iteration
 
