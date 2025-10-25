@@ -43,6 +43,8 @@ module MaintenanceTasks
 
     attr_accessor :metadata
 
+    attr_writer :run_data
+
     class << self
       # Finds a Task with the given name.
       #
@@ -314,6 +316,13 @@ module MaintenanceTasks
       raise NoMethodError, "#{self.class.name} must implement `process`."
     end
 
+    # Placeholder method for task output implementation.
+    #
+    # @return [String, nil]
+    def output
+      nil
+    end
+
     # Total count of iterations to be performed, delegated to the strategy.
     #
     # @return [Integer, nil]
@@ -330,6 +339,15 @@ module MaintenanceTasks
     # @return [Enumerator]
     def enumerator_builder(cursor:)
       nil
+    end
+
+    # Call and return the @run_data proc created by the task instance
+    #
+    # @return [Run::RunData, nil]
+    def run_data
+      return @run_data.call if @run_data.respond_to?(:call)
+
+      @run_data
     end
   end
 end
