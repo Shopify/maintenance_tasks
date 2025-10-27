@@ -59,7 +59,7 @@ jobs:
     - name: RuboCop
       run: bundle exec rubocop
     - name: Archive system test artifacts
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v5
       if: failure()
       with:
         name: screenshots-${{ strategy.job-index }}
