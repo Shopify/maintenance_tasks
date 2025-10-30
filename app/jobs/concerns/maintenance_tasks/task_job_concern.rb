@@ -123,7 +123,7 @@ module MaintenanceTasks
         @task.csv_content = @run.csv_file.download
       end
 
-      @run.running
+      @run.running unless @run.succeeded?
 
       @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
         @run.persist_progress(ticks, duration)
@@ -178,7 +178,7 @@ module MaintenanceTasks
 
       if defined?(@run)
         @run.cursor = cursor_position
-        @run.persist_error(error)
+        @run.persist_error(error) unless @run.succeeded?
 
         task_context = {
           task_name: @run.task_name,

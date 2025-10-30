@@ -201,6 +201,20 @@ module MaintenanceTasks
       assert_equal "1", run.cursor
     end
 
+    test ".perform_now does not update Run when task is succeeded" do
+      freeze_time
+      run = Run.create!(task_name: "Maintenance::ErrorTask", status: :succeeded)
+
+      TaskJob.perform_now(run)
+      run.reload
+
+      assert_nil run.error_class
+      assert_nil run.error_message
+      assert_nil run.backtrace
+      assert_nil run.ended_at
+      assert_nil run.cursor
+    end
+
     test ".perform_now handles when the Task cannot be found" do
       run = Run.new(task_name: "Maintenance::DeletedTask")
       run.save(validate: false)
