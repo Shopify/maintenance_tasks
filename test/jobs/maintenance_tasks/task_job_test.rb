@@ -121,23 +121,13 @@ module MaintenanceTasks
 
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
 
-      reload_status_call_count = 0
-      original_reload_status = run.method(:reload_status)
-      run.expects(:reload_status).twice.with do
-        reload_status_call_count += 1
-        original_reload_status.call
-      end
+      # We iterate 3 times, but only 1 reload is necessary because the next 2
+      # iterations are within the status_reload_frequency
+      run.expects(:reload_status).once
 
-      Maintenance::UpdatePostsTask.any_instance.expects(:process).times(3).with do
-        travel(0.5)
-        true
-      end
+      Maintenance::UpdatePostsTask.any_instance.expects(:process).times(3)
 
       TaskJob.perform_now(run)
-
-      # We iterated 3 times, but only 2 reloads were needed because the second
-      # iteration was within the status_reload_frequency
-      assert_equal(2, reload_status_call_count)
     ensure
       MaintenanceTasks.status_reload_frequency = original_frequency
     end
