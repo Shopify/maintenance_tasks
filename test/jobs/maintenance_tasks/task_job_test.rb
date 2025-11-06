@@ -113,9 +113,6 @@ module MaintenanceTasks
     test ".perform_now respects status_reload_frequency for reloading status each iteration" do
       freeze_time
 
-      original_frequency = MaintenanceTasks.status_reload_frequency
-      MaintenanceTasks.status_reload_frequency = 1.second
-
       # Total of 3 posts
       Post.create!(title: "Hello World!", content: "Something")
 
@@ -127,9 +124,9 @@ module MaintenanceTasks
 
       Maintenance::UpdatePostsTask.any_instance.expects(:process).times(3)
 
-      TaskJob.perform_now(run)
-    ensure
-      MaintenanceTasks.status_reload_frequency = original_frequency
+      Maintenance::UpdatePostsTask.with(status_reload_frequency: 1.second) do
+        TaskJob.perform_now(run)
+      end
     end
 
     test ".perform_now persists started_at when the job starts" do
