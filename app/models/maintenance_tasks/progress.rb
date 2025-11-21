@@ -27,7 +27,10 @@ module MaintenanceTasks
     # @return [Integer] if progress can be determined or the Run is stopped.
     # @return [nil] if progress can't be determined and the Run isn't stopped.
     def value
-      @run.tick_count if estimatable? || @run.stopped?
+      return 0 if @run.completed? && @run.tick_total.to_i.zero?
+      return @run.tick_count if estimatable? || @run.stopped?
+
+      nil
     end
 
     # The maximum amount of work expected to be done. This is extracted from the
@@ -48,7 +51,7 @@ module MaintenanceTasks
     #
     # @return [String] the text for the Run progress.
     def text
-      count = @run.tick_count
+      count = @run.tick_count || 0
       total = @run.tick_total
 
       if !total?
