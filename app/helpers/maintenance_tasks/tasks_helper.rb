@@ -199,5 +199,55 @@ module MaintenanceTasks
         validator.kind == :presence
       end
     end
+
+    # Extracts unique namespaces from a collection of tasks.
+    #
+    # @param tasks [Array] collection of task objects with a name method.
+    # @return [Array<String>] sorted unique namespaces.
+    def extract_namespaces(tasks)
+      tasks
+        .filter_map { |task| task.name.deconstantize.presence }
+        .uniq
+        .sort
+    end
+
+    # Builds a nested tree structure from a flat list of namespaces.
+    #
+    # @param namespaces [Array<String>] flat list of namespaces.
+    # @return [Hash] nested tree structure.
+    def build_namespace_tree(namespaces)
+      namespaces.each_with_object({}) do |namespace, tree|
+        parts = namespace.split("::")
+        parts.each_with_index.inject(tree) do |current, (part, index)|
+          full_path = parts[0..index].join("::")
+          current[part] ||= { name: part, full_path: full_path, children: {} }
+          current[part][:children]
+        end
+      end
+    end
+
+    # Renders a namespace tree node with nested children using details/summary.
+    #
+    # @param node [Hash] the node to render { name:, full_path:, children: }.
+    # @param selected_namespace [String, nil] the currently selected namespace.
+    # @return [ActiveSupport::SafeBuffer] HTML for the node.
+    def render_namespace_node(node, selected_namespace)
+      is_active = selected_namespace == node[:full_path]
+      is_expanded = is_active || selected_namespace&.start_with?("#{node[:full_path]}::")
+      link = link_to(node[:name], tasks_path(namespace: node[:full_path]), class: class_names("is-active" => is_active))
+
+      content_tag(:li) do
+        if node[:children].present?
+          content_tag(:details, open: is_expanded || nil) do
+            content_tag(:summary) { link } +
+              content_tag(:ul) do
+                safe_join(node[:children].values.sort_by { |n| n[:name] }.map { |child| render_namespace_node(child, selected_namespace) })
+              end
+          end
+        else
+          link
+        end
+      end
+    end
   end
 end

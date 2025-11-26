@@ -91,6 +91,69 @@
         color: var(--required-color);
         font-size: 12px;
       }
+
+      /* Sidebar styles */
+      .sidebar {
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-radius: 8px;
+        border-left: 3px solid #485fc7;
+      }
+      .sidebar .menu-list a {
+        border-radius: 4px;
+        padding: 0.5em 0.75em;
+        color: #363636;
+        transition: all 0.15s ease;
+        font-size: 0.9rem;
+      }
+      .sidebar .menu-list a:hover {
+        background-color: #e8e8e8;
+        color: #485fc7;
+      }
+      .sidebar .menu-list a.is-active {
+        background-color: #485fc7;
+        color: #fff;
+        font-weight: 600;
+      }
+      .sidebar .menu-list li {
+        margin-bottom: 2px;
+      }
+      /* Nested namespace styles */
+      .sidebar .menu-list details {
+        margin: 0;
+      }
+      .sidebar .menu-list details > summary {
+        list-style: none;
+        cursor: pointer;
+      }
+      .sidebar .menu-list details > summary::before {
+        content: none;
+        display: none;
+      }
+      .sidebar .menu-list details > summary::-webkit-details-marker,
+      .sidebar .menu-list details > summary::marker {
+        display: none;
+        content: '';
+      }
+      .sidebar .menu-list details > summary a {
+        display: inline-block;
+      }
+      .sidebar .menu-list details > summary > a::before {
+        content: '▶';
+        font-size: 0.5rem;
+        display: inline-block;
+        width: 1rem;
+        position: static;
+        transition: transform 0.15s ease;
+      }
+      .sidebar .menu-list details[open] > summary > a::before {
+        transform: rotate(90deg);
+      }
+      .sidebar .menu-list details > ul {
+        margin-left: 1rem;
+        margin-top: 2px;
+        padding-left: 0.5rem;
+        border-left: 1px solid #dbdbdb;
+      }
     </style>
 
     <script>

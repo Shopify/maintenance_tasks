@@ -149,6 +149,41 @@ module MaintenanceTasks
       assert_not attribute_required?(task, :content)
     end
 
+    test "#extract_namespaces returns sorted unique namespaces" do
+      task_struct = Struct.new(:name)
+      tasks = [
+        task_struct.new("Maintenance::Nested::NestedTask"),
+        task_struct.new("Maintenance::UpdatePostsTask"),
+        task_struct.new("Maintenance::Nested::NestedMore::NestedMoreTask"),
+        task_struct.new("Maintenance::ErrorTask"),
+      ]
+      expected = ["Maintenance", "Maintenance::Nested", "Maintenance::Nested::NestedMore"]
+      assert_equal expected, extract_namespaces(tasks)
+    end
+
+    test "#extract_namespaces excludes tasks without namespaces" do
+      task_struct = Struct.new(:name)
+      tasks = [
+        task_struct.new("UpdatePostsTask"),
+        task_struct.new("Maintenance::ErrorTask"),
+      ]
+      assert_equal ["Maintenance"], extract_namespaces(tasks)
+    end
+
+    test "#build_namespace_tree creates nested tree structure" do
+      namespaces = ["Maintenance", "Maintenance::Nested", "Maintenance::Nested::NestedMore", "Other"]
+      tree = build_namespace_tree(namespaces)
+
+      assert_equal "Maintenance", tree["Maintenance"][:name]
+      assert_equal "Maintenance", tree["Maintenance"][:full_path]
+      assert_equal "Nested", tree["Maintenance"][:children]["Nested"][:name]
+      assert_equal "Maintenance::Nested", tree["Maintenance"][:children]["Nested"][:full_path]
+      assert_equal "NestedMore", tree["Maintenance"][:children]["Nested"][:children]["NestedMore"][:name]
+      assert_equal "Maintenance::Nested::NestedMore", tree["Maintenance"][:children]["Nested"][:children]["NestedMore"][:full_path]
+      assert_equal "Other", tree["Other"][:name]
+      assert_equal "Other", tree["Other"][:full_path]
+    end
+
     private
 
     def with_zone_default(new_zone)

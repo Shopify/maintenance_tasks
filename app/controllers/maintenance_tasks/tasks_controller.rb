@@ -12,7 +12,17 @@ module MaintenanceTasks
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
     def index
-      @available_tasks = TaskDataIndex.available_tasks.group_by(&:category)
+      all_tasks = TaskDataIndex.available_tasks
+      @namespaces = helpers.extract_namespaces(all_tasks)
+      @selected_namespace = params[:namespace]
+
+      filtered_tasks = if @selected_namespace.present?
+        all_tasks.select { |task| task.name.start_with?("#{@selected_namespace}::") }
+      else
+        all_tasks
+      end
+
+      @available_tasks = filtered_tasks.group_by(&:category)
     end
 
     # Renders the page responsible for providing Task actions to users.
