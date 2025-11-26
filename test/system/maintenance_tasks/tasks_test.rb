@@ -266,6 +266,31 @@ module MaintenanceTasks
       end
     end
 
+    test "search filters tasks by name" do
+      visit maintenance_tasks_path
+
+      # Search input should be visible
+      assert_selector "#task-search-input"
+
+      # Type in search box
+      fill_in "task-search-input", with: "Update"
+
+      # Should show matching results in dropdown
+      within ".task-search-results" do
+        assert_link "Maintenance::UpdatePostsTask"
+        assert_link "Maintenance::UpdatePostsInBatchesTask"
+        assert_no_link "Maintenance::ErrorTask"
+      end
+
+      # Click on a result to navigate
+      within ".task-search-results" do
+        click_on "Maintenance::UpdatePostsTask"
+      end
+
+      # Should be on the task page
+      assert_title "Maintenance::UpdatePostsTask"
+    end
+
     test "sidebar displays namespaces and filters tasks" do
       visit maintenance_tasks_path
 

@@ -2,4 +2,19 @@
   <div class="navbar-brand">
     <%= link_to 'Maintenance Tasks', root_path, class: 'navbar-item is-size-4 has-text-weight-semibold has-text-danger' %>
   </div>
+  <% if action_name == "index" %>
+    <div class="navbar-end">
+      <div class="navbar-item">
+        <div class="task-search" data-tasks-path="<%= tasks_path %>">
+          <%= text_field_tag :task_search, nil,
+            id: "task-search-input",
+            class: "input",
+            placeholder: "Search tasks...",
+            autocomplete: "off",
+            aria: { label: "Search tasks", autocomplete: "list", controls: "task-search-results" } %>
+          <div class="task-search-results" id="task-search-results" role="listbox"></div>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </nav>
