@@ -274,7 +274,7 @@ module MaintenanceTasks
       run = Run.create!(
         task_name: "Maintenance::TestTask",
         cursor_is_json: false,
-        cursor: "0"
+        cursor: "0",
       )
 
       Maintenance::TestTask.any_instance.expects(:process).once.with(2)
@@ -324,7 +324,7 @@ module MaintenanceTasks
 
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
-        cursor: [first_post.title, first_post.id].to_json
+        cursor: [first_post.title, first_post.id].to_json,
       )
 
       TaskJob.perform_now(run)
