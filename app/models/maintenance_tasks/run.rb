@@ -36,6 +36,7 @@ module MaintenanceTasks
     enum :status, STATUSES.to_h { |status| [status, status.to_s] }
 
     after_save :instrument_status_change
+    after_initialize :set_cursor_is_json, if: :new_record?
 
     validate :task_name_belongs_to_a_valid_task, on: :create
     validate :csv_attachment_presence, on: :create
@@ -522,6 +523,14 @@ module MaintenanceTasks
       # Add jitter (±25% randomization) to prevent thundering herd
       jitter = delay * 0.25
       delay + (rand * 2 - 1) * jitter
+    end
+
+    # After initialize hook - default the cursor type to JSON if it hasn't been
+    # explicitly set.
+    def set_cursor_is_json
+      return unless cursor_is_json.nil?
+
+      self.cursor_is_json = true
     end
   end
 end
