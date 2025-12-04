@@ -11,7 +11,7 @@ module MaintenanceTasks
       policy.style_src_elem(
         BULMA_CDN,
         # <style> tag in app/views/layouts/maintenance_tasks/application.html.erb
-        "'sha256-Cb+Ml3lY17UKzW2LeTuFDi7IgPXk0ICA4TLWXd7mhAA='",
+        "'sha256-jxixiCsEmOniWo0ywDFgxS+LQe+frJrsg1dfPPTJhAA='",
       )
       capybara_lockstep_scripts = [
         "'sha256-1AoN3ZtJC5OvqkMgrYvhZjp4kI8QjJjO7TAyKYiDw+U='",
