@@ -32,6 +32,21 @@
         --ruby-keyword: #d73a49;
         --ruby-string: #032f62;
         --required-color: #ff6685;
+        --sidebar-bg: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        --sidebar-border: #485fc7;
+        --sidebar-text: #363636;
+        --sidebar-hover-bg: #e8e8e8;
+        --sidebar-active-bg: #485fc7;
+        --sidebar-active-text: #fff;
+        --sidebar-nested-border: #dbdbdb;
+        --search-bg: #fff;
+        --search-border: #dbdbdb;
+        --search-text: #363636;
+        --search-divider: #f5f5f5;
+        --search-hover-bg: #485fc7;
+        --search-hover-text: #fff;
+        --search-muted: #7a7a7a;
+        --search-highlight: #ffe08a;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -44,6 +59,21 @@
           --ruby-keyword: #ff7b72;
           --ruby-string: #a5d6ff;
           --required-color: #ff6685;
+          --sidebar-bg: linear-gradient(135deg, #2d2d2d 0%, #1f1f1f 100%);
+          --sidebar-border: #6385f1;
+          --sidebar-text: #e0e0e0;
+          --sidebar-hover-bg: #3d3d3d;
+          --sidebar-active-bg: #6385f1;
+          --sidebar-active-text: #fff;
+          --sidebar-nested-border: #4a4a4a;
+          --search-bg: #2d2d2d;
+          --search-border: #4a4a4a;
+          --search-text: #e0e0e0;
+          --search-divider: #3d3d3d;
+          --search-hover-bg: #6385f1;
+          --search-hover-text: #fff;
+          --search-muted: #9a9a9a;
+          --search-highlight: #8a6d00;
         }
       }
 
@@ -91,6 +121,121 @@
         color: var(--required-color);
         font-size: 12px;
       }
+
+      /* Sidebar styles */
+      .sidebar {
+        background: var(--sidebar-bg);
+        border-radius: 8px;
+        border-left: 3px solid var(--sidebar-border);
+      }
+      .sidebar .menu-list a {
+        border-radius: 4px;
+        padding: 0.5em 0.75em;
+        color: var(--sidebar-text);
+        transition: all 0.15s ease;
+        font-size: 0.9rem;
+      }
+      .sidebar .menu-list a:hover {
+        background-color: var(--sidebar-hover-bg);
+        color: var(--sidebar-border);
+      }
+      .sidebar .menu-list a.is-active {
+        background-color: var(--sidebar-active-bg);
+        color: var(--sidebar-active-text);
+        font-weight: 600;
+      }
+      .sidebar .menu-list li {
+        margin-bottom: 2px;
+      }
+      /* Nested namespace styles */
+      .sidebar .menu-list details {
+        margin: 0;
+      }
+      .sidebar .menu-list details > summary {
+        list-style: none;
+        cursor: pointer;
+      }
+      .sidebar .menu-list details > summary::before {
+        content: none;
+        display: none;
+      }
+      .sidebar .menu-list details > summary::-webkit-details-marker,
+      .sidebar .menu-list details > summary::marker {
+        display: none;
+        content: '';
+      }
+      .sidebar .menu-list details > summary a {
+        display: inline-block;
+      }
+      .sidebar .menu-list details > summary > a::before {
+        content: '▶';
+        font-size: 0.5rem;
+        display: inline-block;
+        width: 1rem;
+        position: static;
+        transition: transform 0.15s ease;
+      }
+      .sidebar .menu-list details[open] > summary > a::before {
+        transform: rotate(90deg);
+      }
+      .sidebar .menu-list details > ul {
+        margin-left: 1rem;
+        margin-top: 2px;
+        padding-left: 0.5rem;
+        border-left: 1px solid var(--sidebar-nested-border);
+      }
+
+      /* Task search styles */
+      .task-search {
+        position: relative;
+        width: 300px;
+      }
+      .task-search-results {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: var(--search-bg);
+        border: 1px solid var(--search-border);
+        border-radius: 4px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        max-height: 400px;
+        overflow-y: auto;
+        z-index: 100;
+        display: none;
+      }
+      .task-search-results.is-active {
+        display: block;
+      }
+      .task-search-results a {
+        display: block;
+        padding: 0.75rem 1rem;
+        color: var(--search-text);
+        border-bottom: 1px solid var(--search-divider);
+        text-decoration: none;
+      }
+      .task-search-results a:last-child {
+        border-bottom: none;
+      }
+      .task-search-results a:hover,
+      .task-search-results a.is-selected {
+        background-color: var(--search-hover-bg);
+        color: var(--search-hover-text);
+      }
+      .task-search-results .no-results {
+        padding: 0.75rem 1rem;
+        color: var(--search-muted);
+        font-style: italic;
+      }
+      .task-search-results mark {
+        background-color: var(--search-highlight);
+        color: inherit;
+        padding: 0;
+      }
+      .task-search-results a:hover mark,
+      .task-search-results a.is-selected mark {
+        background-color: rgba(255,255,255,0.3);
+      }
     </style>
 
     <script>
@@ -115,6 +260,141 @@
         }, 3000)
       }
       document.addEventListener('DOMContentLoaded', refresh)
+
+      // Task search functionality
+      function initTaskSearch() {
+        const searchContainer = document.querySelector('.task-search')
+        const searchInput = document.getElementById('task-search-input')
+        const searchResults = document.getElementById('task-search-results')
+        if (!searchInput || !searchResults || !searchContainer) return
+
+        const tasksBasePath = searchContainer.dataset.tasksPath
+        let tasks = []
+        let selectedIndex = -1
+
+        const loadTasks = () => {
+          const taskLinks = document.querySelectorAll('a[href*="/tasks/"]')
+          const taskSet = new Set()
+          taskLinks.forEach(link => {
+            const match = link.href.match(/\/tasks\/([^?/]+)/)
+            if (match) {
+              const taskName = decodeURIComponent(match[1])
+              if (taskName && !taskName.includes('runs')) {
+                taskSet.add(taskName)
+              }
+            }
+          })
+          tasks = Array.from(taskSet).sort()
+        }
+
+        const fuzzyMatch = (text, query) => {
+          const lowerText = text.toLowerCase()
+          const lowerQuery = query.toLowerCase()
+          let score = 0
+          let textIndex = 0
+          let matchIndices = []
+
+          for (let i = 0; i < lowerQuery.length; i++) {
+            const char = lowerQuery[i]
+            const foundIndex = lowerText.indexOf(char, textIndex)
+            if (foundIndex === -1) return null
+
+            matchIndices.push(foundIndex)
+            score += foundIndex === textIndex ? 10 : 1
+            if (foundIndex === 0 || text[foundIndex - 1] === ':') score += 5
+            textIndex = foundIndex + 1
+          }
+
+          return { score, matchIndices }
+        }
+
+        const escapeHtml = (text) => {
+          const div = document.createElement('div')
+          div.textContent = text
+          return div.innerHTML
+        }
+
+        const highlightMatch = (text, matchIndices) => {
+          let result = ''
+          let lastIndex = 0
+          matchIndices.forEach(idx => {
+            result += escapeHtml(text.slice(lastIndex, idx))
+            result += '<mark>' + escapeHtml(text[idx]) + '</mark>'
+            lastIndex = idx + 1
+          })
+          result += escapeHtml(text.slice(lastIndex))
+          return result
+        }
+
+        const renderResults = (query) => {
+          if (!query.trim()) {
+            searchResults.classList.remove('is-active')
+            return
+          }
+
+          const matches = tasks
+            .map(task => ({ task, match: fuzzyMatch(task, query) }))
+            .filter(item => item.match)
+            .sort((a, b) => b.match.score - a.match.score)
+            .slice(0, 10)
+
+          if (matches.length === 0) {
+            searchResults.innerHTML = '<div class="no-results">No tasks found</div>'
+          } else {
+            searchResults.innerHTML = matches.map((item, index) =>
+              '<a href="' + tasksBasePath + '/' + encodeURIComponent(item.task) + '" class="' + (index === selectedIndex ? 'is-selected' : '') + '">' + highlightMatch(item.task, item.match.matchIndices) + '</a>'
+            ).join('')
+          }
+          searchResults.classList.add('is-active')
+          selectedIndex = -1
+        }
+
+        const updateSelection = (items) => {
+          items.forEach((item, index) => {
+            item.classList.toggle('is-selected', index === selectedIndex)
+          })
+          if (selectedIndex >= 0) {
+            items[selectedIndex].scrollIntoView({ block: 'nearest' })
+          }
+        }
+
+        const handleKeydown = (e) => {
+          const items = searchResults.querySelectorAll('a')
+          if (!items.length) return
+
+          if (e.key === 'ArrowDown') {
+            e.preventDefault()
+            selectedIndex = Math.min(selectedIndex + 1, items.length - 1)
+            updateSelection(items)
+          } else if (e.key === 'ArrowUp') {
+            e.preventDefault()
+            selectedIndex = Math.max(selectedIndex - 1, -1)
+            updateSelection(items)
+          } else if (e.key === 'Enter' && selectedIndex >= 0) {
+            e.preventDefault()
+            items[selectedIndex].click()
+          } else if (e.key === 'Escape') {
+            searchResults.classList.remove('is-active')
+            searchInput.blur()
+          }
+        }
+
+        searchInput.addEventListener('input', e => {
+          loadTasks()
+          renderResults(e.target.value)
+        })
+        searchInput.addEventListener('keydown', handleKeydown)
+        searchInput.addEventListener('focus', () => {
+          loadTasks()
+          if (searchInput.value.trim()) renderResults(searchInput.value)
+        })
+        document.addEventListener('click', e => {
+          if (!e.target.closest('.task-search')) {
+            searchResults.classList.remove('is-active')
+          }
+        })
+      }
+      document.addEventListener('DOMContentLoaded', initTaskSearch)
     </script>
   </head>
 

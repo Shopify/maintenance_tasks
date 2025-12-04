@@ -1,0 +1,12 @@
+<h3 class="title is-4 has-text-weight-bold">Namespaces</h3>
+<aside class="menu sidebar">
+  <ul class="menu-list">
+    <li>
+      <%= link_to "All Tasks", tasks_path, class: class_names("is-active" => @selected_namespace.blank?) %>
+    </li>
+    <% build_namespace_tree(@namespaces).values.sort_by { |n| n[:name] }.each do |node| %>
+      <%= render_namespace_node(node, @selected_namespace) %>
+    <% end %>
+  </ul>
+</aside>
+

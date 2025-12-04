@@ -41,7 +41,7 @@ module MaintenanceTasks
         "Maintenance::ImportPostsTask Succeeded",
       ]
 
-      assert_equal expected, page.all("h3").map(&:text)
+      assert_equal expected, page.all(".column:not(.is-one-quarter) h3").map(&:text)
     end
 
     test "show a Task" do
@@ -264,6 +264,70 @@ module MaintenanceTasks
       within_frame("maintenance-tasks-iframe") do
         assert_content "Maintenance Tasks"
       end
+    end
+
+    test "search filters tasks by name" do
+      visit maintenance_tasks_path
+
+      # Search input should be visible
+      assert_selector "#task-search-input"
+
+      # Type in search box
+      fill_in "task-search-input", with: "Update"
+
+      # Should show matching results in dropdown
+      within ".task-search-results" do
+        assert_link "Maintenance::UpdatePostsTask"
+        assert_link "Maintenance::UpdatePostsInBatchesTask"
+        assert_no_link "Maintenance::ErrorTask"
+      end
+
+      # Click on a result to navigate
+      within ".task-search-results" do
+        click_on "Maintenance::UpdatePostsTask"
+      end
+
+      # Should be on the task page
+      assert_title "Maintenance::UpdatePostsTask"
+    end
+
+    test "sidebar displays namespaces and filters tasks" do
+      visit maintenance_tasks_path
+
+      # Sidebar should display namespaces with short names
+      assert_text "Namespaces"
+      assert_link "All Tasks"
+      assert_link "Maintenance"
+
+      # Nested namespaces should be inside dropdowns (details elements)
+      within(".sidebar") do
+        # Expand the Maintenance dropdown to see nested namespaces
+        find("details", text: "Maintenance").click
+        assert_link "Nested"
+      end
+
+      # Click on a nested namespace to filter (within sidebar to be specific)
+      within(".sidebar") do
+        click_on "Nested"
+      end
+
+      # Should show filtered tasks
+      assert_link "Maintenance::Nested::NestedTask"
+      assert_link "Maintenance::Nested::NestedMore::NestedMoreTask"
+
+      # Should show namespace filter tag
+      assert_selector ".tag", text: "Maintenance::Nested"
+
+      # Should not show tasks from other namespaces
+      assert_no_link "Maintenance::UpdatePostsTask"
+      assert_no_link "Maintenance::ErrorTask"
+
+      # Click "All Tasks" to clear filter
+      click_on "All Tasks"
+
+      # Should show all tasks again
+      assert_link "Maintenance::UpdatePostsTask"
+      assert_link "Maintenance::ErrorTask"
     end
   end
 end
