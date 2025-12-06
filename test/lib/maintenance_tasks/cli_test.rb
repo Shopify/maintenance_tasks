@@ -9,7 +9,7 @@ module MaintenanceTasks
       assert_predicate CLI, :exit_on_failure?
     end
 
-    test "#perfom runs the given Task and prints a success message" do
+    test "#perform runs the given Task and prints a success message" do
       task = mock(name: "MyTask")
 
       Runner.expects(:run).with(name: "MyTask", csv_file: nil, arguments: {})
@@ -20,7 +20,7 @@ module MaintenanceTasks
       end
     end
 
-    test "#perfom prints an error message when the runner raises" do
+    test "#perform prints an error message when the runner raises" do
       Runner.expects(:run).with(name: "Wrong", csv_file: nil, arguments: {})
         .raises("Invalid!")
 
