@@ -242,8 +242,8 @@ seconds to process. Consider skipping the count (defining a `count` that returns
 `nil`) or use an approximation, eg: count the number of new lines:
 
 ```ruby
-def count(task)
-  task.csv_content.count("\n") - 1
+def count
+  csv_content.count("\n") - 1
 end
 ```
 
