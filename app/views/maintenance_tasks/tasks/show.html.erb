@@ -4,6 +4,10 @@
   <%= @task %>
 </h1>
 
+<% if @task.description.present? %>
+  <p class="subtitle is-5 has-text-grey mb-4"><%= @task.description %></p>
+<% end %>
+
 <div class="container">
   <%= form_with url: task_runs_path(@task), method: :post do |form| %>
     <% if @task.csv_task? %>

@@ -40,6 +40,15 @@ module MaintenanceTasks
     attr_reader :name
     alias_method :to_s, :name
 
+    # Returns the description of the Task, if one is defined.
+    #
+    # @return [String, nil] the description of the Task.
+    def description
+      return if deleted?
+
+      Task.named(name).description
+    end
+
     # @return [RunsPage] the current page of completed runs, based on the cursor
     #   passed in initialize.
     attr_reader :runs_page

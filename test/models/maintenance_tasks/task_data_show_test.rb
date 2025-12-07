@@ -153,5 +153,23 @@ module MaintenanceTasks
       task_data = TaskDataShow.prepare("Maintenance::ParamsTask", arguments: { unknown: nil })
       assert_nothing_raised { task_data.new }
     end
+
+    test "#description returns the Task's description when set" do
+      task_data = TaskDataShow.new("Maintenance::UpdatePostsTask")
+      assert_equal(
+        "Updates the content of all posts with the current timestamp.",
+        task_data.description,
+      )
+    end
+
+    test "#description returns nil when Task has no description" do
+      task_data = TaskDataShow.new("Maintenance::TestTask")
+      assert_nil task_data.description
+    end
+
+    test "#description returns nil when Task is deleted" do
+      task_data = TaskDataShow.new("Maintenance::DoesNotExist")
+      assert_nil task_data.description
+    end
   end
 end

@@ -131,5 +131,16 @@ module MaintenanceTasks
     ensure
       Maintenance::TestTask.status_reload_frequency = original_reload_frequency
     end
+
+    test ".description returns the description when set" do
+      assert_equal(
+        "Updates the content of all posts with the current timestamp.",
+        Maintenance::UpdatePostsTask.description,
+      )
+    end
+
+    test ".description returns nil when not set" do
+      assert_nil Maintenance::TestTask.description
+    end
   end
 end

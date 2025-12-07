@@ -2,6 +2,8 @@
 
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
+    description "Updates the content of all posts with the current timestamp."
+
     class << self
       attr_accessor :fast_task
     end

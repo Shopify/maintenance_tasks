@@ -41,9 +41,26 @@ module MaintenanceTasks
 
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
+    # The description of the Task. This is an optional class-level attribute
+    # that can be set to provide a human-readable description of the Task.
+    #
+    # @api private
+    class_attribute :task_description, default: nil
+
     attr_accessor :metadata
 
     class << self
+      # Sets or returns the description for this Task.
+      #
+      # @param text [String, nil] the description text for the Task. If nil,
+      #   returns the current description.
+      # @return [String, nil] the description of the Task.
+      def description(text = nil)
+        return task_description if text.nil?
+
+        self.task_description = text
+      end
+
       # Finds a Task with the given name.
       #
       # @param name [String] the name of the Task to be found.
