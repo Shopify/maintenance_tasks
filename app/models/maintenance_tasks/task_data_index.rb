@@ -25,7 +25,8 @@ module MaintenanceTasks
       def available_tasks
         tasks = []
 
-        task_names = Task.load_all.map(&:name)
+        # Filter out anonymous classes (nil names) that may exist from test suites
+        task_names = Task.load_all.map(&:name).compact
 
         active_runs = Run.with_attached_csv.active.where(task_name: task_names)
         active_runs.each do |run|
