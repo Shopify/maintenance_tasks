@@ -736,6 +736,27 @@ module MaintenanceTasks
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
     end
 
+    test "after_initialize #cursor_is_json set to true by default" do
+      assert Run.new.cursor_is_json
+    end
+
+    test "after_initialize #cursor_is_json respects set value" do
+      run = Run.new(cursor_is_json: false)
+      assert_equal run.cursor_is_json, false
+    end
+
+    test "after_initialize does not modify value for persisted records" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running,
+      )
+
+      # Unset column to simulate an old run record without a value set.
+      run.update_columns(cursor_is_json: nil)
+
+      assert_nil run.reload.cursor_is_json
+    end
+
     private
 
     def expected_notification(run)
