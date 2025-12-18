@@ -18,13 +18,7 @@ end
 gem "rubocop"
 gem "rubocop-shopify"
 gem "sprockets-rails"
-if @sqlite3_requirement
-  # causes Dependabot to ignore the next line and update the next gem "sqlite3"
-  sqlite3 = "sqlite3"
-  gem sqlite3, @sqlite3_requirement
-else
-  gem "sqlite3"
-end
+gem "sqlite3"
 gem "yard"
 
 group :test do
