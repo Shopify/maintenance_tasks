@@ -39,6 +39,11 @@ module MaintenanceTasks
     # @api private
     class_attribute :status_reload_frequency, default: MaintenanceTasks.status_reload_frequency
 
+    # Whether this Task processes items in parallel.
+    #
+    # @api private
+    class_attribute :parallelized, default: false
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     attr_accessor :metadata
@@ -111,6 +116,54 @@ module MaintenanceTasks
       # a collection.
       def no_collection
         self.collection_builder_strategy = MaintenanceTasks::NoCollectionBuilder.new
+      end
+
+      # Enable parallel processing for this Task.
+      #
+      # When enabled, the Task processes items in parallel using threads.
+      # Task authors define their collection with batching (using in_batches,
+      # csv_collection(in_batches:), or each_slice), and implement
+      # process_item(item) instead of process(item).
+      #
+      # @example ActiveRecord with batching
+      #   class Maintenance::UpdateUsersTask < MaintenanceTasks::Task
+      #     parallelize
+      #
+      #     def collection
+      #       User.where(status: 'pending').in_batches(of: 10)
+      #     end
+      #
+      #     def process_item(user)
+      #       # This will be called in parallel (10 concurrent threads per batch)
+      #       user.update!(status: 'processed')
+      #     end
+      #   end
+      #
+      # @note Cursor granularity: The cursor tracks batches, not individual items.
+      #   If the task is interrupted mid-batch, items from that batch will be
+      #   reprocessed on resume. Ensure your process_item method is idempotent.
+      #
+      # @note Thread safety requirements:
+      #   - Your process_item method MUST be thread-safe
+      #   - Avoid shared mutable state between items
+      #   - Most ActiveRecord operations are thread-safe if each thread gets its own connection
+      #   - ActiveRecord handles connection pooling automatically
+      #
+      # @note Error handling: If any thread raises an exception, the entire batch
+      #   fails and the exception is propagated to the maintenance task's error handler.
+      #   The first exception encountered is raised.
+      #
+      # @note Progress tracking: Progress is tracked per batch, not per item.
+      #   The UI will show "X batches processed" rather than "X items processed".
+      def parallelize
+        self.parallelized = true
+      end
+
+      # Returns whether this Task processes items in parallel.
+      #
+      # @return [Boolean] whether the Task is parallelized.
+      def parallelized?
+        parallelized
       end
 
       delegate :has_csv_content?, :no_collection?, to: :collection_builder_strategy
@@ -306,12 +359,35 @@ module MaintenanceTasks
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
     #
-    # @param _item [Object] the current item from the enumerator being iterated.
+    # When the Task is parallelized, this method processes a batch by spawning
+    # threads for parallel execution. Otherwise, it raises an error advising
+    # subclasses to implement an override.
     #
-    # @raise [NotImplementedError] with a message advising subclasses to
+    # @param item_or_batch [Object] the current item from the enumerator being
+    #   iterated, or a batch when parallelized.
+    #
+    # @raise [NoMethodError] with a message advising subclasses to
     #   implement an override for this method.
-    def process(_item)
-      raise NoMethodError, "#{self.class.name} must implement `process`."
+    def process(item_or_batch)
+      if self.class.parallelized?
+        process_batch_in_parallel(item_or_batch)
+      else
+        raise NoMethodError, "#{self.class.name} must implement `process`."
+      end
+    end
+
+    # Task authors implement this method instead of process(item) when using
+    # parallelize. It will be called in parallel for each item in a batch.
+    #
+    # @param _item [Object] the individual item to process
+    #
+    # @raise [NoMethodError] with a message advising subclasses to
+    #   implement an override for this method.
+    def process_item(_item)
+      raise NoMethodError, <<~MSG.squish
+        #{self.class.name} must implement `process_item(item)` when using
+        parallelize.
+      MSG
     end
 
     # Total count of iterations to be performed, delegated to the strategy.
@@ -330,6 +406,34 @@ module MaintenanceTasks
     # @return [Enumerator]
     def enumerator_builder(cursor:)
       nil
+    end
+
+    # Returns whether this Task processes items in parallel.
+    #
+    # @return [Boolean] whether the Task is parallelized.
+    def parallelized?
+      self.class.parallelized?
+    end
+
+    private
+
+    # Process a batch by spawning threads for parallel execution.
+    # This is called by the process method when the Task is parallelized.
+    #
+    # @param batch [Object] batch (ActiveRecord::Relation, Array of items/rows)
+    def process_batch_in_parallel(batch)
+      # Convert batch to array of items
+      # ActiveRecord::Relation responds to to_a, arrays are already arrays
+      items = batch.respond_to?(:to_a) ? batch.to_a : Array(batch)
+
+      # Execute items in parallel, storing errored item for context
+      ParallelExecutor.execute(items) do |item|
+        process_item(item)
+      end
+    rescue => error
+      # Store the errored item for maintenance tasks error reporting
+      @errored_element = error.errored_item if error.respond_to?(:errored_item)
+      raise
     end
   end
 end
