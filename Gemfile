@@ -24,7 +24,7 @@ gem "yard"
 group :test do
   gem "capybara"
   gem "capybara-lockstep"
-  gem "minitest", "< 6"
+  gem "minitest", "< 7"
   gem "mocha"
   gem "selenium-webdriver"
 end
