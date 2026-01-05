@@ -30,6 +30,9 @@ jobs:
         - gemfile: "gemfiles/postgresql.gemfile"
           ruby: 3.4
           database: postgres
+        exclude:
+        - gemfile: gemfiles/rails_main.gemfile
+          ruby: 3.2
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
       DB: ${{ matrix.database }}
