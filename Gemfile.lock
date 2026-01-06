@@ -152,7 +152,7 @@ GEM
     matrix (0.4.3)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.26.0)
+    minitest (5.27.0)
     mocha (3.0.1)
       ruby2_keywords (>= 0.0.5)
     net-imap (0.5.12)
