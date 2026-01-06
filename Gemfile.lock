@@ -152,7 +152,8 @@ GEM
     matrix (0.4.3)
     mini_mime (1.1.5)
     mini_portile2 (2.8.9)
-    minitest (5.27.0)
+    minitest (6.0.1)
+      prism (~> 1.5)
     mocha (3.0.1)
       ruby2_keywords (>= 0.0.5)
     net-imap (0.5.12)
@@ -330,7 +331,7 @@ DEPENDENCIES
   capybara-lockstep
   debug
   maintenance_tasks!
-  minitest (< 6)
+  minitest (< 7)
   mocha
   puma
   rails (>= 7.1)
