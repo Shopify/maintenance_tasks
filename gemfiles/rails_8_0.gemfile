@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
 @rails_gem_requirement = "~> 8.0.0"
+# TODO: Remove once a Rails 8.0.x release with the following commit is cut.
+# https://github.com/rails/rails/commit/ec62932ee7d31e0ef870e61c2d7de2c3efe3faa6
+@minitest_gem_requirement = "< 6"
 
 eval_gemfile "../Gemfile"
