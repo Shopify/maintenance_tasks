@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_11_28_180556) do
+ActiveRecord::Schema[7.1].define(version: 2026_01_19_151430) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.string "name", null: false
     t.string "record_type", null: false
@@ -59,6 +59,12 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_28_180556) do
     t.text "metadata"
     t.boolean "cursor_is_json", default: false, null: false
     t.index ["task_name", "status", "created_at"], name: "index_maintenance_tasks_runs", order: { created_at: :desc }
+  end
+
+  create_table "orders", primary_key: ["shop_id", "number"], force: :cascade do |t|
+    t.bigint "shop_id", null: false
+    t.bigint "number", null: false
+    t.string "name"
   end
 
   create_table "posts", force: :cascade do |t|

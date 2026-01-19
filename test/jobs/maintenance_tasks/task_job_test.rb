@@ -333,6 +333,36 @@ module MaintenanceTasks
       assert_equal [last_post.title, last_post.id], JSON.parse(run.reload.cursor)
     end
 
+    test ".perform_now serializes composite primary key cursors to JSON" do
+      run = Run.create!(
+        task_name: "Maintenance::CompositePrimaryKeyModelTask",
+        cursor_is_json: true,
+      )
+
+      TaskJob.perform_now(run)
+
+      order = Order.order(shop_id: :desc, number: :desc).first
+
+      assert_equal [order.shop_id, order.number], JSON.parse(run.reload.cursor)
+    end
+
+    test ".perform_now starts job from composite primary key cursor position on resume" do
+      first_order = Order.order(shop_id: :asc, number: :asc).first
+      last_order = Order.order(shop_id: :desc, number: :desc).first
+
+      Maintenance::CompositePrimaryKeyModelTask.any_instance.expects(:process).once.with(last_order)
+
+      run = Run.create!(
+        task_name: "Maintenance::CompositePrimaryKeyModelTask",
+        cursor: [first_order.shop_id, first_order.number].to_json,
+        cursor_is_json: true,
+      )
+
+      TaskJob.perform_now(run)
+
+      assert_equal [last_order.shop_id, last_order.number], JSON.parse(run.reload.cursor)
+    end
+
     test ".perform_now accepts Active Record Relations as collection" do
       Maintenance::TestTask.any_instance.stubs(collection: Post.all)
       Maintenance::TestTask.any_instance.expects(:process).times(Post.count)
