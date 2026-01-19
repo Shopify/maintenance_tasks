@@ -391,7 +391,10 @@ This method should return an `Enumerator`, yielding pairs of `[item, cursor]`.
 Maintenance Tasks takes care of persisting the current cursor position and will
 provide it as the `cursor` argument if your task is interrupted or resumed. The
 `cursor` is stored as a `String`, so your custom enumerator should handle
-serializing/deserializing the value if required.
+serializing/deserializing the value if required. Note that if you've enabled
+[JSON cursors](#json-cursors), the cursor will be automatically serialized and
+deserialized. However for this to work, the cursor values must be
+JSON-serializable.
 
 ```ruby
 # app/tasks/maintenance/custom_enumerator_task.rb
@@ -560,6 +563,9 @@ control the cursor columns, through the `cursor_columns` method in the
 `MaintenanceTasks::Task` class. If the `cursor_columns` method returns `nil`,
 the query is ordered by the primary key. If cursor columns values change during
 an iteration, records may be skipped or yielded multiple times.
+
+Note that in order to use this feature, you must first enable
+[JSON cursors](#json-cursors).
 
 ```ruby
 module Maintenance
@@ -1315,6 +1321,32 @@ email of the user who performed the maintenance task.
 MaintenanceTasks.metadata = ->() do
   { user_email: current_user.email }
 end
+```
+
+#### JSON Cursors
+
+By default, cursor values are persisted in the database as a string. If you
+want to iterate over collections that require multiple values to keep track of
+the position, you can enable JSON cursors. This will cause the cursor to be
+serialized as JSON when persisted, and deserialized when read back.
+
+This is especially useful when you need to iterate over a model that uses a
+composite primary key.
+
+Be advised that this feature comes with a few caveats:
+
+1. Cursor values must be capable of being serialized to JSON and parsed from
+   JSON. If they are not, errors will occur during task execution.
+2. If a cursor contains a value that loses precision when serialized, it may
+   lead to unexpected behaviour.
+3. This feature utilizes a string column to store the JSON data. If your
+   database has a hard limit on how big a string value can be, be mindful that
+   certain cursor structures could result in a value that could exceed that
+   limit and cause issues.
+
+```ruby
+# config/initializers/maintenance_tasks.rb
+MaintenanceTasks.json_cursors = true
 ```
 
 ## Upgrading

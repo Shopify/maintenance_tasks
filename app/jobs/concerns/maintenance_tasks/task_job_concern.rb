@@ -33,11 +33,11 @@ module MaintenanceTasks
     private
 
     def serialized_cursor_position
-      cursor_position && @run.cursor_is_json ? cursor_position.to_json : cursor_position
+      cursor_position && @run.cursor_is_json? ? cursor_position.to_json : cursor_position
     end
 
     def deserialized_run_cursor
-      return JSON.parse(@run.cursor) if @run.cursor && @run.cursor_is_json
+      return JSON.parse(@run.cursor) if @run.cursor && @run.cursor_is_json?
 
       @run.cursor
     end

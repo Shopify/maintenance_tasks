@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "test_helper"
+require "minitest/mock"
 
 module MaintenanceTasks
   class RunnerTest < ActiveSupport::TestCase
@@ -112,6 +113,34 @@ module MaintenanceTasks
           name: "Maintenance::ParamsTask",
           arguments: { post_ids: "123" },
         )
+      end
+    end
+
+    test "#run sets cursor_is_json to true when json_cursors config is true" do
+      MaintenanceTasks.stub(:json_cursors, true) do
+        @runner.run(name: @name)
+      end
+
+      run = Run.last
+      assert run.cursor_is_json
+    end
+
+    test "#run sets cursor_is_json to false when json_cursors config is false" do
+      MaintenanceTasks.stub(:json_cursors, false) do
+        @runner.run(name: @name)
+      end
+
+      run = Run.last
+      refute run.cursor_is_json
+    end
+
+    test "#run does not set cursor_is_json if Run does not support it" do
+      run = Run.new(task_name: @name)
+
+      Run.stub(:new, run) do
+        run.expects(:has_attribute?).with(:cursor_is_json).returns(false)
+        run.expects(:cursor_is_json=).never
+        @runner.run(name: @name)
       end
     end
 

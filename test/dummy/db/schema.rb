@@ -57,7 +57,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_11_28_180556) do
     t.text "arguments"
     t.integer "lock_version", default: 0, null: false
     t.text "metadata"
-    t.boolean "cursor_is_json"
+    t.boolean "cursor_is_json", default: false, null: false
     t.index ["task_name", "status", "created_at"], name: "index_maintenance_tasks_runs", order: { created_at: :desc }
   end
 

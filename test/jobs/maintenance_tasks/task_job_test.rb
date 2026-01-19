@@ -305,7 +305,7 @@ module MaintenanceTasks
       cursor_columns = [:title, :id]
       Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
 
-      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask", cursor_is_json: true)
 
       TaskJob.perform_now(run)
 
@@ -325,6 +325,7 @@ module MaintenanceTasks
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
         cursor: [first_post.title, first_post.id].to_json,
+        cursor_is_json: true,
       )
 
       TaskJob.perform_now(run)

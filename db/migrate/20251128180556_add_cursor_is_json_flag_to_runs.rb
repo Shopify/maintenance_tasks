@@ -2,6 +2,6 @@
 
 class AddCursorIsJsonFlagToRuns < ActiveRecord::Migration[7.1]
   def change
-    add_column(:maintenance_tasks_runs, :cursor_is_json, :boolean)
+    add_column(:maintenance_tasks_runs, :cursor_is_json, :boolean, default: false, null: false)
   end
 end
