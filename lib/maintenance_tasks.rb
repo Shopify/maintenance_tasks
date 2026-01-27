@@ -109,7 +109,7 @@ module MaintenanceTasks
   #  @return [Boolean] whether to report unexpected errors as handled (true) or unhandled (false).
   mattr_accessor :report_errors_as_handled, default: true
 
-  # @!attribute json_cursors
+  # @!attribute serialize_cursors_as_json
   # @scope class
   #  Whether or not to store cursors as JSON in the database. Defaults to false.
   #
@@ -130,7 +130,17 @@ module MaintenanceTasks
   #     that limit and cause issues.
   #
   #  @return [Boolean] whether or not to store cursor values as JSON.
-  mattr_accessor :json_cursors, default: false
+  mattr_reader :serialize_cursors_as_json, default: false
+
+  # @!visibility private
+  def self.serialize_cursors_as_json=(value)
+    msg = "Run is missing the required `cursor_is_json` column. " \
+      "Ensure migration to add JSON cursor support is run before enabling serialize_cursors_as_json."
+
+    raise(msg) if value && Run.column_names.exclude?("cursor_is_json")
+
+    @@serialize_cursors_as_json = value
+  end
 
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \

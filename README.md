@@ -1346,7 +1346,7 @@ Be advised that this feature comes with a few caveats:
 
 ```ruby
 # config/initializers/maintenance_tasks.rb
-MaintenanceTasks.json_cursors = true
+MaintenanceTasks.serialize_cursors_as_json = true
 ```
 
 ## Upgrading

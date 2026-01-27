@@ -42,9 +42,7 @@ module MaintenanceTasks
     def run(name:, csv_file: nil, arguments: {}, run_model: Run, metadata: nil)
       run = run_model.new(task_name: name, arguments: arguments, metadata: metadata)
 
-      if run.has_attribute?(:cursor_is_json)
-        run.cursor_is_json = MaintenanceTasks.json_cursors
-      end
+      run.cursor_is_json = true if MaintenanceTasks.serialize_cursors_as_json
 
       if csv_file
         run.csv_file.attach(csv_file)
