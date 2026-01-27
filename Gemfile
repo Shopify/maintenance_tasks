@@ -31,6 +31,7 @@ group :test do
     minitest = "minitest"
     gem minitest, @minitest_gem_requirement
   end
+  gem "minitest-mock"
   gem "mocha"
   gem "selenium-webdriver"
 end

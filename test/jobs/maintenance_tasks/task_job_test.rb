@@ -256,6 +256,32 @@ module MaintenanceTasks
       assert_equal "0", @run.reload.cursor
     end
 
+    # Smoke test for backward compatibility with old, non-JSON cursors.
+    test ".perform_now persists string cursor when run does not encode the cursor as JSON" do
+      run = Run.create!(task_name: "Maintenance::TestTask", cursor_is_json: false)
+
+      Maintenance::TestTask.any_instance.expects(:process).once.with do
+        run.pausing!
+      end
+
+      TaskJob.perform_now(run)
+
+      assert_equal "0", run.reload.cursor
+    end
+
+    # Smoke test for backward compatibility with old, non-JSON cursors.
+    test ".perform_now starts job from cursor position when run does not encode the cursor as JSON" do
+      run = Run.create!(
+        task_name: "Maintenance::TestTask",
+        cursor_is_json: false,
+        cursor: "0",
+      )
+
+      Maintenance::TestTask.any_instance.expects(:process).once.with(2)
+
+      TaskJob.perform_now(run)
+    end
+
     test ".perform_now persists cursor when there's an error" do
       run = Run.create!(task_name: "Maintenance::ErrorTask")
 
@@ -273,6 +299,68 @@ module MaintenanceTasks
       Maintenance::TestTask.any_instance.expects(:process).once.with(2)
 
       TaskJob.perform_now(@run)
+    end
+
+    test ".perform_now serializes multi-column cursors to JSON" do
+      cursor_columns = [:title, :id]
+      Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask", cursor_is_json: true)
+
+      TaskJob.perform_now(run)
+
+      post = Post.order(title: :desc).first
+
+      assert_equal [post.title, post.id], JSON.parse(run.reload.cursor)
+    end
+
+    test ".perform_now starts job from multi-column cursor position on resume" do
+      cursor_columns = [:title, :id]
+      first_post = Post.order(title: :asc).first
+      last_post = Post.order(title: :desc).first
+
+      Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
+      Maintenance::UpdatePostsTask.any_instance.expects(:process).once.with(last_post)
+
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        cursor: [first_post.title, first_post.id].to_json,
+        cursor_is_json: true,
+      )
+
+      TaskJob.perform_now(run)
+
+      assert_equal [last_post.title, last_post.id], JSON.parse(run.reload.cursor)
+    end
+
+    test ".perform_now serializes composite primary key cursors to JSON" do
+      run = Run.create!(
+        task_name: "Maintenance::CompositePrimaryKeyModelTask",
+        cursor_is_json: true,
+      )
+
+      TaskJob.perform_now(run)
+
+      order = Order.order(shop_id: :desc, number: :desc).first
+
+      assert_equal [order.shop_id, order.number], JSON.parse(run.reload.cursor)
+    end
+
+    test ".perform_now starts job from composite primary key cursor position on resume" do
+      first_order = Order.order(shop_id: :asc, number: :asc).first
+      last_order = Order.order(shop_id: :desc, number: :desc).first
+
+      Maintenance::CompositePrimaryKeyModelTask.any_instance.expects(:process).once.with(last_order)
+
+      run = Run.create!(
+        task_name: "Maintenance::CompositePrimaryKeyModelTask",
+        cursor: [first_order.shop_id, first_order.number].to_json,
+        cursor_is_json: true,
+      )
+
+      TaskJob.perform_now(run)
+
+      assert_equal [last_order.shop_id, last_order.number], JSON.parse(run.reload.cursor)
     end
 
     test ".perform_now accepts Active Record Relations as collection" do

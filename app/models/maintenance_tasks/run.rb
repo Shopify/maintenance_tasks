@@ -442,6 +442,15 @@ module MaintenanceTasks
       argument_filter.filter(arguments)
     end
 
+    # This method is safe to call regardless of whether or not the
+    # `cursor_is_json` column exists.
+    #
+    # @return [Boolean]
+    #   True when the cursor value should be treated as serialized JSON.
+    def cursor_is_json?
+      has_attribute?(:cursor_is_json) && cursor_is_json
+    end
+
     private
 
     def instrument_status_change

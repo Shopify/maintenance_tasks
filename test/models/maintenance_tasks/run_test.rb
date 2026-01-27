@@ -736,6 +736,27 @@ module MaintenanceTasks
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
     end
 
+    test "#cursor_is_json? returns true when the underlying column is true" do
+      run = Run.new(cursor_is_json: true)
+      assert run.cursor_is_json?
+    end
+
+    test "#cursor_is_json? returns false when the underlying column is false" do
+      run = Run.new(cursor_is_json: false)
+      refute run.cursor_is_json?
+    end
+
+    test "#cursor_is_json? returns false when the underlying column does not exist" do
+      # This is a bit of a hack, but I'm creating an anonymous subclass so that
+      # I can ignore the column and pretend it doesn't exist.
+      klass = Class.new(Run) do
+        self.ignored_columns = [:cursor_is_json]
+      end
+
+      run = klass.new
+      refute run.cursor_is_json?
+    end
+
     private
 
     def expected_notification(run)

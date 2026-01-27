@@ -41,6 +41,9 @@ module MaintenanceTasks
     #   to a value being too long for the column type.
     def run(name:, csv_file: nil, arguments: {}, run_model: Run, metadata: nil)
       run = run_model.new(task_name: name, arguments: arguments, metadata: metadata)
+
+      run.cursor_is_json = true if MaintenanceTasks.serialize_cursors_as_json
+
       if csv_file
         run.csv_file.attach(csv_file)
         run.csv_file.filename = filename(name)

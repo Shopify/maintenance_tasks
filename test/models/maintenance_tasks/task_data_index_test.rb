@@ -9,6 +9,7 @@ module MaintenanceTasks
         "Maintenance::BatchImportPostsTask",
         "Maintenance::CallbackTestTask",
         "Maintenance::CancelledEnqueueTask",
+        "Maintenance::CompositePrimaryKeyModelTask",
         "Maintenance::CustomEnumeratingTask",
         "Maintenance::EnqueueErrorTask",
         "Maintenance::ErrorTask",
