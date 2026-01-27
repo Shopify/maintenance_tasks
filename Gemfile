@@ -18,18 +18,19 @@ end
 gem "rubocop"
 gem "rubocop-shopify"
 gem "sprockets-rails"
-if @sqlite3_requirement
-  # causes Dependabot to ignore the next line and update the next gem "sqlite3"
-  sqlite3 = "sqlite3"
-  gem sqlite3, @sqlite3_requirement
-else
-  gem "sqlite3"
-end
+gem "sqlite3"
 gem "yard"
 
 group :test do
   gem "capybara"
   gem "capybara-lockstep"
+  if !@minitest_gem_requirement
+    gem "minitest"
+  else
+    # causes Dependabot to ignore the next line and update the previous gem "minitest"
+    minitest = "minitest"
+    gem minitest, @minitest_gem_requirement
+  end
   gem "mocha"
   gem "selenium-webdriver"
 end

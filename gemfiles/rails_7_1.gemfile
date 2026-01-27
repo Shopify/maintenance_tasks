@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
 @rails_gem_requirement = "~> 7.1.0"
+@minitest_gem_requirement = "< 6"
 
 eval_gemfile "../Gemfile"

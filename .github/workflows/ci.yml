@@ -24,20 +24,26 @@ jobs:
         - gemfiles/rails_8_0.gemfile
         - Gemfile # current minor release
         - gemfiles/rails_main.gemfile
-        ruby: ["3.2", "3.3", "3.4"]
+        ruby: ["3.2", "3.3", "3.4", "4.0"]
         database: [sqlite]
         include:
         - gemfile: "gemfiles/postgresql.gemfile"
-          ruby: 3.4
+          ruby: "3.4"
           database: postgres
+        - gemfile: "gemfiles/postgresql.gemfile"
+          ruby: "4.0"
+          database: postgres
+        exclude:
+        - gemfile: gemfiles/rails_main.gemfile
+          ruby: "3.2"
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
       DB: ${{ matrix.database }}
     steps:
     - name: Check out code
-      uses: actions/checkout@1af3b93b6815bc44a9784bd300feb67ff0d1eeb3 # v6.0.0
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
     - name: Set up Ruby ${{ matrix.ruby }}
-      uses: ruby/setup-ruby@8aeb6ff8030dd539317f8e1769a044873b56ea71 # v1.268.0
+      uses: ruby/setup-ruby@90be1154f987f4dc0fe0dd0feedac9e473aa4ba8 # v1.286.0
       with:
         ruby-version: ${{ matrix.ruby }}
         bundler-cache: true
@@ -60,7 +66,7 @@ jobs:
     - name: RuboCop
       run: bundle exec rubocop
     - name: Archive system test artifacts
-      uses: actions/upload-artifact@v5
+      uses: actions/upload-artifact@v6
       if: failure()
       with:
         name: screenshots-${{ strategy.job-index }}
