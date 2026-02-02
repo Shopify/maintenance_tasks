@@ -132,16 +132,6 @@ module MaintenanceTasks
   #  @return [Boolean] whether or not to store cursor values as JSON.
   mattr_reader :serialize_cursors_as_json, default: false
 
-  # @!visibility private
-  def self.serialize_cursors_as_json=(value)
-    msg = "Run is missing the required `cursor_is_json` column. " \
-      "Ensure migration to add JSON cursor support is run before enabling serialize_cursors_as_json."
-
-    raise(msg) if value && Run.column_names.exclude?("cursor_is_json")
-
-    @@serialize_cursors_as_json = value
-  end
-
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
       "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \
@@ -165,6 +155,16 @@ module MaintenanceTasks
     # @api-private
     def deprecator
       @deprecator ||= ActiveSupport::Deprecation.new("3.0", "MaintenanceTasks")
+    end
+
+    # @!visibility private
+    def serialize_cursors_as_json=(value)
+      msg = "Run is missing the required `cursor_is_json` column. " \
+        "Ensure migration to add JSON cursor support is run before enabling serialize_cursors_as_json."
+
+      raise(msg) if value && Run.column_names.exclude?("cursor_is_json")
+
+      @@serialize_cursors_as_json = value # rubocop:disable Style/ClassVars
     end
   end
 end
