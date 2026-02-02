@@ -260,6 +260,7 @@ module MaintenanceTasks
     test ".perform_now persists string cursor when run does not encode the cursor as JSON" do
       run = Run.create!(task_name: "Maintenance::TestTask", cursor_is_json: false)
 
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
       Maintenance::TestTask.any_instance.expects(:process).once.with do
         run.pausing!
       end
@@ -277,6 +278,7 @@ module MaintenanceTasks
         cursor: "0",
       )
 
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
       Maintenance::TestTask.any_instance.expects(:process).once.with(2)
 
       TaskJob.perform_now(run)
@@ -304,6 +306,7 @@ module MaintenanceTasks
     test ".perform_now serializes multi-column cursors to JSON" do
       cursor_columns = [:title, :id]
       Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
 
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask", cursor_is_json: true)
 
@@ -321,6 +324,7 @@ module MaintenanceTasks
 
       Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
       Maintenance::UpdatePostsTask.any_instance.expects(:process).once.with(last_post)
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
 
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",
@@ -334,6 +338,7 @@ module MaintenanceTasks
     end
 
     test ".perform_now serializes composite primary key cursors to JSON" do
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
       run = Run.create!(
         task_name: "Maintenance::CompositePrimaryKeyModelTask",
         cursor_is_json: true,
@@ -351,6 +356,7 @@ module MaintenanceTasks
       last_order = Order.order(shop_id: :desc, number: :desc).first
 
       Maintenance::CompositePrimaryKeyModelTask.any_instance.expects(:process).once.with(last_order)
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
 
       run = Run.create!(
         task_name: "Maintenance::CompositePrimaryKeyModelTask",

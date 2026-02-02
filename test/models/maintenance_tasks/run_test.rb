@@ -736,24 +736,21 @@ module MaintenanceTasks
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
     end
 
-    test "#cursor_is_json? returns true when the underlying column is true" do
+    test "#cursor_is_json? returns true when the config flag is enabled and the underlying column is true" do
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
       run = Run.new(cursor_is_json: true)
       assert run.cursor_is_json?
     end
 
-    test "#cursor_is_json? returns false when the underlying column is false" do
+    test "#cursor_is_json? returns false when the config flag is enabled and the underlying column is false" do
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
       run = Run.new(cursor_is_json: false)
       refute run.cursor_is_json?
     end
 
-    test "#cursor_is_json? returns false when the underlying column does not exist" do
-      # This is a bit of a hack, but I'm creating an anonymous subclass so that
-      # I can ignore the column and pretend it doesn't exist.
-      klass = Class.new(Run) do
-        self.ignored_columns = [:cursor_is_json]
-      end
-
-      run = klass.new
+    test "#cursor_is_json? returns false when the config flag is disabled" do
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(false)
+      run = Run.new(cursor_is_json: true)
       refute run.cursor_is_json?
     end
 

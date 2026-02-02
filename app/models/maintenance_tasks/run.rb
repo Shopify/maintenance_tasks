@@ -448,7 +448,7 @@ module MaintenanceTasks
     # @return [Boolean]
     #   True when the cursor value should be treated as serialized JSON.
     def cursor_is_json?
-      has_attribute?(:cursor_is_json) && cursor_is_json
+      MaintenanceTasks.serialize_cursors_as_json && cursor_is_json
     end
 
     private
