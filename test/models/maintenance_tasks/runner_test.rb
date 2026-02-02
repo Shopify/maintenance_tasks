@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "minitest/mock"
 
 module MaintenanceTasks
   class RunnerTest < ActiveSupport::TestCase
@@ -117,18 +116,16 @@ module MaintenanceTasks
     end
 
     test "#run sets cursor_is_json to true when serialize_cursors_as_json config is true" do
-      MaintenanceTasks.stub(:serialize_cursors_as_json, true) do
-        @runner.run(name: @name)
-      end
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
+      @runner.run(name: @name)
 
       run = Run.last
       assert run.cursor_is_json
     end
 
     test "#run sets cursor_is_json to false when serialize_cursors_as_json config is false" do
-      MaintenanceTasks.stub(:serialize_cursors_as_json, false) do
-        @runner.run(name: @name)
-      end
+      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(false)
+      @runner.run(name: @name)
 
       run = Run.last
       refute run.cursor_is_json
