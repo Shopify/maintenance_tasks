@@ -25,6 +25,17 @@ module MaintenanceTasks
       )
     end
 
+    # Returns the estimated count of items for a Task as JSON.
+    def count
+      task_data = TaskDataShow.new(
+        params.fetch(:id),
+        arguments: params.except(:id, :controller, :action).permit!,
+      )
+      render(json: { count: task_data.count })
+    rescue StandardError
+      render(json: { count: nil })
+    end
+
     private
 
     def set_refresh

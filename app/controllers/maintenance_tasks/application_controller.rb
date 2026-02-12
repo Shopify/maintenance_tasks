@@ -20,6 +20,8 @@ module MaintenanceTasks
       policy.script_src_elem(
         # <script> tag in app/views/layouts/maintenance_tasks/application.html.erb
         "'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='",
+        # <script> tag in app/views/maintenance_tasks/tasks/show.html.erb
+        "'sha256-oCsB8YG3WI4aqJRWK/T7XfMAd3GEq+jhwDCOkSokj68='",
         # <script> tag for capybara-lockstep
         *capybara_lockstep_scripts,
       )
