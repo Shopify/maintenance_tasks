@@ -737,21 +737,24 @@ module MaintenanceTasks
     end
 
     test "#cursor_is_json? returns true when the config flag is enabled and the underlying column is true" do
-      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
-      run = Run.new(cursor_is_json: true)
-      assert run.cursor_is_json?
+      MaintenanceTasks.with(serialize_cursors_as_json: true) do
+        run = Run.new(cursor_is_json: true)
+        assert run.cursor_is_json?
+      end
     end
 
     test "#cursor_is_json? returns false when the config flag is enabled and the underlying column is false" do
-      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
-      run = Run.new(cursor_is_json: false)
-      refute run.cursor_is_json?
+      MaintenanceTasks.with(serialize_cursors_as_json: true) do
+        run = Run.new(cursor_is_json: false)
+        refute run.cursor_is_json?
+      end
     end
 
     test "#cursor_is_json? returns false when the config flag is disabled" do
-      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(false)
-      run = Run.new(cursor_is_json: true)
-      refute run.cursor_is_json?
+      MaintenanceTasks.with(serialize_cursors_as_json: false) do
+        run = Run.new(cursor_is_json: true)
+        refute run.cursor_is_json?
+      end
     end
 
     private

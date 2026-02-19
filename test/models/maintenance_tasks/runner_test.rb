@@ -116,19 +116,21 @@ module MaintenanceTasks
     end
 
     test "#run sets cursor_is_json to true when serialize_cursors_as_json config is true" do
-      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(true)
-      @runner.run(name: @name)
+      MaintenanceTasks.with(serialize_cursors_as_json: true) do
+        @runner.run(name: @name)
 
-      run = Run.last
-      assert run.cursor_is_json
+        run = Run.last
+        assert run.cursor_is_json
+      end
     end
 
     test "#run sets cursor_is_json to false when serialize_cursors_as_json config is false" do
-      MaintenanceTasks.stubs(:serialize_cursors_as_json).returns(false)
-      @runner.run(name: @name)
+      MaintenanceTasks.with(serialize_cursors_as_json: false) do
+        @runner.run(name: @name)
 
-      run = Run.last
-      refute run.cursor_is_json
+        run = Run.last
+        refute run.cursor_is_json
+      end
     end
 
     test "#run attaches CSV file to Run if one is provided" do
