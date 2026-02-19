@@ -17,10 +17,6 @@ module Dummy
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults("#{Rails::VERSION::MAJOR}.#{Rails::VERSION::MINOR}")
 
-    config.to_prepare do
-      MaintenanceTasks.job = "CustomTaskJob"
-    end
-
     # Only include the helper module which match the name of the controller.
     config.action_controller.include_all_helpers = false
 
