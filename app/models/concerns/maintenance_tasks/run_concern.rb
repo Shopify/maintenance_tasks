@@ -453,7 +453,31 @@ module MaintenanceTasks
     # @return [Boolean]
     #   True when the cursor value should be treated as serialized JSON.
     def cursor_is_json?
-      MaintenanceTasks.serialize_cursors_as_json && cursor_is_json
+      MaintenanceTasks.serialize_cursors_as_json && has_attribute?(:cursor_is_json) && cursor_is_json
+    end
+
+    # Configures the Run to use the appropriate type of cursor encoding based
+    # on `MaintenanceTasks.serialize_cursors_as_json`.
+    #
+    # This method exists to gracefully handle the situation where the
+    # `cursor_is_json` column does not exist. As long as the application is not
+    # configured to use JSON cursors (the default), the Run will continue to
+    # function even without the new column.
+    #
+    # * When `MaintenanceTasks.serialize_cursors_as_json` is false, this method
+    #   no-ops.
+    # * When `MaintenanceTasks.serialize_cursors_as_json` is true, this method
+    #   will attempt to mutate the Run so that `cursor_is_json` is set to true.
+    #
+    # @raise [ActiveRecord::RecordInvalid] when the `cursor_is_json` column
+    #   does not exist and `MaintenanceTasks.serialize_cursors_as_json` is true
+    def configure_cursor_encoding!
+      return unless MaintenanceTasks.serialize_cursors_as_json
+
+      return self.cursor_is_json = true if has_attribute?(:cursor_is_json)
+
+      errors.add(:cursor_is_json, "column does not exist - please run maintenance_tasks migrations")
+      raise(ActiveRecord::RecordInvalid, self)
     end
 
     private

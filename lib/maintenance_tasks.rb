@@ -109,6 +109,30 @@ module MaintenanceTasks
   #  @return [Boolean] whether to report unexpected errors as handled (true) or unhandled (false).
   mattr_accessor :report_errors_as_handled, default: true
 
+  # @!attribute serialize_cursors_as_json
+  #  @scope class
+  #  Controls whether or not cursor values are stored as JSON in the database.
+  #  Defaults to false.
+  #
+  #  Storing cursors as JSON enables more complex cursor structures. For
+  #  example, with JSON cursors a task can iterate over collections using
+  #  multiple fields or columns to track progress. This is particularly useful
+  #  for iterating over models with composite primary keys.
+  #
+  #  Be advised that this feature comes with a few caveats:
+  #
+  #  1. Cursor values must be capable of being serialized to JSON and parsed
+  #     from JSON. If they are not, errors will occur during task execution.
+  #  2. If a cursor contains a value that loses precision when serialized, it
+  #     may lead to unexpected behaviour.
+  #  3. This feature utilizes a string column to store the JSON data. If your
+  #     database has a hard limit on how big a string value can be, be mindful
+  #     that certain cursor structures could result in a value that could exceed
+  #     that limit and cause issues.
+  #
+  #  @return [Boolean] whether or not to store cursor values as JSON.
+  mattr_accessor :serialize_cursors_as_json, default: false
+
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
       "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \
@@ -132,41 +156,6 @@ module MaintenanceTasks
     # @api-private
     def deprecator
       @deprecator ||= ActiveSupport::Deprecation.new("3.0", "MaintenanceTasks")
-    end
-
-    # Whether or not to store cursors as JSON in the database. Defaults to false.
-    #
-    # @return [Boolean] whether or not to store cursor values as JSON.
-    def serialize_cursors_as_json
-      @serialize_cursors_as_json || false
-    end
-
-    # Controls whether or not cursor values are stored as JSON in the database.
-    #
-    # Storing cursors as JSON enables more complex cursor structures. For
-    # example, with JSON cursors a task can iterate over collections using
-    # multiple fields or columns to track progress. This is particularly useful
-    # for iterating over models with composite primary keys.
-    #
-    # Be advised that this feature comes with a few caveats:
-    #
-    # 1. Cursor values must be capable of being serialized to JSON and parsed
-    #    from JSON. If they are not, errors will occur during task execution.
-    # 2. If a cursor contains a value that loses precision when serialized, it
-    #    may lead to unexpected behaviour.
-    # 3. This feature utilizes a string column to store the JSON data. If your
-    #    database has a hard limit on how big a string value can be, be mindful
-    #    that certain cursor structures could result in a value that could exceed
-    #    that limit and cause issues.
-    #
-    # @param value [Boolean] - whether or not to store cursor values as JSON.
-    def serialize_cursors_as_json=(value)
-      msg = "Run is missing the required `cursor_is_json` column. " \
-        "Ensure migration to add JSON cursor support is run before enabling serialize_cursors_as_json."
-
-      raise(msg) if value && Run.column_names.exclude?("cursor_is_json")
-
-      @serialize_cursors_as_json = value
     end
   end
 end
