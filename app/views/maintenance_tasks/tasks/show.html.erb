@@ -26,6 +26,11 @@
       </div>
     <% end %>
     <%= render "maintenance_tasks/tasks/custom", form: form %>
+    <% unless @task.deleted? || @task.csv_task? || @task.no_collection? %>
+      <div id="task-count" data-url="<%= count_task_path(@task) %>" class="block">
+        <p class="has-text-grey">Estimating expected items count...</p>
+      </div>
+    <% end %>
     <div class="block">
       <%= form.submit 'Run', class: "button is-success is-rounded mb-4 has-text-white-ter", disabled: @task.deleted? %>
     </div>
@@ -60,4 +65,68 @@
 
     <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
   <% end %>
+<% end %>
+
+<% unless @task.deleted? || @task.csv_task? || @task.no_collection? %>
+<script>
+(function() {
+  var countEl = document.getElementById('task-count');
+  if (!countEl) return;
+
+  var form = document.querySelector('form');
+  if (!form) return;
+
+  var url = countEl.dataset.url;
+  var abortCtrl;
+
+  function serializeParams() {
+    var params = new URLSearchParams();
+    new FormData(form).forEach(function(value, key) {
+      var m = key.match(/^task\[(.+)\]$/);
+      if (m) params.set(m[1], value);
+    });
+    return params.toString();
+  }
+
+  var lastParams = serializeParams();
+
+  function fetchCount() {
+    if (abortCtrl) abortCtrl.abort();
+    abortCtrl = new AbortController();
+
+    var p = countEl.querySelector('p');
+    p.textContent = 'Estimating expected items count...';
+    countEl.classList.remove('is-hidden');
+
+    var serialized = serializeParams();
+    lastParams = serialized;
+
+    fetch(url + '?' + serialized, { signal: abortCtrl.signal })
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        if (data.count != null) {
+          p.textContent = '';
+          var strong = document.createElement('strong');
+          strong.textContent = data.count.toLocaleString();
+          p.appendChild(strong);
+          p.appendChild(document.createTextNode(
+            ' ' + (data.count === 1 ? 'item' : 'items') + ' expected to be processed'
+          ));
+          countEl.classList.remove('is-hidden');
+        } else {
+          countEl.classList.add('is-hidden');
+        }
+      })
+      .catch(function() {});
+  }
+
+  function fetchCountIfChanged() {
+    if (serializeParams() !== lastParams) fetchCount();
+  }
+
+  fetchCount();
+  form.addEventListener('focusout', fetchCountIfChanged);
+  form.addEventListener('change', fetchCount);
+})();
+</script>
 <% end %>
