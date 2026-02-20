@@ -130,6 +130,10 @@ module MaintenanceTasks
   #     that certain cursor structures could result in a value that could exceed
   #     that limit and cause issues.
   #
+  #  A new column was added to discern JSON cursors from plain string cursors.
+  #  Make sure you have run the latest database migrations provided by the gem
+  #  before enabling this feature.
+  #
   #  @return [Boolean] whether or not to store cursor values as JSON.
   mattr_accessor :serialize_cursors_as_json, default: false
 

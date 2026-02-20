@@ -28,20 +28,6 @@ module MaintenanceTasks
   end
 
   class RunTest < ActiveSupport::TestCase
-    setup do
-      # This anonymous class exists so that we can run test cases in the state
-      # where the `cursor_is_json` column does not exist yet.
-      @run_class_without_column = Class.new(Run) do
-        self.ignored_columns = [:cursor_is_json]
-
-        class << self
-          def name
-            "MyRunClass"
-          end
-        end
-      end
-    end
-
     test "invalid if the task doesn't exist" do
       run = Run.new(task_name: "Maintenance::DoesNotExist")
       refute_predicate run, :valid?
@@ -771,13 +757,6 @@ module MaintenanceTasks
       end
     end
 
-    test "#cursor_is_json? returns false when cursor_is_json column does not exist" do
-      MaintenanceTasks.with(serialize_cursors_as_json: true) do
-        run = @run_class_without_column.new
-        refute run.cursor_is_json?
-      end
-    end
-
     test "#configure_cursor_encoding! sets cursor_is_json to true when the config flag is enabled" do
       MaintenanceTasks.with(serialize_cursors_as_json: true) do
         run = Run.new
@@ -786,33 +765,11 @@ module MaintenanceTasks
       end
     end
 
-    test "#configure_cursor_encoding! raises when the config flag is enabled and the column does not exist" do
-      MaintenanceTasks.with(serialize_cursors_as_json: true) do
-        error = assert_raises(ActiveRecord::RecordInvalid) do
-          run = @run_class_without_column.new
-          run.configure_cursor_encoding!
-        end
-
-        assert_equal(
-          error.message,
-          "Validation failed: Cursor is json column does not exist - please run maintenance_tasks migrations",
-        )
-      end
-    end
-
     test "#configure_cursor_encoding! does not set cursor_is_json when the config flag is disabled" do
       MaintenanceTasks.with(serialize_cursors_as_json: false) do
         run = Run.new
         run.configure_cursor_encoding!
         refute run.cursor_is_json
-      end
-    end
-
-    test "#configure_cursor_encoding! does not raise when the config flag is disabled and the column does not exist" do
-      MaintenanceTasks.with(serialize_cursors_as_json: false) do
-        run = @run_class_without_column.new
-        run.configure_cursor_encoding!
-        assert true # I only care that an exception wasn't raised but we need an assertion.
       end
     end
 

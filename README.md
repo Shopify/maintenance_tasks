@@ -1344,6 +1344,10 @@ Be advised that this feature comes with a few caveats:
    certain cursor structures could result in a value that could exceed that
    limit and cause issues.
 
+A new column was added to discern JSON cursors from plain string cursors. Make
+sure you have run the latest database migrations provided by the gem before
+enabling this feature. See [upgrading](#upgrading) for more information.
+
 ```ruby
 # config/initializers/maintenance_tasks.rb
 MaintenanceTasks.serialize_cursors_as_json = true
