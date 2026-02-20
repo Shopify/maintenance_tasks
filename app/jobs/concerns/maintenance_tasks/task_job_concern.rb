@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "json"
+
 module MaintenanceTasks
   # Concern that holds the behaviour of the job that runs the tasks. It is
   # included in {TaskJob} and if MaintenanceTasks.job is overridden, it must be
@@ -30,8 +32,18 @@ module MaintenanceTasks
 
     private
 
+    def serialized_cursor_position
+      cursor_position && @run.cursor_is_json? ? cursor_position.to_json : cursor_position
+    end
+
+    def deserialized_run_cursor
+      return JSON.parse(@run.cursor) if @run.cursor && @run.cursor_is_json?
+
+      @run.cursor
+    end
+
     def build_enumerator(_run, cursor:)
-      cursor ||= @run.cursor
+      cursor ||= deserialized_run_cursor
       self.cursor_position = cursor
       enumerator_builder = self.enumerator_builder
       @collection_enum = @task.enumerator_builder(cursor: cursor)
@@ -140,7 +152,7 @@ module MaintenanceTasks
 
     def on_shutdown
       @run.job_shutdown
-      @run.cursor = cursor_position
+      @run.cursor = serialized_cursor_position
       @ticker.persist
     end
 
@@ -177,7 +189,7 @@ module MaintenanceTasks
       @ticker.persist if defined?(@ticker)
 
       if defined?(@run)
-        @run.cursor = cursor_position
+        @run.cursor = serialized_cursor_position
         @run.persist_error(error)
 
         task_context = {

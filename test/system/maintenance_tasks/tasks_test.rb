@@ -25,6 +25,7 @@ module MaintenanceTasks
         "Maintenance::BatchImportPostsTask New",
         "Maintenance::CallbackTestTask New",
         "Maintenance::CancelledEnqueueTask New",
+        "Maintenance::CompositePrimaryKeyModelTask New",
         "Maintenance::CustomEnumeratingTask New",
         "Maintenance::EnqueueErrorTask New",
         "Maintenance::ErrorTask New",

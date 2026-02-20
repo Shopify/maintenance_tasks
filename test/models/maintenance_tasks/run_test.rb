@@ -736,6 +736,43 @@ module MaintenanceTasks
         (Run::ACTIVE_STATUSES + Run::COMPLETED_STATUSES).sort
     end
 
+    test "#cursor_is_json? returns true when the config flag is enabled and the underlying column is true" do
+      MaintenanceTasks.with(serialize_cursors_as_json: true) do
+        run = Run.new(cursor_is_json: true)
+        assert run.cursor_is_json?
+      end
+    end
+
+    test "#cursor_is_json? returns false when the config flag is enabled and the underlying column is false" do
+      MaintenanceTasks.with(serialize_cursors_as_json: true) do
+        run = Run.new(cursor_is_json: false)
+        refute run.cursor_is_json?
+      end
+    end
+
+    test "#cursor_is_json? returns false when the config flag is disabled" do
+      MaintenanceTasks.with(serialize_cursors_as_json: false) do
+        run = Run.new(cursor_is_json: true)
+        refute run.cursor_is_json?
+      end
+    end
+
+    test "#configure_cursor_encoding! sets cursor_is_json to true when the config flag is enabled" do
+      MaintenanceTasks.with(serialize_cursors_as_json: true) do
+        run = Run.new
+        run.configure_cursor_encoding!
+        assert run.cursor_is_json
+      end
+    end
+
+    test "#configure_cursor_encoding! does not set cursor_is_json when the config flag is disabled" do
+      MaintenanceTasks.with(serialize_cursors_as_json: false) do
+        run = Run.new
+        run.configure_cursor_encoding!
+        refute run.cursor_is_json
+      end
+    end
+
     private
 
     def expected_notification(run)
