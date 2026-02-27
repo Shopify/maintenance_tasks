@@ -115,6 +115,11 @@ module MaintenanceTasks
       end
     end
 
+    test "#run invokes Run#configure_cursor_encoding!" do
+      Run.any_instance.expects(:configure_cursor_encoding!)
+      @runner.run(name: @name)
+    end
+
     test "#run attaches CSV file to Run if one is provided" do
       @runner.run(name: "Maintenance::ImportPostsTask", csv_file: csv_io)
 
