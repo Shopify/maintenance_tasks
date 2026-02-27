@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require "timeout"
+
 module MaintenanceTasks
   # Class that represents the data related to a Task. Such information can be
   # sourced from a Task or from existing Run records for a Task that was since
@@ -11,6 +13,8 @@ module MaintenanceTasks
   #
   # @api private
   class TaskDataShow
+    TIMEOUT = 15
+
     # Initializes a Task Data with a name.
     #
     # @param name [String] the name of the Task subclass.
@@ -97,6 +101,11 @@ module MaintenanceTasks
       !deleted? && Task.named(name).has_csv_content?
     end
 
+    # @return [Boolean] whether the Task is collection-less.
+    def no_collection?
+      !deleted? && Task.named(name).no_collection?
+    end
+
     # @return [Array<String>] the names of parameters the Task accepts.
     def parameter_names
       if deleted?
@@ -104,6 +113,26 @@ module MaintenanceTasks
       else
         Task.named(name).attribute_names
       end
+    end
+
+    # @return [Integer] the count of items to be processed.
+    # @return [nil] if the count is unavailable (e.g. CSV tasks where the
+    #   collection depends on uploaded file content, tasks whose collection
+    #   requires arguments, or when the query times out).
+    def count
+      return if deleted?
+      return if csv_task?
+
+      task_instance = new
+      return if task_instance.nil?
+
+      Timeout.timeout(TIMEOUT) do
+        result = task_instance.count
+        result = task_instance.collection.count if result == :no_count
+        result if result.is_a?(Integer)
+      end
+    rescue StandardError
+      nil
     end
 
     # @return [MaintenanceTasks::Task] an instance of the Task class.

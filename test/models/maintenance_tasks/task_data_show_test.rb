@@ -91,6 +91,18 @@ module MaintenanceTasks
       refute_predicate TaskDataShow.new("Maintenance::DoesNotExist"), :csv_task?
     end
 
+    test "#no_collection? returns true for a no-collection Task" do
+      assert_predicate TaskDataShow.new("Maintenance::NoCollectionTask"), :no_collection?
+    end
+
+    test "#no_collection? returns false for a Task with a collection" do
+      refute_predicate TaskDataShow.new("Maintenance::UpdatePostsTask"), :no_collection?
+    end
+
+    test "#no_collection? returns false if the Task is deleted" do
+      refute_predicate TaskDataShow.new("Maintenance::DoesNotExist"), :no_collection?
+    end
+
     test "#refresh? returns true if there are active runs" do
       assert_predicate TaskDataShow.new("Maintenance::UpdatePostsTask"), :refresh?
     end
@@ -152,6 +164,55 @@ module MaintenanceTasks
     test "#new ignores unknown arguments" do
       task_data = TaskDataShow.prepare("Maintenance::ParamsTask", arguments: { unknown: nil })
       assert_nothing_raised { task_data.new }
+    end
+
+    test "#count returns the count for a Task with a count override" do
+      task_data = TaskDataShow.new("Maintenance::UpdatePostsThrottledTask")
+      assert_equal Post.count, task_data.count
+    end
+
+    test "#count returns the count for a custom enumerating Task" do
+      task_data = TaskDataShow.new("Maintenance::CustomEnumeratingTask")
+      assert_equal 3, task_data.count
+    end
+
+    test "#count falls back to collection count for a Task without a count override" do
+      task_data = TaskDataShow.new("Maintenance::TestTask")
+      assert_equal 2, task_data.count
+    end
+
+    test "#count returns nil when collection count errors" do
+      task_data = TaskDataShow.new("Maintenance::ParamsTask")
+      assert_nil task_data.count
+    end
+
+    test "#count returns the count for a no-collection Task" do
+      task_data = TaskDataShow.new("Maintenance::NoCollectionTask")
+      assert_equal 1, task_data.count
+    end
+
+    test "#count returns nil for a CSV Task" do
+      task_data = TaskDataShow.new("Maintenance::ImportPostsTask")
+      assert_nil task_data.count
+    end
+
+    test "#count returns nil for a deleted Task" do
+      task_data = TaskDataShow.new("Maintenance::DoesNotExist")
+      assert_nil task_data.count
+    end
+
+    test "#count returns nil when collection count times out" do
+      task_data = TaskDataShow.new("Maintenance::UpdatePostsThrottledTask")
+      Task.named("Maintenance::UpdatePostsThrottledTask").any_instance.stubs(:count).raises(Timeout::Error)
+      assert_nil task_data.count
+    end
+
+    test "#count returns the count for a Task with arguments" do
+      task_data = TaskDataShow.new(
+        "Maintenance::ParamsTask",
+        arguments: { post_ids: Post.first.id.to_s },
+      )
+      assert_equal 1, task_data.count
     end
   end
 end
