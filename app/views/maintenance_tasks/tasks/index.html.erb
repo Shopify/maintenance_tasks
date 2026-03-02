@@ -14,9 +14,9 @@
     <% end %>
     <% if new_tasks = @available_tasks[:new] %>
       <h3 class="title is-4 has-text-weight-bold">New Tasks</h3>
-	  <div class="grid is-col-min-20">
+	    <div class="grid is-col-min-20">
         <%= render partial: 'task', collection: new_tasks %>
-	  </div>
+	    </div>
     <% end %>
     <% if completed_tasks = @available_tasks[:completed] %>
       <h3 class="title is-4 has-text-weight-bold">Completed Tasks</h3>
