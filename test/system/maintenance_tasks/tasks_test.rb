@@ -71,6 +71,18 @@ module MaintenanceTasks
       assert_text(/January 01, 2020 01:00 Succeeded #\d/)
     end
 
+    test "show a Task with outdated run" do
+      travel_to(maintenance_tasks_runs(:outdated_task).ended_at + 2.days) do
+        MaintenanceTasks.with(outdated_task_threshold: 1.day) do
+          visit maintenance_tasks_path
+
+          within page.find("a", text: "Maintenance::OutdatedTask").find(:xpath, "..").sibling(".has-text-warning") do |element|
+            assert_text "This task last ran 1 day ago. Consider removing it as it may be outdated."
+          end
+        end
+      end
+    end
+
     test "task with attributes renders default values on the form" do
       visit maintenance_tasks_path
 

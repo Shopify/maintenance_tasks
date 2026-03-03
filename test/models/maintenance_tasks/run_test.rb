@@ -773,6 +773,27 @@ module MaintenanceTasks
       end
     end
 
+    test "#outdated? returns true when the run is beyond the outdated task threshold" do
+      MaintenanceTasks.with(outdated_task_threshold: 1.day) do
+        run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 2.days.ago)
+        assert run.outdated?
+      end
+    end
+
+    test "#outdated? returns false when the run is within the outdated task threshold" do
+      MaintenanceTasks.with(outdated_task_threshold: 2.day) do
+        run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 1.day.ago)
+        refute run.outdated?
+      end
+    end
+
+    test "#outdated? returns false when the run is nil" do
+      MaintenanceTasks.with(outdated_task_threshold: 1.day) do
+        run = Run.new
+        refute run.outdated?
+      end
+    end
+
     private
 
     def expected_notification(run)

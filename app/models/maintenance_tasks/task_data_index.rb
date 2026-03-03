@@ -64,6 +64,8 @@ module MaintenanceTasks
 
     alias_method :to_s, :name
 
+    delegate :outdated?, to: :related_run
+
     # Returns the status of the latest active or completed Run, if present.
     # If the Task does not have any Runs, the Task status is `new`.
     #

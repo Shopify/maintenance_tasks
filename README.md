@@ -1353,6 +1353,15 @@ enabling this feature. See [upgrading](#upgrading) for more information.
 MaintenanceTasks.serialize_cursors_as_json = true
 ```
 
+#### Configure outdated task threshold
+
+To specify a date threshold which will display an outdated message, you can
+configure `MaintenanceTasks.outdated_task_threshold`. Tasks that have last run
+successfully after this threshold will be marked outdated.
+
+The value for `MaintenanceTasks.outdated_task_threshold` must be an
+`ActiveSupport::Duration`. If no value is specified, it will default to 30 days.
+
 ## Upgrading
 
 Use bundler to check for and upgrade to newer versions. After installing a new

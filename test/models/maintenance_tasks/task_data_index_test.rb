@@ -51,6 +51,14 @@ module MaintenanceTasks
       assert_equal "Maintenance::UpdatePostsTask", task_data.to_s
     end
 
+    test "#outdated? returns true when the task is outdated from the delegated related_run" do
+      MaintenanceTasks.with(outdated_task_threshold: 1.day) do
+        run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 2.days.ago)
+        task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask", run)
+        assert task_data.outdated?
+      end
+    end
+
     test "#status is new when Task does not have any Runs" do
       task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask")
       assert_equal "new", task_data.status
