@@ -467,6 +467,28 @@ module Maintenance
 end
 ```
 
+If you want the throttle to change based on task attributes, you can define the
+`throttle_on` inside `#initialize`:
+
+```ruby
+# app/tasks/maintenance/update_posts_throttled_task.rb
+
+module Maintenance
+  class UpdatePostsThrottledTask < MaintenanceTasks::Task
+    attribute :throttle_backoff_seconds, :integer
+
+    def initialize(*)
+      super
+
+      throttle_on(backoff: throttle_backoff_seconds) do
+        DatabaseStatus.unhealthy?
+      end
+    end
+    # ...
+  end
+end
+```
+
 ### Custom Task Parameters
 
 Tasks may need additional information, supplied via parameters, to run.

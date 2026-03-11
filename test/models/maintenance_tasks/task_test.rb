@@ -113,6 +113,20 @@ module MaintenanceTasks
       Maintenance::TestTask.throttle_conditions = []
     end
 
+    test "#throttle_on registers throttle condition for Task" do
+      throttle_condition = -> { true }
+
+      task = Maintenance::TestTask.new
+      task.throttle_on(&throttle_condition)
+
+      task_throttle_conditions = task.throttle_conditions
+      assert_equal(1, task_throttle_conditions.size)
+
+      condition = task_throttle_conditions.first
+      assert_equal(throttle_condition, condition[:throttle_on])
+      assert_equal(30.seconds, condition[:backoff].call)
+    end
+
     test ".cursor_columns returns nil" do
       task = Task.new
       assert_nil task.cursor_columns
