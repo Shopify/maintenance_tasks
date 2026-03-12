@@ -70,8 +70,8 @@ import_posts_task_succeeded_old:
   tick_count: 10
   tick_total: 10
 
-outdated_task:
-  task_name: Maintenance::OutdatedTask
+stale_task:
+  task_name: Maintenance::StaleTask
   tick_count: 10
   tick_total: 10
   job_id: '123abc'

@@ -137,13 +137,13 @@ module MaintenanceTasks
   #  @return [Boolean] whether or not to store cursor values as JSON.
   mattr_accessor :serialize_cursors_as_json, default: false
 
-  # @!attribute outdated_task_threshold
+  # @!attribute task_staleness_threshold
   #  @scope class
-  #  The threshold after which a task is considered outdated.
-  #  Defaults to 30 days.
+  #  The threshold after which a task is considered stale.
+  #  Defaults to 30 days. Can be disabled by setting this to `false`.
   #
-  #  @return [ActiveSupport::Duration] the threshold after which a task is considered outdated.
-  mattr_accessor :outdated_task_threshold, default: 30.days
+  #  @return [ActiveSupport::Duration, false] time interval after which a task is considered stale.
+  mattr_accessor :task_staleness_threshold, default: 30.days
 
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \

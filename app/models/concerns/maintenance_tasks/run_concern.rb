@@ -471,13 +471,15 @@ module MaintenanceTasks
       self.cursor_is_json = true
     end
 
-    # Returns whether the run is beyond the outdated task threshold.
+    # Returns whether the run is stale based on the staleness threshold.
     #
     # @return [Boolean]
-    def outdated?
+    def stale?
+      return false unless MaintenanceTasks.task_staleness_threshold.present?
+      return false unless succeeded?
       return false unless ended_at.present?
 
-      ended_at < MaintenanceTasks.outdated_task_threshold.ago
+      ended_at < MaintenanceTasks.task_staleness_threshold.ago
     end
 
     private

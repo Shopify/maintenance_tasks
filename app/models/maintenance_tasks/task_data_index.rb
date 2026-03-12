@@ -64,7 +64,14 @@ module MaintenanceTasks
 
     alias_method :to_s, :name
 
-    delegate :outdated?, to: :related_run
+    # Delegates to the related run's stale? method when available.
+    #
+    # @return [Boolean] whether the related run is stale.
+    def stale?
+      return false unless related_run.present?
+
+      related_run.stale?
+    end
 
     # Returns the status of the latest active or completed Run, if present.
     # If the Task does not have any Runs, the Task status is `new`.

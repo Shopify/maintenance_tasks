@@ -1353,14 +1353,15 @@ enabling this feature. See [upgrading](#upgrading) for more information.
 MaintenanceTasks.serialize_cursors_as_json = true
 ```
 
-#### Configure outdated task threshold
+#### Configure staleness threshold
 
-To specify a date threshold which will display an outdated message, you can
-configure `MaintenanceTasks.outdated_task_threshold`. Tasks that have last run
-successfully after this threshold will be marked outdated.
+To specify a staleness threshold date interval which will mark task runs as stale, you can
+configure `MaintenanceTasks.task_staleness_threshold`. Tasks that have last run
+successfully after this threshold will be marked stale.
 
-The value for `MaintenanceTasks.outdated_task_threshold` must be an
-`ActiveSupport::Duration`. If no value is specified, it will default to 30 days.
+The value for `MaintenanceTasks.task_staleness_threshold` must be an
+`ActiveSupport::Duration`. If no value is specified, it will default to 30 days. This can be disabled
+by setting `MaintenanceTasks.task_staleness_threshold` to `false`.
 
 ## Upgrading
 
