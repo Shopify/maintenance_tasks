@@ -50,7 +50,7 @@ module MaintenanceTasks
     end
 
     test "#status_tag renders a span with the appropriate tag based on status" do
-      expected = '<span class="tag has-text-weight-medium pr-2 mr-4 is-warning is-light">Pausing</span>'
+      expected = '<span class="tag has-text-weight-medium px-2 mx-4 is-warning is-light">Pausing</span>'
       assert_equal expected, status_tag("pausing")
     end
 

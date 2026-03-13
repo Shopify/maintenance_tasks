@@ -22,6 +22,7 @@ module MaintenanceTasks
         # duplicate due to fixtures containing two active runs of this task
         "Maintenance::NoCollectionTask",
         "Maintenance::ParamsTask",
+        "Maintenance::StaleTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
         "Maintenance::UpdatePostsModulePrependedTask",
@@ -49,6 +50,25 @@ module MaintenanceTasks
       task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask")
 
       assert_equal "Maintenance::UpdatePostsTask", task_data.to_s
+    end
+
+    test "#stale? returns `true` for tasks outside of the staleness threshold for the related_run" do
+      MaintenanceTasks.with(task_staleness_threshold: 1.day) do
+        run = Run.create!(
+          task_name: "Maintenance::UpdatePostsTask",
+          ended_at: 2.days.ago,
+          status: :succeeded,
+        )
+        task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask", run)
+        assert task_data.stale?
+      end
+    end
+
+    test "#stale? returns `false` for tasks with no related run" do
+      MaintenanceTasks.with(task_staleness_threshold: 1.day) do
+        task_data = TaskDataIndex.new("Maintenance::UpdatePostsTask", nil)
+        refute task_data.stale?
+      end
     end
 
     test "#status is new when Task does not have any Runs" do

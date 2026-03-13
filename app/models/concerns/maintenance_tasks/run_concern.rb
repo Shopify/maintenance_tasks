@@ -471,6 +471,17 @@ module MaintenanceTasks
       self.cursor_is_json = true
     end
 
+    # Returns whether the run is stale based on the staleness threshold.
+    #
+    # @return [Boolean]
+    def stale?
+      return false unless MaintenanceTasks.task_staleness_threshold.present?
+      return false unless succeeded?
+      return false unless ended_at.present?
+
+      ended_at < MaintenanceTasks.task_staleness_threshold.ago
+    end
+
     private
 
     def instrument_status_change

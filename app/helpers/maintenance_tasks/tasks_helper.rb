@@ -62,7 +62,7 @@ module MaintenanceTasks
     def status_tag(status)
       tag.span(
         status.capitalize,
-        class: ["tag", "has-text-weight-medium", "pr-2", "mr-4"] + STATUS_COLOURS.fetch(status),
+        class: ["tag", "has-text-weight-medium", "px-2", "mx-4"] + STATUS_COLOURS.fetch(status),
       )
     end
 
