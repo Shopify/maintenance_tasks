@@ -46,6 +46,6 @@
     <% elsif run.active? %>
       <%= button_to 'Pause', pause_task_run_path(@task, run), class: 'button is-warning', disabled: @task.deleted? %>
       <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
-    <% end%>
+    <% end %>
   </div>
 </details>

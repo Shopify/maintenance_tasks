@@ -44,7 +44,7 @@
 
 <%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
   <% if @task.active_runs.any? %>
-    <hr/>
+    <hr>
 
     <h4 class="title is-4">Active Runs</h4>
 
@@ -52,7 +52,7 @@
   <% end %>
 
   <% if @task.runs_page.records.present? %>
-    <hr/>
+    <hr>
 
     <h4 class="title is-5 has-text-weight-bold">Previous Runs</h4>
 
