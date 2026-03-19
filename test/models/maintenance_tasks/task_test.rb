@@ -20,6 +20,7 @@ module MaintenanceTasks
         "Maintenance::Nested::NestedTask",
         "Maintenance::NoCollectionTask",
         "Maintenance::ParamsTask",
+        "Maintenance::StaleTask",
         "Maintenance::TestTask",
         "Maintenance::UpdatePostsInBatchesTask",
         "Maintenance::UpdatePostsModulePrependedTask",
