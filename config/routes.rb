@@ -2,6 +2,9 @@
 
 MaintenanceTasks::Engine.routes.draw do
   resources :tasks, only: [:index, :show], format: false do
+    member do
+      get :count
+    end
     resources :runs, only: [:create], format: false do
       member do
         post "pause"

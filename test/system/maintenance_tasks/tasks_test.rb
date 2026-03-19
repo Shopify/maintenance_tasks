@@ -259,6 +259,32 @@ module MaintenanceTasks
       assert_button "Run", disabled: true
     end
 
+    test "show a Task with count indicator" do
+      visit maintenance_tasks.task_path("Maintenance::UpdatePostsThrottledTask")
+      assert_text "items expected to be processed"
+    end
+
+    test "count updates dynamically when params change" do
+      visit maintenance_tasks.task_path("Maintenance::ParamsTask")
+      assert_selector "#task-count:not(.is-hidden)"
+
+      fill_in "task[post_ids]", with: Post.first.id.to_s
+      find_field("task[post_ids]").send_keys(:tab)
+      within("#task-count") do
+        assert_text "1 item expected to be processed"
+      end
+    end
+
+    test "show a Task without count indicator" do
+      visit maintenance_tasks.task_path("Maintenance::ImportPostsTask")
+      assert_no_text "expected to be processed"
+    end
+
+    test "show a no-collection Task without count indicator" do
+      visit maintenance_tasks.task_path("Maintenance::NoCollectionTask")
+      assert_no_selector "#task-count"
+    end
+
     test "visit main page through iframe" do
       visit root_path
 
