@@ -776,14 +776,14 @@ module MaintenanceTasks
     test "#stale? returns `false` when the run is not succeeded" do
       MaintenanceTasks.with(task_staleness_threshold: 1.day) do
         run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 2.days.ago, status: :running)
-        refute run.stale?
+        refute_predicate run, :stale?
       end
     end
 
     test "#stale? returns `false` when the staleness threshold is disabled" do
       MaintenanceTasks.with(task_staleness_threshold: false) do
         run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 2.days.ago, status: :succeeded)
-        refute run.stale?
+        refute_predicate run, :stale?
       end
     end
 
@@ -793,27 +793,27 @@ module MaintenanceTasks
         ended_at: (MaintenanceTasks.task_staleness_threshold + 1.day).ago,
         status: :succeeded,
       )
-      assert run.stale?
+      assert_predicate run, :stale?
     end
 
     test "#stale? returns `true` when the run is succeeded and beyond the staleness threshold" do
       MaintenanceTasks.with(task_staleness_threshold: 1.day) do
         run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 2.days.ago, status: :succeeded)
-        assert run.stale?
+        assert_predicate run, :stale?
       end
     end
 
     test "#stale? returns `false` when the run is succeeded and within the staleness threshold" do
       MaintenanceTasks.with(task_staleness_threshold: 2.day) do
         run = Run.create!(task_name: "Maintenance::UpdatePostsTask", ended_at: 1.day.ago, status: :succeeded)
-        refute run.stale?
+        refute_predicate run, :stale?
       end
     end
 
     test "#stale? returns `false` when the run is nil" do
       MaintenanceTasks.with(task_staleness_threshold: 1.day) do
         run = Run.new
-        refute run.stale?
+        refute_predicate run, :stale?
       end
     end
 
