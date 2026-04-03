@@ -77,7 +77,10 @@ module MaintenanceTasks
         MaintenanceTasks.with(task_staleness_threshold: 1.day) do
           visit maintenance_tasks_path
 
-          within page.find("a", text: "Maintenance::StaleTask").find(:xpath, "..").sibling(".has-text-warning") do |element|
+          within page
+            .find("a", text: "Maintenance::StaleTask")
+            .find(:xpath, "..")
+            .sibling(".has-text-warning") do
             assert_text "This task last ran 1 day ago. Consider removing it as it may be stale."
           end
         end
