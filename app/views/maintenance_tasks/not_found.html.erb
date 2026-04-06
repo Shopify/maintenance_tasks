@@ -1,0 +1,9 @@
+<% content_for :page_title, "Not Found" %>
+
+<div class="container has-text-centered">
+  <h1 class="title is-3 has-text-weight-bold">Task Not Found</h1>
+  <p class="subtitle is-5">The task you are looking for does not exist or has been deleted.</p>
+  <p>
+    <%= link_to "Back to Tasks", tasks_path, class: "button is-primary is-rounded" %>
+  </p>
+</div>

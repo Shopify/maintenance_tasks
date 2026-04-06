@@ -259,6 +259,15 @@ module MaintenanceTasks
       assert_button "Run", disabled: true
     end
 
+    test "show a not found Task" do
+      visit maintenance_tasks_path + "/tasks/Maintenance::DoesNotExist"
+
+      assert_title "Not Found"
+      assert_text "Task Not Found"
+      assert_text "The task you are looking for does not exist or has been deleted."
+      assert_link "Back to Tasks"
+    end
+
     test "visit main page through iframe" do
       visit root_path
 
