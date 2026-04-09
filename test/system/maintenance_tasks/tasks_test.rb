@@ -40,6 +40,7 @@ module MaintenanceTasks
         "Maintenance::UpdatePostsThrottledTask New",
         "Completed Tasks",
         "Maintenance::ImportPostsTask Succeeded",
+        "Maintenance::StaleTask Succeeded",
       ]
 
       assert_equal expected, page.all("h3").map(&:text)
@@ -69,6 +70,21 @@ module MaintenanceTasks
       assert_equal ["Active Runs", "Previous Runs"], page.all("h4").map(&:text)
       assert_text(/July 18, 2022 11:05 Paused #\d/)
       assert_text(/January 01, 2020 01:00 Succeeded #\d/)
+    end
+
+    test "show a Task with stale run" do
+      travel_to(maintenance_tasks_runs(:stale_task).ended_at + 2.days) do
+        MaintenanceTasks.with(task_staleness_threshold: 1.day) do
+          visit maintenance_tasks_path
+
+          within page
+            .find("a", text: "Maintenance::StaleTask")
+            .find(:xpath, "..")
+            .sibling(".has-text-warning") do
+            assert_text "This task last ran 1 day ago. Consider removing it as it may be stale."
+          end
+        end
+      end
     end
 
     test "task with attributes renders default values on the form" do
