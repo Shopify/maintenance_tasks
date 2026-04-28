@@ -148,10 +148,8 @@ module MaintenanceTasks
     end
 
     def check_throttle
-      @task.throttle_conditions.each do |condition|
-        return condition[:backoff].call if condition[:throttle_on].call
-      end
-      nil
+      condition = @task.throttle_conditions.find { |c| c[:throttle_on].call }
+      condition&.dig(:backoff)&.call
     end
 
     def before_perform
