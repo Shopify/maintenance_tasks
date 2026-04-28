@@ -175,7 +175,7 @@ module MaintenanceTasks
       TaskJob.perform_now(@run)
 
       assert_predicate @run.reload, :interrupted?
-      # Continuable handles re-enqueue via retry_job on Interrupt
+      assert_enqueued_jobs(1)
     end
 
     test ".perform_now updates Run to errored and persists ended_at when exception is raised" do
