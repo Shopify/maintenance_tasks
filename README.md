@@ -45,12 +45,10 @@ If your task updates your database schema instead of data, use a migration
 instead of a maintenance task.
 
 If your task happens regularly, consider Active Jobs with a scheduler or cron,
-[job-iteration jobs][job-iteration] and/or [custom rails_admin
+ActiveJob jobs with `ActiveJob::Continuable` and/or [custom rails_admin
 UIs][rails-admin-engines] instead of the Maintenance Tasks gem. Maintenance
 tasks should be ephemeral, to suit their intentionally limited UI. They should
 not repeat.
-
-[job-iteration]: https://github.com/shopify/job-iteration
 
 To create seed data for a new application, use the provided Rails `db/seeds.rb`
 file instead.
@@ -548,17 +546,11 @@ Rails.application.config.filter_parameters += %i[token]
 
 ### Custom cursor columns to improve performance
 
-The [job-iteration gem][job-iteration], on which this gem depends, adds an
-`order by` clause to the relation returned by the `collection` method, in order
-to iterate through records. It defaults to order on the `id` column.
+The iteration engine adds an `order by` clause to the relation returned by
+the `collection` method, in order to iterate through records. It defaults to
+order on the primary key column.
 
-The [job-iteration gem][job-iteration] supports configuring which columns are
-used to order the cursor, as documented in
-[`build_active_record_enumerator_on_records`][ji-ar-enumerator-doc].
-
-[ji-ar-enumerator-doc]: https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method
-
-The `maintenance-tasks` gem exposes the ability that `job-iteration` provides to
+The `maintenance-tasks` gem allows you to
 control the cursor columns, through the `cursor_columns` method in the
 `MaintenanceTasks::Task` class. If the `cursor_columns` method returns `nil`,
 the query is ordered by the primary key. If cursor columns values change during
@@ -985,10 +977,8 @@ This means a Task can safely be interrupted, re-enqueued and resumed without any
 intervention at the end of an iteration, after the `process` method returns.
 
 By default, a running Task will be interrupted after running for more than 5
-minutes. This is [configured in the `job-iteration` gem][max-job-runtime] and
-can be tweaked in an initializer if necessary.
-
-[max-job-runtime]: https://github.com/Shopify/job-iteration/blob/-/guides/best-practices.md#max-job-runtime
+minutes. This can be configured via `MaintenanceTasks.max_job_runtime` in an
+initializer if necessary.
 
 Running tasks will also be interrupted and re-enqueued when needed. For example
 [when Sidekiq workers shut down for a deploy][sidekiq-deploy]:
@@ -997,7 +987,7 @@ Running tasks will also be interrupted and re-enqueued when needed. For example
 
 * When Sidekiq receives a TSTP or TERM signal, it will consider itself to be
   stopping.
-* When Sidekiq is stopping, JobIteration stops iterating over the enumerator.
+* When Sidekiq is stopping, the queue adapter signals `stopping?` to the job.
   The position in the iteration is saved, a new job is enqueued to resume work,
   and the Task is marked as interrupted.
 

@@ -8,18 +8,24 @@ module MaintenanceTasks
   # included in the job.
   module TaskJobConcern
     extend ActiveSupport::Concern
-    include JobIteration::Iteration
 
     included do
+      include ActiveJob::Continuable
+
+      self.resume_options = { wait: 0 }
+      self.resume_errors_after_advancing = false
+
       before_perform(:before_perform)
-
-      on_start(:on_start)
-      on_shutdown(:on_shutdown)
-      on_complete(:on_complete)
-
       after_perform(:after_perform)
 
       rescue_from StandardError, with: :on_error
+
+      define_method(:checkpoint!) do
+        super()
+        if @job_started_at && Time.now - @job_started_at >= MaintenanceTasks.max_job_runtime
+          interrupt!(reason: :max_runtime)
+        end
+      end
     end
 
     class_methods do
@@ -30,10 +36,58 @@ module MaintenanceTasks
       end
     end
 
+    # Performs the task by iterating over its collection using a
+    # Continuable step for cursor-based resumption.
+    def perform(run)
+      step(:iterate) do |s|
+        cursor = s.cursor || deserialized_run_cursor
+        collection_enum = build_collection_enum(cursor)
+
+        unless @run.started?
+          count = @task.count
+          count = collection_enum.size if count == NO_COUNT_DEFINED
+          @run.start(count)
+        end
+
+        halted = catch(:halt) do
+          collection_enum.each do |item, item_cursor|
+            if (backoff = check_throttle)
+              on_shutdown
+              @reenqueue_wait = backoff
+              throw(:halt, true)
+            end
+
+            if @run.stopping?
+              on_shutdown
+              throw(:halt, true)
+            end
+
+            task_iteration(item)
+            @ticker.tick
+            reload_run_status
+
+            @run.cursor = serialize_cursor(item_cursor)
+            s.set!(item_cursor)
+          end
+
+          false
+        end
+
+        unless halted
+          @ticker.persist
+          @run.complete
+        end
+      end
+    rescue ActiveJob::Continuation::Interrupt
+      on_shutdown
+      @run.persist_transition
+      raise
+    end
+
     private
 
-    def serialized_cursor_position
-      cursor_position && @run.cursor_is_json? ? cursor_position.to_json : cursor_position
+    def serialize_cursor(value)
+      value && @run.cursor_is_json? ? value.to_json : value&.to_s
     end
 
     def deserialized_run_cursor
@@ -42,19 +96,17 @@ module MaintenanceTasks
       @run.cursor
     end
 
-    def build_enumerator(_run, cursor:)
-      cursor ||= deserialized_run_cursor
-      self.cursor_position = cursor
-      enumerator_builder = self.enumerator_builder
-      @collection_enum = @task.enumerator_builder(cursor: cursor)
+    def build_collection_enum(cursor)
+      collection_enum = @task.enumerator_builder(cursor: cursor)
+      return collection_enum if collection_enum
 
-      @collection_enum ||= case (collection = @task.collection)
+      case (collection = @task.collection)
       when :no_collection
-        enumerator_builder.build_once_enumerator(cursor: nil)
+        OnceEnumerator.new(cursor: nil)
       when ActiveRecord::Relation
         options = { cursor: cursor, columns: @task.cursor_columns }
         options[:batch_size] = @task.active_record_enumerator_batch_size if @task.active_record_enumerator_batch_size
-        enumerator_builder.active_record_on_records(collection, **options)
+        ActiveRecordRecordEnumerator.new(collection, **options)
       when ActiveRecord::Batches::BatchEnumerator
         if collection.start || collection.finish
           raise ArgumentError, <<~MSG.squish
@@ -63,23 +115,18 @@ module MaintenanceTasks
           MSG
         end
 
-        # For now, only support automatic count based on the enumerator for
-        # batches
-        enumerator_builder.active_record_on_batch_relations(
+        ActiveRecordBatchEnumerator.new(
           collection.relation,
           cursor: cursor,
           batch_size: collection.batch_size,
           columns: @task.cursor_columns,
         )
       when Array
-        enumerator_builder.build_array_enumerator(collection, cursor: cursor&.to_i)
+        ArrayEnumerator.new(collection, cursor: cursor&.to_i)
       when BatchCsvCollectionBuilder::BatchCsv
-        JobIteration::CsvEnumerator.new(collection.csv).batches(
-          batch_size: collection.batch_size,
-          cursor: cursor&.to_i,
-        )
+        CsvBatchEnumerator.new(collection.csv, batch_size: collection.batch_size, cursor: cursor&.to_i)
       when CSV
-        JobIteration::CsvEnumerator.new(collection).rows(cursor: cursor&.to_i)
+        CsvRowEnumerator.new(collection, cursor: cursor&.to_i)
       else
         raise ArgumentError, <<~MSG.squish
           #{@task.class.name}#collection must be either an
@@ -87,34 +134,6 @@ module MaintenanceTasks
           Array, or CSV.
         MSG
       end
-
-      unless @collection_enum.is_a?(JobIteration.enumerator_builder::Wrapper)
-        @collection_enum = enumerator_builder.wrap(enumerator_builder, @collection_enum)
-      end
-      throttle_enumerator(@collection_enum)
-    end
-
-    def throttle_enumerator(collection_enum)
-      @task.throttle_conditions.reduce(collection_enum) do |enum, condition|
-        enumerator_builder.build_throttle_enumerator(
-          enum,
-          throttle_on: condition[:throttle_on],
-          backoff: condition[:backoff].call,
-        )
-      end
-    end
-
-    # Performs task iteration logic for the current input returned by the
-    # enumerator.
-    #
-    # @param input [Object] the current element from the enumerator.
-    # @param _run [Run] the current Run, passed as an argument by Job Iteration.
-    def each_iteration(input, _run)
-      throw(:abort, :skip_complete_callbacks) if @run.stopping?
-      task_iteration(input)
-      @ticker.tick
-
-      reload_run_status
     end
 
     def task_iteration(input)
@@ -126,6 +145,13 @@ module MaintenanceTasks
     rescue => error
       @errored_element = input
       raise error unless @task.rescue_with_handler(error)
+    end
+
+    def check_throttle
+      @task.throttle_conditions.each do |condition|
+        return condition[:backoff].call if condition[:throttle_on].call
+      end
+      nil
     end
 
     def before_perform
@@ -142,45 +168,18 @@ module MaintenanceTasks
       end
 
       @last_status_reload = nil
-    end
-
-    def on_start
-      count = @task.count
-      count = @collection_enum.size if count == NO_COUNT_DEFINED
-      @run.start(count)
+      @job_started_at = Time.now
     end
 
     def on_shutdown
       @run.job_shutdown
-      @run.cursor = serialized_cursor_position
       @ticker.persist
-    end
-
-    def on_complete
-      @run.complete
-    end
-
-    # We are reopening a private part of Job Iteration's API here, so we should
-    # ensure the method is still defined upstream. This way, in the case where
-    # the method changes upstream, we catch it at load time instead of at
-    # runtime while calling `super`.
-    unless JobIteration::Iteration
-        .private_method_defined?(:reenqueue_iteration_job)
-      error_message = <<~HEREDOC
-        JobIteration::Iteration#reenqueue_iteration_job is expected to be
-        defined. Upgrading the maintenance_tasks gem should solve this problem.
-      HEREDOC
-      raise error_message
-    end
-    def reenqueue_iteration_job(should_ignore: true)
-      super() unless should_ignore
-      @reenqueue_iteration_job = true
     end
 
     def after_perform
       @run.persist_transition
-      if defined?(@reenqueue_iteration_job) && @reenqueue_iteration_job
-        reenqueue_iteration_job(should_ignore: false) unless @run.stopped?
+      if @reenqueue_wait && !@run.stopped?
+        self.class.set(wait: @reenqueue_wait).perform_later(@run)
       end
     end
 
@@ -189,7 +188,6 @@ module MaintenanceTasks
       @ticker.persist if defined?(@ticker)
 
       if defined?(@run)
-        @run.cursor = serialized_cursor_position
         @run.persist_error(error)
 
         task_context = {
