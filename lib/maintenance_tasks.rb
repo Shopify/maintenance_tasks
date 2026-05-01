@@ -7,6 +7,7 @@ require "active_record"
 
 require "job-iteration"
 require "maintenance_tasks/engine"
+require "maintenance_tasks/count_timeout"
 
 # The engine's namespace module. It provides isolation between the host
 # application's code and the engine-specific code. Top-level engine constants
@@ -149,6 +150,23 @@ module MaintenanceTasks
   NO_COUNT_DEFINED.define_singleton_method(:inspect) { "MaintenanceTasks::NO_COUNT_DEFINED" }
   NO_COUNT_DEFINED.freeze
   private_constant :NO_COUNT_DEFINED
+
+  # @!attribute count_timeout_ms
+  #  @scope class
+  #  Server-side statement timeout, in milliseconds, applied while computing
+  #  a Task's count for progress tracking. The count query populates the
+  #  progress bar and is not required for task execution, so a slow count
+  #  must never block or fail a run.
+  #
+  #  Implemented via the database's native cancellation mechanism
+  #  (`statement_timeout` on PostgreSQL, `max_execution_time` on MySQL /
+  #  Trilogy). Adapters without a native equivalent (e.g. SQLite) ignore the
+  #  setting. See {CountTimeout}.
+  #
+  #  Set to `nil` or `0` to disable.
+  #
+  #  @return [Integer, nil] the timeout in milliseconds.
+  mattr_accessor :count_timeout_ms, default: 5_000
 
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \

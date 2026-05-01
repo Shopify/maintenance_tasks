@@ -806,6 +806,32 @@ module MaintenanceTasks
       assert_equal 2, @run.reload.tick_total
     end
 
+    test "a count query that exceeds the timeout is rescued and the run starts with no tick_total" do
+      Maintenance::TestTask.any_instance.stubs(:count).raises(
+        ActiveRecord::QueryCanceled.new("canceling statement due to statement timeout"),
+      )
+      Rails.error.expects(:report).with do |error, **kwargs|
+        error.is_a?(ActiveRecord::QueryCanceled) &&
+          kwargs[:handled] == true &&
+          kwargs[:severity] == :warning &&
+          kwargs[:context][:task] == "Maintenance::TestTask"
+      end
+
+      TaskJob.perform_now(@run)
+
+      assert_nil @run.reload.tick_total
+    end
+
+    test "@task.count is wrapped in CountTimeout with the configured timeout" do
+      original = MaintenanceTasks.count_timeout_ms
+      MaintenanceTasks.count_timeout_ms = 1234
+      CountTimeout.expects(:with_timeout).with(1234).yields.returns(MaintenanceTasks.const_get(:NO_COUNT_DEFINED))
+
+      TaskJob.perform_now(@run)
+    ensure
+      MaintenanceTasks.count_timeout_ms = original
+    end
+
     test ".perform_now accepts custom enumerated tasks" do
       run = Run.create!(task_name: "Maintenance::CustomEnumeratingTask")
 

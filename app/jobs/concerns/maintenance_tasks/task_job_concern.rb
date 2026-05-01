@@ -145,9 +145,21 @@ module MaintenanceTasks
     end
 
     def on_start
-      count = @task.count
+      @run.start(safe_count)
+    end
+
+    def safe_count
+      count = CountTimeout.with_timeout(MaintenanceTasks.count_timeout_ms) { @task.count }
       count = @collection_enum.size if count == NO_COUNT_DEFINED
-      @run.start(count)
+      count
+    rescue ActiveRecord::QueryCanceled => error
+      Rails.error.report(
+        error,
+        handled: true,
+        severity: :warning,
+        context: { task: @task.class.name, timeout_ms: MaintenanceTasks.count_timeout_ms },
+      )
+      nil
     end
 
     def on_shutdown
