@@ -75,12 +75,12 @@ module MaintenanceTasks
     end
 
     test ".count calls #count" do
-      assert_equal :no_count, Maintenance::TestTask.count
+      assert_equal 2, Maintenance::TestTask.count
     end
 
     test "#count is :no_count by default" do
       task = Task.new
-      assert_equal(:no_count, task.count)
+      assert_equal NO_COUNT_DEFINED, task.count
     end
 
     test "#collection raises NoMethodError" do

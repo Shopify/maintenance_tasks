@@ -146,7 +146,7 @@ module MaintenanceTasks
 
     def on_start
       count = @task.count
-      count = @collection_enum.size if count == :no_count
+      count = @collection_enum.size if count == NO_COUNT_DEFINED
       @run.start(count)
     end
 
