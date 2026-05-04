@@ -22,7 +22,7 @@ module MaintenanceTasks
     #
     # @return [Integer, nil]
     def count(task)
-      :no_count
+      NO_COUNT_DEFINED
     end
 
     # Return that the Task does not process CSV content.

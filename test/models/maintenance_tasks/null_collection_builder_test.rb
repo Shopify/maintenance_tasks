@@ -16,7 +16,7 @@ module MaintenanceTasks
     end
 
     test "count" do
-      assert_equal(:no_count, @builder.count(@task))
+      assert_equal(NO_COUNT_DEFINED, @builder.count(@task))
     end
 
     test "#has_csv_content?" do

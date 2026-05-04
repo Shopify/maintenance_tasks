@@ -145,6 +145,11 @@ module MaintenanceTasks
   #  @return [ActiveSupport::Duration, false] time interval after which a task is considered stale.
   mattr_accessor :task_staleness_threshold, default: 30.days
 
+  NO_COUNT_DEFINED = Object.new
+  NO_COUNT_DEFINED.define_singleton_method(:inspect) { "MaintenanceTasks::NO_COUNT_DEFINED" }
+  NO_COUNT_DEFINED.freeze
+  private_constant :NO_COUNT_DEFINED
+
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \
       "Instead, reports will be sent to the Rails error reporter. Do not set a handler and subscribe " \
