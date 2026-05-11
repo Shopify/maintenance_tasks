@@ -8,35 +8,36 @@ module MaintenanceTasks
   module RunConcern
     extend ActiveSupport::Concern
 
+    STATUSES = [
+      :enqueued,    # The task has been enqueued by the user.
+      :running,     # The task is being performed by a job worker.
+      :succeeded,   # The task finished without error.
+      :cancelling,  # The task has been told to cancel but is finishing work.
+      :cancelled,   # The user explicitly halted the task's execution.
+      :interrupted, # The task was interrupted by the job infrastructure.
+      :pausing,     # The task has been told to pause but is finishing work.
+      :paused,      # The task was paused in the middle of the run by the user.
+      :errored,     # The task code produced an unhandled exception.
+    ].freeze
+
+    ACTIVE_STATUSES = [
+      :enqueued,
+      :running,
+      :paused,
+      :pausing,
+      :cancelling,
+      :interrupted,
+    ].freeze
+
+    STOPPING_STATUSES = [
+      :pausing,
+      :cancelling,
+      :cancelled,
+    ].freeze
+
+    COMPLETED_STATUSES = [:succeeded, :errored, :cancelled].freeze
+
     included do
-      # Various statuses a run can be in.
-      STATUSES = [
-        :enqueued,    # The task has been enqueued by the user.
-        :running,     # The task is being performed by a job worker.
-        :succeeded,   # The task finished without error.
-        :cancelling,  # The task has been told to cancel but is finishing work.
-        :cancelled,   # The user explicitly halted the task's execution.
-        :interrupted, # The task was interrupted by the job infrastructure.
-        :pausing,     # The task has been told to pause but is finishing work.
-        :paused,      # The task was paused in the middle of the run by the user.
-        :errored,     # The task code produced an unhandled exception.
-      ]
-
-      ACTIVE_STATUSES = [
-        :enqueued,
-        :running,
-        :paused,
-        :pausing,
-        :cancelling,
-        :interrupted,
-      ]
-      STOPPING_STATUSES = [
-        :pausing,
-        :cancelling,
-        :cancelled,
-      ]
-      COMPLETED_STATUSES = [:succeeded, :errored, :cancelled]
-
       enum :status, STATUSES.to_h { |status| [status, status.to_s] }
 
       after_save :instrument_status_change
