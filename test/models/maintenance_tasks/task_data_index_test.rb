@@ -4,32 +4,44 @@ require "test_helper"
 
 module MaintenanceTasks
   class TaskDataIndexTest < ActiveSupport::TestCase
-    test ".available_tasks returns a list of Tasks as TaskDataShow, ordered alphabetically by name" do
-      expected = [
-        "Maintenance::BatchImportPostsTask",
-        "Maintenance::CallbackTestTask",
-        "Maintenance::CancelledEnqueueTask",
-        "Maintenance::CompositePrimaryKeyModelTask",
-        "Maintenance::CustomEnumeratingTask",
-        "Maintenance::EnqueueErrorTask",
-        "Maintenance::ErrorTask",
-        "Maintenance::ImportPostsTask",
-        "Maintenance::ImportPostsWithEncodingTask",
-        "Maintenance::ImportPostsWithOptionsTask",
-        "Maintenance::Nested::NestedMore::NestedMoreTask",
-        "Maintenance::Nested::NestedTask",
-        "Maintenance::NoCollectionTask",
-        # duplicate due to fixtures containing two active runs of this task
-        "Maintenance::NoCollectionTask",
-        "Maintenance::ParamsTask",
-        "Maintenance::StaleTask",
-        "Maintenance::TestTask",
-        "Maintenance::UpdatePostsInBatchesTask",
-        "Maintenance::UpdatePostsModulePrependedTask",
-        "Maintenance::UpdatePostsTask",
-        "Maintenance::UpdatePostsThrottledTask",
-      ]
-      assert_equal expected, TaskDataIndex.available_tasks.map(&:name)
+    test ".available_tasks orders completed tasks by most recent run first" do
+      completed_tasks = TaskDataIndex.available_tasks.select { |task| task.category == :completed }
+
+      assert_equal(
+        ["Maintenance::StaleTask", "Maintenance::ImportPostsTask"],
+        completed_tasks.map(&:name),
+      )
+    end
+
+    test ".available_tasks orders active tasks by most recent run first, regardless of name order" do
+      # TestTask sorts alphabetically BEFORE UpdatePostsThrottledTask, but we
+      # give UpdatePostsThrottledTask the newer run so the test fails if the
+      # code falls back to alphabetical-by-name ordering.
+      Run.create!(task_name: "Maintenance::TestTask", status: :enqueued, created_at: 2.hours.ago)
+      Run.create!(task_name: "Maintenance::UpdatePostsThrottledTask", status: :enqueued, created_at: 1.minute.ago)
+
+      active_names = TaskDataIndex.available_tasks
+        .select { |task| task.category == :active }
+        .map(&:name)
+
+      assert_equal(
+        [
+          "Maintenance::UpdatePostsThrottledTask",
+          "Maintenance::TestTask",
+          "Maintenance::NoCollectionTask",
+          "Maintenance::NoCollectionTask",
+          "Maintenance::UpdatePostsTask",
+        ],
+        active_names,
+      )
+    end
+
+    test ".available_tasks orders new tasks alphabetically by name" do
+      new_task_names = TaskDataIndex.available_tasks
+        .select { |task| task.category == :new }
+        .map(&:name)
+
+      assert_equal new_task_names.sort, new_task_names
     end
 
     test ".available_tasks assigns related run by most recent created completed run" do

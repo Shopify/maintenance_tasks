@@ -15,7 +15,9 @@ module MaintenanceTasks
       # Returns a list of sorted Task Data objects that represent the
       # available Tasks.
       #
-      # Tasks are sorted by category, and within a category, by Task name.
+      # Tasks are sorted by category, and within a category, by the most
+      # recent Run's creation time (most recent first). New tasks with no
+      # Run history fall back to alphabetical order by name.
       # Determining a Task's category requires their latest Run records.
       # Two queries are done to get the currently active and completed Run
       # records, and Task Data instances are initialized with these related run
@@ -41,10 +43,13 @@ module MaintenanceTasks
           tasks << TaskDataIndex.new(task_name, last_run)
         end
 
-        # We add an additional sorting key (status) to avoid possible
-        # inconsistencies across database adapters when a Task has
-        # multiple active Runs.
-        tasks.sort_by! { |task| [task.name, task.status] }
+        # Most-recent-first by Run creation time; new tasks (no Run) sort
+        # together by name. Status is a final tiebreaker to keep ordering
+        # stable across database adapters when a Task has multiple active
+        # Runs created at the same time.
+        tasks.sort_by! do |task|
+          [-(task.related_run&.created_at&.to_f || 0), task.name, task.status]
+        end
       end
     end
 
