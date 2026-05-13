@@ -5,7 +5,6 @@ require "action_view"
 require "active_job"
 require "active_record"
 
-require "job-iteration"
 require "maintenance_tasks/engine"
 
 # The engine's namespace module. It provides isolation between the host
@@ -149,6 +148,14 @@ module MaintenanceTasks
   NO_COUNT_DEFINED.define_singleton_method(:inspect) { "MaintenanceTasks::NO_COUNT_DEFINED" }
   NO_COUNT_DEFINED.freeze
   private_constant :NO_COUNT_DEFINED
+
+  # @!attribute max_job_runtime
+  #  @scope class
+  #  The maximum duration a job is allowed to run before it is interrupted
+  #  and re-enqueued. Replaces JobIteration.max_job_runtime.
+  #
+  #  @return [ActiveSupport::Duration, Numeric] the maximum job runtime.
+  mattr_accessor :max_job_runtime, default: 5.minutes
 
   class << self
     DEPRECATION_MESSAGE = "MaintenanceTasks.error_handler is deprecated and will be removed in the 3.0 release. " \

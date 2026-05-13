@@ -295,8 +295,6 @@ module MaintenanceTasks
     #
     # If cursor_columns returns nil, the query is ordered by the primary key.
     # If cursor columns values change during an iteration, records may be skipped or yielded multiple times.
-    # More details in the documentation of JobIteration::EnumeratorBuilder.build_active_record_enumerator_on_records:
-    # https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method
     #
     # @return the cursor_columns.
     def cursor_columns

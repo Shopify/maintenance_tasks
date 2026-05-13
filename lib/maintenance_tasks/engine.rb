@@ -25,14 +25,6 @@ module MaintenanceTasks
       Rails.application.deprecators[:maintenance_tasks] = MaintenanceTasks.deprecator
     end
 
-    config.to_prepare do
-      _ = TaskJobConcern # load this for JobIteration compatibility check
-    end
-
-    config.after_initialize do
-      JobIteration.max_job_runtime ||= 5.minutes
-    end
-
     config.action_dispatch.rescue_responses.merge!(
       "MaintenanceTasks::Task::NotFoundError" => :not_found,
     )

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require "test_helper"
-require "job-iteration"
 
 module MaintenanceTasks
   class TaskJobTest < ActiveJob::TestCase
@@ -102,12 +101,15 @@ module MaintenanceTasks
     end
 
     test ".perform_now updates tick_count when job is interrupted" do
-      JobIteration.stubs(interruption_adapter: -> { true })
+      old_runtime = MaintenanceTasks.max_job_runtime
+      MaintenanceTasks.max_job_runtime = 0
       Maintenance::TestTask.any_instance.expects(:process).once
 
       TaskJob.perform_now(@run)
 
-      assert_equal 1, @run.reload.tick_count
+      assert_equal(1, @run.reload.tick_count)
+    ensure
+      MaintenanceTasks.max_job_runtime = old_runtime
     end
 
     test ".perform_now respects status_reload_frequency for reloading status each iteration" do
@@ -158,7 +160,7 @@ module MaintenanceTasks
     end
 
     test ".perform_now updates Run to interrupted when job is interrupted" do
-      JobIteration.stubs(interruption_adapter: -> { true })
+      MaintenanceTasks.stubs(:max_job_runtime).returns(0)
       Maintenance::TestTask.any_instance.expects(:process).once
 
       TaskJob.perform_now(@run)
@@ -167,10 +169,13 @@ module MaintenanceTasks
     end
 
     test ".perform_now re-enqueues the job when interrupted" do
-      JobIteration.stubs(interruption_adapter: -> { true })
+      MaintenanceTasks.stubs(:max_job_runtime).returns(0)
       Maintenance::TestTask.any_instance.expects(:process).once
 
-      assert_enqueued_with(job: TaskJob) { TaskJob.perform_now(@run) }
+      TaskJob.perform_now(@run)
+
+      assert_predicate @run.reload, :interrupted?
+      assert_enqueued_jobs(1)
     end
 
     test ".perform_now updates Run to errored and persists ended_at when exception is raised" do
@@ -210,24 +215,6 @@ module MaintenanceTasks
       assert_equal "MaintenanceTasks::Task::NotFoundError", run.error_class
       assert run.error_message
         .start_with?("Task Maintenance::DeletedTask not found.")
-    end
-
-    test ".perform_now delays reenqueuing the job after interruption until all callbacks are finished" do
-      JobIteration.stubs(interruption_adapter: -> { true })
-
-      AnotherTaskJob = Class.new(TaskJob) do
-        after_perform { self.class.times_interrupted = times_interrupted }
-
-        class << self
-          attr_accessor :times_interrupted
-        end
-      end
-      AnotherTaskJob.perform_now(@run)
-
-      # The job should not yet have been reenqueued, so times_interrupted should
-      # be 0
-      assert_equal 0, AnotherTaskJob.times_interrupted
-      assert_enqueued_jobs 1
     end
 
     test ".perform_now does not enqueue another job if Run errors" do
@@ -636,7 +623,7 @@ module MaintenanceTasks
     end
 
     test ".perform_now cancels run when race occurs between interrupting and cancelling run" do
-      JobIteration.stubs(interruption_adapter: -> { true })
+      MaintenanceTasks.stubs(:max_job_runtime).returns(0)
 
       # Simulate cancel happening after we've already checked @run.cancelling?
       @run.expects(:cancelling?).at_least(2).with do
@@ -651,7 +638,7 @@ module MaintenanceTasks
     end
 
     test ".perform_now pauses run when race occurs between interrupting and pausing run" do
-      JobIteration.stubs(interruption_adapter: -> { true })
+      MaintenanceTasks.stubs(:max_job_runtime).returns(0)
 
       # Simulate pause happening after we've already checked @run.pausing?
       @run.expects(:pausing?).at_least(2).with do
@@ -756,42 +743,40 @@ module MaintenanceTasks
     test "Active Record Relation tasks can specify a relation batch size" do
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
 
-      JobIteration::EnumeratorBuilder
-        .any_instance
-        .expects(:active_record_on_records)
+      ActiveRecordRecordEnumerator
+        .expects(:new)
         .with(anything, has_entry(batch_size: 1000))
+        .returns(ArrayEnumerator.new(Post.all.to_a))
 
       TaskJob.perform_now(run)
     end
 
-    test "MaintenanceTasks::TaskJobConcern#build_enumerator provides cursor_columns as the column argument to active_record_on_records" do
+    test "MaintenanceTasks::TaskJobConcern#build_collection_enum provides cursor_columns as the column argument to ActiveRecordRecordEnumerator" do
       cursor_columns = [:created_at, :id]
 
       Maintenance::UpdatePostsTask.any_instance.stubs(cursor_columns: cursor_columns)
 
       run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
 
-      JobIteration::EnumeratorBuilder
-        .any_instance
-        .expects(:active_record_on_records)
+      ActiveRecordRecordEnumerator
+        .expects(:new)
         .with(anything, has_entry(columns: [:created_at, :id]))
-        .returns(NullCollectionBuilder.new)
+        .returns(ArrayEnumerator.new(Post.all.to_a))
 
       TaskJob.perform_now(run)
     end
 
-    test "MaintenanceTasks::TaskJobConcern#build_enumerator provides cursor_columns as the column argument to active_record_on_batch_relations" do
+    test "MaintenanceTasks::TaskJobConcern#build_collection_enum provides cursor_columns as the column argument to ActiveRecordBatchEnumerator" do
       cursor_columns = [:created_at, :id]
 
       Maintenance::UpdatePostsInBatchesTask.any_instance.stubs(cursor_columns: cursor_columns)
 
       run = Run.new(task_name: "Maintenance::UpdatePostsInBatchesTask")
 
-      JobIteration::EnumeratorBuilder
-        .any_instance
-        .expects(:active_record_on_batch_relations)
+      ActiveRecordBatchEnumerator
+        .expects(:new)
         .with(anything, has_entry(columns: [:created_at, :id]))
-        .returns(NullCollectionBuilder.new)
+        .returns(ArrayEnumerator.new([Post.all]))
 
       TaskJob.perform_now(run)
     end

@@ -8,7 +8,7 @@ gem "better_html"
 gem "debug"
 gem "puma"
 if !@rails_gem_requirement
-  gem "rails", ">= 7.1"
+  gem "rails", ">= 8.1"
   ruby ">= 3.2.0"
 else
   # causes Dependabot to ignore the next line and update the previous gem "rails"
