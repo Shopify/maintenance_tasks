@@ -39,8 +39,8 @@ module MaintenanceTasks
         "Maintenance::UpdatePostsModulePrependedTask New",
         "Maintenance::UpdatePostsThrottledTask New",
         "Completed Tasks",
-        "Maintenance::ImportPostsTask Succeeded",
         "Maintenance::StaleTask Succeeded",
+        "Maintenance::ImportPostsTask Succeeded",
       ]
 
       assert_equal expected, page.all("h3").map(&:text)
