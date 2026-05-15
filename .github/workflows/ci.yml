@@ -62,8 +62,6 @@ jobs:
       run: bundle exec rails test
     - name: System Tests
       run: bundle exec rails test:system
-    - name: RuboCop
-      run: bundle exec rubocop
     - name: Archive system test artifacts
       uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       if: failure()
@@ -81,3 +79,19 @@ jobs:
         fi
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    timeout-minutes: 5
+    steps:
+      - name: Check out code
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@6aaa311d81eba98ae12eaffbcb63296ace0efcde # v1.307.0
+        with:
+          ruby-version: "4.0"
+          bundler-cache: true
+      - name: RuboCop
+        run: bundle exec rubocop
+      - name: Herb 🌿
+        run: bundle exec herb analyze

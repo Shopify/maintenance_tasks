@@ -4,8 +4,8 @@ source "https://rubygems.org"
 
 gemspec
 
-gem "better_html"
 gem "debug"
+gem "herb"
 gem "puma"
 if !@rails_gem_requirement
   gem "rails", ">= 7.2"
