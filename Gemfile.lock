@@ -2,12 +2,12 @@ PATH
   remote: .
   specs:
     maintenance_tasks (2.16.0)
-      actionpack (>= 7.1)
-      activejob (>= 7.1)
-      activerecord (>= 7.1)
+      actionpack (>= 7.2)
+      activejob (>= 7.2)
+      activerecord (>= 7.2)
       csv
       job-iteration (>= 1.3.6)
-      railties (>= 7.1)
+      railties (>= 7.2)
       zeitwerk (>= 2.6.2)
 
 GEM
@@ -335,7 +335,7 @@ DEPENDENCIES
   minitest
   mocha
   puma
-  rails (>= 7.1)
+  rails (>= 7.2)
   rubocop
   rubocop-shopify
   selenium-webdriver
