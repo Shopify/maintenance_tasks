@@ -2,6 +2,8 @@
 
 module Maintenance
   class ErrorTask < MaintenanceTasks::Task
+    tag :errors
+
     def collection
       [1, 2, 3, 4, 5]
     end

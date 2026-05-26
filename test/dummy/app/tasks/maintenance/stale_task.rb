@@ -2,6 +2,8 @@
 
 module Maintenance
   class StaleTask < MaintenanceTasks::Task
+    tag :examples
+
     def collection
       [1, 2]
     end

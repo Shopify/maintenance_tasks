@@ -4,6 +4,7 @@ require "test_module"
 
 module Maintenance
   class UpdatePostsModulePrependedTask < MaintenanceTasks::Task
+    tag :posts, :updates
     prepend TestModule
 
     class << self

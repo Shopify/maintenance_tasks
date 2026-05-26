@@ -2,6 +2,7 @@
 
 module Maintenance
   class ImportPostsWithOptionsTask < MaintenanceTasks::Task
+    tag :posts, :csv
     csv_collection(skip_lines: /^#/, converters: ->(field) { field.to_s.upcase })
 
     def process(row)

@@ -2,6 +2,8 @@
 
 module Maintenance
   class UpdatePostsThrottledTask < MaintenanceTasks::Task
+    tag :posts, :updates, :throttled
+
     class << self
       attr_accessor :throttle, :throttle_proc
     end

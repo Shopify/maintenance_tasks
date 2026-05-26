@@ -2,6 +2,8 @@
 
 module Maintenance
   class UpdatePostsTask < MaintenanceTasks::Task
+    tag :posts, :updates
+
     class << self
       attr_accessor :fast_task
     end

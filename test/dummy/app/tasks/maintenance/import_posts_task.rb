@@ -2,6 +2,7 @@
 
 module Maintenance
   class ImportPostsTask < MaintenanceTasks::Task
+    tag :posts, :csv
     csv_collection
 
     def process(row)

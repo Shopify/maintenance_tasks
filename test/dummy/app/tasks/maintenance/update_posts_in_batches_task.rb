@@ -2,6 +2,8 @@
 
 module Maintenance
   class UpdatePostsInBatchesTask < MaintenanceTasks::Task
+    tag :posts, :updates
+
     def collection
       Post.in_batches(of: 5)
     end

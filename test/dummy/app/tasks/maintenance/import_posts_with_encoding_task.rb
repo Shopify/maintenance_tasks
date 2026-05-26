@@ -2,6 +2,7 @@
 
 module Maintenance
   class ImportPostsWithEncodingTask < MaintenanceTasks::Task
+    tag :posts, :csv
     csv_collection(encoding: Encoding::ASCII)
 
     def process(row)

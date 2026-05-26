@@ -10,6 +10,8 @@ module Maintenance
   end
 
   class ParamsTask < MaintenanceTasks::Task
+    tag :params, :examples
+
     attribute :post_ids, :string
 
     validates :post_ids,

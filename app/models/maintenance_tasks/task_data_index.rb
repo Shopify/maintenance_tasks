@@ -98,5 +98,15 @@ module MaintenanceTasks
         :completed
       end
     end
+
+    # Returns the tags declared on the Task class via the `tag` macro.
+    # Falls back to an empty array when the Task class has been deleted.
+    #
+    # @return [Array<Symbol>] the Task's tags.
+    def tags
+      @tags ||= Task.named(name).tags
+    rescue Task::NotFoundError
+      @tags = [].freeze
+    end
   end
 end

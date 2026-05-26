@@ -39,6 +39,11 @@ module MaintenanceTasks
     # @api private
     class_attribute :status_reload_frequency, default: MaintenanceTasks.status_reload_frequency
 
+    # Tags applied to this Task, used to group and filter Tasks in the
+    # web UI. Subclasses inherit parent tags and may add their own via
+    # the `tag` class macro.
+    class_attribute :tags, default: [].freeze
+
     define_callbacks :start, :complete, :error, :cancel, :pause, :interrupt
 
     attr_accessor :metadata
@@ -164,6 +169,21 @@ module MaintenanceTasks
       # @param size [Integer] the number of records to fetch in a single query.
       def collection_batch_size(size)
         self.active_record_enumerator_batch_size = size
+      end
+
+      # Tag this Task with one or more labels. Tags are used by the web UI to
+      # group and filter Tasks on the index page. Tags are inherited from
+      # superclasses; calling tag on a subclass adds to (does not replace) the
+      # inherited set.
+      #
+      # @param names [Array<Symbol, String>] one or more tag names.
+      #
+      # @example
+      #   class Maintenance::CleanupOldPostsTask < MaintenanceTasks::Task
+      #     tag :data, :cleanup
+      #   end
+      def tag(*names)
+        self.tags = (tags + names.map(&:to_sym)).uniq.freeze
       end
 
       # Adds attribute names to sensitive arguments list.

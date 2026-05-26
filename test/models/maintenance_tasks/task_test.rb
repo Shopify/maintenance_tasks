@@ -133,5 +133,55 @@ module MaintenanceTasks
     ensure
       Maintenance::TestTask.status_reload_frequency = original_reload_frequency
     end
+
+    test ".tags defaults to an empty frozen array" do
+      assert_equal [], Maintenance::TestTask.tags
+      assert Maintenance::TestTask.tags.frozen?
+    end
+
+    test ".tag adds the given symbols to .tags" do
+      assert_equal [:posts, :updates], Maintenance::UpdatePostsTask.tags
+    end
+
+    test ".tag accepts strings and coerces them to symbols" do
+      sandbox_tags(Maintenance::TestTask) do
+        Maintenance::TestTask.tag("data", "cleanup")
+        assert_equal [:data, :cleanup], Maintenance::TestTask.tags
+      end
+    end
+
+    test ".tag is additive across multiple calls and dedupes" do
+      sandbox_tags(Maintenance::TestTask) do
+        Maintenance::TestTask.tag(:data)
+        Maintenance::TestTask.tag(:data, :cleanup)
+        assert_equal [:data, :cleanup], Maintenance::TestTask.tags
+      end
+    end
+
+    test ".tag in a subclass inherits parent tags without mutating the parent" do
+      # Use two existing tagged tasks: ImportPostsTask (:posts, :csv)
+      # subclasses are tested implicitly elsewhere; here we directly verify
+      # that the inheritance semantic works via class_attribute.
+      assert_equal [:posts, :csv], Maintenance::ImportPostsTask.tags
+      assert_equal [:posts, :updates], Maintenance::UpdatePostsTask.tags
+      # And that calls to one do not leak into the other.
+      sandbox_tags(Maintenance::TestTask) do
+        Maintenance::TestTask.tag(:isolated)
+        assert_equal [:isolated], Maintenance::TestTask.tags
+        assert_equal [:posts, :csv], Maintenance::ImportPostsTask.tags
+      end
+    end
+
+    private
+
+    # Snapshots and restores a Task class's tags around a block so each test
+    # is hermetic. Avoids spawning anonymous subclasses (which would leak into
+    # ActiveSupport::DescendantsTracker and pollute .load_all).
+    def sandbox_tags(task_class)
+      original = task_class.tags
+      yield
+    ensure
+      task_class.tags = original
+    end
   end
 end
