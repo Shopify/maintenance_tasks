@@ -1,5 +1,24 @@
 <nav class="navbar" role="navigation" aria-label="Main navigation">
   <div class="navbar-brand">
-    <%= link_to 'Maintenance Tasks', root_path, class: 'navbar-item is-size-4 has-text-weight-semibold has-text-danger' %>
+    <%= link_to 'Maintenance Tasks', root_path, class: 'navbar-item is-size-5 has-text-weight-medium brand-link' %>
+  </div>
+  <div class="navbar-end">
+    <span class="navbar-item">
+      <span class="navbar-refresh-indicator"
+            id="refresh-indicator"
+            role="status"
+            aria-live="polite"
+            aria-label="Auto-refresh idle"
+            hidden></span>
+    </span>
+    <span class="navbar-item">
+      <button type="button"
+              id="theme-toggle"
+              class="theme-toggle"
+              aria-label="Toggle color theme"
+              title="Toggle color theme">
+        <span class="theme-toggle-icon" aria-hidden="true"></span>
+      </button>
+    </span>
   </div>
 </nav>

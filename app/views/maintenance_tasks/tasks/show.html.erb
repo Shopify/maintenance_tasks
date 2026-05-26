@@ -4,12 +4,31 @@
   <%= @task %>
 </h1>
 
-<div class="container">
+<% if @task.deleted? %>
+  <div class="notification is-warning is-light" role="status">
+    This task no longer exists in the codebase. <strong>Run, Pause, Resume, and Cancel actions are disabled</strong> until it is restored.
+  </div>
+<% end %>
+
+<%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
+  <% if @task.active_runs.any? %>
+    <section class="task-active-runs mb-6">
+      <h2 class="title is-4">Active Runs</h2>
+      <%= render partial: "maintenance_tasks/runs/run", collection: @task.active_runs %>
+    </section>
+  <% end %>
+<% end %>
+
+<h2 class="title is-4 mt-5">Run this task</h2>
+
+<div class="container mb-6">
   <%= form_with url: task_runs_path(@task), method: :post do |form| %>
     <% if @task.csv_task? %>
-      <div class="container mb-4">
-        <%= form.label :csv_file, class: "label" %>
-        <%= form.file_field :csv_file, accept: "text/csv" %>
+      <div class="field mb-4">
+        <%= form.label :csv_file, "CSV file", class: "label" %>
+        <div class="control">
+          <%= form.file_field :csv_file, accept: "text/csv", class: "csv-file-input" %>
+        </div>
       </div>
     <% end %>
     <% parameter_names = @task.parameter_names %>
@@ -27,37 +46,28 @@
     <% end %>
     <%= render "maintenance_tasks/tasks/custom", form: form %>
     <div class="block">
-      <%= form.submit 'Run', class: "button is-success is-rounded mb-4 has-text-white-ter", disabled: @task.deleted? %>
+      <%= form.submit "Run", class: "button is-success", disabled: @task.deleted? %>
     </div>
   <% end %>
 </div>
 
-<% if (code = @task.code) %>
+<%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
+  <% if @task.runs_page.records.present? %>
+    <section class="task-previous-runs mt-6">
+      <h2 class="title is-4">Previous Runs</h2>
 
-<details class="box">
-  <summary class="is-size-5 is-flex is-align-items-center">
-    <h5 class="pl-5">Source code</h5>
-  </summary>
-  <pre><code><%= highlight_code(code) %></code></pre>
-</details>
+      <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
+
+      <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor), class: "pagination-link" unless @task.runs_page.last? %>
+    </section>
+  <% end %>
 <% end %>
 
-<%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
-  <% if @task.active_runs.any? %>
-    <hr>
-
-    <h4 class="title is-4">Active Runs</h4>
-
-    <%= render partial: "maintenance_tasks/runs/run", collection: @task.active_runs %>
-  <% end %>
-
-  <% if @task.runs_page.records.present? %>
-    <hr>
-
-    <h4 class="title is-5 has-text-weight-bold">Previous Runs</h4>
-
-    <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
-
-    <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
-  <% end %>
+<% if (code = @task.code) %>
+  <details class="box mt-6">
+    <summary class="is-size-5 is-flex is-align-items-center">
+      <h2 class="title is-5 mb-0">Source code</h2>
+    </summary>
+    <pre><code><%= highlight_code(code) %></code></pre>
+  </details>
 <% end %>

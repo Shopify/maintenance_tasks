@@ -1,26 +1,75 @@
-<%= tag.div(data: { refresh: (defined?(@refresh) && @refresh) || "" }) do %>
-  <% if @available_tasks.empty? %>
-    <div class="content is-large">
-      <h3 class="title is-3"> The MaintenanceTasks gem has been successfully installed! </h3>
-      <p>
-        Any new Tasks will show up here. To start writing your first Task,
-        run <code>bin/rails generate maintenance_tasks:task my_task</code>.
-      </p>
+<h1 class="title is-3 has-text-weight-bold">Tasks</h1>
+
+<% if @tasks.empty? %>
+  <div class="content">
+    <p class="is-size-5">No maintenance tasks have been defined yet.</p>
+    <p>
+      Generate your first task with:
+    </p>
+    <pre><code>bin/rails generate maintenance_tasks:task my_task</code></pre>
+  </div>
+<% else %>
+  <div class="task-toolbar mb-4">
+    <div class="control has-icons-left">
+      <input type="search"
+             id="task-search"
+             class="input"
+             placeholder="Search tasks…"
+             aria-label="Search tasks by name"
+             autocomplete="off"
+             autocapitalize="off"
+             spellcheck="false">
+      <span class="icon is-left" aria-hidden="true">⌕</span>
     </div>
-  <% else %>
-    <% if active_tasks = @available_tasks[:active] %>
-      <h3 class="title is-4 has-text-weight-bold">Active Tasks</h3>
-      <%= render partial: 'task', collection: active_tasks %>
-    <% end %>
-    <% if new_tasks = @available_tasks[:new] %>
-      <h3 class="title is-4 has-text-weight-bold">New Tasks</h3>
-      <div class="grid is-col-min-20">
-        <%= render partial: 'task', collection: new_tasks %>
+
+    <% if @tag_filters.any? %>
+      <div class="tag-filters" role="group" aria-label="Filter tasks by tag">
+        <% @tag_filters.each do |tag_name| %>
+          <button type="button"
+                  class="tag-filter tag is-medium"
+                  data-tag="<%= tag_name %>"
+                  aria-pressed="false">
+            <%= tag_name %>
+          </button>
+        <% end %>
       </div>
     <% end %>
-    <% if completed_tasks = @available_tasks[:completed] %>
-      <h3 class="title is-4 has-text-weight-bold">Completed Tasks</h3>
-      <%= render partial: 'task', collection: completed_tasks %>
-    <% end %>
+  </div>
+
+  <p class="task-empty-results has-text-grey is-italic mb-4" hidden role="status">
+    No tasks match the current filters.
+  </p>
+
+  <% with_runs, never_run = @tasks.partition(&:related_run) %>
+
+  <%= tag.div(data: { refresh: (defined?(@refresh) && @refresh) || "" }) do %>
+    <div class="table-container">
+      <table class="task-table table is-fullwidth is-hoverable">
+        <thead>
+          <tr>
+            <th scope="col">Task</th>
+            <th scope="col">Tags</th>
+            <th scope="col" class="task-col-last-run">Last run</th>
+          </tr>
+        </thead>
+        <% if with_runs.any? %>
+          <tbody>
+            <%= render partial: "task", collection: with_runs %>
+          </tbody>
+        <% end %>
+        <% if never_run.any? %>
+          <% if with_runs.any? %>
+            <tbody class="task-section-divider" aria-hidden="true">
+              <tr>
+                <td colspan="3"><span>Never run</span></td>
+              </tr>
+            </tbody>
+          <% end %>
+          <tbody>
+            <%= render partial: "task", collection: never_run, locals: { hide_never_run_label: with_runs.any? } %>
+          </tbody>
+        <% end %>
+      </table>
+    </div>
   <% end %>
 <% end %>

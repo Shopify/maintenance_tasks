@@ -1,51 +1,49 @@
-<details class="box" open id="run_<%= run.id %>">
-  <summary class="is-flex is-justify-content-space-between is-align-items-center">
-    <div class="is-flex is-align-items-center">
-      <h5 class="title is-5 has-text-weight-medium pl-5 pr-5 mb-0">
-        <%= time_tag run.created_at, title: run.created_at.utc %>
-      </h5>
+<div class="run">
+  <%= link_to "##{run.id}", "#run_#{run.id}", class: "run-permalink", title: "Run ID" %>
+  <details class="box" open id="run_<%= run.id %>">
+    <summary class="is-flex is-align-items-center">
+      <h3 class="title is-5 has-text-weight-medium pr-5 mb-0">
+        <%= time_tag run.created_at, aria: { label: "#{run.created_at.utc.strftime("%B %-d, %Y at %H:%M")} UTC" } %>
+      </h3>
       <%= status_tag run.status %>
+    </summary>
+
+    <%= progress run %>
+
+    <div class="content">
+      <%= render "maintenance_tasks/runs/info/#{run.status}", run: run %>
     </div>
-    <div>
-      <a href="#run_<%= run.id %>" class="is-pulled-right" title="Run ID">#<%= run.id %></a>
+
+    <div class="content" id="custom-content-<%= run.id %>">
+      <%= render "maintenance_tasks/runs/info/custom", run: run %>
     </div>
-  </summary>
 
-  <%= progress run %>
+    <%= render "maintenance_tasks/runs/csv", run: run %>
+    <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
+    <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments %>
+    <%= tag.hr if run.csv_file.present? || run.arguments.present? && run.metadata.present? %>
+    <%= render "maintenance_tasks/runs/metadata", metadata: run.metadata %>
 
-  <div class="content">
-    <%= render "maintenance_tasks/runs/info/#{run.status}", run: run %>
-  </div>
-
-  <div class="content" id="custom-content">
-    <%= render "maintenance_tasks/runs/info/custom", run: run %>
-  </div>
-
-  <%= render "maintenance_tasks/runs/csv", run: run %>
-  <%= tag.hr if run.csv_file.present? && run.arguments.present? %>
-  <%= render "maintenance_tasks/runs/arguments", arguments: run.masked_arguments %>
-  <%= tag.hr if run.csv_file.present? || run.arguments.present? && run.metadata.present? %>
-  <%= render "maintenance_tasks/runs/metadata", metadata: run.metadata %>
-
-  <div class="buttons">
-    <% if run.paused? %>
-      <%= button_to 'Resume', resume_task_run_path(@task, run), class: 'button is-primary', disabled: @task.deleted? %>
-      <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
-    <% elsif run.errored? %>
-      <%= button_to 'Resume', resume_task_run_path(@task, run), class: 'button is-primary', disabled: @task.deleted? %>
-    <% elsif run.cancelling? %>
-      <% if run.stuck? %>
-        <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger', disabled: @task.deleted? %>
+    <div class="buttons">
+      <% if run.paused? %>
+        <%= button_to 'Resume', resume_task_run_path(@task, run), class: 'button is-primary', disabled: @task.deleted? %>
+        <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
+      <% elsif run.errored? %>
+        <%= button_to 'Resume', resume_task_run_path(@task, run), class: 'button is-primary', disabled: @task.deleted? %>
+      <% elsif run.cancelling? %>
+        <% if run.stuck? %>
+          <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger', disabled: @task.deleted? %>
+        <% end %>
+      <% elsif run.pausing? %>
+        <%= button_to 'Pausing', pause_task_run_path(@task, run), class: 'button is-warning', disabled: true %>
+        <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
+        <% if run.stuck? %>
+          <%= button_to 'Force pause', pause_task_run_path(@task, run), class: 'button is-danger', disabled: @task.deleted? %>
+        <% end %>
+      <% elsif run.active? %>
+        <%= button_to 'Pause', pause_task_run_path(@task, run), class: 'button is-warning', disabled: @task.deleted? %>
+        <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
       <% end %>
-    <% elsif run.pausing? %>
-      <%= button_to 'Pausing', pause_task_run_path(@task, run), class: 'button is-warning', disabled: true %>
-      <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
-      <% if run.stuck? %>
-        <%= button_to 'Force pause', pause_task_run_path(@task, run), class: 'button is-danger', disabled: @task.deleted? %>
-      <% end %>
-    <% elsif run.active? %>
-      <%= button_to 'Pause', pause_task_run_path(@task, run), class: 'button is-warning', disabled: @task.deleted? %>
-      <%= button_to 'Cancel', cancel_task_run_path(@task, run), class: 'button is-danger' %>
-    <% end %>
-  </div>
-</details>
+    </div>
+  </details>
+</div>

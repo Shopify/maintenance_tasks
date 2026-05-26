@@ -182,7 +182,7 @@ module MaintenanceTasks
 
       assert_equal "ArgumentError", run.error_class
       assert_equal "Something went wrong", run.error_message
-      expected_backtrace = %r{app/tasks/maintenance/error_task\.rb:10:in ('Maintenance::ErrorTask#|`)process'}
+      expected_backtrace = %r{app/tasks/maintenance/error_task\.rb:12:in ('Maintenance::ErrorTask#|`)process'}
       assert_match expected_backtrace, run.backtrace.first
       assert_equal Time.now, run.ended_at
       assert_equal "1", run.cursor

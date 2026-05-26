@@ -15,12 +15,15 @@
 
     <%= csrf_meta_tags %>
 
-    <%=
-      stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, "npm/bulma@1.0.4/css/bulma.min.css"),
-        media: :all,
-        integrity: "sha256-Z/om3xyp6V2PKtx8BPobFfo9JCV0cOvBDMaLmquRS+4=",
-        crossorigin: "anonymous") unless request.xhr?
-    %>
+    <% unless request.xhr? %>
+      <link rel="preconnect" href="<%= controller.class::BULMA_CDN %>" crossorigin>
+      <%=
+        stylesheet_link_tag(URI.join(controller.class::BULMA_CDN, "npm/bulma@1.0.4/css/bulma.min.css"),
+          media: :all,
+          integrity: "sha256-Z/om3xyp6V2PKtx8BPobFfo9JCV0cOvBDMaLmquRS+4=",
+          crossorigin: "anonymous")
+      %>
+    <% end %>
 
     <style>
       :root {
@@ -31,11 +34,10 @@
         --ruby-number: #005cc5;
         --ruby-keyword: #d73a49;
         --ruby-string: #032f62;
-        --required-color: #ff6685;
       }
 
       @media (prefers-color-scheme: dark) {
-        :root {
+        :root:not([data-theme="light"]) {
           --ruby-comment: #8b949e;
           --ruby-const: #ffa657;
           --ruby-embexpr: #c9d1d9;
@@ -43,9 +45,21 @@
           --ruby-number: #79c0ff;
           --ruby-keyword: #ff7b72;
           --ruby-string: #a5d6ff;
-          --required-color: #ff6685;
         }
       }
+      :root[data-theme="dark"] {
+        --ruby-comment: #8b949e;
+        --ruby-const: #ffa657;
+        --ruby-embexpr: #c9d1d9;
+        --ruby-ident: #d2a8ff;
+        --ruby-number: #79c0ff;
+        --ruby-keyword: #ff7b72;
+        --ruby-string: #a5d6ff;
+      }
+
+      .brand-link,
+      .brand-link:hover,
+      .brand-link:focus { color: var(--bulma-danger-on-scheme); }
 
       .ruby-comment { color: var(--ruby-comment); }
       .ruby-const { color: var(--ruby-const); }
@@ -56,23 +70,42 @@
       .ruby-label, .ruby-tstring-beg, .ruby-tstring-content, .ruby-tstring-end { color: var(--ruby-string); }
 
       .select, select { width: 100%; }
-      summary { cursor: pointer; }
       input[type="datetime-local"], input[type="date"], input[type="time"] {
         width: fit-content;
       }
-	  details > summary {
+
+      details > summary {
         list-style: none;
+        cursor: pointer;
       }
-      summary::-webkit-details-marker {
-        display: none
-      }
+      summary::-webkit-details-marker { display: none; }
       summary::before {
-        content: '► ';
-        position:absolute;
-        font-size: 16px
+        content: "▶";
+        display: inline-block;
+        margin-right: 0.5em;
+        font-size: 0.75em;
+        vertical-align: 0.1em;
+        transition: transform 150ms ease-out;
       }
-      details[open] summary:before {
-        content: "▼ ";
+      details[open] > summary::before {
+        transform: rotate(90deg);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        summary::before { transition: none; }
+      }
+
+      details.box pre {
+        overflow-x: auto;
+      }
+
+      /* Per Vercel guidelines: eliminate 300ms double-tap delay on touch UIs. */
+      a, button, input[type="submit"], summary, .task-row, .tag-filter, .theme-toggle {
+        touch-action: manipulation;
+      }
+
+      /* Per Vercel guidelines: prevent widows/orphans on headings. */
+      .title, h1, h2, h3 {
+        text-wrap: balance;
       }
 
       .box {
@@ -80,48 +113,531 @@
                     0 2px 4px -1px #0000001a;
       }
 
-      @media (prefers-color-scheme: dark) {
-        .box {
-          background-color: var(--bulma-background);
-        }
-      }
-
       .label.is-required:after {
         content: " (required)";
-        color: var(--required-color);
+        color: var(--bulma-danger-on-scheme);
         font-size: 12px;
+      }
+
+      .skip-link {
+        position: absolute;
+        left: -9999px;
+        top: 0.5rem;
+        z-index: 100;
+        padding: 0.5rem 1rem;
+        background: var(--bulma-link, #485fc7);
+        color: #fff;
+        border-radius: 4px;
+        text-decoration: none;
+      }
+      .skip-link:focus {
+        left: 0.5rem;
+        outline: 2px solid currentColor;
+        outline-offset: 2px;
+      }
+      main:focus { outline: none; }
+
+      .run { position: relative; }
+      .run-permalink {
+        position: absolute;
+        top: 0.6rem;
+        right: 0.75rem;
+        z-index: 2;
+        display: inline-block;
+        padding: 0.35rem 0.6rem;
+        min-width: 2.75rem;
+        min-height: 2.75rem;
+        text-align: right;
+        line-height: 2rem;
+      }
+
+      .grid > .cell { min-width: 0; }
+
+      @media (max-width: 32rem) {
+        .grid[class*="is-col-min-"] { grid-template-columns: 1fr; }
+      }
+
+      .task-title { gap: 0.5rem; flex-wrap: wrap; }
+      .task-title > a {
+        flex: 1 1 auto;
+        min-width: 0;
+        overflow-wrap: anywhere;
+        word-break: break-word;
+      }
+      .task-title .tag { flex: 0 0 auto; }
+
+      .pagination-link {
+        display: inline-block;
+        padding: 0.625rem 1rem;
+        min-height: 2.75rem;
+        line-height: 1.6;
+        margin-top: 0.5rem;
+      }
+
+      /* Bulma's .section defaults to 3rem padding — too airy for an embedded
+         admin UI. Tighten the top so the page H1 sits closer to the navbar. */
+      main.section { padding-top: 1.75rem; padding-bottom: 3rem; }
+      main.section > .container > .title.is-3 { margin-bottom: 1.25rem; }
+
+      /* Style the native file input so the "Choose file" button matches Bulma
+         buttons. The selector-button pseudo is the only cross-browser way to
+         style file inputs without restructuring the markup. */
+      .csv-file-input {
+        font: inherit;
+        color: var(--bulma-text);
+        max-width: 100%;
+      }
+      .csv-file-input::file-selector-button {
+        background: var(--bulma-link);
+        color: var(--bulma-link-invert, #fff);
+        border: 0;
+        border-radius: 6px;
+        padding: 0.5rem 1rem;
+        font: inherit;
+        font-weight: 500;
+        cursor: pointer;
+        margin-right: 0.75rem;
+        transition: background-color 150ms ease-out;
+      }
+      .csv-file-input::file-selector-button:hover {
+        background: var(--bulma-link-active, var(--bulma-link));
+        filter: brightness(0.93);
+      }
+      .csv-file-input:focus-visible::file-selector-button {
+        outline: 2px solid var(--bulma-link);
+        outline-offset: 2px;
+      }
+
+      .task-toolbar {
+        display: flex;
+        flex-direction: column;
+        gap: 0.85rem;
+        margin-bottom: 1.25rem;
+      }
+      .task-toolbar .control { max-width: 28rem; }
+      .task-toolbar .control .icon { pointer-events: none; }
+
+      .task-section-divider td {
+        padding: 1.75rem 0 0.5rem;
+        border: 0;
+        border-top: 1px solid var(--bulma-border, #d6d8db);
+        padding-top: 1.75rem;
+      }
+      .task-section-divider td > span {
+        display: inline-block;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--task-muted-text);
+        padding-top: 1.25rem;
+      }
+      /* Don't double-border with the row above. */
+      .task-table tbody.task-section-divider + tbody tr:first-child > td {
+        padding-top: 0.5rem;
+      }
+
+      /* Scheme-aware muted text. Bulma's .has-text-grey is a fixed value that
+         fails contrast on dark backgrounds; use this token for any secondary
+         text inside .task-row-status to keep AA contrast in both schemes. */
+      :root { --task-muted-text: rgb(74, 85, 104); }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --task-muted-text: rgb(199, 205, 214); }
+      }
+      :root[data-theme="dark"] { --task-muted-text: rgb(199, 205, 214); }
+      /* Bulma's .has-text-* helpers ship with !important; match it. */
+      .task-row-status .has-text-grey { color: var(--task-muted-text) !important; }
+      .task-row-status .has-text-grey-light {
+        color: var(--task-muted-text) !important;
+        opacity: 0.7;
+      }
+
+      .tag-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.4rem;
+      }
+      .tag-filter {
+        cursor: pointer;
+        border: 1px solid transparent;
+        background: var(--bulma-background);
+        color: var(--bulma-text);
+        font-family: inherit;
+      }
+      .tag-filter:hover {
+        border-color: var(--bulma-link);
+      }
+      .tag-filter[aria-pressed="true"] {
+        background: var(--bulma-link);
+        color: var(--bulma-link-invert, #fff);
+      }
+      .tag-filter:focus-visible {
+        outline: 2px solid var(--bulma-link);
+        outline-offset: 2px;
+      }
+
+      .task-table { table-layout: auto; }
+      .task-table th {
+        font-weight: 600;
+        font-size: 0.78rem;
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        color: var(--task-muted-text);
+        padding-bottom: 0.65rem;
+        border-bottom: 1px solid var(--bulma-border, #d6d8db);
+      }
+      .task-table th.task-col-last-run { text-align: right; }
+      .task-table td.task-row-status { text-align: right; white-space: nowrap; }
+      .task-table .tag.is-light {
+        background-color: var(--bulma-background);
+        color: var(--bulma-text);
+      }
+      .task-table .task-row { position: relative; transition: background-color 120ms ease-out; }
+      .task-table .task-row td { vertical-align: middle; }
+      .task-table .task-row .task-row-name a::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+      .task-table .task-row > td { position: relative; z-index: 1; }
+      .task-table .task-row .task-row-name { z-index: 0; }
+      .task-table tbody:not(.task-section-divider) > .task-row:hover {
+        background-color: var(--bulma-background);
+      }
+      .task-table tbody:not(.task-section-divider) > .task-row:hover .task-row-name a {
+        text-decoration: underline;
+      }
+
+      /* Row pulse when a task's status changes during a polling refresh.
+         Subtle yellow wash that decays — helps the eye catch live updates. */
+      @keyframes task-row-status-pulse {
+        0%   { background-color: var(--bulma-warning-90, rgba(255, 224, 138, 0.45)); }
+        100% { background-color: transparent; }
+      }
+      .task-row.task-row-just-changed {
+        animation: task-row-status-pulse 1800ms ease-out;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .task-row.task-row-just-changed { animation: none; }
+      }
+
+      /* Smooth opacity for rows hidden by search/chip filtering, so the list
+         feels filtered rather than chopped. The [hidden] attribute removes
+         layout; opacity transition only fires during the show direction. */
+      .task-row { transition: background-color 120ms ease-out, opacity 150ms ease-out; }
+      .task-row[hidden] { display: none; }
+      @media (prefers-reduced-motion: reduce) {
+        .task-row { transition: none; }
+      }
+
+      /* Theme toggle: half-turn spin when clicked. The icon character itself
+         changes via [data-theme] selectors — combined with the rotation, the
+         icon flip feels intentional rather than a sudden swap. */
+      .theme-toggle-icon {
+        display: inline-block;
+        transition: transform 220ms cubic-bezier(0.25, 1, 0.5, 1);
+      }
+      .theme-toggle.is-spinning .theme-toggle-icon {
+        transform: rotate(180deg);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .theme-toggle-icon { transition: none; }
+      }
+
+      @media (max-width: 40rem) {
+        .task-table thead { display: none; }
+        .task-table tr { display: block; padding: 0.6rem 0; border-top: 1px solid var(--bulma-border, #ededed); }
+        .task-table td { display: block; padding: 0.1rem 0; border: 0; overflow-wrap: anywhere; }
+        .task-table .task-row-name a { word-break: break-word; }
+      }
+
+      .theme-toggle {
+        border: 0;
+        background: transparent;
+        cursor: pointer;
+        padding: 0.4rem 0.6rem;
+        border-radius: 999px;
+        font: inherit;
+        line-height: 1;
+        color: var(--bulma-text);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .theme-toggle:hover { background: var(--bulma-background); }
+      .theme-toggle:focus-visible {
+        outline: 2px solid var(--bulma-link);
+        outline-offset: 2px;
+      }
+      .theme-toggle-icon::before {
+        content: "☾";
+        font-size: 1.05rem;
+        display: inline-block;
+        line-height: 1;
+      }
+      /* Resolved scheme determines which icon shows. Icon represents the
+         destination state (sun = "switch to light", moon = "switch to dark"). */
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) .theme-toggle-icon::before { content: "☀"; }
+      }
+      :root[data-theme="dark"] .theme-toggle-icon::before { content: "☀"; }
+      :root[data-theme="light"] .theme-toggle-icon::before { content: "☾"; }
+
+      .navbar-refresh-indicator {
+        display: inline-block;
+        width: 1rem;
+        height: 1rem;
+        border: 2px solid var(--bulma-border, #ededed);
+        border-top-color: var(--bulma-link);
+        border-radius: 50%;
+        animation: navbar-refresh-spin 0.8s linear infinite;
+      }
+      .navbar-refresh-indicator[hidden] { display: none; }
+      @keyframes navbar-refresh-spin {
+        to { transform: rotate(360deg); }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .navbar-refresh-indicator { animation: none; }
       }
     </style>
 
     <script>
-      function refresh() {
-        const target = document.querySelector("[data-refresh]")
-        if (!target || !target.dataset.refresh) return
-        window.setTimeout(() => {
-          document.body.style.cursor = "wait"
-          fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } }).then(
-            async response => {
-              const text = await response.text()
-              const newDocument = new DOMParser().parseFromString(text, "text/html")
-              const newTarget = newDocument.querySelector("[data-refresh]")
-              if (newTarget) {
-                target.replaceWith(newTarget)
-              }
-              document.body.style.cursor = ""
-              refresh()
-            },
-            error => location.reload()
+      // Apply saved theme synchronously, before <body> paints, to prevent a
+      // flash of the wrong scheme. Pure feature detection — silent on failure.
+      try {
+        var savedTheme = localStorage.getItem("maintenance-tasks-theme")
+        if (savedTheme === "dark" || savedTheme === "light") {
+          document.documentElement.setAttribute("data-theme", savedTheme)
+        }
+      } catch (e) { /* localStorage may be disabled */ }
+
+      (function () {
+        const POLL_INTERVAL = 3000
+        const MAX_FAILURES = 5
+        let failures = 0
+        let timer = null
+
+        function toggleTheme() {
+          const html = document.documentElement
+          const current = html.getAttribute("data-theme")
+          const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+          let next
+          if (!current) {
+            next = prefersDark ? "light" : "dark"
+          } else {
+            next = current === "dark" ? "light" : "dark"
+          }
+          html.setAttribute("data-theme", next)
+          try { localStorage.setItem("maintenance-tasks-theme", next) } catch (e) {}
+
+          // Trigger the icon spin: add the class, remove it after the transition.
+          const btn = document.getElementById("theme-toggle")
+          if (btn) {
+            btn.classList.add("is-spinning")
+            setTimeout(() => btn.classList.remove("is-spinning"), 250)
+          }
+        }
+
+        function clearFilters() {
+          const search = document.getElementById("task-search")
+          let changed = false
+          if (search && search.value) {
+            search.value = ""
+            changed = true
+          }
+          document.querySelectorAll('.tag-filter[aria-pressed="true"]').forEach((c) => {
+            c.setAttribute("aria-pressed", "false")
+            changed = true
+          })
+          if (changed) applyFilter()
+          return changed
+        }
+
+        function isTypingTarget(el) {
+          if (!el) return false
+          if (el.isContentEditable) return true
+          const tag = el.tagName
+          if (tag === "TEXTAREA" || tag === "SELECT") return true
+          if (tag === "INPUT") {
+            const type = (el.type || "").toLowerCase()
+            return type !== "checkbox" && type !== "radio" && type !== "button" && type !== "submit"
+          }
+          return false
+        }
+
+        document.addEventListener("keydown", (e) => {
+          if (e.metaKey || e.ctrlKey || e.altKey) return
+          const search = document.getElementById("task-search")
+          const typing = isTypingTarget(document.activeElement)
+
+          // "/" focuses search — common dev convention (GitHub, Linear, …).
+          if (e.key === "/" && !typing && search) {
+            e.preventDefault()
+            search.focus()
+            search.select()
+            return
+          }
+          // Esc clears search/chips, or blurs the search input.
+          if (e.key === "Escape") {
+            if (document.activeElement === search && search.value === "") {
+              search.blur()
+              return
+            }
+            const cleared = clearFilters()
+            if (cleared && search) search.focus()
+            return
+          }
+          // "t" toggles theme (only when not typing).
+          if (e.key === "t" && !typing) {
+            e.preventDefault()
+            toggleTheme()
+          }
+        })
+
+        function setIndicator(visible) {
+          const el = document.getElementById("refresh-indicator")
+          if (!el) return
+          el.hidden = !visible
+          el.setAttribute("aria-label", visible ? "Refreshing" : "Auto-refresh idle")
+        }
+
+        function applyFilter() {
+          const searchInput = document.getElementById("task-search")
+          const search = (searchInput ? searchInput.value : "").trim().toLowerCase()
+          const activeTags = new Set(
+            Array.from(document.querySelectorAll('.tag-filter[aria-pressed="true"]'))
+              .map((b) => b.dataset.tag)
           )
-        }, 3000)
-      }
-      document.addEventListener('DOMContentLoaded', refresh)
+          const rows = document.querySelectorAll("tr.task-row")
+          let visible = 0
+          rows.forEach((row) => {
+            const name = (row.dataset.taskName || "").toLowerCase()
+            const rowTags = (row.dataset.tags || "").split(" ").filter(Boolean)
+            const matchesSearch = !search || name.includes(search)
+            const matchesTags = activeTags.size === 0 || rowTags.some((t) => activeTags.has(t))
+            const show = matchesSearch && matchesTags
+            row.hidden = !show
+            if (show) visible += 1
+          })
+          const empty = document.querySelector(".task-empty-results")
+          if (empty) empty.hidden = visible !== 0 || rows.length === 0
+        }
+
+        document.addEventListener("input", (e) => {
+          if (e.target && e.target.id === "task-search") applyFilter()
+        })
+        document.addEventListener("click", (e) => {
+          if (!e.target.closest) return
+          const chip = e.target.closest(".tag-filter")
+          if (chip) {
+            const pressed = chip.getAttribute("aria-pressed") === "true"
+            chip.setAttribute("aria-pressed", pressed ? "false" : "true")
+            applyFilter()
+            return
+          }
+          if (e.target.closest("#theme-toggle")) {
+            toggleTheme()
+          }
+        })
+
+        function refreshOnce() {
+          const targets = Array.from(document.querySelectorAll("[data-refresh]"))
+          if (targets.length === 0 || !targets.some((t) => t.dataset.refresh)) return
+
+          const detailsState = new Map()
+          targets.forEach((t) => {
+            t.querySelectorAll("details[id]").forEach((d) => detailsState.set(d.id, d.open))
+          })
+          // Snapshot task-row statuses so we can pulse rows whose status changed.
+          const previousStatuses = new Map()
+          targets.forEach((t) => {
+            t.querySelectorAll("tr.task-row[data-task-name]").forEach((r) => {
+              previousStatuses.set(r.dataset.taskName, r.dataset.status)
+            })
+          })
+          const active = document.activeElement
+          const focusedId = active && active.id && targets.some((t) => t.contains(active))
+            ? active.id
+            : null
+          const scrollY = window.scrollY
+
+          setIndicator(true)
+
+          fetch(document.location, { headers: { "X-Requested-With": "XMLHttpRequest" } })
+            .then(async (response) => {
+              if (!response.ok) throw new Error("HTTP " + response.status)
+              const text = await response.text()
+              const newDoc = new DOMParser().parseFromString(text, "text/html")
+              const newTargets = Array.from(newDoc.querySelectorAll("[data-refresh]"))
+
+              targets.forEach((target, i) => {
+                const newTarget = newTargets[i]
+                if (!newTarget) return
+                newTarget.querySelectorAll("details[id]").forEach((d) => {
+                  if (detailsState.has(d.id)) d.open = detailsState.get(d.id)
+                })
+                // Mark rows whose status transitioned so the pulse animation fires.
+                newTarget.querySelectorAll("tr.task-row[data-task-name]").forEach((r) => {
+                  const prev = previousStatuses.get(r.dataset.taskName)
+                  if (prev !== undefined && prev !== r.dataset.status) {
+                    r.classList.add("task-row-just-changed")
+                    setTimeout(() => r.classList.remove("task-row-just-changed"), 1900)
+                  }
+                })
+                target.replaceWith(newTarget)
+              })
+
+              if (focusedId) {
+                const el = document.getElementById(focusedId)
+                if (el && typeof el.focus === "function") el.focus()
+              }
+              window.scrollTo(0, scrollY)
+
+              setIndicator(false)
+              applyFilter()
+
+              failures = 0
+              scheduleNext()
+            })
+            .catch(() => {
+              setIndicator(false)
+              failures += 1
+              if (failures >= MAX_FAILURES) {
+                location.reload()
+                return
+              }
+              scheduleNext(POLL_INTERVAL * Math.pow(2, failures - 1))
+            })
+        }
+
+        function scheduleNext(delay) {
+          clearTimeout(timer)
+          if (document.hidden) return
+          timer = setTimeout(refreshOnce, delay == null ? POLL_INTERVAL : delay)
+        }
+
+        document.addEventListener("visibilitychange", () => {
+          if (document.hidden) {
+            clearTimeout(timer)
+          } else {
+            scheduleNext(0)
+          }
+        })
+
+        document.addEventListener("DOMContentLoaded", () => {
+          applyFilter()
+          scheduleNext()
+        })
+      })()
     </script>
   </head>
 
   <body>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
     <%= render 'layouts/maintenance_tasks/navbar' %>
 
-    <section class="section">
+    <main id="main-content" tabindex="-1" class="section">
       <div class="container">
         <% if notice %>
           <div class="notification is-success"><%= notice %></div>
@@ -131,6 +647,7 @@
 
         <%= yield %>
       </div>
-    </section>
+    </main>
+
   </body>
 </html>

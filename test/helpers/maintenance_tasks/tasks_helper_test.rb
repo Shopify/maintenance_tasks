@@ -28,8 +28,9 @@ module MaintenanceTasks
       )
 
       expected = '<div class="block"><progress value="42" max="84" ' \
-        'class="progress mt-4 is-primary is-light"></progress>' \
-        "<p><i>Almost there!</i></p></div>"
+        'class="progress mt-4 is-primary is-light" ' \
+        'aria-labelledby="progress_text_"></progress>' \
+        '<p id="progress_text_"><i>Almost there!</i></p></div>'
       assert_equal expected, progress(@run)
     end
 
@@ -44,13 +45,15 @@ module MaintenanceTasks
       )
 
       expected = '<div class="block"><progress max="84" ' \
-        'class="progress mt-4 is-primary is-light"></progress>' \
-        "<p><i>Almost there!</i></p></div>"
+        'class="progress mt-4 is-primary is-light" ' \
+        'aria-labelledby="progress_text_"></progress>' \
+        '<p id="progress_text_"><i>Almost there!</i></p></div>'
       assert_equal expected, progress(@run)
     end
 
     test "#status_tag renders a span with the appropriate tag based on status" do
-      expected = '<span class="tag has-text-weight-medium px-2 mx-4 is-warning is-light">Pausing</span>'
+      expected = '<span class="tag has-text-weight-medium px-2 ml-2 is-warning is-light">' \
+        '<span aria-hidden="true" class="mr-1">⌛</span>Pausing</span>'
       assert_equal expected, status_tag("pausing")
     end
 

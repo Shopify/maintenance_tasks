@@ -10,9 +10,11 @@ module MaintenanceTasks
     before_action :set_refresh, only: [:index]
 
     # Renders the maintenance_tasks/tasks page, displaying
-    # available tasks to users, grouped by category.
+    # the list of available tasks, their tags, and their most
+    # recent run status.
     def index
-      @available_tasks = TaskDataIndex.available_tasks.group_by(&:category)
+      @tasks = TaskDataIndex.available_tasks
+      @tag_filters = @tasks.flat_map(&:tags).uniq.sort
     end
 
     # Renders the page responsible for providing Task actions to users.

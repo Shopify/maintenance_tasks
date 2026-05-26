@@ -20,6 +20,21 @@ module MaintenanceTasks
       "errored" => ["is-danger"],
     }
 
+    # Unicode glyph paired with each status word so the indicator carries shape
+    # plus color, not color alone (helps colorblind users distinguish statuses).
+    STATUS_ICONS = {
+      "new" => "✦",
+      "enqueued" => "⌛",
+      "running" => "▶",
+      "interrupted" => "‖",
+      "pausing" => "⌛",
+      "paused" => "‖",
+      "succeeded" => "✓",
+      "cancelling" => "⌛",
+      "cancelled" => "✕",
+      "errored" => "⚠",
+    }
+
     # Formats a run backtrace.
     #
     # @param backtrace [Array<String>] the backtrace associated with an
@@ -43,13 +58,15 @@ module MaintenanceTasks
       return unless run.started?
 
       progress = Progress.new(run)
+      text_id = "progress_text_#{run.id}"
 
       progress_bar = tag.progress(
         value: progress.value,
         max: progress.max,
         class: ["progress", "mt-4"] + STATUS_COLOURS.fetch(run.status),
+        aria: { labelledby: text_id },
       )
-      progress_text = tag.p(tag.i(progress.text))
+      progress_text = tag.p(tag.i(progress.text), id: text_id)
       tag.div(progress_bar + progress_text, class: "block")
     end
 
@@ -60,10 +77,12 @@ module MaintenanceTasks
     # @return [String] the span element containing the status, with the
     #   appropriate tag class attached.
     def status_tag(status)
-      tag.span(
-        status.capitalize,
-        class: ["tag", "has-text-weight-medium", "px-2", "mx-4"] + STATUS_COLOURS.fetch(status),
-      )
+      tag.span(class: ["tag", "has-text-weight-medium", "px-2", "ml-2"] + STATUS_COLOURS.fetch(status)) do
+        safe_join([
+          tag.span(STATUS_ICONS.fetch(status), aria: { hidden: true }, class: "mr-1"),
+          status.capitalize,
+        ])
+      end
     end
 
     # Reports the approximate elapsed time a Run has been processed so far based
