@@ -138,18 +138,52 @@
       main:focus { outline: none; }
 
       .run { position: relative; }
+      .run + .run { margin-top: 0.85rem; }
+      .run details.box {
+        padding: 0.95rem 1.1rem;
+        border-radius: 10px;
+      }
+      .run details.box > summary { margin-bottom: 0.25rem; }
+      /* Slim, modern progress bar — Bulma defaults to 1rem (heavy). The mt-4
+       * helper on the <progress> would force 1.5rem; override at a higher
+       * specificity so the bar sits close to the summary. */
+      .run progress.progress {
+        height: 0.5rem;
+        margin-top: 0.6rem !important;
+      }
+      .run progress.progress + p {
+        font-size: 0.9rem;
+        color: var(--task-muted-text);
+        margin-top: 0.25rem;
+      }
+      .run details.box .block { margin-bottom: 0.85rem; }
+      .run details.box .block:last-child { margin-bottom: 0; }
+      /* Author-overridable info/custom partial and the action-buttons row are
+       * always emitted as wrappers, even when their inner partials produce
+       * nothing. Collapse the wrapper when it has no element children so
+       * succeeded runs don't carry phantom whitespace at the bottom. */
+      .run details.box .content:not(:has(> *)),
+      .run details.box .buttons:not(:has(> *)) {
+        display: none;
+      }
       .run-permalink {
         position: absolute;
-        top: 0.6rem;
-        right: 0.75rem;
+        top: 0.95rem;
+        right: 1rem;
         z-index: 2;
-        display: inline-block;
-        padding: 0.35rem 0.6rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: flex-end;
+        padding: 0.35rem 0.45rem;
         min-width: 2.75rem;
         min-height: 2.75rem;
-        text-align: right;
-        line-height: 2rem;
+        font-size: 0.85rem;
+        font-weight: 500;
+        opacity: 0.65;
+        transition: opacity 120ms ease-out;
       }
+      .run-permalink:hover,
+      .run-permalink:focus-visible { opacity: 1; }
 
       .grid > .cell { min-width: 0; }
 
