@@ -541,14 +541,77 @@
           }
         })
 
+        // In-place DOM morph: leave unchanged subtrees alone so polls don't
+        // wipe `<details>` state, focus, scroll, or text selection. Children
+        // are matched by id when possible, otherwise by position — fine here
+        // because the server orders runs and task rows deterministically.
+        // Form input value/checked properties aren't preserved; no inputs
+        // currently live inside [data-refresh] so it's not a concern.
+        function syncAttributes(oldEl, newEl) {
+          const oldAttrs = oldEl.attributes
+          for (let i = oldAttrs.length - 1; i >= 0; i--) {
+            const name = oldAttrs[i].name
+            // `<details open>` is user-controlled — server always renders it open.
+            if (oldEl.nodeName === "DETAILS" && name === "open") continue
+            if (!newEl.hasAttribute(name)) oldEl.removeAttribute(name)
+          }
+          const newAttrs = newEl.attributes
+          for (let i = 0; i < newAttrs.length; i++) {
+            const { name, value } = newAttrs[i]
+            if (oldEl.nodeName === "DETAILS" && name === "open") continue
+            if (oldEl.getAttribute(name) !== value) oldEl.setAttribute(name, value)
+          }
+        }
+
+        function morph(oldNode, newNode) {
+          if (oldNode.isEqualNode(newNode)) return
+          if (oldNode.nodeType !== newNode.nodeType || oldNode.nodeName !== newNode.nodeName) {
+            oldNode.replaceWith(newNode.cloneNode(true))
+            return
+          }
+          if (oldNode.nodeType !== Node.ELEMENT_NODE) {
+            if (oldNode.nodeValue !== newNode.nodeValue) oldNode.nodeValue = newNode.nodeValue
+            return
+          }
+          syncAttributes(oldNode, newNode)
+
+          const oldById = new Map()
+          for (let c = oldNode.firstChild; c; c = c.nextSibling) {
+            if (c.nodeType === Node.ELEMENT_NODE && c.id) oldById.set(c.id, c)
+          }
+
+          const newChildren = Array.from(newNode.childNodes)
+          for (let i = 0; i < newChildren.length; i++) {
+            const newChild = newChildren[i]
+            const slot = oldNode.childNodes[i] || null
+            const keyed = newChild.nodeType === Node.ELEMENT_NODE && newChild.id
+              ? oldById.get(newChild.id)
+              : null
+
+            if (keyed) {
+              oldById.delete(newChild.id)
+              if (keyed !== slot) oldNode.insertBefore(keyed, slot)
+              morph(keyed, newChild)
+            } else if (
+              slot &&
+              slot.nodeType === newChild.nodeType &&
+              slot.nodeName === newChild.nodeName &&
+              !(slot.nodeType === Node.ELEMENT_NODE && slot.id)
+            ) {
+              morph(slot, newChild)
+            } else {
+              oldNode.insertBefore(newChild.cloneNode(true), slot)
+            }
+          }
+          while (oldNode.childNodes.length > newChildren.length) {
+            oldNode.removeChild(oldNode.lastChild)
+          }
+        }
+
         function refreshOnce() {
           const targets = Array.from(document.querySelectorAll("[data-refresh]"))
           if (targets.length === 0 || !targets.some((t) => t.dataset.refresh)) return
 
-          const detailsState = new Map()
-          targets.forEach((t) => {
-            t.querySelectorAll("details[id]").forEach((d) => detailsState.set(d.id, d.open))
-          })
           // Snapshot task-row statuses so we can pulse rows whose status changed.
           const previousStatuses = new Map()
           targets.forEach((t) => {
@@ -556,11 +619,6 @@
               previousStatuses.set(r.dataset.taskName, r.dataset.status)
             })
           })
-          const active = document.activeElement
-          const focusedId = active && active.id && targets.some((t) => t.contains(active))
-            ? active.id
-            : null
-          const scrollY = window.scrollY
 
           setIndicator(true)
 
@@ -573,26 +631,17 @@
 
               targets.forEach((target, i) => {
                 const newTarget = newTargets[i]
-                if (!newTarget) return
-                newTarget.querySelectorAll("details[id]").forEach((d) => {
-                  if (detailsState.has(d.id)) d.open = detailsState.get(d.id)
-                })
-                // Mark rows whose status transitioned so the pulse animation fires.
-                newTarget.querySelectorAll("tr.task-row[data-task-name]").forEach((r) => {
-                  const prev = previousStatuses.get(r.dataset.taskName)
-                  if (prev !== undefined && prev !== r.dataset.status) {
-                    r.classList.add("task-row-just-changed")
-                    setTimeout(() => r.classList.remove("task-row-just-changed"), 1900)
-                  }
-                })
-                target.replaceWith(newTarget)
+                if (newTarget) morph(target, newTarget)
               })
 
-              if (focusedId) {
-                const el = document.getElementById(focusedId)
-                if (el && typeof el.focus === "function") el.focus()
-              }
-              window.scrollTo(0, scrollY)
+              // Pulse rows whose status changed during this poll.
+              document.querySelectorAll("tr.task-row[data-task-name]").forEach((r) => {
+                const prev = previousStatuses.get(r.dataset.taskName)
+                if (prev !== undefined && prev !== r.dataset.status) {
+                  r.classList.add("task-row-just-changed")
+                  setTimeout(() => r.classList.remove("task-row-just-changed"), 1900)
+                }
+              })
 
               setIndicator(false)
               applyFilter()
