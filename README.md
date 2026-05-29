@@ -856,10 +856,10 @@ end
 
 You can run your new Task by accessing the Web UI and clicking on "Run".
 
-The task list page auto-refreshes in the background to reflect the latest run
-statuses. You can turn this off with the "Disable auto-refresh" toggle on the
-page, which adds a `?refresh=false` parameter to the URL. Use "Enable
-auto-refresh" to turn it back on.
+A Task's page auto-refreshes in the background while it has active runs, so the
+progress and run statuses stay up to date. You can turn this off with the
+"Disable auto-refresh" toggle on the Task page, which adds a `?refresh=false`
+parameter to the URL. Use "Enable auto-refresh" to turn it back on.
 
 #### Running a Task from the command line
 

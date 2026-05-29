@@ -7,7 +7,7 @@ module MaintenanceTasks
   #
   # @api private
   class TasksController < ApplicationController
-    before_action :set_refresh, only: [:index]
+    before_action :set_refresh, only: [:index, :show]
 
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
