@@ -28,7 +28,7 @@ module MaintenanceTasks
     private
 
     def set_refresh
-      @refresh = true
+      @refresh = params[:refresh] != "false"
     end
   end
 end
