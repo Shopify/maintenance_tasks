@@ -1047,6 +1047,8 @@ Reports to the error reporter will contain the following data:
    * `run_id`: The id of the errored Task run
    * `tick_count`: The tick count at the time of the error
    * `errored_element`: The element, if any, that was being processed when the
+     Task errored. Active Record elements are reported as a hash with
+     `class_name` and `id` keys.
 * `source`: This will be `maintenance-tasks`
 * `handled`: the value of `MaintenanceTasks.report_errors_as_handled` (default `true`, see below)
 
