@@ -517,9 +517,30 @@ module MaintenanceTasks
       assert_equal("Maintenance::ErrorTask", report.dig(:context, :task_name))
       assert_equal(run.id, report.dig(:context, :run_id))
       assert_equal(0, report.dig(:context, :tick_count))
+      assert_equal(3, report.dig(:context, :errored_element))
       refute_predicate(report, :handled)
     ensure
       MaintenanceTasks.report_errors_as_handled = @old_handled
+    end
+
+    test ".perform_now reports Active Record errored elements as serializable context" do
+      post = Post.create!(title: "Hello World!", content: "Something")
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      Maintenance::UpdatePostsTask.any_instance.expects(:collection).returns(Post.where(id: post.id))
+      Maintenance::UpdatePostsTask.any_instance.expects(:process).with do |input|
+        assert_equal(post.id, input.id)
+        true
+      end.raises(ArgumentError)
+
+      report = assert_error_reported(ArgumentError) do
+        TaskJob.perform_now(run)
+      end
+
+      assert_equal(
+        { class_name: "Post", id: post.id },
+        report.dig(:context, :errored_element),
+      )
     end
 
     test ".perform_now handles case where run is not set and reports error" do

@@ -42,6 +42,15 @@ module MaintenanceTasks
       @run.cursor
     end
 
+    def serialized_errored_element(errored_element)
+      return errored_element unless errored_element.is_a?(ActiveRecord::Base)
+
+      {
+        class_name: errored_element.class.name,
+        id: errored_element.id,
+      }
+    end
+
     def build_enumerator(_run, cursor:)
       cursor ||= deserialized_run_cursor
       self.cursor_position = cursor
@@ -206,10 +215,15 @@ module MaintenanceTasks
         errored_element = task_context.delete(:errored_element)
         MaintenanceTasks.error_handler.call(error, task_context.except(:run_id, :tick_count), errored_element)
       else
+        report_context = task_context.dup
+        if report_context.key?(:errored_element)
+          report_context[:errored_element] = serialized_errored_element(report_context[:errored_element])
+        end
+
         Rails.error.report(
           error,
           handled: MaintenanceTasks.report_errors_as_handled,
-          context: task_context,
+          context: report_context,
           source: "maintenance-tasks",
         )
       end
