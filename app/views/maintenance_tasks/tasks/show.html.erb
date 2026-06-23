@@ -42,7 +42,16 @@
 </details>
 <% end %>
 
-<%= tag.div(data: { refresh: @task.refresh? || "" }) do %>
+<% if @task.refresh? %>
+  <div class="is-flex is-justify-content-flex-end mb-2">
+    <% if @refresh %>
+      <%= link_to "Disable auto-refresh", task_path(@task, refresh: false), class: "button is-small" %>
+    <% else %>
+      <%= link_to "Enable auto-refresh", task_path(@task), class: "button is-small" %>
+    <% end %>
+  </div>
+<% end %>
+<%= tag.div(data: { refresh: (@task.refresh? && @refresh) || "" }) do %>
   <% if @task.active_runs.any? %>
     <hr>
 
