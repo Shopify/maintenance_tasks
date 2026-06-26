@@ -32,9 +32,5 @@ module MaintenanceTasks
     config.after_initialize do
       JobIteration.max_job_runtime ||= 5.minutes
     end
-
-    config.action_dispatch.rescue_responses.merge!(
-      "MaintenanceTasks::Task::NotFoundError" => :not_found,
-    )
   end
 end

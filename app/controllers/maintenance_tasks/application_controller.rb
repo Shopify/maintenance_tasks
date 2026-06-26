@@ -31,5 +31,9 @@ module MaintenanceTasks
     end
 
     protect_from_forgery with: :exception
+
+    rescue_from Task::NotFoundError do |error|
+      render("maintenance_tasks/not_found", status: :not_found)
+    end
   end
 end
