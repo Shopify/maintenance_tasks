@@ -155,6 +155,30 @@ module MaintenanceTasks
       assert_predicate run.reload, :succeeded?
     end
 
+    test "#persist_transition accepts a terminal status when a concurrent run already errored" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask", status: "running")
+      # A concurrent execution of the same run finalizes it as errored, bumping
+      # the lock_version so this instance's save races.
+      Run.find(run.id).errored!
+
+      run.status = :interrupted
+      assert_nothing_raised do
+        run.persist_transition
+      end
+      assert_predicate run.reload, :errored?
+    end
+
+    test "#persist_transition accepts a terminal status when a concurrent run already succeeded" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask", status: "running")
+      Run.find(run.id).succeeded!
+
+      run.status = :interrupted
+      assert_nothing_raised do
+        run.persist_transition
+      end
+      assert_predicate run.reload, :succeeded?
+    end
+
     test "#persist_progress persists increments to tick count and time_running" do
       run = Run.create!(
         task_name: "Maintenance::UpdatePostsTask",

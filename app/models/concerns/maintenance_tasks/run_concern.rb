@@ -110,6 +110,14 @@ module MaintenanceTasks
 
           success = succeeded?
           reload_status
+          # A concurrent execution of the same Run may have already moved it to
+          # a terminal status (succeeded, errored, or cancelled). Forcing a
+          # further transition would raise a RunStatusValidator error (e.g.
+          # "Cannot transition run from status errored to interrupted"), so
+          # accept the persisted terminal status and let the finalizing worker
+          # own the lifecycle callbacks.
+          return if completed?
+
           if success
             self.status = :succeeded
           else
