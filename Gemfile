@@ -9,7 +9,7 @@ gem "herb"
 gem "puma"
 if !@rails_gem_requirement
   gem "rails", ">= 7.2"
-  ruby ">= 3.2.0"
+  ruby ">= 3.3.0"
 else
   # causes Dependabot to ignore the next line and update the previous gem "rails"
   rails = "rails"
