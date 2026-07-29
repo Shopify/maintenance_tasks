@@ -427,7 +427,7 @@ module MaintenanceTasks
     # @return [Task] a Task instance.
     def task
       @task ||= begin
-        task = Task.named(task_name).new
+        task = Task.named(task_name).new(run_id: id)
         if task.attribute_names.any? && arguments.present?
           task.assign_attributes(arguments)
         end

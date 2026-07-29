@@ -636,6 +636,16 @@ module MaintenanceTasks
       assert_equal({ "foo" => "bar" }, run.task.metadata)
     end
 
+    test "#task sets the run id on the Task" do
+      run = Run.create!(task_name: "Maintenance::TestTask")
+      assert_equal run.id, Run.find(run.id).task.run_id
+    end
+
+    test "#task leaves the run id blank for an unpersisted Run" do
+      run = Run.new(task_name: "Maintenance::TestTask")
+      assert_nil run.task.run_id
+    end
+
     test "#validate_task_arguments instantiates Task and assigns arguments if Task has parameters" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",

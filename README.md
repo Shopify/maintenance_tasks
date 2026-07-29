@@ -731,6 +731,29 @@ values will be available for subsequent calls to `process` within the same job.
 Still, memoization can be used for throttling or reporting, and you can use
 [Task callbacks](#using-task-callbacks) to persist or log a report for example.
 
+#### Identifying the Run
+
+A Task instance exposes the id of the Run it is being processed by as `run_id`,
+which gives you a stable identifier for the execution of the Task across
+interruptions and potential pauses:
+
+```ruby
+class Maintenance::UpdatePostsTask < MaintenanceTasks::Task
+  def collection
+    Post.all
+  end
+
+  def process(post)
+    post.update!(content: "Updated by run #{run_id}")
+  end
+end
+```
+
+It is useful to correlate log lines or reports with the Run they came from, or
+as an idempotency key for work performed while processing the collection. It is
+`nil` when a Task is instantiated outside of a typical workflow, such as when
+you call `Maintenance::UpdatePostsTask.new` in your tests.
+
 ### Writing tests for a Task
 
 The task generator will also create a test file for your task in the folder
