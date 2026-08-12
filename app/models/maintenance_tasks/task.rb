@@ -43,6 +43,11 @@ module MaintenanceTasks
 
     attr_accessor :metadata
 
+    # The id of the Run this Task instance is being performed by, if any.
+    #
+    # @return [Integer, nil] the Run id.
+    attr_reader :run_id
+
     class << self
       # Finds a Task with the given name.
       #
@@ -250,6 +255,12 @@ module MaintenanceTasks
 
         Rails.autoloaders.main.eager_load_namespace(namespace)
       end
+    end
+
+    # @param run_id [Integer, nil] the id of the Run performing this Task.
+    def initialize(run_id: nil)
+      @run_id = run_id
+      super()
     end
 
     # The contents of a CSV file to be processed by a Task.
