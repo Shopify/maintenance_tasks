@@ -72,6 +72,32 @@ module MaintenanceTasks
       assert_text(/January 01, 2020 01:00 Succeeded #\d/)
     end
 
+    test "toggle auto-refresh on a Task with active runs" do
+      task_path = maintenance_tasks.task_path("Maintenance::UpdatePostsTask")
+
+      visit task_path
+
+      assert_selector "[data-refresh=true]"
+      assert_link "Disable auto-refresh", href: "#{task_path}?refresh=false"
+
+      click_on "Disable auto-refresh"
+
+      assert_no_selector "[data-refresh=true]"
+      assert_link "Enable auto-refresh", href: task_path
+
+      click_on "Enable auto-refresh"
+
+      assert_selector "[data-refresh=true]"
+      assert_link "Disable auto-refresh", href: "#{task_path}?refresh=false"
+    end
+
+    test "hide the auto-refresh toggle when a Task has no active runs" do
+      visit maintenance_tasks.task_path("Maintenance::ImportPostsTask")
+
+      assert_no_link "Disable auto-refresh"
+      assert_no_link "Enable auto-refresh"
+    end
+
     test "show a Task with stale run" do
       travel_to(maintenance_tasks_runs(:stale_task).ended_at + 2.days) do
         MaintenanceTasks.with(task_staleness_threshold: 1.day) do
@@ -233,6 +259,15 @@ module MaintenanceTasks
       assert_equal("false", boolean_dropdown_field.value)
       boolean_dropdown_field_options = boolean_dropdown_field.find_all("option").map { |option| option[:value] }
       assert_equal(["", "true", "false"], boolean_dropdown_field_options)
+    end
+
+    test "refresh=false does not interfere with Task parameters" do
+      visit maintenance_tasks.task_path("Maintenance::ParamsTask", params: {
+        refresh: false,
+        content: "string content",
+      })
+
+      assert_field "task[content]", with: "string content"
     end
 
     test "view a Task with multiple pages of Runs" do
