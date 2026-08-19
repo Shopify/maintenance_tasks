@@ -94,6 +94,57 @@
     </style>
 
     <script>
+      function progressStates(target) {
+        return new Map(
+          Array.from(
+            target.querySelectorAll("progress[data-progress-run-id]"),
+            progress => [
+              progress.dataset.progressRunId,
+              progress.hasAttribute("value") ? {
+                value: Number(progress.value),
+                max: Number(progress.max),
+              } : null,
+            ],
+          ),
+        )
+      }
+
+      function animateProgressBars(target, previousStates) {
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
+
+        target
+          .querySelectorAll("progress[data-progress-run-id][value]")
+          .forEach(progress => {
+            const previousState = previousStates.get(progress.dataset.progressRunId)
+            const nextValue = Number(progress.value)
+            const startValue = previousState &&
+              (previousState.value / previousState.max) * Number(progress.max)
+
+            if (
+              !Number.isFinite(startValue) ||
+              startValue === nextValue
+            ) return
+
+            const startedAt = performance.now()
+            const duration = 450
+
+            progress.value = startValue
+
+            function drawFrame(timestamp) {
+              const elapsed = Math.min((timestamp - startedAt) / duration, 1)
+              const eased = 1 - Math.pow(1 - elapsed, 3)
+
+              progress.value = startValue + ((nextValue - startValue) * eased)
+
+              if (elapsed < 1 && progress.isConnected) {
+                window.requestAnimationFrame(drawFrame)
+              }
+            }
+
+            window.requestAnimationFrame(drawFrame)
+          })
+      }
+
       function refresh() {
         const target = document.querySelector("[data-refresh]")
         if (!target || !target.dataset.refresh) return
@@ -105,7 +156,10 @@
               const newDocument = new DOMParser().parseFromString(text, "text/html")
               const newTarget = newDocument.querySelector("[data-refresh]")
               if (newTarget) {
+                const previousStates = progressStates(target)
+
                 target.replaceWith(newTarget)
+                animateProgressBars(newTarget, previousStates)
               }
               document.body.style.cursor = ""
               refresh()
