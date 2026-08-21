@@ -56,6 +56,34 @@ module MaintenanceTasks
       assert_no_selector "[data-refresh=true]"
     end
 
+    test "toggle auto-refresh on the index page" do
+      tasks_path = maintenance_tasks.tasks_path
+
+      visit tasks_path
+
+      assert_selector "[data-refresh=true]"
+      assert_link "Disable auto-refresh", href: "#{tasks_path}?refresh=false"
+
+      click_on "Disable auto-refresh"
+
+      assert_no_selector "[data-refresh=true]"
+      assert_link "Enable auto-refresh", href: tasks_path
+
+      click_on "Enable auto-refresh"
+
+      assert_selector "[data-refresh=true]"
+      assert_link "Disable auto-refresh", href: "#{tasks_path}?refresh=false"
+    end
+
+    test "hide the auto-refresh toggle when there are no tasks" do
+      TaskDataIndex.stubs(available_tasks: [])
+
+      visit maintenance_tasks_path
+
+      assert_no_link "Disable auto-refresh"
+      assert_no_link "Enable auto-refresh"
+    end
+
     test "show a Task" do
       visit maintenance_tasks_path
 
