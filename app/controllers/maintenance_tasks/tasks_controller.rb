@@ -7,7 +7,7 @@ module MaintenanceTasks
   #
   # @api private
   class TasksController < ApplicationController
-    before_action :set_refresh, only: [:index]
+    before_action :set_refresh, only: [:index, :show]
 
     # Renders the maintenance_tasks/tasks page, displaying
     # available tasks to users, grouped by category.
@@ -21,14 +21,14 @@ module MaintenanceTasks
       @task = TaskDataShow.prepare(
         params.fetch(:id),
         runs_cursor: params[:cursor],
-        arguments: params.except(:id, :controller, :action).permit!,
+        arguments: params.except(:id, :controller, :action, :refresh).permit!,
       )
     end
 
     private
 
     def set_refresh
-      @refresh = true
+      @auto_refresh_enabled = params[:refresh] != "false"
     end
   end
 end
