@@ -46,6 +46,16 @@ module MaintenanceTasks
       assert_equal expected, page.all("h3").map(&:text)
     end
 
+    test "auto-refresh is not enabled when there are no tasks" do
+      TaskDataIndex.stubs(available_tasks: [])
+
+      visit maintenance_tasks_path
+
+      assert_text "The MaintenanceTasks gem has been successfully installed!"
+      assert_selector "[data-refresh='']"
+      assert_no_selector "[data-refresh=true]"
+    end
+
     test "show a Task" do
       visit maintenance_tasks_path
 
