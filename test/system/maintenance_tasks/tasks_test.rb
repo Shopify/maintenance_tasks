@@ -261,10 +261,17 @@ module MaintenanceTasks
 
       click_on("Maintenance::TestTask")
       assert_no_text "Errored"
+      assert_no_link "Previous page"
 
       click_on("Next page")
       assert_text "Errored"
       assert_no_link "Next page"
+      assert_link "Previous page"
+
+      click_on("Previous page")
+      assert_no_text "Errored"
+      assert_no_link "Previous page"
+      assert_link "Next page"
     end
 
     test "show a deleted Task" do
