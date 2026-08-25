@@ -30,6 +30,21 @@ module MaintenanceTasks
       end
     end
 
+    if ActiveJob.gem_version < Gem::Version.new("8.1")
+      # Active Job 7.2 and 8.0 retry by enqueuing a duplicate, so
+      # +successfully_enqueued?+ is set on the copy rather than this job.
+      # Enqueue self instead, keeping the +enqueue_retry+ instrumentation.
+      def retry_job(options = {})
+        return if defined?(@retried) && @retried
+
+        result = instrument(:enqueue_retry, options.slice(:error, :wait)) do
+          enqueue(options)
+        end
+        @retried = true
+        result
+      end
+    end
+
     private
 
     def serialized_cursor_position
@@ -188,8 +203,15 @@ module MaintenanceTasks
 
     def after_perform
       @run.persist_transition
-      if defined?(@reenqueue_iteration_job) && @reenqueue_iteration_job
-        reenqueue_iteration_job(should_ignore: false) unless @run.stopped?
+      if defined?(@reenqueue_iteration_job) && @reenqueue_iteration_job && !@run.stopped?
+        reenqueue_iteration_job(should_ignore: false)
+        unless successfully_enqueued?
+          error = enqueue_error || ActiveJob::EnqueueError.new(
+            "The job to perform #{@run.task_name} could not be re-enqueued. " \
+              "Enqueuing has been prevented by a callback.",
+          )
+          raise error
+        end
       end
     end
 
