@@ -173,6 +173,40 @@ module MaintenanceTasks
       assert_enqueued_with(job: TaskJob) { TaskJob.perform_now(@run) }
     end
 
+    if ActiveJob.gem_version < Gem::Version.new("8.1")
+      test ".perform_now instruments enqueue_retry when the job is interrupted" do
+        JobIteration.stubs(interruption_adapter: -> { true })
+        Maintenance::TestTask.any_instance.expects(:process).once
+
+        events = []
+        callback = ->(*args) { events << ActiveSupport::Notifications::Event.new(*args) }
+        ActiveSupport::Notifications.subscribed(callback, "enqueue_retry.active_job") do
+          TaskJob.perform_now(@run)
+        end
+
+        assert_equal 1, events.size
+        assert_kind_of TaskJob, events.first.payload[:job]
+      end
+    end
+
+    test ".perform_now errors the Run when re-enqueuing is unsuccessful" do
+      JobIteration.stubs(interruption_adapter: -> { true })
+      Maintenance::TestTask.any_instance.expects(:process).once
+      job_class = Class.new(TaskJob) do
+        before_enqueue { throw :abort }
+      end
+
+      assert_no_enqueued_jobs { job_class.perform_now(@run) }
+
+      assert_predicate @run.reload, :errored?
+      assert_equal "ActiveJob::EnqueueError", @run.error_class
+      assert_equal(
+        "The job to perform Maintenance::TestTask could not be re-enqueued. " \
+          "Enqueuing has been prevented by a callback.",
+        @run.error_message,
+      )
+    end
+
     test ".perform_now updates Run to errored and persists ended_at when exception is raised" do
       freeze_time
       run = Run.create!(task_name: "Maintenance::ErrorTask")
