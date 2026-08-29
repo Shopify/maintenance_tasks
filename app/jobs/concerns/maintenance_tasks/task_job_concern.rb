@@ -154,18 +154,32 @@ module MaintenanceTasks
 
     def before_perform
       @run = arguments.first
-      @task = @run.task
-      if @task.has_csv_content?
-        @task.csv_content = @run.csv_file.download
+      @run.running
+
+      if @run.running?
+        @task = @run.task
+        if @task.has_csv_content?
+          @task.csv_content = @run.csv_file.download
+        end
+        @run.reload_status
       end
 
-      @run.running
+      abort_unless_run_is_running
+      @last_status_reload = Time.now
 
       @ticker = Ticker.new(MaintenanceTasks.ticker_delay) do |ticks, duration|
         @run.persist_progress(ticks, duration)
       end
+    end
 
-      @last_status_reload = nil
+    def abort_unless_run_is_running
+      return if @run.running?
+
+      if @run.cancelling? || @run.pausing?
+        @run.job_shutdown
+        @run.persist_transition
+      end
+      throw(:abort)
     end
 
     def on_start
