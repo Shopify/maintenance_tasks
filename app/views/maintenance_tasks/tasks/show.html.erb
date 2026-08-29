@@ -68,6 +68,9 @@
 
     <%= render partial: "maintenance_tasks/runs/run", collection: @task.runs_page.records %>
 
-    <%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %>
+    <nav class="is-flex is-justify-content-space-between" aria-label="pagination">
+      <span><%= link_to "Previous page", task_path(@task, cursor: @task.runs_page.previous_cursor) unless @task.runs_page.first? %></span>
+      <span><%= link_to "Next page", task_path(@task, cursor: @task.runs_page.next_cursor) unless @task.runs_page.last? %></span>
+    </nav>
   <% end %>
 <% end %>

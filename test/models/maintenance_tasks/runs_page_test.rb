@@ -44,5 +44,97 @@ module MaintenanceTasks
       runs_page = RunsPage.new(@runs, nil)
       refute_predicate runs_page, :last?
     end
+
+    test "#first? returns true when there is no cursor" do
+      assert_predicate RunsPage.new(@runs, nil), :first?
+      refute_predicate RunsPage.new(@runs, @runs.first.id), :first?
+    end
+
+    test "#previous_cursor returns nil when the previous page is the first page" do
+      first_page = RunsPage.new(@runs, nil)
+      second_page = RunsPage.new(@runs, first_page.next_cursor)
+
+      assert_nil second_page.previous_cursor
+    end
+
+    test "#previous_cursor returns the cursor for the preceding page" do
+      20.times do
+        Run.create!(
+          task_name: @task_name,
+          started_at: Time.now,
+          tick_count: 10,
+          tick_total: 10,
+          status: :succeeded,
+          ended_at: Time.now,
+        )
+      end
+      runs = Run.where(task_name: @task_name).order(created_at: :desc)
+      first_page = RunsPage.new(runs, nil)
+      second_page = RunsPage.new(runs, first_page.next_cursor)
+      third_page = RunsPage.new(runs, second_page.next_cursor)
+
+      assert_equal first_page.next_cursor, third_page.previous_cursor
+    end
+
+    test "#records does not duplicate or omit runs when ids and timestamps have different orders" do
+      Run.where(task_name: @task_name).delete_all
+      base_time = Time.current
+      Run.create!(task_name: @task_name, status: :succeeded, created_at: base_time - 1.hour)
+      21.times do |i|
+        Run.create!(task_name: @task_name, status: :succeeded, created_at: base_time - i.minutes)
+      end
+
+      runs = Run.where(task_name: @task_name).order(created_at: :desc)
+      first_page = RunsPage.new(runs, nil)
+      second_page = RunsPage.new(runs, first_page.next_cursor)
+
+      expected_ids = runs.reorder(created_at: :desc, id: :desc).pluck(:id)
+      assert_equal expected_ids, (first_page.records + second_page.records).map(&:id)
+    end
+
+    test "#records uses the id to order runs with identical timestamps" do
+      Run.where(task_name: @task_name).delete_all
+      created_at = Time.current
+      22.times do
+        Run.create!(task_name: @task_name, status: :succeeded, created_at: created_at)
+      end
+
+      runs = Run.where(task_name: @task_name).order(created_at: :desc)
+      first_page = RunsPage.new(runs, nil)
+      second_page = RunsPage.new(runs, first_page.next_cursor)
+
+      expected_ids = runs.reorder(created_at: :desc, id: :desc).pluck(:id)
+      assert_equal expected_ids, (first_page.records + second_page.records).map(&:id)
+    end
+
+    test "#previous_cursor uses the id to order runs with identical timestamps" do
+      Run.where(task_name: @task_name).delete_all
+      created_at = Time.current
+      41.times do
+        Run.create!(task_name: @task_name, status: :succeeded, created_at: created_at)
+      end
+
+      runs = Run.where(task_name: @task_name)
+      first_page = RunsPage.new(runs, nil)
+      second_page = RunsPage.new(runs, first_page.next_cursor)
+      third_page = RunsPage.new(runs, second_page.next_cursor)
+
+      assert_equal first_page.next_cursor, third_page.previous_cursor
+    end
+
+    test "#previous_cursor uses timestamps when ids have a different order" do
+      Run.where(task_name: @task_name).delete_all
+      base_time = Time.current
+      41.times do |i|
+        Run.create!(task_name: @task_name, status: :succeeded, created_at: base_time - i.minutes)
+      end
+
+      runs = Run.where(task_name: @task_name)
+      first_page = RunsPage.new(runs, nil)
+      second_page = RunsPage.new(runs, first_page.next_cursor)
+      third_page = RunsPage.new(runs, second_page.next_cursor)
+
+      assert_equal first_page.next_cursor, third_page.previous_cursor
+    end
   end
 end
