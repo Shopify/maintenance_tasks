@@ -1,3 +1,5 @@
+<%# locals: (run:) %>
+
 <% if (time_to_completion = run.time_to_completion) %>
   <p>Running for <%= time_running_in_words(run) %>. <%= distance_of_time_in_words(time_to_completion).capitalize %> remaining.</p>
 <% end %>

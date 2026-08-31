@@ -1,3 +1,5 @@
+<%# locals: () %>
+
 <%= tag.div(data: { refresh: @available_tasks.any? && @auto_refresh_enabled || "" }) do %>
   <% if @available_tasks.empty? %>
     <div class="content is-large">
