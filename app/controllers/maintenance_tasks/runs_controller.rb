@@ -59,7 +59,7 @@ module MaintenanceTasks
     private
 
     def set_run
-      @run = Run.find(params.fetch(:id))
+      @run = Run.find_by!(id: params.fetch(:id), task_name: params.fetch(:task_id))
     end
   end
 end
