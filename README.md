@@ -1292,6 +1292,11 @@ controller class which **must inherit** from `ActionController::Base`.
 
 If no value is specified, it will default to `"ActionController::Base"`.
 
+Run actions (pause, cancel, resume) are nested under their Task
+(`/tasks/:task_id/runs/:id/...`), and a Run is only found if it belongs to the
+Task in `params[:task_id]`, so authorization logic may rely on `params[:task_id]`
+to restrict access to specific Tasks.
+
 #### Configure time after which the task will be considered stuck
 
 To specify a time duration after which a task is considered stuck if it has not
