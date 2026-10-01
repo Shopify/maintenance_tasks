@@ -36,6 +36,10 @@ module MaintenanceTasks
         assert_migration(mig)
         assert_file("db/schema.rb") do |contents|
           assert_match(/create_table "maintenance_tasks_runs"/, contents)
+          assert_match(
+            /t\.bigint "tick_count", default: 0, null: false/,
+            contents,
+          )
         end
       end
     end
