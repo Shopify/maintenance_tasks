@@ -358,6 +358,20 @@ module MaintenanceTasks
       end
     end
 
+    test "#runnable? returns true if status is among Run::RUNNABLE_STATUSES" do
+      run = Run.new(task_name: "Maintenance::UpdatePostsTask")
+
+      (Run::STATUSES - Run::RUNNABLE_STATUSES).each do |status|
+        run.status = status
+        refute_predicate run, :runnable?
+      end
+
+      Run::RUNNABLE_STATUSES.each do |status|
+        run.status = status
+        assert_predicate run, :runnable?
+      end
+    end
+
     test "#time_to_completion returns nil if the run is completed" do
       run = Run.new(
         task_name: "Maintenance::UpdatePostsTask",
@@ -427,13 +441,16 @@ module MaintenanceTasks
       end
     end
 
-    test "with optimistic locking enabled, #running doesn't set a stopping run to running" do
-      [:cancelling, :pausing].each do |status|
+    test "with optimistic locking enabled, #running doesn't set a non-runnable run to running" do
+      non_runnable_statuses = Run::STATUSES - Run::RUNNABLE_STATUSES
+      non_runnable_statuses.each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
           status: status,
         )
-        refute_predicate run, :running?
+        run.running
+
+        assert_equal status.to_s, run.status
       end
     end
 
@@ -461,12 +478,26 @@ module MaintenanceTasks
       assert_predicate run, :pausing?
     end
 
-    test "with optimistic locking disabled, #running doesn't set a stopping run to running and reloads the status" do
-      [:cancelling, :pausing].each do |status|
+    test "with optimistic locking enabled, #running reloads a stale running Run" do
+      run = Run.create!(
+        task_name: "Maintenance::UpdatePostsTask",
+        status: :running,
+      )
+      Run.find(run.id).cancelling!
+
+      run.running
+
+      assert_predicate run, :cancelling?
+    end
+
+    test "with optimistic locking disabled, #running doesn't set a non-runnable run to running and reloads the status" do
+      Run.expects(:locking_enabled?).returns(false).at_least_once
+      non_runnable_statuses = Run::STATUSES - Run::RUNNABLE_STATUSES
+      non_runnable_statuses.each do |status|
         run = Run.create!(
           task_name: "Maintenance::UpdatePostsTask",
         )
-        Run.find(run.id).update(status: status) # race condition
+        Run.find(run.id).update_column(:status, status) # race condition
         run.running
 
         assert_equal status.to_s, run.status
