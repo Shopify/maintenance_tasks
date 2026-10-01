@@ -19,7 +19,7 @@ module MaintenanceTasks
       ] if defined?(Capybara::Lockstep)
       policy.script_src_elem(
         # <script> tag in app/views/layouts/maintenance_tasks/application.html.erb
-        "'sha256-NiHKryHWudRC2IteTqmY9v1VkaDUA/5jhgXkMTkgo2w='",
+        "'sha256-7yJtzzaCpz6GIYkRX8ZJ28S1A9mKj4x/BMn5HIHA+Jc='",
         # <script> tag for capybara-lockstep
         *capybara_lockstep_scripts,
       )

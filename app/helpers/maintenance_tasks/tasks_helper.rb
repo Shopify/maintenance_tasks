@@ -48,6 +48,7 @@ module MaintenanceTasks
         value: progress.value,
         max: progress.max,
         class: ["progress", "mt-4"] + STATUS_COLOURS.fetch(run.status),
+        data: { progress_run_id: run.id },
       )
       progress_text = tag.p(tag.i(progress.text))
       tag.div(progress_bar + progress_text, class: "block")
