@@ -517,6 +517,21 @@ following types are supported:
 For enumerables that don't match the supported types, a text field will be
 rendered instead.
 
+To let someone select multiple values, declare the attribute with
+`MaintenanceTasks::Types::StringList`. An inclusion validator will then render
+a multiple select, and the type will cast its values to strings and remove the
+blank value added by Rails' multiple-select helper:
+
+```ruby
+class DumpTablesTask < MaintenanceTasks::Task
+  attribute :tables, MaintenanceTasks::Types::StringList.new
+
+  validates :tables,
+    presence: true,
+    inclusion: { in: ->(_) { ActiveRecord::Base.connection.tables } }
+end
+```
+
 ### Masking Task Parameters
 
 Task attributes can be masked in the UI by adding `mask_attribute` class method
