@@ -142,9 +142,9 @@ module MaintenanceTasks
 
       run.update_column(:status, :running)
 
-      within("details#run_#{run.id} > summary") do
-        assert_text "Running", wait: 5 # auto-refreshes every 3 seconds
-      end
+      # Query the summary afresh each time: auto-refresh replaces the node, so a
+      # `within` scope would keep pointing at the detached original.
+      assert_selector "details#run_#{run.id} > summary", text: "Running", wait: 5 # auto-refreshes every 3 seconds
       assert_selector "details#run_#{run.id}:not([open])"
     end
 
