@@ -129,6 +129,25 @@ module MaintenanceTasks
       assert_link "Disable auto-refresh", href: "#{task_path}?refresh=false"
     end
 
+    test "collapsed runs stay collapsed after auto-refresh" do
+      run = maintenance_tasks_runs(:update_posts_task_paused)
+
+      visit maintenance_tasks.task_path("Maintenance::UpdatePostsTask")
+
+      assert_selector "[data-refresh=true]"
+      assert_selector "details#run_#{run.id}[open]"
+
+      find("details#run_#{run.id} > summary h5").click
+      assert_no_selector "details#run_#{run.id}[open]"
+
+      run.update_column(:status, :running)
+
+      within("details#run_#{run.id} > summary") do
+        assert_text "Running", wait: 5 # auto-refreshes every 3 seconds
+      end
+      assert_selector "details#run_#{run.id}:not([open])"
+    end
+
     test "hide the auto-refresh toggle when a Task has no active runs" do
       visit maintenance_tasks.task_path("Maintenance::ImportPostsTask")
 
