@@ -151,6 +151,22 @@
             })
         }
 
+        function captureClosedDetails(target) {
+          return new Set(
+            Array.from(
+              target.querySelectorAll("details[id]:not([open])"),
+              details => details.id,
+            ),
+          )
+        }
+
+        function restoreClosedDetails(target, closedIds) {
+          closedIds.forEach(id => {
+            const details = target.querySelector(`details[id="${CSS.escape(id)}"]`)
+            if (details) details.open = false
+          })
+        }
+
         function refresh() {
           const target = document.querySelector("[data-refresh]")
           if (!target || !target.dataset.refresh) return
@@ -163,7 +179,9 @@
                 const newTarget = newDocument.querySelector("[data-refresh]")
                 if (newTarget) {
                   const previousStates = captureProgressStates(target)
+                  const closedDetails = captureClosedDetails(target)
 
+                  restoreClosedDetails(newTarget, closedDetails)
                   target.replaceWith(newTarget)
                   animateProgressBars(newTarget, previousStates)
                 }
