@@ -551,8 +551,16 @@ module MaintenanceTasks
 
     def argument_filter
       @argument_filter ||= ActiveSupport::ParameterFilter.new(
-        Rails.application.config.filter_parameters + task.masked_arguments,
+        Rails.application.config.filter_parameters + task_masked_arguments,
       )
+    end
+
+    # A deleted Task has no class to ask for mask_attribute names. The
+    # application's parameter filter still applies.
+    def task_masked_arguments
+      task.masked_arguments
+    rescue Task::NotFoundError
+      []
     end
 
     def with_stale_object_retry(retry_count = 0)

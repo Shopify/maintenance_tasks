@@ -33,6 +33,31 @@ module MaintenanceTasks
       refute_predicate run, :valid?
     end
 
+    test "masked arguments for a deleted Task use the application parameter filter" do
+      run = Run.new(
+        task_name: "Maintenance::DeletedTask",
+        arguments: { "post_ids" => "1", "secret" => "hunter2" },
+      )
+      run.save!(validate: false)
+      run.reload
+
+      assert_equal(
+        { "post_ids" => "1", "secret" => "[FILTERED]" },
+        run.masked_arguments,
+      )
+    end
+
+    test "masked arguments still include masks declared on the Task" do
+      run = Run.create!(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { "post_ids" => "1", "sensitive_content" => "do-not-show" },
+      )
+      run.reload
+
+      assert_equal "1", run.masked_arguments["post_ids"]
+      assert_equal "[FILTERED]", run.masked_arguments["sensitive_content"]
+    end
+
     test "invalid if associated with CSV Task and no attachment" do
       run = Run.new(task_name: "Maintenance::ImportPostsTask")
       refute_predicate run, :valid?
