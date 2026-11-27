@@ -451,12 +451,16 @@ module MaintenanceTasks
     end
 
     # Returns all the run arguments with sensitive information masked.
+    # Returns nil when the Task class no longer exists, because its masks are
+    # unknown and the arguments must not be shown.
     #
-    # @return [Hash] The masked arguments.
+    # @return [Hash, nil] The masked arguments.
     def masked_arguments
       return unless arguments.present?
 
       argument_filter.filter(arguments)
+    rescue Task::NotFoundError
+      nil
     end
 
     # @return [Boolean]
