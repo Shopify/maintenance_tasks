@@ -127,6 +127,11 @@ module MaintenanceTasks
       assert_nil task.cursor_columns
     end
 
+    test ".around_query returns nil" do
+      task = Task.new
+      assert_nil task.around_query
+    end
+
     test ".status_reload_frequency defaults to global configuration" do
       task = Task.new
       assert_equal MaintenanceTasks.status_reload_frequency, task.status_reload_frequency

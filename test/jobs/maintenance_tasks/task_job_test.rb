@@ -924,6 +924,68 @@ module MaintenanceTasks
       TaskJob.perform_now(run)
     end
 
+    test "MaintenanceTasks::TaskJobConcern#build_enumerator provides around_query to active_record_on_records" do
+      around_query = ->(&query) { query.call }
+
+      Maintenance::UpdatePostsTask.any_instance.stubs(around_query: around_query)
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      JobIteration::EnumeratorBuilder
+        .any_instance
+        .expects(:active_record_on_records)
+        .with(anything, has_entry(around_query: around_query))
+        .returns(NullCollectionBuilder.new)
+
+      TaskJob.perform_now(run)
+    end
+
+    test "MaintenanceTasks::TaskJobConcern#build_enumerator provides around_query to active_record_on_batch_relations" do
+      around_query = ->(&query) { query.call }
+
+      Maintenance::UpdatePostsInBatchesTask.any_instance.stubs(around_query: around_query)
+
+      run = Run.create!(task_name: "Maintenance::UpdatePostsInBatchesTask")
+
+      JobIteration::EnumeratorBuilder
+        .any_instance
+        .expects(:active_record_on_batch_relations)
+        .with(anything, has_entry(around_query: around_query))
+        .returns(NullCollectionBuilder.new)
+
+      TaskJob.perform_now(run)
+    end
+
+    test "MaintenanceTasks::TaskJobConcern#build_enumerator omits around_query when the Task does not define one" do
+      run = Run.create!(task_name: "Maintenance::UpdatePostsTask")
+
+      JobIteration::EnumeratorBuilder
+        .any_instance
+        .expects(:active_record_on_records)
+        .with(anything, Not(has_key(:around_query)))
+        .returns(NullCollectionBuilder.new)
+
+      TaskJob.perform_now(run)
+    end
+
+    test "Active Record Relation tasks run the count and batch queries in around_query, and process outside of it" do
+      selects = record_post_selects_with_around_query("Maintenance::UpdatePostsTask") do |inside|
+        Maintenance::UpdatePostsTask.any_instance.expects(:process).twice.with { !inside.call }
+      end
+
+      assert_operator selects.size, :>=, 2
+      assert selects.all?, "Expected every posts SELECT to run inside around_query"
+    end
+
+    test "Active Record batch tasks run the count and batch queries in around_query, and process outside of it" do
+      selects = record_post_selects_with_around_query("Maintenance::UpdatePostsInBatchesTask") do |inside|
+        Maintenance::UpdatePostsInBatchesTask.any_instance.expects(:process).once.with { !inside.call }
+      end
+
+      assert_operator selects.size, :>=, 2
+      assert selects.all?, "Expected every posts SELECT to run inside around_query"
+    end
+
     test "array-based tasks have their count calculated implicitly" do
       Maintenance::TestTask.any_instance.expects(:process).once.with do
         @run.cancelling!
@@ -991,6 +1053,29 @@ module MaintenanceTasks
       # defaults
       assert_predicate(report, :handled)
       assert_equal(report.source, "maintenance-tasks")
+    end
+
+    private
+
+    def record_post_selects_with_around_query(task_name)
+      inside = false
+      around_query = ->(&query) do
+        inside = true
+        query.call
+      ensure
+        inside = false
+      end
+      task_name.constantize.any_instance.stubs(around_query: around_query)
+      yield(-> { inside })
+
+      selects = []
+      record_select = ->(*, payload) do
+        selects << inside if payload[:sql].match?(/\ASELECT\b.*\bFROM "posts"/i)
+      end
+      ActiveSupport::Notifications.subscribed(record_select, "sql.active_record") do
+        TaskJob.perform_now(Run.create!(task_name: task_name))
+      end
+      selects
     end
   end
 end

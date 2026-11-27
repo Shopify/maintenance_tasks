@@ -314,6 +314,19 @@ module MaintenanceTasks
       nil
     end
 
+    # The proc used to wrap the queries the Active Record enumerator executes, such as
+    # to run them on a read replica. It receives each query as a block and must call it.
+    #
+    # If around_query returns nil, the queries run in the job's current database context.
+    # Requires job-iteration 1.19.0 or later.
+    # More details in the documentation of JobIteration::EnumeratorBuilder.build_active_record_enumerator_on_records:
+    # https://www.rubydoc.info/gems/job-iteration/JobIteration/EnumeratorBuilder#build_active_record_enumerator_on_records-instance_method
+    #
+    # @return [Proc, nil] the around_query proc.
+    def around_query
+      nil
+    end
+
     # Placeholder method to raise in case a subclass fails to implement the
     # expected instance method.
     #
