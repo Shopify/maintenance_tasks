@@ -72,12 +72,15 @@ module MaintenanceTasks
       enumerator_builder = self.enumerator_builder
       @collection_enum = @task.enumerator_builder(cursor: cursor)
 
+      around_query = @task.around_query
+
       @collection_enum ||= case (collection = @task.collection)
       when :no_collection
         enumerator_builder.build_once_enumerator(cursor: nil)
       when ActiveRecord::Relation
         options = { cursor: cursor, columns: @task.cursor_columns }
         options[:batch_size] = @task.active_record_enumerator_batch_size if @task.active_record_enumerator_batch_size
+        options[:around_query] = around_query if around_query
         enumerator_builder.active_record_on_records(collection, **options)
       when ActiveRecord::Batches::BatchEnumerator
         if collection.start || collection.finish
@@ -89,12 +92,9 @@ module MaintenanceTasks
 
         # For now, only support automatic count based on the enumerator for
         # batches
-        enumerator_builder.active_record_on_batch_relations(
-          collection.relation,
-          cursor: cursor,
-          batch_size: collection.batch_size,
-          columns: @task.cursor_columns,
-        )
+        options = { cursor: cursor, batch_size: collection.batch_size, columns: @task.cursor_columns }
+        options[:around_query] = around_query if around_query
+        enumerator_builder.active_record_on_batch_relations(collection.relation, **options)
       when Array
         enumerator_builder.build_array_enumerator(collection, cursor: cursor&.to_i)
       when BatchCsvCollectionBuilder::BatchCsv

@@ -585,6 +585,42 @@ module Maintenance
 end
 ```
 
+### Running collection queries in a specific database context
+
+Active Record collections are loaded lazily, in batches, while the Task runs.
+Wrapping code around the Task does not change which database those batch
+queries use.
+
+The [job-iteration gem][job-iteration] (1.19.0 or later) accepts an
+`around_query` proc that wraps the queries its Active Record enumerators
+execute. The `maintenance-tasks` gem passes it through from the `around_query`
+method in the `MaintenanceTasks::Task` class. The proc receives each query as a
+block and must call it. For example, to read the collection from a replica:
+
+```ruby
+module Maintenance
+  class UpdatePostsTask < MaintenanceTasks::Task
+    def around_query
+      ->(&query) { ActiveRecord::Base.connected_to(role: :reading, prevent_writes: true, &query) }
+    end
+
+    def collection
+      Post.where(created_at: 2.days.ago...1.hour.ago)
+    end
+
+    def process(post)
+      post.update!(content: "updated content")
+    end
+  end
+end
+```
+
+The proc wraps each batch query, and the count used for the progress total
+when the Task does not define `#count`. `#process` runs outside of it, so
+writes keep the job's database context. For batch collections, the relation
+yielded to `#process` is loaded inside `#process`, so that query also runs
+outside of the proc.
+
 ### Subscribing to instrumentation events
 
 If you are interested in actioning a specific task event, please refer to the
