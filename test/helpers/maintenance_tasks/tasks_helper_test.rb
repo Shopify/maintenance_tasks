@@ -120,7 +120,7 @@ module MaintenanceTasks
     end
 
     test "#parameter_field adds information about datetime fields when Time.zone_default is set" do
-      with_zone_default(Time.find_zone!("EST")) do # ignored
+      with_zone_default(Time.find_zone!("America/New_York")) do # ignored
         assert_match Time.now.zone.to_s, markup("datetime_attr")
       end
     end
