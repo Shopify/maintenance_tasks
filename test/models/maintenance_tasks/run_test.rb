@@ -63,6 +63,25 @@ module MaintenanceTasks
       refute_predicate run, :valid?
     end
 
+    test "valid if StringList arguments contain only included values" do
+      run = Run.new(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: "1,2,3", string_list_dropdown_attr: ["posts", "users", ""] },
+      )
+
+      assert_predicate run, :valid?
+      assert_equal ["posts", "users"], run.task.string_list_dropdown_attr
+    end
+
+    test "invalid if StringList arguments contain a value outside the inclusion list" do
+      run = Run.new(
+        task_name: "Maintenance::ParamsTask",
+        arguments: { post_ids: "1,2,3", string_list_dropdown_attr: ["posts", "unknown"] },
+      )
+
+      refute_predicate run, :valid?
+    end
+
     test "invalid if arguments used do not match parameters on Task" do
       run = Run.new(
         task_name: "Maintenance::ParamsTask",

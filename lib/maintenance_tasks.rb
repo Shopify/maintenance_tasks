@@ -6,6 +6,7 @@ require "active_job"
 require "active_record"
 
 require "job-iteration"
+require "maintenance_tasks/types/string_list"
 require "maintenance_tasks/engine"
 
 # The engine's namespace module. It provides isolation between the host

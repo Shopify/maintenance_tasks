@@ -154,7 +154,11 @@ module MaintenanceTasks
     def parameter_field(form_builder, parameter_name)
       inclusion_values = resolve_inclusion_value(form_builder.object, parameter_name)
       if inclusion_values
-        return tag.div(form_builder.select(parameter_name, inclusion_values, prompt: "Select a value"), class: "select")
+        type = form_builder.object.class.attribute_types[parameter_name]
+        multiple = type.is_a?(Types::StringList)
+        options = multiple ? {} : { prompt: "Select a value" }
+        html_options = multiple ? { multiple: true } : {}
+        return tag.div(form_builder.select(parameter_name, inclusion_values, options, html_options), class: "select")
       end
 
       case form_builder.object.class.attribute_types[parameter_name]

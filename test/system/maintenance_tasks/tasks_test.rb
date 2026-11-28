@@ -222,6 +222,12 @@ module MaintenanceTasks
         assert_equal(["", "100", "200", "300"], integer_dropdown_field_options)
       end
 
+      string_list_dropdown_field = page.find_field("task[string_list_dropdown_attr][]")
+      assert_equal("select", string_list_dropdown_field.tag_name)
+      assert_equal("select-multiple", string_list_dropdown_field[:type])
+      string_list_dropdown_options = string_list_dropdown_field.find_all("option").map { |option| option[:value] }
+      assert_equal(["posts", "users"], string_list_dropdown_options)
+
       text_integer_field = page.find_field("task[text_integer_attr_unbounded_range]")
       assert_equal("input", text_integer_field.tag_name)
       assert_equal("number", text_integer_field[:type])

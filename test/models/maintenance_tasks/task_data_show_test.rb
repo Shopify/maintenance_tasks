@@ -125,6 +125,7 @@ module MaintenanceTasks
           "integer_dropdown_attr_from_method",
           "integer_dropdown_attr_callable",
           "boolean_dropdown_attr",
+          "string_list_dropdown_attr",
           "text_integer_attr_unbounded_range",
         ],
         TaskDataShow.new("Maintenance::ParamsTask").parameter_names,

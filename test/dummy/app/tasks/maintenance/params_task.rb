@@ -34,6 +34,7 @@ module Maintenance
     attribute :integer_dropdown_attr_from_method, :integer
     attribute :integer_dropdown_attr_callable, :integer
     attribute :boolean_dropdown_attr, :boolean
+    attribute :string_list_dropdown_attr, MaintenanceTasks::Types::StringList.new
 
     mask_attribute :sensitive_content
 
@@ -43,6 +44,7 @@ module Maintenance
     validates_inclusion_of :integer_dropdown_attr_from_method, in: :dropdown_attr_options, allow_nil: true
     validates_inclusion_of :integer_dropdown_attr_callable, in: DropdownOptions, allow_nil: true
     validates_inclusion_of :boolean_dropdown_attr, within: [true, false], allow_nil: true
+    validates_inclusion_of :string_list_dropdown_attr, in: ["posts", "users"], allow_blank: true
 
     # Dropdown options with unsupported scenarios
     attribute :text_integer_attr_unbounded_range, :integer

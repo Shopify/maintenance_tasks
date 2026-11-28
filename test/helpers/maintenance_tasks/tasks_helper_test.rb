@@ -106,6 +106,14 @@ module MaintenanceTasks
       refute_match "Select a value", markup("text_integer_attr_unbounded_range").squish
     end
 
+    test "#parameter_field renders StringList attributes as a multiple select" do
+      select = Nokogiri::HTML.fragment(markup("string_list_dropdown_attr", value: ["posts", "users"]))
+        .at_css("select")
+
+      assert select["multiple"]
+      assert_equal ["posts", "users"], select.css("option[selected]").map { |option| option["value"] }
+    end
+
     test "#parameter_field adds information about datetime fields when Time.zone_default is not set" do
       with_zone_default(nil) do
         assert_match "UTC", markup("datetime_attr")
@@ -159,9 +167,12 @@ module MaintenanceTasks
       Time.zone_default = zone
     end
 
-    def markup(attribute)
-      render(inline: <<~TEMPLATE)
-        <%= fields_for(Maintenance::ParamsTask.new) do |form| %>
+    def markup(attribute, value: nil)
+      task = Maintenance::ParamsTask.new
+      task.public_send("#{attribute}=", value) unless value.nil?
+
+      render(inline: <<~TEMPLATE, locals: { task: task })
+        <%= fields_for(task) do |form| %>
           <%= parameter_field(form, '#{attribute}') %>
         <% end %>
       TEMPLATE
